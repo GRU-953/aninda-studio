@@ -1,0 +1,13 @@
+{
+  "name": "aninda-studio-sandbox",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Project-local build tooling for the Aninda Studio brand system. Nothing here ships.",
+  "type": "module",
+  "devDependencies": {
+    "svgo": "4.0.2",
+    "esbuild": "0.25.12",
+    "typescript": "5.9.3",
+    "@figma/plugin-typings": "1.133.0"
+  }
+}

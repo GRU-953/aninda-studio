@@ -1,0 +1,5 @@
+# GENERATED FILE. Written by 11_site/build.py. Do not hand-edit — the next build overwrites it, and --check fails on any difference.
+User-agent: *
+Allow: /
+
+Sitemap: https://anindastudio.com/sitemap.xml

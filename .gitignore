@@ -1,0 +1,23 @@
+# Aninda Studio — what is deliberately not committed.
+#
+# Note what is NOT here: the generated trees. `07_tokens/build`, `07_tokens/css`,
+# `04_mark/svg`, `08_components/cards`, `12_packages` and the guidebook are all
+# committed on purpose. That is what lets CI regenerate them and fail on any
+# difference — a gitignored output cannot be proved unedited.
+
+# ── The project-local sandbox. Rebuilt by 00_sandbox, never shipped. ──────────
+.venv/
+node_modules/
+00_sandbox/browsers/
+__pycache__/
+*.py[cod]
+
+# ── Working files from a build or a check run ─────────────────────────────────
+_shot.png
+_review_pages/
+_review_pages2/
+*.tmp
+.playwright/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store

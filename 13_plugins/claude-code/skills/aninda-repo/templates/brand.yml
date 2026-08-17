@@ -1,0 +1,137 @@
+# The Aninda Studio brand check.
+#
+# The jobs are ordered so the CHEAPEST FAILURE SURFACES FIRST. A typo fails in
+# fifteen seconds, and the slow job never starts. That ordering is the whole
+# design of this file.
+#
+# The job that matters most is `drift`. It regenerates every generated file and
+# then runs `git diff --exit-code`. A non-empty diff means one of two things: a
+# generator changed without its output being regenerated, or somebody hand-edited
+# an output file instead of its input. Both are silent failures in every other
+# kind of check.
+#
+# That check only works because generation is deterministic — which is why nothing
+# generated in this repository may contain a timestamp. Build time lives in the CI
+# log, never in a file that gets diffed.
+#
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Aninda Sundar Howlader
+
+name: brand
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 1 ── seconds. The things that need no build at all.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Every JSON parses
+        run: |
+          find . -name '*.json' -not -path './node_modules/*' -not -path './.venv/*' -print0 \
+          | xargs -0 -I{} python3 -c "import json; json.load(open('{}'))"
+
+      - name: No .DS_Store committed
+        run: |
+          if find . -name '.DS_Store' -not -path './.git/*' | grep -q .; then
+            echo "::error::.DS_Store files are committed"; exit 1
+          fi
+
+      - name: The PolyForm URL has no trailing slash
+        # The trailing-slash form returns 404. It takes one keystroke to add and
+        # a long time to notice.
+        run: |
+          if grep -rnE "noncommercial/1\\.0\\.0/" \
+               --include='*.md' --include='*.json' --include='*.py' . ; then
+            echo "::error::The PolyForm URL must not have a trailing slash"; exit 1
+          fi
+
+      - name: There is no OFL 1.2
+        run: |
+          if grep -rniE "OFL[ -]*1\.2" --include='*.md' --include='*.json' . \
+             | grep -viE "(no|not|never).{0,40}OFL[ -]*1\.2|OFL[ -]*1\.2.{0,40}(does not exist|is always wrong)"; then
+            echo "::error::SIL OFL has no version 1.2. Version 1.1 is the only one"; exit 1
+          fi
+
+      - name: Every licence file is present
+        run: |
+          for f in LICENSE NOTICE; do
+            test -f "$f" || { echo "::error::$f is missing"; exit 1; }
+          done
+          test -f LICENSE-DOCS.md || test -f LICENSE-DOCS.txt \
+            || { echo "::error::no LICENSE-DOCS file for the PolyForm text"; exit 1; }
+
+      - name: Every font has its OFL file beside it
+        run: |
+          status=0
+          while IFS= read -r font; do
+            dir=$(dirname "$font")
+            ls "$dir"/*OFL* >/dev/null 2>&1 || { echo "::error::$font has no OFL file beside it"; status=1; }
+          done < <(find . -name '*.woff2' -o -name '*.ttf' -o -name '*.otf')
+          exit $status
+
+  # 2 ── under a minute. The drift guard. This is the important one.
+  drift:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: test ! -f requirements.txt || pip install -r requirements.txt
+
+      - name: Regenerate everything
+        run: |
+          # Replace with this repository's own generators, cheapest first.
+          test ! -f build.py || python build.py
+
+      - name: Nothing generated may differ from what was committed
+        run: |
+          git diff --exit-code \
+            || { echo "::error::A generated file differs from a fresh one. Either a generator
+                 changed without regenerating its output, or an output was hand-edited."; exit 1; }
+
+  # 3 ── a minute or two. The brand and accessibility check.
+  brand:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Check against the system and WCAG 2.2 AA
+        # Exit 3 means the check was not equipped to run. Treat that as a failure:
+        # a check that did not run must never read as a pass.
+        run: |
+          python path/to/aninda-review/scripts/check.py . --json brand-report.json
+          status=$?
+          if [ "$status" = "3" ]; then
+            echo "::error::The brand check was not equipped to run, so it did not check anything"
+            exit 1
+          fi
+          exit $status
+
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brand-report
+          path: brand-report.json
+          if-no-files-found: ignore

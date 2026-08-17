@@ -1,0 +1,162 @@
+{
+  "$comment": "The Bangla strings verified against the Bangla Academy's own dictionary, page by page. Nothing outside this list may be written into a shipped product. Taken from 06_type/BANGLA-STANDARD.md, final recommended-strings table.",
+  "standard": "বাংলা একাডেমি, প্রমিত বাংলা বানানের নিয়ম, পরিমার্জিত সংস্করণ ২০১২ (পুনর্মুদ্রণ ২০১৫)",
+  "checked": "2026-08-14",
+  "strings": [
+    {
+      "id": "wm-1",
+      "bangla": "অনিন্দ্য স্টুডিও",
+      "english": "Aninda Studio"
+    },
+    {
+      "id": "wm-2",
+      "bangla": "অনিন্দ্য",
+      "english": "Aninda"
+    },
+    {
+      "id": "th-1",
+      "bangla": "আলো",
+      "english": "Light"
+    },
+    {
+      "id": "th-2",
+      "bangla": "অন্ধকার",
+      "english": "Dark"
+    },
+    {
+      "id": "th-3",
+      "bangla": "বেশি কনট্রাস্ট",
+      "english": "High contrast"
+    },
+    {
+      "id": "col-1",
+      "bangla": "মোহনা",
+      "english": "Estuary — the ground ramp"
+    },
+    {
+      "id": "col-2",
+      "bangla": "জোয়ার",
+      "english": "Tidewater — the accent ramp"
+    },
+    {
+      "id": "col-3",
+      "bangla": "পলি",
+      "english": "Silt — the success ramp"
+    },
+    {
+      "id": "col-4",
+      "bangla": "কাশ",
+      "english": "Kans — the warning ramp"
+    },
+    {
+      "id": "col-5",
+      "bangla": "লাল মাটি",
+      "english": "Laterite — the danger ramp"
+    },
+    {
+      "id": "col-6",
+      "bangla": "বর্ষা",
+      "english": "Monsoon — the info ramp"
+    },
+    {
+      "id": "bt-1",
+      "bangla": "লেখাটি সংরক্ষণ করুন",
+      "english": "Save the entry"
+    },
+    {
+      "id": "bt-2",
+      "bangla": "বাতিল করুন",
+      "english": "Cancel"
+    },
+    {
+      "id": "bt-3",
+      "bangla": "ফাইলটি মুছে ফেলুন",
+      "english": "Delete the file"
+    },
+    {
+      "id": "bt-4",
+      "bangla": "আবার চেষ্টা করুন",
+      "english": "Try again"
+    },
+    {
+      "id": "bt-5",
+      "bangla": "কোডটি কপি করুন",
+      "english": "Copy the code"
+    },
+    {
+      "id": "ms-1",
+      "bangla": "সংরক্ষণ করা যায়নি। আপনার লেখা এখনো আছে — একটু পরে আবার চেষ্টা করুন।",
+      "english": "Couldn't save. Your work is still here — try again in a moment."
+    },
+    {
+      "id": "ms-2",
+      "bangla": "ফাইলটি অনেক বড়ো। সর্বোচ্চ ১০ মেগাবাইট।",
+      "english": "That file is too big. The limit is 10 MB."
+    },
+    {
+      "id": "ms-3",
+      "bangla": "এখনো কিছু নেই। শুরু করতে প্রথম লেখাটি যোগ করুন।",
+      "english": "Nothing here yet. Add your first entry to begin."
+    },
+    {
+      "id": "ms-4",
+      "bangla": "সংরক্ষিত হয়েছে",
+      "english": "Saved"
+    },
+    {
+      "id": "vc-1",
+      "bangla": "আমি ছোটো, যত্নে গড়া সফটওয়্যার বানাই। কোনো কিছুর সীমা থাকলে সেটা এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না।",
+      "english": "I make small, carefully built software. Where something has a limit, that limit is written down here rather than hidden."
+    },
+    {
+      "id": "gb-1",
+      "bangla": "স্বাগতম",
+      "english": "Welcome"
+    },
+    {
+      "id": "gb-2",
+      "bangla": "নাম",
+      "english": "Name"
+    },
+    {
+      "id": "gb-3",
+      "bangla": "চিহ্ন",
+      "english": "The mark"
+    },
+    {
+      "id": "gb-4",
+      "bangla": "রং",
+      "english": "Colour"
+    },
+    {
+      "id": "gb-5",
+      "bangla": "হরফ",
+      "english": "Typography"
+    },
+    {
+      "id": "gb-6",
+      "bangla": "ফাঁক ও আকার",
+      "english": "Space and shape"
+    },
+    {
+      "id": "gb-7",
+      "bangla": "উপাদান",
+      "english": "Components"
+    },
+    {
+      "id": "gb-8",
+      "bangla": "গতি",
+      "english": "Motion"
+    },
+    {
+      "id": "gb-9",
+      "bangla": "কণ্ঠস্বর",
+      "english": "Voice"
+    },
+    {
+      "id": "gb-10",
+      "bangla": "যা এই পদ্ধতি করে না",
+      "english": "What this system does not do"
+    }
+  ]
+}

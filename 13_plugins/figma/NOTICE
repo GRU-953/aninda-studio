@@ -1,0 +1,69 @@
+Aninda Studio — the Figma plugin
+Copyright 2026 Aninda Sundar Howlader
+
+This folder carries two licences, because two different kinds of thing live in
+it. The repository's NOTICE file at the root states the whole split; this file
+states the part that applies here.
+
+-------------------------------------------------------------------------------
+THE CODE AND THE TOKENS — Apache License 2.0
+-------------------------------------------------------------------------------
+   Covers   build.mjs, everything under scripts/, everything under src/,
+            everything under dist/, manifest.template.json, tsconfig.json, and
+            RECEIPT-EXPECTED.json.
+   Means    Anyone may use, change and redistribute it, including commercially,
+            with attribution and a note of what they changed.
+   Text     LICENSE.txt
+   SPDX     Apache-2.0  (OSI-approved open source)
+
+-------------------------------------------------------------------------------
+THE WRITING — PolyForm Noncommercial 1.0.0
+-------------------------------------------------------------------------------
+   Covers   README.md, and the prose inside the plugin's own window.
+   Means    Free to read, copy, adapt and share for any noncommercial purpose.
+            Not for resale.
+   Text     LICENSE-DOCS.md
+   SPDX     PolyForm-Noncommercial-1.0.0
+   URL      https://polyformproject.org/licenses/noncommercial/1.0.0
+            (no trailing slash — the trailing-slash form returns 404)
+   Note     SOURCE-AVAILABLE, NOT OPEN SOURCE. It is not approved by the Open
+            Source Initiative, because the Open Source Definition does not allow
+            a restriction on a field of use. Licence scanners and company
+            allowlists often flag it. That is stated here rather than left to be
+            discovered.
+
+-------------------------------------------------------------------------------
+THE TYPEFACES — SIL Open Font License 1.1
+-------------------------------------------------------------------------------
+   Covers   Literata, Noto Serif Bengali, and the IBM Plex Mono subset renamed
+            "Aninda Mono".
+   Note     No font file ships in this folder. The plugin asks your computer for
+            fonts you have already installed and never carries one. There is no
+            OFL version 1.2; 1.1 dates from 26 February 2007 and its home is now
+            https://openfontlicense.org/
+
+-------------------------------------------------------------------------------
+THE IDENTITY — not licensed at all
+-------------------------------------------------------------------------------
+   Covers   The name "Aninda Studio", the Bangla name "অনিন্দ্য", the mark, the
+            wordmark, the tile, the icons, and any lockup of them. The mark SVGs
+            compiled into dist/code.js are among these.
+   Means    No licence is granted to any of it, by this file or any other.
+   Detail   TRADEMARKS.md at the root of the repository.
+   Why      The system is meant to be reused. The identity is not. Fork the
+            system and put your own name and mark on it — that is the intended
+            use, and it costs you nothing.
+
+-------------------------------------------------------------------------------
+THIRD-PARTY BUILD TOOLS — not redistributed here
+-------------------------------------------------------------------------------
+   esbuild (MIT), TypeScript (Apache-2.0) and @figma/plugin-typings (MIT) are
+   used to build this plugin. They live in the project's own sandbox at
+   00_sandbox/node_modules and none of them is copied into this folder. Their
+   licence files travel with them.
+
+Contact for questions and permissions: aninda.sh15@gmail.com
+Source: https://github.com/GRU-953/aninda-studio
+Site:   https://anindastudio.com
+
+Not legal advice. Written by the author of this kit, who is not a lawyer.

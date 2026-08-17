@@ -1,0 +1,40 @@
+{
+  "key": "derived",
+  "name": "Derived",
+  "name_bn": "উদ্ভূত",
+  "premise": "The identity is an output of the system rather than a drawing placed beside it. The mark's proportions come from the type scale and from the measured contrast ratios, so regenerating the tokens regenerates the mark — which means the logo can never drift from the system it is supposed to represent. Colour is a wide analogous band through green and olive rather than a two-colour pair, so charts, categories and product sub-brands all have somewhere to live. This is the riskiest of the four: a generative identity is either genuinely distinctive or it ages very badly, and it is the hardest to keep disciplined once other people start using it.",
+  "families": {
+    "ground": {
+      "label": "Canopy",
+      "label_bn": "ছাউনি",
+      "kind": "brand",
+      "anchor": "#17251A",
+      "note": "A deep green-black. Surfaces and text roles come from here."
+    },
+    "accent": {
+      "label": "Shoot",
+      "label_bn": "কুঁড়ি",
+      "kind": "brand",
+      "anchor": "#6E9B2E",
+      "note": "Olive-lime. The interactive colour, and the brightest thing in the system."
+    },
+    "support": {
+      "label": "Reed",
+      "label_bn": "নল",
+      "kind": "brand",
+      "anchor": "#2E8B7A",
+      "note": "The analogous neighbour on the cool side. Secondary categories and chart series."
+    },
+    "highlight": {
+      "label": "Husk",
+      "label_bn": "তুষ",
+      "kind": "brand",
+      "anchor": "#B8862B",
+      "note": "The analogous neighbour on the warm side. Tertiary categories and chart series."
+    },
+    "success": { "label": "Yield", "label_bn": "ফলন", "kind": "semantic", "anchor": "#2F7A33" },
+    "warning": { "label": "Chaff", "label_bn": "খড়", "kind": "semantic", "anchor": "#96701A" },
+    "danger":  { "label": "Blight", "label_bn": "পোড়া", "kind": "semantic", "anchor": "#A5341F" },
+    "info":    { "label": "Delta", "label_bn": "দ্বীপ", "kind": "semantic", "anchor": "#24707E" }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "name": "aninda-studio-tokens",
+  "version": "1.0.0",
+  "description": "The Aninda Studio design tokens: colour, type, space, shape and motion, in four themes \u2014 light, dark, and a high-contrast pair. Every colour pairing was measured rather than chosen, against WCAG 2.2 AA in the ordinary themes and AAA in the high-contrast ones.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Aninda Sundar Howlader",
+    "email": "aninda.sh15@gmail.com",
+    "url": "https://anindastudio.com"
+  },
+  "homepage": "https://anindastudio.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GRU-953/aninda-studio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GRU-953/aninda-studio/issues"
+  },
+  "keywords": [
+    "design-tokens",
+    "dtcg",
+    "design-system",
+    "accessibility",
+    "wcag",
+    "high-contrast",
+    "css-variables",
+    "bangla",
+    "bilingual"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./tokens.json": "./dist/aninda.tokens.json",
+    "./css": "./dist/tokens.css",
+    "./css/light": "./dist/tokens.light.css",
+    "./css/dark": "./dist/tokens.dark.css",
+    "./css/hc-light": "./dist/tokens.hc-light.css",
+    "./css/hc-dark": "./dist/tokens.hc-dark.css",
+    "./typography.css": "./dist/typography.css",
+    "./layout.css": "./dist/layout.css",
+    "./package.json": "./package.json"
+  }
+}

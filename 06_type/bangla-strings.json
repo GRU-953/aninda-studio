@@ -1,0 +1,472 @@
+{
+  "card.colour.name": {
+    "en": "Colour",
+    "bn": "রং",
+    "basis": "Verified string gb-4, BANGLA-STANDARD.md. Rule ২.৪ names রং in its own example list; রং is the dictionary headword (p. 1156), রঙ has no entry."
+  },
+  "card.colour.subtitle": {
+    "en": "Seventeen roles across four themes, each with the contrast ratio it was measured at and the criterion it was measured against.",
+    "bn": "চার থিমে ১৭টি ভূমিকা — প্রতিটির মাপা কনট্রাস্ট অনুপাত আর কোন মানদণ্ডে মাপা হয়েছে",
+    "basis": "কনট্রাস্ট reused from verified th-3; loanword licensed by rule ২.৬. কোন = which (interrogative), correct per the dictionary entry at p. 337. থিম is a ২.৬ loanword, not a dictionary headword. Bengali numeral ১৭ per house rule 9."
+  },
+  "card.typography.name": {
+    "en": "Typography",
+    "bn": "হরফ",
+    "basis": "Verified string gb-5, BANGLA-STANDARD.md. Dictionary headword; plainer than টাইপোগ্রাফি or অক্ষরবিন্যাস."
+  },
+  "card.typography.subtitle": {
+    "en": "One scale of a perfect fourth, two scripts, a measured multiplier for Bangla and a floor it never goes below.",
+    "bn": "পারফেক্ট ফোর্থ অনুপাতে একটি স্কেল, দুই লিপি, বাংলার জন্য মেপে নেওয়া গুণক আর যে মাপের নিচে হরফ কখনো নামে না",
+    "basis": "কখনো with ও-কার per BANGLA-STANDARD.md house rule 1 (dictionary headword; কখনও is not). নিচ with short ই-কার per rule ২.১ (অতৎসম). লিপি and গুণক are plain dictionary words; পারফেক্ট ফোর্থ is the interval's name, a ২.৬ loanword."
+  },
+  "card.space-and-shape.name": {
+    "en": "Space and shape",
+    "bn": "ফাঁক ও আকার",
+    "basis": "Verified string gb-6, BANGLA-STANDARD.md. চন্দ্রবিন্দু on ফাঁক is lexical; the Academy has no rule on it."
+  },
+  "card.space-and-shape.subtitle": {
+    "en": "A 4 px scale in ten steps, and four radii. Everything in the system sits on one of them.",
+    "bn": "দশ ধাপে ৪ পিক্সেলের একটি স্কেল আর চার রকম কোণের বাঁক — পদ্ধতির সবকিছু এর কোনো একটির উপর বসে",
+    "basis": "কোনো = any/some per rule ২.৩ and the dictionary (p. 338). কোণ (corner) keeps ণ as a তৎসম under ণ-ত্ব বিধান — distinct from কোন/কোনো. পদ্ধতি reused from verified gb-10. পিক্সেল is a ২.৬ loanword; checked 14 Aug 2026, not a dictionary headword."
+  },
+  "card.motion.name": {
+    "en": "Motion",
+    "bn": "গতি",
+    "basis": "Verified string gb-8, BANGLA-STANDARD.md."
+  },
+  "card.motion.subtitle": {
+    "en": "Two durations and three easing curves. Things that move may overshoot; things that only change colour never do.",
+    "bn": "দুটি সময়কাল আর তিনটি ইজিং বাঁক — যা নড়ে তা একটু বেশি এগিয়ে ফিরে আসতে পারে, যার শুধু রং বদলায় তা কখনো নয়",
+    "basis": "রং standing alone takes অনুস্বার per rule ২.৪. কখনো per house rule 1. বাঁক is the plain native word for a curve; ইজিং is a ২.৬ loanword with no native equivalent in real use."
+  },
+  "card.the-marks.name": {
+    "en": "The marks",
+    "bn": "চিহ্ন",
+    "basis": "Verified string gb-3, BANGLA-STANDARD.md. চিহ্ন is reserved for the brand marks throughout, so icons take আইকন — one name for one thing."
+  },
+  "card.the-marks.subtitle": {
+    "en": "The Estuary mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
+    "bn": "মোহনা চিহ্ন দুই ওজনে — currentColor দিয়ে আঁকা, তাই যে থিমে বসে সেই থিমের রং নিয়ে নেয়",
+    "basis": "মোহনা reused from verified col-1 (Estuary). currentColor stays Latin: a code token copied literally, per BANGLA-STANDARD.md house guidance 3."
+  },
+  "card.accessibility.name": {
+    "en": "Accessibility",
+    "bn": "অভিগম্যতা",
+    "basis": "Not a dictionary headword (checked 14 Aug 2026). Chosen on Bangladeshi institutional usage: the government's own accessibility project is branded অভিগম্য অভিধান — accessibledictionary.gov.bd. See open question 1."
+  },
+  "card.accessibility.subtitle": {
+    "en": "Target sizes with the guidance each one comes from, the anatomy of the focus ring, and what happens in forced colours — the mode where the operating system replaces every colour with its own.",
+    "bn": "ছোঁয়ার জায়গার মাপ আর তার নির্দেশনার উৎস, ফোকাস রিঙের গড়ন, আর ফোর্সড কালার্স মোডে কী হয় — যেখানে অপারেটিং সিস্টেম নিজের রং বসিয়ে সব রং বদলে দেয়",
+    "basis": "রিঙের takes ঙ because a vowel follows, per rule ২.৪ (cf. রঙের). কী = what, দীর্ঘ ঈ-কার per rule ৩.১. ছোঁয়ার জায়গা is plain and physical, in place of the stiff লক্ষ্যবস্তুর আকার."
+  },
+  "card.button.name": {
+    "en": "Button",
+    "bn": "বাটন",
+    "basis": "Rule ২.৬ loanword, and what a Bangladeshi developer says. বোতাম is a dictionary headword (p. 1018) and is used in some Bangla localisations — see open question 4."
+  },
+  "card.button.subtitle": {
+    "en": "Four kinds, two sizes and an icon-only form, each with a label that says what will happen.",
+    "bn": "চার রকম, দুই মাপ আর শুধু আইকনের একটি রূপ — প্রতিটির লেখা বলে দেয় কী ঘটবে",
+    "basis": "কী = what per rule ৩.১. আইকন rather than চিহ্ন, which is reserved for the brand marks (gb-3). লেখা for label keeps the same word the verified strings use (bt-1, ms-1)."
+  },
+  "card.input.name": {
+    "en": "Input",
+    "bn": "ইনপুট",
+    "basis": "Rule ২.৬ loanword; the word Bangladeshi developers use for the element. No native word is in real use for it."
+  },
+  "card.input.subtitle": {
+    "en": "A label, an optional hint, and an error that says what happened and then what to do next.",
+    "bn": "ঘরের নাম, দরকারে একটি ইঙ্গিত, আর ভুল হলে যে বার্তা বলে কী হয়েছে আর তারপর কী করতে হবে",
+    "basis": "ইঙ্গিত and বার্তা are plain dictionary words, preferred over হিন্ট and মেসেজ. কী = what per rule ৩.১. ঘর for a form field is the ordinary Bangla word."
+  },
+  "card.select.name": {
+    "en": "Select",
+    "bn": "বাছাই তালিকা",
+    "basis": "Both words are ordinary Bangla (বাছাই, তালিকা) and say what the control does. Preferred over সিলেক্ট for a card title a non-developer also reads."
+  },
+  "card.select.subtitle": {
+    "en": "A native select with a drawn arrow, so the arrow follows the theme instead of the operating system.",
+    "bn": "ব্রাউজারের নিজের সিলেক্ট, তিরটি আঁকা — তাই তির অপারেটিং সিস্টেমের নয়, থিমের রং নেয়",
+    "basis": "তির (arrow) takes short ই-কার per rule ২.১ as an অতৎসম word, and is a dictionary headword (p. 604); তীর with দীর্ঘ ঈ is the তৎসম word for a riverbank. সিলেক্ট names the HTML element here, so the loanword is the precise term."
+  },
+  "card.checkbox-radio.name": {
+    "en": "Checkbox and radio",
+    "bn": "চেকবক্স ও রেডিও",
+    "basis": "Rule ২.৬ loanwords; no native equivalents are in real use. চেক follows rule ২.১০ — no hasanta (the rules list চেক by name)."
+  },
+  "card.checkbox-radio.subtitle": {
+    "en": "Native controls at 24 px, wrapped in a label so the words are part of the target.",
+    "bn": "ব্রাউজারের নিজের চেকবক্স ও রেডিও, ২৪ পিক্সেল মাপে — লেখাটিও সঙ্গে জোড়া, তাই লেখায় ছুঁলেও কাজ হয়",
+    "basis": "Bengali numeral ২৪ per house rule 9 (measurement in prose). Says the consequence in plain terms rather than translating \"part of the target\"."
+  },
+  "card.textarea.name": {
+    "en": "Textarea",
+    "bn": "লেখার ঘর",
+    "basis": "Two ordinary words, and it says exactly what the control is. Keeps লেখা, the noun the verified strings already use for a user's entry (bt-1, ms-1, ms-3)."
+  },
+  "card.textarea.subtitle": {
+    "en": "You can drag it taller but never wider, so the line length stays comfortable to read.",
+    "bn": "টেনে লম্বা করা যায়, চওড়া নয় — তাই লাইনের মাপ পড়ার মতো আরামেই থাকে",
+    "basis": "নিশ্চয়ার্থক ই attached in full in আরামেই, per rule ৩.৫ (আজই, এখনই). Plain চলিত throughout per rule ৫ and §৭ of BANGLA-STANDARD.md."
+  },
+  "card.badge.name": {
+    "en": "Badge",
+    "bn": "ব্যাজ",
+    "basis": "Rule ২.৬ loanword, and the word used for a UI badge. তকমা is the native word but carries a faintly pejorative sense in Bangladeshi usage."
+  },
+  "card.badge.subtitle": {
+    "en": "Five meanings, each carrying a glyph and a word so the colour is the third signal and never the only one.",
+    "bn": "পাঁচটি অর্থ, প্রতিটির সঙ্গে একটি প্রতীক ও একটি শব্দ — রং এখানে তৃতীয় সংকেত, কখনো একমাত্র নয়",
+    "basis": "প্রতীক for glyph, keeping চিহ্ন free for the brand marks. রং word-final takes অনুস্বার per rule ২.৪. কখনো per house rule 1."
+  },
+  "card.card.name": {
+    "en": "Card",
+    "bn": "কার্ড",
+    "basis": "Rule ২.৬ loanword; universal in Bangladeshi usage and unambiguous. তাস means a playing card and would mislead."
+  },
+  "card.card.subtitle": {
+    "en": "A surface a step brighter than the page, with a shadow in the light theme and none in the dark ones.",
+    "bn": "পাতার চেয়ে এক ধাপ উজ্জ্বল একটি তল — আলো থিমে ছায়া পড়ে, অন্ধকার থিমে পড়ে না",
+    "basis": "আলো and অন্ধকার reused from verified th-1 and th-2."
+  },
+  "card.alert.name": {
+    "en": "Alert",
+    "bn": "বার্তা",
+    "basis": "Plain native word, and accurate: the card holds four kinds including success and information, so সতর্কবার্তা (warning) would be wrong for three of them."
+  },
+  "card.alert.subtitle": {
+    "en": "Four kinds. Each says what happened, then what happens next, and never blames the reader.",
+    "bn": "চার রকম — প্রতিটি বলে কী হয়েছে, তারপর কী হবে, আর কখনো পাঠককে দোষ দেয় না",
+    "basis": "কী = what per rule ৩.১; কখনো per house rule 1. Matches the verified ms-1, which states the position and then the next step without blame."
+  },
+  "card.dialog.name": {
+    "en": "Dialog",
+    "bn": "ডায়ালগ",
+    "basis": "Rule ২.৬ loanword, and the name of the HTML element. সংলাপ means a conversation and would not be understood as this control."
+  },
+  "card.dialog.subtitle": {
+    "en": "A real dialog element over a dimmed backdrop, with the destructive action named rather than called OK.",
+    "bn": "ব্রাউজারের নিজের ডায়ালগ উপাদান, পিছনে আবছা পর্দা — যে কাজ আর ফেরানো যায় না তার নাম লেখা থাকে, শুধু OK নয়",
+    "basis": "উপাদান reused from verified gb-7 (components). \"যে কাজ আর ফেরানো যায় না\" carries \"destructive\" in plain words instead of ধ্বংসাত্মক. OK stays Latin: it is the literal button label being argued against."
+  },
+  "card.table.name": {
+    "en": "Table",
+    "bn": "টেবিল",
+    "basis": "Rule ২.৬ loanword, and what Bangladeshi developers say. সারণি is the school-textbook word — see open question 5."
+  },
+  "card.table.subtitle": {
+    "en": "Row headers, a caption saying what the numbers are, and a sideways scroll when the table is wider than the space.",
+    "bn": "সারির শিরোনাম, সংখ্যাগুলো কীসের তা বলা এক লাইনের পরিচয়, আর জায়গার চেয়ে চওড়া হলে পাশে সরিয়ে দেখা",
+    "basis": "সারি, শিরোনাম and পরিচয় are plain dictionary words; \"পাশে সরিয়ে দেখা\" avoids the loanword স্ক্রল where a native phrase reads naturally."
+  },
+  "card.tabs.name": {
+    "en": "Tabs",
+    "bn": "ট্যাব",
+    "basis": "Rule ২.৬ loanword; universal in Bangladeshi usage, and no native word exists for it."
+  },
+  "card.tabs.subtitle": {
+    "en": "The selected tab is bold, underlined and marked with aria-selected. Three signals, one of which is a colour.",
+    "bn": "বাছাই করা ট্যাব মোটা হরফে, নিচে দাগ, আর aria-selected দিয়ে চিহ্নিত — তিনটি সংকেত, তার একটি রং",
+    "basis": "হরফ reused from verified gb-5. নিচ with short ই-কার per rule ২.১. aria-selected stays Latin: a code token copied literally."
+  },
+  "card.nav.name": {
+    "en": "Nav",
+    "bn": "নেভিগেশন",
+    "basis": "Rule ২.৬ loanword. পথনির্দেশ is a coinage nobody uses for site navigation; মেনু names a different thing and is kept for it."
+  },
+  "card.nav.subtitle": {
+    "en": "Vertical and horizontal. The current item carries a bar, a heavier weight and aria-current.",
+    "bn": "খাড়া আর আড়াআড়ি — এখন যেখানে আছেন সেই অংশে একটি দাগ, ভারী হরফ আর aria-current",
+    "basis": "খাড়া and আড়াআড়ি are the plain native words for vertical and horizontal, in place of উল্লম্ব and অনুভূমিক. aria-current stays Latin."
+  },
+  "card.breadcrumb.name": {
+    "en": "Breadcrumb",
+    "bn": "পথরেখা",
+    "basis": "Two ordinary words (পথ, রেখা) that say what the trail is. ব্রেডক্রাম্ব transliterates to \"bread crumb\" in Bangla and carries none of the meaning — see open question 6."
+  },
+  "card.breadcrumb.subtitle": {
+    "en": "The last item is not a link, because you are already on it.",
+    "bn": "শেষ ধাপটি লিংক নয়, কারণ আপনি এখন সেখানেই আছেন",
+    "basis": "নিশ্চয়ার্থক ই in সেখানেই per rule ৩.৫. লিংক with অনুস্বার by the rule ২.৪ pattern, as in the Academy's own ইংরেজি."
+  },
+  "card.toast.name": {
+    "en": "Toast",
+    "bn": "টোস্ট",
+    "basis": "Rule ২.৬ loanword; what developers say. It also reads as the bread — see open question 2."
+  },
+  "card.toast.subtitle": {
+    "en": "A short message with a dismiss button that has a name of its own, not only a cross.",
+    "bn": "ছোটো একটি বার্তা, সরানোর বাটনটির নিজের নাম আছে — শুধু একটি ক্রস নয়",
+    "basis": "ছোটো with ও-কার: named in rule ২.৩'s example list and the dictionary headword; ছোট has no entry. বাটন matches card.button.name."
+  },
+  "card.empty-state.name": {
+    "en": "Empty state",
+    "bn": "যখন কিছু নেই",
+    "basis": "Written as Bangla rather than calqued: it echoes the verified ms-3, এখনো কিছু নেই। A phrase as a title follows the approved gb-10, যা এই পদ্ধতি করে না."
+  },
+  "card.empty-state.subtitle": {
+    "en": "Says what is missing, and then exactly what to do about it.",
+    "bn": "কী নেই তা বলে, তারপর ঠিক কী করতে হবে সেটাও বলে",
+    "basis": "কী = what per rule ৩.১."
+  },
+  "card.code-block.name": {
+    "en": "Code block",
+    "bn": "কোড ব্লক",
+    "basis": "কোড reused from verified bt-5 (কোডটি কপি করুন); ব্লক is a rule ২.৬ loanword in ordinary use."
+  },
+  "card.code-block.subtitle": {
+    "en": "Aninda Mono, a horizontal scroll rather than a wrap, and a copy button that says what it copies.",
+    "bn": "Aninda Mono হরফে, লাইন ভাঙে না — পাশে সরে যায়, আর কপি বাটনটি বলে কী কপি হবে",
+    "basis": "Aninda Mono stays Latin: a product name that must stay recognisable, per house guidance 2. কপি is a dictionary headword (p. 265) and is used in verified bt-5."
+  },
+  "card.sign-in.name": {
+    "en": "Sign in",
+    "bn": "প্রবেশ",
+    "basis": "Plain native word, and the one Bangla sites already use (প্রবেশ করুন). Preferred over সাইন ইন or লগ ইন."
+  },
+  "card.sign-in.subtitle": {
+    "en": "One card, two fields, and an option for someone who has no password.",
+    "bn": "একটি কার্ড, দুটি ঘর, আর যার পাসওয়ার্ড নেই তার জন্যও একটি উপায়",
+    "basis": "পাসওয়ার্ড spelt with স per rule ২.৮ (ইংরেজি s ধ্বনির জন্য স — পাসপোর্ট, বাস). Plain যার/তার rather than the honorific যাঁর/তাঁর, since the Academy has no চন্দ্রবিন্দু rule and the plain form suits the register."
+  },
+  "card.settings.name": {
+    "en": "Settings",
+    "bn": "সেটিংস",
+    "basis": "Rule ২.৬ loanword; universal in Bangladeshi software. বিন্যাস means layout and would mislead."
+  },
+  "card.settings.subtitle": {
+    "en": "Grouped in fieldsets, with the destructive action kept apart and named.",
+    "bn": "ঘরগুলো দলে সাজানো, আর যে কাজ আর ফেরানো যায় না সেটি আলাদা রাখা, নাম ধরে লেখা",
+    "basis": "\"যে কাজ আর ফেরানো যায় না\" matches card.dialog.subtitle — one name for one thing."
+  },
+  "card.dashboard.name": {
+    "en": "Dashboard",
+    "bn": "ড্যাশবোর্ড",
+    "basis": "Rule ২.৬ loanword; no native equivalent is in use."
+  },
+  "card.dashboard.subtitle": {
+    "en": "Four figures, one table, and a note saying where the numbers came from.",
+    "bn": "চারটি সংখ্যা, একটি টেবিল, আর সংখ্যাগুলো কোথা থেকে এসেছে তা বলা একটি লাইন",
+    "basis": "টেবিল matches card.table.name. Counts up to ten are written as words (চারটি) and larger ones as Bengali numerals, per house rule 9."
+  },
+  "card.docs-page.name": {
+    "en": "Docs page",
+    "bn": "নির্দেশিকার পাতা",
+    "basis": "নির্দেশিকা is a dictionary headword (p. 746) and the everyday Bangladeshi word for a manual (ব্যবহার নির্দেশিকা). সহায়িকা was rejected: not a headword (checked 14 Aug 2026)."
+  },
+  "card.docs-page.subtitle": {
+    "en": "Breadcrumb, page navigation and prose held to a readable line length.",
+    "bn": "পথরেখা, পাতার ভিতরের নেভিগেশন, আর পড়ার মতো মাপে ধরে রাখা লেখা",
+    "basis": "পথরেখা and নেভিগেশন match card.breadcrumb.name and card.nav.name. মতো with ও-কার per rule ২.৩, which lists it by name."
+  },
+  "card.landing.name": {
+    "en": "Landing",
+    "bn": "প্রথম পাতা",
+    "basis": "Plain and true to the thing: the page a visitor arrives on. ল্যান্ডিং পাতা is the developer's phrase and remains available if the site later needs to distinguish it from a home page."
+  },
+  "card.landing.subtitle": {
+    "en": "A claim, the reason to believe it, and two ways forward.",
+    "bn": "একটি দাবি, সেটি বিশ্বাস করার কারণ, আর এগিয়ে যাওয়ার দুটি পথ",
+    "basis": "Plain চলিত; all four nouns are ordinary dictionary words."
+  },
+  "card.pricing.name": {
+    "en": "Pricing",
+    "bn": "দাম",
+    "basis": "The plainest native word, and the one people actually use. মূল্যতালিকা is the shopfront word and reads formal."
+  },
+  "card.pricing.subtitle": {
+    "en": "Three plans, with the recommended one marked by a badge and a word.",
+    "bn": "তিনটি প্যাকেজ, সুপারিশ করা প্যাকেজটির গায়ে একটি ব্যাজ আর একটি শব্দ",
+    "basis": "প্যাকেজ is what Bangladeshi users call a priced tier (ইন্টারনেট প্যাকেজ); a rule ২.৬ loanword, not a dictionary headword (checked 14 Aug 2026). পরিকল্পনা would mean a scheme, not a tier. ব্যাজ matches card.badge.name."
+  },
+  "card.not-found.name": {
+    "en": "Not found",
+    "bn": "পাতা পাওয়া যায়নি",
+    "basis": "Same string as ui.not-found, so the pattern and the page it describes are named identically."
+  },
+  "card.not-found.subtitle": {
+    "en": "Says the page is missing, then offers the pages most people were looking for.",
+    "bn": "পাতাটি নেই তা জানায়, তারপর মানুষ যেসব পাতা সবচেয়ে বেশি খোঁজেন সেগুলো দেখায়",
+    "basis": "Plain চলিত verb forms per rule ৫ and §৭. খোঁজেন keeps the ordinary polite third person."
+  },
+  "card.form-with-validation.name": {
+    "en": "Form with validation",
+    "bn": "যাচাইসহ ফর্ম",
+    "basis": "ফর্ম and যাচাই are both plain and in ordinary use; যাচাই is preferred over ভ্যালিডেশন. Compound written closed per rule ৩.২ (সমাসবদ্ধ পদ)."
+  },
+  "card.form-with-validation.subtitle": {
+    "en": "A summary at the top, an error under each field, and nothing lost.",
+    "bn": "উপরে এক জায়গায় সব ভুলের তালিকা, প্রতিটি ঘরের নিচে তার নিজের ভুল, আর কিছুই হারায় না",
+    "basis": "তালিকা preferred over the loanword লিস্ট. নিচ with short ই-কার per rule ২.১. নিশ্চয়ার্থক ই in কিছুই per rule ৩.৫."
+  },
+  "chapter.welcome": {
+    "en": "Welcome",
+    "bn": "স্বাগতম",
+    "basis": "Verified string gb-1, BANGLA-STANDARD.md."
+  },
+  "chapter.the-name": {
+    "en": "The name",
+    "bn": "নাম",
+    "basis": "Verified string gb-2, BANGLA-STANDARD.md."
+  },
+  "chapter.the-mark": {
+    "en": "The mark",
+    "bn": "চিহ্ন",
+    "basis": "Verified string gb-3, BANGLA-STANDARD.md."
+  },
+  "chapter.icons": {
+    "en": "Icons",
+    "bn": "আইকন",
+    "basis": "Rule ২.৬ loanword. চিহ্ন is already the mark (gb-3), so reusing it here would break the one-name-one-thing rule; প্রতীক is kept for a glyph inside a component."
+  },
+  "chapter.colour": {
+    "en": "Colour",
+    "bn": "রং",
+    "basis": "Verified string gb-4, BANGLA-STANDARD.md."
+  },
+  "chapter.type": {
+    "en": "Type",
+    "bn": "হরফ",
+    "basis": "Verified string gb-5, BANGLA-STANDARD.md."
+  },
+  "chapter.space-and-shape": {
+    "en": "Space and shape",
+    "bn": "ফাঁক ও আকার",
+    "basis": "Verified string gb-6, BANGLA-STANDARD.md."
+  },
+  "chapter.components": {
+    "en": "Components",
+    "bn": "উপাদান",
+    "basis": "Verified string gb-7, BANGLA-STANDARD.md."
+  },
+  "chapter.motion": {
+    "en": "Motion",
+    "bn": "গতি",
+    "basis": "Verified string gb-8, BANGLA-STANDARD.md."
+  },
+  "chapter.voice": {
+    "en": "Voice",
+    "bn": "কণ্ঠস্বর",
+    "basis": "Verified string gb-9, BANGLA-STANDARD.md. ণ is correct here by ণ-ত্ব বিধান (তৎসম)."
+  },
+  "chapter.writing-in-bangla": {
+    "en": "Writing in Bangla",
+    "bn": "বাংলায় লেখা",
+    "basis": "বাংলা keeps অনুস্বার — rule ২.৪ says so by name (\"বাংলা ও বাংলাদেশ শব্দে অনুস্বার থাকবে\"). লেখা is the noun the verified strings already use."
+  },
+  "chapter.applying-it": {
+    "en": "Applying it",
+    "bn": "কাজে লাগানো",
+    "basis": "Plain চলিত idiom. প্রয়োগ is correct but reads like a manual; কাজে লাগানো is what a person says."
+  },
+  "chapter.licence-and-trademarks": {
+    "en": "Licence and trademarks",
+    "bn": "লাইসেন্স ও ট্রেডমার্ক",
+    "basis": "Both are dictionary headwords — লাইসেন্স p. 1201, ট্রেডমার্ক p. 558 — and ট্রেডমার্ক is the term in Bangladesh's own statute, ট্রেডমার্ক আইন, ২০০৯ (bdlaws.minlaw.gov.bd, act-1010). পণ্যচিহ্ন is the older word and is not what the law uses."
+  },
+  "chapter.what-this-system-does-not-do": {
+    "en": "What this system does not do",
+    "bn": "যা এই পদ্ধতি করে না",
+    "basis": "Approved string gb-10, BANGLA-STANDARD.md. পদ্ধতি rather than ব্যবস্থা, which reads administrative."
+  },
+  "theme.light": {
+    "en": "Light",
+    "bn": "আলো",
+    "basis": "Verified string th-1, BANGLA-STANDARD.md. ও-কার per rule ২.৩."
+  },
+  "theme.dark": {
+    "en": "Dark",
+    "bn": "অন্ধকার",
+    "basis": "Verified string th-2, BANGLA-STANDARD.md."
+  },
+  "theme.hc-light": {
+    "en": "High contrast, light",
+    "bn": "বেশি কনট্রাস্ট, আলো",
+    "basis": "Verified th-3 (বেশি কনট্রাস্ট) joined to verified th-1 (আলো) with the same comma the English label uses. Comma is ordinary Western punctuation in Bangla — W3C Bengali orthography notes."
+  },
+  "theme.hc-dark": {
+    "en": "High contrast, dark",
+    "bn": "বেশি কনট্রাস্ট, অন্ধকার",
+    "basis": "Verified th-3 joined to verified th-2, same construction as theme.hc-light."
+  },
+  "ui.skip-to-content": {
+    "en": "Skip to next content",
+    "bn": "সরাসরি মূল অংশে যান",
+    "basis": "Written as Bangla, not calqued: a skip link says where it takes you. সরাসরি carries \"skip\" without the awkward এড়িয়ে যান, which would read as \"avoid it\"."
+  },
+  "ui.menu": {
+    "en": "Menu",
+    "bn": "মেনু",
+    "basis": "Rule ২.৬ loanword; universal. তালিকা is kept for an actual list, so the two do not collide."
+  },
+  "ui.close": {
+    "en": "Close",
+    "bn": "বন্ধ করুন",
+    "basis": "Plain চলিত imperative, matching the verified button set (বাতিল করুন, আবার চেষ্টা করুন)."
+  },
+  "ui.search": {
+    "en": "Search",
+    "bn": "খুঁজুন",
+    "basis": "Plain native imperative; অনুসন্ধান করুন is the official-notice register the brand avoids. চন্দ্রবিন্দু is lexical."
+  },
+  "ui.copy": {
+    "en": "Copy",
+    "bn": "কপি করুন",
+    "basis": "Matches verified bt-5. কপি is a dictionary headword (p. 265); অনুলিপি would be less standard, not more."
+  },
+  "ui.copied": {
+    "en": "Copied",
+    "bn": "কপি হয়েছে",
+    "basis": "Built on verified ms-4 (সংরক্ষিত হয়েছে) so the two confirmations sound alike."
+  },
+  "ui.download": {
+    "en": "Download",
+    "bn": "ডাউনলোড করুন",
+    "basis": "Rule ২.৬ loanword; what Bangladeshi users say and read everywhere. নামিয়ে নিন is native but ambiguous on its own."
+  },
+  "ui.loading": {
+    "en": "Loading",
+    "bn": "লোড হচ্ছে…",
+    "basis": "Rule ২.৬ loanword, চলিত continuous per rule ৫. The plainer আসছে… was considered and set aside as too vague on its own."
+  },
+  "ui.not-found": {
+    "en": "Page not found",
+    "bn": "পাতা পাওয়া যায়নি",
+    "basis": "Plain চলিত negative; states the fact without blaming the reader, as the verified ms-1 does. Same string as card.not-found.name."
+  },
+  "ui.back-to-top": {
+    "en": "Back to the top",
+    "bn": "উপরে ফিরে যান",
+    "basis": "Plain চলিত imperative; ঊর্ধ্বে would be তৎসম register against the brand voice."
+  },
+  "ui.read-more": {
+    "en": "Read more",
+    "bn": "আরও পড়ুন",
+    "basis": "আরও keeps its full ও — the Academy dictionary calls it আরো-র সংগততর বানান (p. 164), and it does not follow the এখনো pattern. House rule 1."
+  },
+  "ui.language": {
+    "en": "English / বাংলা",
+    "bn": "English / বাংলা",
+    "basis": "Identical in both languages by design: each half is written in its own script so a reader of either language can find it without first understanding the other. বাংলা keeps অনুস্বার per rule ২.৪."
+  },
+  "status.success": {
+    "en": "Success",
+    "bn": "সফল",
+    "basis": "Plain dictionary word, one syllable pair, fits a badge."
+  },
+  "status.warning": {
+    "en": "Warning",
+    "bn": "সতর্কতা",
+    "basis": "Plain dictionary word. সাবধান is an imperative shout and is too loud for a status label."
+  },
+  "status.error": {
+    "en": "Error",
+    "bn": "সমস্যা",
+    "basis": "সমস্যা names the situation without implying the reader caused it, which matches the brand rule that errors never blame the reader. ত্রুটি is the more conventional UI word — see open question 3. ভুল stays for a wrong entry in a specific form field."
+  },
+  "status.info": {
+    "en": "Information",
+    "bn": "তথ্য",
+    "basis": "Plain dictionary word, universally understood."
+  }
+}

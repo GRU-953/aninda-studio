@@ -1,0 +1,583 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Aninda Sundar Howlader
+"""
+WHY THIS FILE EXISTS
+====================
+This is the single writer of the Aninda Studio design tokens. Everything that
+carries a colour, a size, a duration or a typeface downstream — the stylesheets,
+the Figma library, the component cards, the guidebook, the npm and PyPI packages
+— is generated from what this script emits. Nothing hand-edits its output.
+
+The colour values are not decided here. They are read from
+05_colour/generated/estuary.proof.json, which measured them. This script's job is
+to express them in a standard other tools can read, and to carry the proof along
+with them so a downstream reader can check the claim rather than trust it.
+
+THE STANDARD, STATED PRECISELY
+------------------------------
+Design Tokens Format Module **2025.10**, a Final Community Group Report of the
+W3C Design Tokens Community Group, dated 28 October 2025. It is published under
+the W3C Community Final Specification Agreement and is **not a W3C Standard and
+not on the W3C Standards Track**. Calling it "a W3C standard" is wrong and this
+system does not.
+
+Three things about 2025.10 that catch people out, all handled here:
+  * a colour `$value` is an OBJECT — {colorSpace, components, hex} — not a string;
+  * `dimension` and `duration` are objects with a mandatory unit, even at zero;
+  * there is no theming or mode concept in the specification at all.
+
+HOW THEMES ARE MODELLED, AND WHY
+--------------------------------
+One file per theme, with identical token paths in each.
+
+The tempting alternative is a single file carrying all four themes inside
+`$extensions`. It is rejected because the specification permits any tool to
+IGNORE `$extensions` — and a tool that ignores it does not error, it silently
+renders one theme's values for all four. Silent wrong output is the exact failure
+class this whole system exists to prevent. One file per theme is also what IBM
+Carbon does, and Carbon is the only flagship system verified shipping conformant
+DTCG.
+
+WHAT CANNOT BE MODELLED IN DTCG AT ALL
+--------------------------------------
+`forced-colors` mode. Its values are CSS system colour keywords — Canvas,
+CanvasText, ButtonFace — which are not colours in the DTCG sense: they have no
+colour space, no components and no hex, because the operating system supplies
+them. DTCG's thirteen types include nothing that fits. So the forced-colors map
+lives in its own file, outside the DTCG tree, explicitly marked as not DTCG,
+rather than being bent into a shape the specification does not have.
+
+RUN
+---
+    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    ./.venv/bin/python 07_tokens/build.py
+    ./.venv/bin/python 07_tokens/build.py --check    # verify, write nothing
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+PROOF = ROOT / "05_colour" / "generated" / "estuary.proof.json"
+OUT = HERE / "build"
+
+DIRECTION = "estuary"
+SCHEMA = "https://tr.designtokens.org/format/"
+NS = "studio.aninda"
+
+THEMES = ("light", "dark", "hc-light", "hc-dark")
+
+# --- Specified constants. A person chose these. Everything else is measured. ---
+
+SCALE_RATIO = 1.333            # a perfect fourth
+BASE_PX = 16                   # the anchor, and the floor for running prose
+SPACE_PX = (4, 8, 12, 16, 24, 32, 48, 64, 96, 128)
+RADIUS_PX = {"badge": 4, "control": 8, "card": 14, "hero": 24}
+
+# The three platform floors are different numbers and the system states all
+# three rather than picking one and implying it is universal.
+TARGET_PX = {
+    "min": (24, "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA"),
+    "apple-min": (28, "Apple HIG minimum control size, iOS and iPadOS"),
+    "comfortable": (44, "Apple HIG default control size, iOS and iPadOS"),
+    "android-min": (48, "Android accessibility guidance minimum touch target, in dp"),
+}
+
+# WCAG 2.4.13 Focus Appearance is Level AAA, not AA. AA requires only 2.4.11,
+# that focus is not ENTIRELY obscured. This system adopts the AAA geometry by
+# choice and labels it honestly.
+FOCUS_PX = {"ring-width": 3, "ring-offset": 2}
+
+TYPE_STEPS = (
+    ("caption", -1), ("body", 0), ("lead", 1), ("h3", 2),
+    ("h2", 3), ("h1", 4), ("display", 5),
+)
+
+# 120ms for a colour changing in place, 220ms for something arriving or leaving.
+# Nothing over 300ms. Deliberately simpler than Material's spring system, and the
+# reason is a choice rather than an omission: springs are excellent on a platform
+# that owns its frame budget, and this system targets low-end Android where a
+# 220ms ease-out costs nothing.
+DURATION_MS = {"colour": 120, "move": 220}
+EASING = {
+    "standard": [0.2, 0.0, 0.0, 1.0],
+    "enter": [0.05, 0.7, 0.1, 1.0],
+    "exit": [0.3, 0.0, 0.8, 0.15],
+}
+
+# Material's own split, adopted as a principle even though its spring system is
+# not: things that MOVE may overshoot; things that merely change colour or
+# opacity never do.
+MOTION_NOTE = ("Things that move may overshoot; things that only change colour "
+               "or opacity never do.")
+
+FONTS = {
+    "latin": {"family": ["Literata", "Georgia", "serif"],
+              "licence": "SIL OFL 1.1", "rfn": None,
+              "note": "Literata, by Veronika Burian and José Scaglione (TypeTogether). "
+                      "An optical-size axis from 7 to 72, so the letterforms are "
+                      "redrawn for the size rather than merely scaled. Its x-height "
+                      "is almost flat across that range (0.5166 to 0.5130 em), which "
+                      "is why the Bangla multiplier below barely moves."},
+    "bangla": {"family": ["Noto Serif Bengali", "serif"],
+               "licence": "SIL OFL 1.1", "rfn": None,
+               "note": "Never uppercased, never letter-spaced, never synthetically "
+                       "emboldened. A serif Bangla answers Bengali's own letterpress "
+                       "tradition rather than importing a Latin UI convention."},
+    "mono": {"family": ["Aninda Mono", "IBM Plex Mono", "ui-monospace", "monospace"],
+             "licence": "SIL OFL 1.1", "rfn": "IBM Plex",
+             "note": "IBM Plex Mono, by Mike Abbink and Bold Monday. It carries the "
+                     "Reserved Font Name 'IBM Plex', and subsetting a font counts as "
+                     "modifying it under OFL 1.1 clause 3 — so the subset shipped "
+                     "here is renamed 'Aninda Mono'. The unmodified family name is "
+                     "kept as the next fallback, so anyone who already has IBM Plex "
+                     "Mono installed gets the real thing."},
+}
+
+# Measured on rendered specimens, not estimated. Bangla's reading height sits near
+# 0.62 em against Latin's 0.51, so Bangla set at the same nominal size looks
+# noticeably larger. These are the per-size corrections for THIS pairing.
+BANGLA_SCALE = {
+    "caption": 0.815, "body": 0.816, "heading": 0.817,
+    "title": 0.822, "display": 0.825,
+}
+
+# WHY THESE TWO NUMBERS, AND HOW THEY WERE ARRIVED AT
+#
+# The মাত্রা is the horizontal stroke every Bangla word hangs from. In a serif
+# Bangla it is thin — 0.0542 em here against 0.0750 for the sans equivalent — and
+# a stroke below one device pixel does not get thinner, it gets PALER, because the
+# renderer anti-aliases it into grey. That is the real failure and it is why the
+# first two attempts to measure this were both wrong: they measured stroke
+# thickness on an upsampled 2× and 4× render, which cannot answer a 1× question
+# and disagreed with each other by a factor of three.
+#
+# Measured properly at device_scale_factor=1, as the luminance the মাত্রা actually
+# renders at on white (lower is darker; above about 110 it reads as grey, not ink):
+#
+#            weight 400   weight 500   weight 600
+#     12px       123          108           90
+#     13px        94           86           68
+#     14px        73           73           65
+#     16px        56           41           38
+#
+# It is not monotonic, because it depends on how the stroke lands on the pixel
+# grid at each size. 12px at weight 400 is the worst case anywhere in the range —
+# and stepping one weight fixes it. So the floor can stay at 12, PROVIDED the
+# weight bump below 14 is honoured. The two numbers only work together.
+BANGLA_MIN_PX = 12
+BANGLA_WEIGHT_BUMP_BELOW_PX = 14
+BANGLA_LINE_HEIGHT = 1.6
+
+
+def colour(hexv: str) -> dict:
+    """A DTCG 2025.10 colour value.
+
+    The components are derived FROM the hex rather than alongside it, so the two
+    representations cannot disagree — a verifier can re-derive the bytes and
+    assert equality.
+    """
+    h = hexv.lstrip("#")
+    comps = [round(int(h[i:i + 2], 16) / 255, 6) for i in (0, 2, 4)]
+    return {"colorSpace": "srgb", "components": comps, "hex": f"#{h.upper()}"}
+
+
+def dim(value: float, unit: str = "px") -> dict:
+    """A DTCG dimension. The unit is mandatory even when the value is zero."""
+    return {"value": value, "unit": unit}
+
+
+def ms(value: int) -> dict:
+    return {"value": value, "unit": "ms"}
+
+
+def primitives(proof: dict) -> dict:
+    ramps: dict = {}
+    for key, fam in proof["families"].items():
+        steps = {
+            step: {
+                "$value": colour(hexv),
+                "$extensions": {NS: {
+                    "step": int(step),
+                    "luminance": fam["ramp_luminance"][step],
+                    "isAnchor": int(step) == fam["anchor_step"],
+                }},
+            }
+            for step, hexv in fam["ramp"].items()
+        }
+        steps["$description"] = f"{fam['label']} ({fam['label_bn']}) — {fam['note'] or fam['kind']}"
+        steps["$extensions"] = {NS: {
+            "hueOklch": fam["hue_oklch"],
+            "chromaCeiling": fam["chroma_ceiling"],
+            "anchor": fam["anchor"],
+            "anchorStep": fam["anchor_step"],
+        }}
+        ramps[key] = steps
+
+    return {
+        "$schema": SCHEMA,
+        "$description": (
+            "Aninda Studio primitive tokens. Generated — do not hand-edit. "
+            "Colour ramps are computed in OKLCH and gamut-mapped into sRGB; every "
+            "value is the rounded 8-bit hex a browser will actually produce."
+        ),
+        "$extensions": {NS: {
+            "direction": DIRECTION,
+            "generatedBy": "07_tokens/build.py",
+            "spec": "DTCG 2025.10 (Final Community Group Report, 28 October 2025) "
+                    "— a W3C Community Group specification, NOT a W3C Standard",
+        }},
+        "color": {"$type": "color", "ramp": ramps},
+        "dimension": {
+            "$type": "dimension",
+            "space": {
+                str(i): {"$value": dim(px),
+                         "$description": f"Step {i} of the 4px spacing scale"}
+                for i, px in enumerate(SPACE_PX)
+            },
+            "radius": {
+                k: {"$value": dim(px), "$description": f"Corner radius for a {k}"}
+                for k, px in RADIUS_PX.items()
+            },
+            "target": {
+                k: {"$value": dim(px), "$description": src,
+                    "$extensions": {NS: {"source": src}}}
+                for k, (px, src) in TARGET_PX.items()
+            },
+            "focus": {
+                k: {"$value": dim(px),
+                    "$description": "Focus indicator geometry. WCAG 2.2 SC 2.4.13 "
+                                    "Focus Appearance is Level AAA, adopted here by "
+                                    "choice; Level AA requires only SC 2.4.11."}
+                for k, px in FOCUS_PX.items()
+            },
+            "type": {
+                **{
+                    name: {
+                        "$value": dim(round(SCALE_RATIO ** n, 4), "rem"),
+                        "$description": f"{round(BASE_PX * SCALE_RATIO ** n, 2)}px at a "
+                                        f"16px root — step {n:+d} of a {SCALE_RATIO} scale",
+                    }
+                    for name, n in TYPE_STEPS
+                },
+                "bangla-min": {
+                    "$value": dim(BANGLA_MIN_PX),
+                    "$description": (
+                        "Hard floor for Bangla — never apply the multiplier past it. At "
+                        "12px the মাত্রা renders at luminance 123 on white at weight 400, "
+                        "which reads as grey rather than ink; at weight 500 it is 108 and "
+                        "holds. So this floor is only safe together with the weight bump."
+                    ),
+                    "$extensions": {NS: {"measuredAt": "device_scale_factor=1",
+                                         "luminanceByWeight": {"400": 123, "500": 108,
+                                                               "600": 90}}},
+                },
+                "bangla-weight-bump-below": {
+                    "$value": dim(BANGLA_WEIGHT_BUMP_BELOW_PX),
+                    "$description": (
+                        "Below this size, step Bangla up one weight. Measured: 12px/400 "
+                        "fails at luminance 123, 12px/500 holds at 108, 13px/400 already "
+                        "holds at 94. The threshold is set at 14 rather than 13 because "
+                        "the relationship is not monotonic — it depends on how the stroke "
+                        "lands on the pixel grid — and one size of margin is cheap."
+                    ),
+                },
+            },
+        },
+        "number": {
+            "$type": "number",
+            "scale": {
+                "ratio": {
+                    "$value": SCALE_RATIO,
+                    "$description": "A perfect fourth. The jumps are large on purpose: "
+                                    "hierarchy is unmistakable and fewer levels are "
+                                    "needed to express it.",
+                },
+                "bangla": {
+                    "$description": (
+                        "How much to shrink Bangla so it looks the same size as Latin. "
+                        "Measured on rendered specimens, not estimated. Bangla's reading "
+                        "height is about 0.62 em against Latin's 0.51, so equal nominal "
+                        "sizes do not look equal. These barely move across the scale "
+                        "because Literata's x-height is nearly flat across its optical "
+                        "range — a face without that property would need a wider spread."
+                    ),
+                    **{k: {"$value": v,
+                           "$description": f"Bangla multiplier at {k} size"}
+                       for k, v in BANGLA_SCALE.items()},
+                },
+            },
+            "lineHeight": {
+                "bangla": {
+                    "$value": BANGLA_LINE_HEIGHT,
+                    "$description": ("Bangla needs more leading than Latin: the মাত্রা sits "
+                                     "above the letters and the vowel signs hang below, so "
+                                     "lines collide sooner. Collision measured at 1.25."),
+                },
+            },
+        },
+        "fontFamily": {
+            "$type": "fontFamily",
+            **{k: {"$value": v["family"], "$description": v["note"],
+                   "$extensions": {NS: {"licence": v["licence"]}}}
+               for k, v in FONTS.items()},
+        },
+        "duration": {
+            "$type": "duration",
+            "motion": {k: {"$value": ms(v)} for k, v in DURATION_MS.items()},
+        },
+        "cubicBezier": {
+            "$type": "cubicBezier",
+            "motion": {k: {"$value": v, "$description": MOTION_NOTE}
+                       for k, v in EASING.items()},
+        },
+    }
+
+
+def semantic(proof: dict, theme_key: str) -> dict:
+    t = proof["themes"][theme_key]
+    fams = proof["families"]
+
+    def step_of(hexv: str, fam_key: str) -> str | None:
+        for step, h in fams[fam_key]["ramp"].items():
+            if h == hexv:
+                return step
+        return None
+
+    surfaces = {}
+    for name, hexv in t["surfaces"].items():
+        surfaces[name] = {
+            "$value": colour(hexv),
+            "$description": f"Tonal surface '{name}' for the {t['label']} theme",
+            "$extensions": {NS: {
+                "luminance": t["surface_luminance"][name],
+                "derivation": "swept along the lightness axis until each rung was at "
+                              "least ΔE2000 0.9 from the one before it",
+            }},
+        }
+
+    def role(name: str) -> dict:
+        r = t["roles"][name]
+        s = step_of(r["value"], r["family"])
+        node: dict = {
+            "$description": r["rationale"],
+            "$extensions": {NS: {
+                "family": r["family"],
+                "step": r["step"],
+                "kind": r["kind"],
+                "proof": {
+                    "required": r["target"],
+                    "measured": r["ratio"],
+                    "worstCaseLsb": r["worst_case_lsb"],
+                    "hardestGround": r["hardest_ground"],
+                    "level": r["level"],
+                    "criterion": r["criterion"],
+                    "againstEverySurface": r["measured"],
+                },
+            }},
+        }
+        # A semantic token is an alias if and only if its value is bit-identical
+        # to a primitive. Anything else is a literal carrying its derivation, so
+        # the graph never lies about where a value came from.
+        if s is not None:
+            node["$value"] = f"{{color.ramp.{r['family']}.{s}}}"
+        else:
+            node["$value"] = colour(r["value"])
+        return node
+
+    return {
+        "$schema": SCHEMA,
+        "$description": (
+            f"Aninda Studio semantic tokens — {t['label']} theme. Generated; do not "
+            f"hand-edit. Every text pairing in this file was measured against every "
+            f"surface it can land on, at a target of {t['text_target']}:1, on the "
+            f"rounded 8-bit hex and again with every channel of both colours nudged "
+            f"by ±1. The published figure is the worst of those."
+        ),
+        "$extensions": {NS: {
+            "direction": DIRECTION,
+            "theme": theme_key,
+            "polarity": t["polarity"],
+            "highContrast": t["high_contrast"],
+            "textTarget": t["text_target"],
+            "nonTextTarget": t["nontext_target"],
+            "generatedBy": "07_tokens/build.py",
+            "note": ("DTCG 2025.10 has no theming concept. Themes are separate files "
+                     "with identical token paths, because a tool is permitted to "
+                     "ignore $extensions and would then render one theme's values "
+                     "for all four without erroring."),
+        }},
+        "color": {
+            "$type": "color",
+            "surface": surfaces,
+            "ink": {"default": role("ink"), "muted": role("ink-muted")},
+            "line": {"default": role("line")},
+            "accent": {"default": role("accent"), "edge": role("accent-edge")},
+            "focus": {"ring": role("focus")},
+            "status": {k: role(k) for k in ("success", "warning", "danger", "info")
+                       if k in t["roles"]},
+        },
+    }
+
+
+FORCED_COLORS = {
+    "format": "non-dtcg",
+    "$description": (
+        "Forced-colors mode cannot be expressed in DTCG. Its values are CSS system "
+        "colour keywords supplied by the operating system — they have no colour "
+        "space, no components and no hex, and DTCG's thirteen types include nothing "
+        "that fits. Bending them into a colour token would be a lie about what they "
+        "are, so this file sits deliberately outside the DTCG tree."
+    ),
+    "generatedBy": "07_tokens/build.py",
+    "map": {
+        "color.surface.base": "Canvas",
+        "color.surface.lowest": "Canvas",
+        "color.surface.low": "Canvas",
+        "color.surface.high": "Canvas",
+        "color.surface.highest": "Canvas",
+        "color.surface.dim": "Canvas",
+        "color.surface.bright": "Canvas",
+        "color.ink.default": "CanvasText",
+        "color.ink.muted": "GrayText",
+        "color.line.default": "CanvasText",
+        "color.accent.default": "LinkText",
+        "color.accent.edge": "CanvasText",
+        "color.focus.ring": "Highlight",
+        "color.status.success": "CanvasText",
+        "color.status.warning": "CanvasText",
+        "color.status.danger": "CanvasText",
+        "color.status.info": "CanvasText",
+    },
+    "rules": [
+        "Every brand colour must be overridden. A hex that survives forced-colors "
+        "mode defeats the whole point of it.",
+        "forced-color-adjust: none is forbidden except where explicitly allow-listed "
+        "with a stated reason.",
+        "Because status colours all resolve to CanvasText, nothing may rely on colour "
+        "alone — every state carries a glyph and a word regardless.",
+    ],
+}
+
+
+def emit(proof: dict) -> dict[str, dict]:
+    files = {"primitive.tokens.json": primitives(proof)}
+    for th in THEMES:
+        files[f"semantic.{th}.tokens.json"] = semantic(proof, th)
+    files["forced-colors.map.json"] = FORCED_COLORS
+    return files
+
+
+def check(files: dict[str, dict], proof: dict) -> list[str]:
+    """Re-read what was built and prove it, rather than trusting that it was built."""
+    problems: list[str] = []
+    prim = files["primitive.tokens.json"]
+
+    def walk(node, path=""):
+        if isinstance(node, dict):
+            if "$value" in node:
+                yield path, node
+            for k, v in node.items():
+                if not k.startswith("$"):
+                    yield from walk(v, f"{path}.{k}" if path else k)
+
+    for name, doc in files.items():
+        if name == "forced-colors.map.json":
+            continue
+        if doc.get("$schema") != SCHEMA:
+            problems.append(f"{name}: wrong or missing $schema")
+        for path, tok in walk(doc):
+            v = tok["$value"]
+            if isinstance(v, dict) and "colorSpace" in v:
+                h = v["hex"].lstrip("#")
+                want = [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+                got = [round(c * 255) for c in v["components"]]
+                if want != got:
+                    problems.append(f"{name}:{path}: components {got} do not re-derive "
+                                    f"the hex bytes {want}")
+            if isinstance(v, dict) and "unit" in v and not v["unit"]:
+                problems.append(f"{name}:{path}: dimension or duration without a unit")
+            if isinstance(v, str) and v.startswith("{"):
+                target = v.strip("{}").split(".")
+                node = prim
+                for part in target:
+                    node = node.get(part) if isinstance(node, dict) else None
+                    if node is None:
+                        problems.append(f"{name}:{path}: alias {v} does not resolve")
+                        break
+
+    # Theme parity: identical token paths in every theme file, or a consumer that
+    # switches theme loses tokens without being told.
+    sets = {th: {p for p, _ in walk(files[f"semantic.{th}.tokens.json"])} for th in THEMES}
+    base = sets["light"]
+    for th, s in sets.items():
+        if s != base:
+            problems.append(f"semantic.{th}: token paths differ from light "
+                            f"(missing {sorted(base - s)}, extra {sorted(s - base)})")
+
+    # Every role in the forced-colors map must exist, or the two drift apart.
+    for role_path in FORCED_COLORS["map"]:
+        if role_path not in base:
+            problems.append(f"forced-colors.map.json: '{role_path}' is not a real token")
+
+    # Every claimed ratio must still hold against the proof it came from.
+    for th in THEMES:
+        doc = files[f"semantic.{th}.tokens.json"]
+        for path, tok in walk(doc):
+            pr = tok.get("$extensions", {}).get(NS, {}).get("proof")
+            if not pr:
+                continue
+            if pr["worstCaseLsb"] < pr["required"]:
+                problems.append(f"semantic.{th}:{path}: worst case {pr['worstCaseLsb']} "
+                                f"is below its required {pr['required']}")
+    return problems
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Emit the Aninda Studio DTCG token set.")
+    ap.add_argument("--check", action="store_true", help="verify without writing")
+    args = ap.parse_args()
+
+    if not PROOF.exists():
+        print(f"Missing {PROOF}. Run 05_colour/engine.py first.", file=sys.stderr)
+        return 2
+
+    proof = json.loads(PROOF.read_text())
+    files = emit(proof)
+    problems = check(files, proof)
+
+    if problems:
+        print("FAILED — nothing written:\n", file=sys.stderr)
+        for p in problems:
+            print(f"  - {p}", file=sys.stderr)
+        return 1
+
+    counts = []
+    for name, doc in files.items():
+        blob = json.dumps(doc, indent=2, ensure_ascii=False) + "\n"
+        counts.append((name, len(blob), hashlib.sha256(blob.encode()).hexdigest()[:12]))
+
+    for name, size, sha in counts:
+        print(f"  {name:<34} {size:>7} bytes  sha256:{sha}")
+
+    if args.check:
+        print(f"\n--check: {len(files)} files verified, {len(problems)} problems. "
+              f"Nothing written.")
+        return 0
+
+    OUT.mkdir(parents=True, exist_ok=True)
+    for name, doc in files.items():
+        (OUT / name).write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
+    print(f"\nWrote {len(files)} files to {OUT.relative_to(ROOT)}/")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

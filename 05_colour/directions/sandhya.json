@@ -1,0 +1,26 @@
+{
+  "key": "sandhya",
+  "name": "Sandhya",
+  "name_bn": "সন্ধ্যা",
+  "premise": "Rooted and literary. The mark is built from the Bangla letterform অ rather than the Latin 'a', so the identity is native to Bangla and the Latin wordmark is the companion — the reverse of how almost every bilingual brand is put together, and the arrangement your two audiences actually argue for. Colour is a warm ink, close to printing black on uncoated paper, with a single saturated vermilion signal. Vermilion because it is the colour of Bengali print culture and hand-set type, not because it is 'ethnic'; nothing here is folkloric. The register is a small press rather than a software company.",
+  "families": {
+    "ground": {
+      "label": "Ink",
+      "label_bn": "কালি",
+      "kind": "brand",
+      "anchor": "#191512",
+      "note": "A warm near-black. Every surface and every text role is drawn from it, so the whole system reads as one paper stock."
+    },
+    "accent": {
+      "label": "Vermilion",
+      "label_bn": "সিঁদুর",
+      "kind": "brand",
+      "anchor": "#C4402B",
+      "note": "The only saturated colour in the system. Used sparingly and always meaningfully — a link, a focus ring, one primary action per screen."
+    },
+    "success": { "label": "Bamboo", "label_bn": "বাঁশ", "kind": "semantic", "anchor": "#2A6B2E" },
+    "warning": { "label": "Turmeric", "label_bn": "হলুদ", "kind": "semantic", "anchor": "#9A6A00" },
+    "danger":  { "label": "Alta", "label_bn": "আলতা", "kind": "semantic", "anchor": "#B02A1C" },
+    "info":    { "label": "Indigo", "label_bn": "নীল", "kind": "semantic", "anchor": "#2A5F86" }
+  }
+}

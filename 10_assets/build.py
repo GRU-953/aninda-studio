@@ -1,0 +1,848 @@
+#!/usr/bin/env python3
+"""Aninda Studio — the raster asset set, generator.
+
+This script is the ONLY writer of 10_assets/. Nothing here is hand-drawn and
+nothing here should be hand-edited: the next run overwrites it.
+
+    export PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers
+    ./.venv/bin/python 10_assets/build.py
+
+How the pixels are made
+    Every raster comes out of the same Chromium that a reader will view the site
+    in, driven by Playwright. The source is always an SVG from 04_mark/svg/ — no
+    artwork is redrawn here. Pillow packs the multi-size .ico and then MEASURES
+    each PNG back off disk.
+
+The one geometry fact that governs everything
+    The everyday icon is ROUNDED and its corners are transparent. Anything that
+    must be opaque therefore needs a ground drawn behind it. Assuming a square
+    would leave four transparent corners on the Apple touch icon, which renders
+    as black on some surfaces and white on others. Each asset below declares
+    `opaque` explicitly and the check refuses to write a file whose alpha does
+    not match what it declared.
+
+Icon policy
+    04_mark/manifest.json records the owner's decision of 14 August 2026: one
+    rounded icon on every surface, Apple included. icon-appstore-square-1024.svg
+    is NOT used by anything here. It exists for an App Store submission only, and
+    MANIFEST.json records that.
+
+Colour
+    Not one colour is typed in this file. Grounds are var(--as-…) resolved from
+    07_tokens/css/tokens.css, which is inlined into every render page. The mark
+    SVGs carry their own values, and those were written by 04_mark/build.py.
+
+Sizes
+    Two classes, and the difference is recorded per file in MANIFEST.json:
+      * long-stable  — favicon, PWA, Apple touch, Open Graph, GitHub preview.
+      * verified     — checked against the platform's own help page on the date
+                       in MANIFEST.json, with the URL and the quote it came from.
+    Anything that could not be verified is marked unverified rather than guessed.
+
+Exit codes
+    0  written and measured
+    1  a guard failed — nothing is written
+    2  could not run — a tool is missing
+
+SPDX-License-Identifier: Apache-2.0
+Copyright 2026 Aninda Sundar Howlader
+"""
+
+from __future__ import annotations
+
+import base64
+import json
+import os
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+
+TOKENS_CSS = ROOT / "07_tokens" / "css" / "tokens.css"
+MARK_DIR = ROOT / "04_mark" / "svg"
+MARK_MANIFEST = ROOT / "04_mark" / "manifest.json"
+FONTS_DIR = ROOT / "08_components" / "fonts"
+
+GENERATOR = "10_assets/build.py"
+BUILT_ON = "2026-08-14"
+DO_NOT_EDIT = (
+    "GENERATED FILE. Written by " + GENERATOR + ". Do not hand-edit — the next "
+    "build overwrites it."
+)
+
+# Playwright looks in a shared cache outside this folder unless it is told
+# otherwise, and then reports the browser as missing. Setting it here as well as
+# in the shell means the failure cannot happen quietly.
+os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", str(ROOT / "00_sandbox" / "browsers"))
+
+try:
+    from PIL import Image
+except ImportError:  # every guard below reads pixels, so this is not optional
+    Image = None
+
+
+class BuildError(Exception):
+    pass
+
+
+# =========================================================================
+# The verified figures
+# -------------------------------------------------------------------------
+# Checked on 14 August 2026 against each platform's OWN help documentation.
+# No third-party "image size" article was used for any number here. The quote
+# is short and attributed so the figure can be traced without trusting me.
+# =========================================================================
+
+VERIFIED = {
+    "x-header": {
+        "spec": "X header photo, 1500 x 500 px",
+        "url": "https://help.x.com/en/managing-your-account/how-to-customize-your-profile",
+        "quote": "recommended dimensions are 1500x500 pixels",
+        "note": (
+            "X states that about 60 px at the top and 60 px at the bottom can be "
+            "cropped, depending on the monitor and the browser. Everything in this "
+            "image is kept clear of both bands."
+        ),
+    },
+    "x-profile-photo": {
+        "spec": "X profile photo, 400 x 400 px, under 2 MB",
+        "url": "https://help.x.com/en/managing-your-account/how-to-customize-your-profile",
+        "quote": "recommended dimensions are 400x400 pixels",
+        "note": "X crops the profile photo to a circle, so the ground is drawn full bleed.",
+    },
+    "linkedin-personal-banner": {
+        "spec": "LinkedIn profile cover image, 1584 x 396 px, under 8 MB",
+        "url": "https://www.linkedin.com/help/linkedin/answer/a566232",
+        "quote": "1584 (w) x 396 (h) pixels (recommended)",
+        "note": (
+            "LinkedIn has renamed this slot: the current help article calls it the "
+            "cover image, not the background photo. The figure is unchanged."
+        ),
+    },
+    "linkedin-company-cover": {
+        "spec": "LinkedIn Page cover image, 4200 x 700 px, under 3 MB",
+        "url": (
+            "https://www.linkedin.com/help/linkedin/answer/a563309/"
+            "image-specifications-for-your-linkedin-pages-and-career-pages"
+        ),
+        "quote": "4200 (w) x 700 (h) pixels",
+        "note": (
+            "LinkedIn gives the same figure as both the minimum and the recommended "
+            "size. It also asks for key details to be kept away from the edges and "
+            "especially the lower-right corner, so the content sits left of centre."
+        ),
+    },
+    "linkedin-company-logo": {
+        "spec": "LinkedIn Page logo, 400 x 400 px recommended (268 x 268 minimum), under 3 MB",
+        "url": (
+            "https://www.linkedin.com/help/linkedin/answer/a563309/"
+            "image-specifications-for-your-linkedin-pages-and-career-pages"
+        ),
+        "quote": "268 (w) x 268 (h) pixels | 400 (w) x 400 (h) pixels",
+        "note": "400 x 400 is the recommended figure and is what is written here.",
+    },
+}
+
+STABLE_NOTE = (
+    "Long-stable size. It has been the same for years across browsers and "
+    "platforms and is not tied to one company's current help page."
+)
+
+
+# =========================================================================
+# SVG handling — lxml, so the source artwork is never edited by string search
+# =========================================================================
+
+
+def load_svg(name: str):
+    from lxml import etree
+
+    path = MARK_DIR / name
+    if not path.exists():
+        raise BuildError(f"Mark not found: {path}. Run 04_mark/build.py first.")
+    return etree.fromstring(path.read_bytes())
+
+
+def svg_to_text(node) -> str:
+    from lxml import etree
+
+    return etree.tostring(node, encoding="unicode")
+
+
+def fill_box(node):
+    """Make the SVG fill whatever box CSS gives it. viewBox stays, so the
+    drawing scales rather than being cropped."""
+    node.set("width", "100%")
+    node.set("height", "100%")
+    return node
+
+
+def free_height(node):
+    """Drop the fixed width and height so CSS can set one and the browser works
+    the other out from the viewBox. Also drop the inline `color`, so the drawing
+    inherits the theme colour from its parent instead of carrying its own."""
+    for attribute in ("width", "height"):
+        if attribute in node.attrib:
+            del node.attrib[attribute]
+    if "style" in node.attrib:
+        del node.attrib["style"]
+    return node
+
+
+def drop_ground(node):
+    """Remove the rounded background rectangle. Used for the maskable icon,
+    where the platform supplies the shape and the ground must be full bleed."""
+    for child in list(node):
+        if child.tag.endswith("}rect") or child.tag == "rect":
+            node.remove(child)
+    return node
+
+
+def scale_about_centre(node, factor: float, grid: float = 100.0):
+    """Wrap everything but the title in one more transform, scaled about the
+    centre of the grid. This is how the maskable icon gets its safe zone."""
+    from lxml import etree
+
+    mid = grid / 2.0
+    group = etree.Element("g")
+    group.set(
+        "transform",
+        f"translate({mid},{mid}) scale({factor:.6f}) translate({-mid},{-mid})",
+    )
+    for child in list(node):
+        if child.tag.endswith("}title") or child.tag == "title":
+            continue
+        node.remove(child)
+        group.append(child)
+    node.append(group)
+    return node
+
+
+# =========================================================================
+# Fonts — the tagline is real text, so the face has to travel with the page
+# =========================================================================
+
+
+def font_face_block() -> str:
+    """Literata only. The names are drawn from the wordmark SVGs, which are real
+    outlines, so no Bangla face is needed to render an image here."""
+    path = FONTS_DIR / "literata-subset.woff2"
+    if not path.exists():
+        raise BuildError(f"Font not found: {path}. Run 08_components/build.py first.")
+    blob = base64.b64encode(path.read_bytes()).decode("ascii")
+    return (
+        "@font-face{font-family:\"Literata\";font-style:normal;font-weight:400 700;"
+        "font-display:block;src:url(data:font/woff2;base64," + blob + ") format(\"woff2\");}"
+    )
+
+
+def guard_glyphs(strings: list[str]) -> None:
+    """The subset in 08_components/fonts/ carries only what the card library
+    asked for. A character outside it would fall back to whatever face the
+    machine happens to have, and the image would differ between machines. So
+    check, and fail closed rather than render something unrepeatable."""
+    from fontTools.ttLib import TTFont
+
+    covered = set(TTFont(FONTS_DIR / "literata-subset.woff2").getBestCmap())
+    missing = sorted({ch for text in strings for ch in text if ord(ch) not in covered})
+    if missing:
+        raise BuildError(
+            "Literata's subset does not carry: "
+            + " ".join(f"{ch!r} (U+{ord(ch):04X})" for ch in missing)
+            + ". Either change the wording or re-subset in 08_components/build.py."
+        )
+
+
+# =========================================================================
+# The pages that get screenshotted
+# =========================================================================
+
+
+def page_shell(theme: str, body: str, extra_css: str = "", with_font: bool = False) -> str:
+    tokens = TOKENS_CSS.read_text("utf-8")
+    face = font_face_block() if with_font else ""
+    return (
+        "<!doctype html>\n"
+        f"<!-- {DO_NOT_EDIT} This page is rendered, never saved. -->\n"
+        f'<html lang="en" data-theme="{theme}"><head><meta charset="utf-8">'
+        "<style>\n" + tokens + "\n" + face + "\n"
+        "html,body{margin:0;padding:0;height:100%;width:100%;background-color:transparent;}\n"
+        "*{box-sizing:border-box;}\n"
+        ".ground{position:absolute;inset:0;overflow:hidden;}\n"
+        ".fill{position:absolute;inset:0;display:block;}\n"
+        + extra_css
+        + "\n</style></head><body>" + body + "</body></html>"
+    )
+
+
+def icon_page(source: str, opaque: bool, maskable: bool = False, safe: float = 0.80) -> str:
+    """One rounded icon, filling the frame. When `opaque` is set the ground is
+    drawn behind it, because the corners of this artwork are transparent."""
+    node = fill_box(load_svg(source))
+    if maskable:
+        node = drop_ground(node)
+        # 04_mark/manifest.json records the mark's worst corner at 45.0 of the
+        # 100-unit grid's centre, that is a radius of 45. The maskable safe zone
+        # is a circle of 80% of the icon, a radius of 40. 40/45 is the exact
+        # factor that brings the worst corner onto the safe circle.
+        node = scale_about_centre(node, (safe * 100.0 / 2.0) / 45.0)
+    ground = '<div class="ground" style="background-color:var(--as-ink)"></div>' if opaque else ""
+    return page_shell(
+        "light",
+        ground + '<div class="fill">' + svg_to_text(node) + "</div>",
+        ".fill svg{display:block;width:100%;height:100%;}",
+    )
+
+
+TAGLINE = "Small, careful software."
+SITE_URL = "anindastudio.com"
+STRAPLINE = "Design tokens, components and marks. Measured, not assumed."
+
+
+def banner_page(layout: dict) -> str:
+    """A wide image: the icon, both wordmarks, one line of English and the
+    address. Everything sits on an opaque ground taken from the theme."""
+    icon = fill_box(load_svg("icon-512.svg"))
+    latin = free_height(load_svg("wordmark-latin.svg"))
+    bangla = free_height(load_svg("wordmark-bangla.svg"))
+
+    lines = [
+        f'<p class="tagline">{TAGLINE}</p>',
+        f'<p class="strap">{STRAPLINE}</p>' if layout.get("strapline") else "",
+        f'<p class="url">{SITE_URL}</p>' if layout.get("url") else "",
+    ]
+    body = (
+        '<div class="ground" style="background-color:var(--as-surface-lowest)">'
+        '<div class="frame">'
+        '<div class="icon">' + svg_to_text(icon) + "</div>"
+        '<div class="words">'
+        '<div class="mark-latin">' + svg_to_text(latin) + "</div>"
+        '<div class="mark-bangla" lang="bn">' + svg_to_text(bangla) + "</div>"
+        + "".join(lines) +
+        "</div></div></div>"
+    )
+    css = f"""
+.frame{{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:{layout['justify']};gap:{layout['gap']}px;
+  padding:{layout['pad_block']}px {layout['pad_inline_end']}px {layout['pad_block']}px {layout['pad_inline']}px;}}
+.icon{{flex:none;width:{layout['icon']}px;height:{layout['icon']}px;}}
+.icon svg{{display:block;width:100%;height:100%;}}
+.words{{display:flex;flex-direction:column;gap:{layout['stack']}px;min-width:0;color:var(--as-ink);}}
+.mark-latin svg{{display:block;height:{layout['latin']}px;width:auto;color:var(--as-ink);}}
+.mark-bangla svg{{display:block;height:{layout['bangla']}px;width:auto;color:var(--as-ink-muted);}}
+p{{margin:0;font-family:Literata,serif;color:var(--as-ink);}}
+.tagline{{font-size:{layout['tagline']}px;line-height:1.3;font-weight:600;}}
+.strap{{font-size:{layout['strap']}px;line-height:1.4;font-weight:400;color:var(--as-ink-muted);}}
+.url{{font-size:{layout['url']}px;line-height:1.3;font-weight:400;color:var(--as-ink-muted);}}
+"""
+    return page_shell(layout["theme"], body, css, with_font=True)
+
+
+# =========================================================================
+# The asset list
+# =========================================================================
+
+
+def banner(theme: str, icon: int, latin: int, bangla: int, tagline: int,
+           strap: int = 0, url: int = 0, pad_block: int = 0, pad_inline: int = 0,
+           pad_inline_end: int = 0, gap: int = 0, stack: int = 0,
+           justify: str = "center") -> dict:
+    return {
+        "theme": theme, "icon": icon, "latin": latin, "bangla": bangla,
+        "tagline": tagline, "strap": strap, "url": url,
+        "strapline": strap > 0, "url_line": url > 0,
+        "pad_block": pad_block, "pad_inline": pad_inline,
+        "pad_inline_end": pad_inline_end or pad_inline,
+        "gap": gap, "stack": stack, "justify": justify,
+    }
+
+
+def asset_list() -> list[dict]:
+    ico_pngs = [16, 32, 48]
+    items: list[dict] = []
+
+    for size in (16, 32, 48, 96):
+        items.append({
+            "name": f"favicon-{size}.png", "w": size, "h": size, "opaque": False,
+            "render": ("icon", "icon-192.svg", False, False),
+            "purpose": f"Browser tab and bookmark icon at {size} px.",
+            "spec": "PNG favicon, 16/32/48/96 px",
+            "verified": "stable", "note": STABLE_NOTE,
+            "in_ico": size in ico_pngs,
+        })
+
+    items += [
+        {
+            "name": "apple-touch-icon.png", "w": 180, "h": 180, "opaque": True,
+            "render": ("icon", "icon-192.svg", True, False),
+            "purpose": "Home-screen icon on iOS and iPadOS. Opaque, because iOS "
+                       "composites no ground of its own behind it.",
+            "spec": "apple-touch-icon, 180 x 180 px, opaque",
+            "verified": "stable", "note": STABLE_NOTE,
+        },
+        {
+            "name": "icon-192.png", "w": 192, "h": 192, "opaque": False,
+            "render": ("icon", "icon-192.svg", False, False),
+            "purpose": "Installed web app icon, purpose \"any\".",
+            "spec": "Web app manifest icon, 192 x 192 px",
+            "verified": "stable", "note": STABLE_NOTE,
+        },
+        {
+            "name": "icon-512.png", "w": 512, "h": 512, "opaque": False,
+            "render": ("icon", "icon-512.svg", False, False),
+            "purpose": "Installed web app icon and splash artwork, purpose \"any\".",
+            "spec": "Web app manifest icon, 512 x 512 px",
+            "verified": "stable", "note": STABLE_NOTE,
+        },
+        {
+            "name": "icon-maskable-512.png", "w": 512, "h": 512, "opaque": True,
+            "render": ("icon", "icon-512.svg", True, True),
+            "purpose": "Installed web app icon, purpose \"maskable\". The ground is "
+                       "full bleed and every drawn pixel sits inside the central "
+                       "80%, so any shape the platform masks to keeps the mark whole.",
+            "spec": "Maskable icon, 512 x 512 px, content within the central 80%",
+            "verified": "stable", "note": STABLE_NOTE,
+        },
+        {
+            "name": "avatar-512.png", "w": 512, "h": 512, "opaque": True,
+            "render": ("icon", "icon-512.svg", True, False),
+            "purpose": "General profile picture. Opaque, because most services "
+                       "flatten an avatar onto their own background.",
+            "spec": "Square avatar, 512 x 512 px",
+            "verified": "stable", "note": STABLE_NOTE,
+        },
+        {
+            "name": "x-profile-photo.png", "w": 400, "h": 400, "opaque": True,
+            "render": ("icon", "icon-512.svg", True, False),
+            "purpose": "Profile photo on X.",
+            "spec": VERIFIED["x-profile-photo"]["spec"],
+            "verified": "verified", "source": VERIFIED["x-profile-photo"],
+        },
+        {
+            "name": "linkedin-company-logo.png", "w": 400, "h": 400, "opaque": True,
+            "render": ("icon", "icon-512.svg", True, False),
+            "purpose": "Logo on a LinkedIn Page.",
+            "spec": VERIFIED["linkedin-company-logo"]["spec"],
+            "verified": "verified", "source": VERIFIED["linkedin-company-logo"],
+        },
+        {
+            "name": "og-image.png", "w": 1200, "h": 630, "opaque": True,
+            "render": ("banner", banner(
+                "dark", icon=132, latin=76, bangla=54, tagline=34, url=25,
+                pad_block=72, pad_inline=88, gap=56, stack=18)),
+            "purpose": "Open Graph image, and the X large summary card. One image "
+                       "serves both; they take the same shape.",
+            "spec": "Open Graph / X summary_large_image, 1200 x 630 px",
+            "verified": "stable", "note": STABLE_NOTE,
+        },
+        {
+            "name": "github-social-preview.png", "w": 1280, "h": 640, "opaque": True,
+            "render": ("banner", banner(
+                "dark", icon=136, latin=78, bangla=56, tagline=35, url=26,
+                pad_block=76, pad_inline=92, gap=58, stack=18)),
+            "purpose": "Repository social preview on GitHub.",
+            "spec": "GitHub repository social preview, 1280 x 640 px",
+            "verified": "stable", "note": STABLE_NOTE,
+        },
+        {
+            "name": "x-header.png", "w": 1500, "h": 500, "opaque": True,
+            "render": ("banner", banner(
+                "dark", icon=104, latin=58, bangla=42, tagline=26, url=20,
+                pad_block=96, pad_inline=96, gap=48, stack=12)),
+            "purpose": "Header image on an X profile. Everything is kept 96 px "
+                       "clear of the top and bottom, past the 60 px X says it may crop.",
+            "spec": VERIFIED["x-header"]["spec"],
+            "verified": "verified", "source": VERIFIED["x-header"],
+        },
+        {
+            "name": "linkedin-personal-banner.png", "w": 1584, "h": 396, "opaque": True,
+            "render": ("banner", banner(
+                "dark", icon=96, latin=54, bangla=38, tagline=24, url=18,
+                pad_block=56, pad_inline=96, gap=44, stack=10)),
+            "purpose": "Cover image on a personal LinkedIn profile.",
+            "spec": VERIFIED["linkedin-personal-banner"]["spec"],
+            "verified": "verified", "source": VERIFIED["linkedin-personal-banner"],
+        },
+        {
+            "name": "linkedin-company-cover.png", "w": 4200, "h": 700, "opaque": True,
+            "render": ("banner", banner(
+                "dark", icon=168, latin=96, bangla=68, tagline=44, url=32,
+                pad_block=120, pad_inline=260, pad_inline_end=1700, gap=76, stack=20,
+                justify="flex-start")),
+            "purpose": "Cover image on a LinkedIn Page. The content is held to the "
+                       "left half, because LinkedIn asks for key details to be kept "
+                       "away from the edges and the lower-right corner in particular.",
+            "spec": VERIFIED["linkedin-company-cover"]["spec"],
+            "verified": "verified", "source": VERIFIED["linkedin-company-cover"],
+        },
+        {
+            "name": "README-header-light.png", "w": 1280, "h": 320, "opaque": True,
+            "render": ("banner", banner(
+                "light", icon=124, latin=62, bangla=44, tagline=28, strap=20,
+                pad_block=52, pad_inline=72, gap=48, stack=12)),
+            "purpose": "Header image for a README, shown to readers using the light theme.",
+            "spec": "No platform publishes a size for this. 1280 x 320 was chosen "
+                    "because GitHub renders README content at about 880 CSS px wide, "
+                    "so this is close to two device pixels per CSS pixel.",
+            "verified": "unverified",
+            "note": "UNVERIFIED: this size is a house decision, not a published spec.",
+        },
+        {
+            "name": "README-header-dark.png", "w": 1280, "h": 320, "opaque": True,
+            "render": ("banner", banner(
+                "dark", icon=124, latin=62, bangla=44, tagline=28, strap=20,
+                pad_block=52, pad_inline=72, gap=48, stack=12)),
+            "purpose": "Header image for a README, shown to readers using the dark theme.",
+            "spec": "No platform publishes a size for this. 1280 x 320 was chosen "
+                    "because GitHub renders README content at about 880 CSS px wide, "
+                    "so this is close to two device pixels per CSS pixel.",
+            "verified": "unverified",
+            "note": "UNVERIFIED: this size is a house decision, not a published spec.",
+        },
+    ]
+    return items
+
+
+# =========================================================================
+# Rendering and measuring
+# =========================================================================
+
+
+def stamp(png: bytes, name: str) -> bytes:
+    """A PNG cannot open with a comment the way a text file can, so the header
+    goes into tEXt chunks instead. `Software` and `Comment` are both standard
+    keywords and every image tool shows them."""
+    import io
+
+    from PIL import PngImagePlugin
+
+    image = Image.open(io.BytesIO(png))
+    info = PngImagePlugin.PngInfo()
+    info.add_text("Software", GENERATOR)
+    info.add_text("Comment", DO_NOT_EDIT)
+    info.add_text("Title", f"Aninda Studio — {name}")
+    out = io.BytesIO()
+    image.save(out, format="PNG", optimize=True, pnginfo=info)
+    return out.getvalue()
+
+
+def measure(png: bytes, item: dict) -> None:
+    """Read the file back and check it against what it said it would be. A
+    render that silently came out square, or opaque when it should be clear, is
+    exactly the failure this catches."""
+    import io
+
+    image = Image.open(io.BytesIO(png)).convert("RGBA")
+    if image.size != (item["w"], item["h"]):
+        raise BuildError(
+            f"{item['name']}: rendered {image.size[0]}x{image.size[1]}, "
+            f"declared {item['w']}x{item['h']}."
+        )
+    alpha = image.getchannel("A")
+    low, high = alpha.getextrema()
+
+    if item["opaque"]:
+        if low < 255:
+            raise BuildError(
+                f"{item['name']}: declared opaque but the least opaque pixel is "
+                f"alpha {low}. The rounded icon's corners are transparent, so a "
+                "ground has to be drawn behind it."
+            )
+    else:
+        if high < 255:
+            raise BuildError(f"{item['name']}: nothing in it is opaque at all.")
+        corner = image.getpixel((0, 0))
+        if corner[3] != 0:
+            raise BuildError(
+                f"{item['name']}: declared transparent-cornered but pixel (0, 0) "
+                f"has alpha {corner[3]}."
+            )
+
+    if "maskable" in item["name"]:
+        check_maskable(image, item)
+
+
+def check_maskable(image, item: dict) -> None:
+    """Measure, do not assume. Find every pixel that differs from the ground and
+    check the furthest one is inside the safe circle — a radius of 40% of the
+    icon, centred."""
+    ground = image.getpixel((0, 0))
+    width, height = image.size
+    centre_x, centre_y = (width - 1) / 2.0, (height - 1) / 2.0
+    limit = 0.40 * width
+    pixels = image.load()
+    worst = 0.0
+    worst_at = (0, 0)
+    for y in range(height):
+        for x in range(width):
+            p = pixels[x, y]
+            if abs(p[0] - ground[0]) + abs(p[1] - ground[1]) + abs(p[2] - ground[2]) < 24:
+                continue
+            distance = ((x - centre_x) ** 2 + (y - centre_y) ** 2) ** 0.5
+            if distance > worst:
+                worst, worst_at = distance, (x, y)
+    if worst == 0.0:
+        raise BuildError(f"{item['name']}: nothing is drawn on the ground at all.")
+    if worst > limit:
+        raise BuildError(
+            f"{item['name']}: a drawn pixel sits {worst:.1f} px from the centre at "
+            f"{worst_at}, outside the {limit:.0f} px safe radius (the central 80%)."
+        )
+    item["measured_safe_radius"] = round(worst, 1)
+    item["safe_radius_limit"] = round(limit, 1)
+
+
+def pack_ico(pngs: dict[int, bytes]) -> bytes:
+    """One .ico holding 16, 32 and 48, each rendered at its own size rather than
+    resampled down from one big one."""
+    import io
+
+    sizes = sorted(pngs)
+    # The base image has to be the LARGEST: Pillow skips any requested size
+    # bigger than the image it was handed. The other two are passed alongside and
+    # matched by exact size, so each entry is the render made at that size rather
+    # than a resample of the 48.
+    images = [Image.open(io.BytesIO(pngs[s])).convert("RGBA") for s in reversed(sizes)]
+    out = io.BytesIO()
+    images[0].save(
+        out, format="ICO",
+        sizes=[(s, s) for s in sizes],
+        append_images=images[1:],
+    )
+    data = out.getvalue()
+
+    # Read it back. Pillow will happily write one entry if append_images is not
+    # honoured, and a favicon that lost two of its three sizes still opens.
+    check = Image.open(io.BytesIO(data))
+    got = sorted(check.ico.sizes()) if hasattr(check, "ico") else []
+    want = sorted((s, s) for s in sizes)
+    if got != want:
+        raise BuildError(f"favicon.ico holds {got}, not {want}.")
+    return data
+
+
+def build_svg_icon() -> bytes:
+    """icon.svg — the scalable favicon. The everyday rounded icon with its fixed
+    width and height removed, so it scales to whatever the browser asks for."""
+    node = load_svg("icon-1024.svg")
+    for attribute in ("width", "height"):
+        if attribute in node.attrib:
+            del node.attrib[attribute]
+    for child in node:
+        if child.tag.endswith("}title") or child.tag == "title":
+            child.text = "Aninda Studio"
+    text = (
+        f"<!-- {DO_NOT_EDIT} -->\n"
+        f"<!-- Source: 04_mark/svg/icon-1024.svg, written by 04_mark/build.py. -->\n"
+        + svg_to_text(node)
+        + "\n"
+    )
+    return text.encode("utf-8")
+
+
+def run() -> int:
+    if Image is None:
+        print("NOT EQUIPPED: Pillow is not importable.", file=sys.stderr)
+        return 2
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("NOT EQUIPPED: playwright is not importable.", file=sys.stderr)
+        return 2
+    if not TOKENS_CSS.exists():
+        print(f"NOT EQUIPPED: {TOKENS_CSS} is missing.", file=sys.stderr)
+        return 2
+
+    guard_glyphs([TAGLINE, SITE_URL, STRAPLINE])
+    items = asset_list()
+
+    out: dict[str, bytes] = {}
+    try:
+        pw = sync_playwright().start()
+    except Exception as exc:
+        print(f"NOT EQUIPPED: playwright would not start — {exc}", file=sys.stderr)
+        return 2
+    try:
+        try:
+            browser = pw.chromium.launch()
+        except Exception as exc:
+            print(
+                "NOT EQUIPPED: Chromium would not launch. Did you export "
+                f"PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers ?\n  {exc}",
+                file=sys.stderr,
+            )
+            return 2
+
+        for item in items:
+            kind = item["render"][0]
+            if kind == "icon":
+                _, source, opaque, maskable = item["render"]
+                html = icon_page(source, opaque, maskable)
+            else:
+                html = banner_page(item["render"][1])
+
+            context = browser.new_context(
+                viewport={"width": item["w"], "height": item["h"]},
+                device_scale_factor=1,
+            )
+            page = context.new_page()
+            failures: list[str] = []
+            page.on("pageerror", lambda e: failures.append(str(e)))
+            page.on("requestfailed", lambda r: failures.append(f"{r.url} — {r.failure}"))
+            page.set_content(html, wait_until="load")
+            page.wait_for_timeout(60)
+            png = page.screenshot(omit_background=not item["opaque"])
+            context.close()
+            if failures:
+                raise BuildError(f"{item['name']}: the render page reported {failures}")
+
+            png = stamp(png, item["name"])
+            measure(png, item)
+            out[item["name"]] = png
+            item["bytes"] = len(png)
+
+        browser.close()
+    finally:
+        pw.stop()
+
+    ico_sources = {
+        int(i["name"].split("-")[1].split(".")[0]): out[i["name"]]
+        for i in items if i.get("in_ico")
+    }
+    if sorted(ico_sources) != [16, 32, 48]:
+        raise BuildError(f"favicon.ico wants 16, 32 and 48; it was offered {sorted(ico_sources)}.")
+    out["favicon.ico"] = pack_ico(ico_sources)
+    out["icon.svg"] = build_svg_icon()
+
+    manifest = build_manifest(items, out)
+    out["MANIFEST.json"] = manifest
+
+    HERE.mkdir(parents=True, exist_ok=True)
+    for name, data in sorted(out.items()):
+        (HERE / name).write_bytes(data)
+
+    known = set(out)
+    for path in sorted(HERE.iterdir()):
+        if path.name in ("build.py", "__pycache__") or path.name.startswith("."):
+            continue
+        if path.is_file() and path.name not in known:
+            path.unlink()
+
+    total = sum(len(v) for v in out.values())
+    print(f"Wrote {len(out)} files, {total / 1_000_000:.2f} MB total, into 10_assets/")
+    for name in sorted(out):
+        print(f"  {name:<34} {len(out[name]) / 1024:8.1f} KB")
+    verified = [i["name"] for i in items if i["verified"] == "verified"]
+    unverified = [i["name"] for i in items if i["verified"] == "unverified"]
+    print(f"\nVerified against the platform's own help page on {BUILT_ON}: {len(verified)}")
+    for name in verified:
+        print(f"  · {name}")
+    print(f"Could NOT be verified against any published spec: {len(unverified)}")
+    for name in unverified:
+        print(f"  · {name}")
+    print("\nicon-appstore-square-1024.svg is not used by anything here. It exists "
+          "for an App Store submission only — see 04_mark/manifest.json.")
+    print("favicon.ico carries no text header: the ICO container has no field for "
+          "one. Its provenance is in MANIFEST.json.")
+    return 0
+
+
+def build_manifest(items: list[dict], out: dict[str, bytes]) -> bytes:
+    files = []
+    for item in items:
+        entry = {
+            "name": item["name"],
+            "size": f"{item['w']}x{item['h']}",
+            "width": item["w"],
+            "height": item["h"],
+            "bytes": item["bytes"],
+            "opaque": item["opaque"],
+            "purpose": item["purpose"],
+            "spec": item["spec"],
+            "verification": item["verified"],
+        }
+        if item["verified"] == "verified":
+            source = item["source"]
+            entry["verified_on"] = BUILT_ON
+            entry["verified_against"] = source["url"]
+            entry["verified_quote"] = source["quote"]
+            entry["note"] = source["note"]
+        else:
+            entry["verified_on"] = None
+            entry["note"] = item.get("note", "")
+        if "measured_safe_radius" in item:
+            entry["measured_safe_radius_px"] = item["measured_safe_radius"]
+            entry["safe_radius_limit_px"] = item["safe_radius_limit"]
+        files.append(entry)
+
+    files.append({
+        "name": "favicon.ico",
+        "size": "16x16, 32x32, 48x48",
+        "width": None, "height": None,
+        "bytes": len(out["favicon.ico"]),
+        "opaque": False,
+        "purpose": "The classic favicon, for browsers and tools that ask for "
+                   "/favicon.ico. Each of the three sizes is rendered at its own "
+                   "size rather than resampled from one large image.",
+        "spec": "Multi-size ICO, 16 + 32 + 48",
+        "verification": "stable",
+        "verified_on": None,
+        "note": "The ICO container has no text field, so this file carries no "
+                "generator header. Its provenance is this manifest. " + STABLE_NOTE,
+    })
+    files.append({
+        "name": "icon.svg",
+        "size": "scalable",
+        "width": None, "height": None,
+        "bytes": len(out["icon.svg"]),
+        "opaque": False,
+        "purpose": "The scalable favicon, linked as rel=\"icon\" type=\"image/svg+xml\". "
+                   "Browsers that support it use this at any size.",
+        "spec": "SVG favicon, scalable",
+        "verification": "stable",
+        "verified_on": None,
+        "note": STABLE_NOTE,
+    })
+
+    mark_policy = json.loads(MARK_MANIFEST.read_text("utf-8"))["icon_policy"]
+    payload = {
+        "_generator": GENERATOR,
+        "_warning": DO_NOT_EDIT,
+        "built_on": BUILT_ON,
+        "source_artwork": "04_mark/svg/, written by 04_mark/build.py",
+        "renderer": "Chromium via Playwright, device_scale_factor 1",
+        "colour": "No colour is typed in the generator. Every ground is a "
+                  "var(--as-…) resolved from 07_tokens/css/tokens.css.",
+        "icon_policy": {
+            "decision": mark_policy["decision"],
+            "app_store_only": mark_policy["app_store_only"],
+            "used_here": "The rounded icon only. "
+                         "icon-appstore-square-1024.svg is not rendered by this build.",
+        },
+        "transparency": "The everyday icon is rounded and its corners are "
+                        "transparent. Every file marked opaque has a ground drawn "
+                        "behind it, and the build measures the alpha channel to "
+                        "prove it rather than trusting the CSS.",
+        "verification_key": {
+            "verified": "Checked against the platform's own help page on the date "
+                        "given, with the URL and the sentence it came from.",
+            "stable": STABLE_NOTE,
+            "unverified": "No platform publishes a size for this. The figure is a "
+                          "house decision and is named as one.",
+        },
+        "files": sorted(files, key=lambda f: f["name"]),
+    }
+    return (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+
+
+def main(argv: list[str]) -> int:
+    try:
+        return run()
+    except BuildError as exc:
+        print(f"BUILD FAILED\n{exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

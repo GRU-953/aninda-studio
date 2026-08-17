@@ -1,0 +1,2425 @@
+#!/usr/bin/env python3
+"""Aninda Studio — the brand guidebook, generator.
+
+This script is the ONLY writer of 09_guidebook/Aninda-Studio-Guidebook.html and
+09_guidebook/Aninda-Studio-Guidebook-print.html. Neither file is hand-written and
+neither should ever be hand-edited: the next run overwrites it.
+
+    Build:   ./.venv/bin/python 09_guidebook/build.py
+    Verify:  ./.venv/bin/python 09_guidebook/build.py --check
+
+`--check` regenerates every byte of both files in memory and compares them
+against what is on disk. It writes nothing and exits non-zero on the first
+difference. That is the drift guard: if a token moves and this book is not
+rebuilt, --check fails.
+
+WHAT IS HAND-WRITTEN AND WHAT IS NOT
+    Hand-written, read from chapters/ and chapters/bn/:
+        Welcome, The name, The mark, Icons, Voice, Writing in Bangla,
+        Applying it, Licence and trademarks, What this system does not do.
+    Generated here, from the sources named at the top of each builder function:
+        Colour, Type, Space and shape, Components, Motion.
+    Not one colour, size, duration or ratio in this book was typed by a person.
+    The colour chapter in particular is read out of 07_tokens/build/*.tokens.json
+    and its embedded proofs, never transcribed.
+
+WHY THERE ARE TWO OUTPUT FILES, AND WHY IT MATTERS
+    Aninda-Studio-Guidebook.html carries the whole kit inline: every file a user
+    of the system needs is a download link whose href is its own base64 data URI.
+    That is 67 files, about 9.8 MB on disk and about 13.1 MB once base64-encoded,
+    in one document. The print build STRIPS those download data URIs and keeps
+    their labels as plain text.
+
+    The reason is the same in both directions: a paper page cannot be clicked. The
+    download payloads buy a printed reader nothing at all, and they cost the whole
+    document. Measured with `scripts/pdf.py --probe-interactive`:
+
+      * printing the print build gives a 1.4 MB PDF;
+      * printing the interactive build gives a 14.2 MB PDF, because Chromium
+        carries every data URI into the PDF as a link target — ten times the size,
+        for links nobody on paper can follow;
+      * and the interactive build has no A4 page geometry and no page-break
+        rules, so its layout breaks in the wrong places throughout.
+
+    ONE HONEST CORRECTION. The failure this split is usually justified by —
+    Chromium's PDF pipeline emitting blank pages once the inlined base64 gets
+    large, at somewhere around 24 MB — was NOT reproduced here. At 13.6 MB the
+    interactive build printed, with no blank page. So the split rests on the two
+    costs measured above and on the fact that the payloads are dead weight on
+    paper, and NOT on a blank-page failure this build has actually seen. Anyone
+    growing the kit past roughly twice its present size should re-run the probe
+    before assuming it still prints.
+
+    Fonts and images are kept in BOTH builds. Without the embedded fonts the
+    Bangla prints in a fallback face, which is the one thing this book must not do.
+
+FAIL CLOSED
+    Every guard runs against both documents held in memory. If any guard fails,
+    the script writes nothing and exits 1:
+      * banned English words (the ENGLISH-STANDARD blocklist) — including in the
+        generated chapters, which is where they would otherwise creep in;
+      * any Bangla run that does not appear verbatim in a verified source file.
+        No Bangla is written for this book. Where a verified string does not
+        exist the English stays and the gap is named;
+      * any unresolved {{placeholder}};
+      * any literal colour in this script's own stylesheet;
+      * any external reference — http, https or protocol-relative — in a src,
+        href to an asset, or url() in CSS.
+
+SPDX-License-Identifier: Apache-2.0
+Copyright 2026 Aninda Sundar Howlader
+"""
+
+from __future__ import annotations
+
+import base64
+import html as html_mod
+import json
+import mimetypes
+import os
+import re
+import sys
+from pathlib import Path
+
+try:
+    import markdown as markdown_mod
+except ImportError:  # pragma: no cover - environment guard
+    print("markdown is not installed in the project venv.", file=sys.stderr)
+    raise SystemExit(2)
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+
+GENERATOR = "09_guidebook/build.py"
+VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+
+# Every figure in this kit was measured or verified on this date. It is a
+# constant rather than today's date so that two builds of the same sources are
+# byte-identical and --check means something.
+SOURCE_DATE = "14 August 2026"
+
+OUT_INTERACTIVE = HERE / "Aninda-Studio-Guidebook.html"
+OUT_PRINT = HERE / "Aninda-Studio-Guidebook-print.html"
+
+# ---------------------------------------------------------------------------
+# Sources
+# ---------------------------------------------------------------------------
+
+TOKENS_DIR = ROOT / "07_tokens" / "build"
+TOKENS_CSS = ROOT / "07_tokens" / "css" / "tokens.css"
+COMPONENTS_CSS = ROOT / "08_components" / "src" / "components.css"
+CARDS_JSON = ROOT / "08_components" / "_cards.json"
+CARDS_DIR = ROOT / "08_components" / "cards"
+FONTS_DIR = ROOT / "08_components" / "fonts"
+MARK_DIR = ROOT / "04_mark"
+SVG_DIR = MARK_DIR / "svg"
+PROOF_JSON = ROOT / "05_colour" / "generated" / "estuary.proof.json"
+MEASUREMENTS_JSON = ROOT / "06_type" / "_data" / "measurements.json"
+FONT_FACTS_JSON = ROOT / "06_type" / "_data" / "font_facts.json"
+NPM_DIST = ROOT / "12_packages" / "npm" / "dist"
+
+THEMES = ["light", "dark", "hc-light", "hc-dark"]
+
+# Sources a Bangla string is allowed to come from. Every one of these is either
+# a primary-source review (BANGLA-STANDARD.md) or a generated artefact whose
+# Bangla was taken from it. Nothing else may contribute Bangla to this book.
+VERIFIED_BN_SOURCES = [
+    ROOT / "06_type" / "BANGLA-STANDARD.md",
+    ROOT / "06_type" / "RECOMMENDATION.md",
+    ROOT / "06_type" / "MEASUREMENTS.md",
+    CARDS_JSON,
+    COMPONENTS_CSS,
+    PROOF_JSON,
+    MARK_DIR / "manifest.json",
+    MEASUREMENTS_JSON,
+    TOKENS_DIR / "primitive.tokens.json",
+]
+
+# ---------------------------------------------------------------------------
+# The verified Bangla strings, and only these
+#
+# Source: the "Recommended final strings" table of 06_type/BANGLA-STANDARD.md,
+# 14 August 2026 — 27 strings reviewed, 6 changed, 21 unchanged. The values
+# below are the RECOMMENDED column, so the six corrections are already applied.
+# Nothing is added to this table by hand. Where a string is missing, the English
+# is used and the gap is named in the book itself.
+# ---------------------------------------------------------------------------
+
+BN = {
+    "wm-1": "অনিন্দ্য স্টুডিও",
+    "wm-2": "অনিন্দ্য",
+    "th-1": "আলো",
+    "th-2": "অন্ধকার",
+    "th-3": "বেশি কনট্রাস্ট",
+    "col-1": "মোহনা",
+    "col-2": "জোয়ার",
+    "col-3": "পলি",
+    "col-4": "কাশ",
+    "col-5": "লাল মাটি",
+    "col-6": "বর্ষা",
+    "bt-1": "লেখাটি সংরক্ষণ করুন",
+    "bt-2": "বাতিল করুন",
+    "bt-3": "ফাইলটি মুছে ফেলুন",
+    "bt-4": "আবার চেষ্টা করুন",
+    "bt-5": "কোডটি কপি করুন",
+    "ms-1": "সংরক্ষণ করা যায়নি। আপনার লেখা এখনো আছে — একটু পরে আবার চেষ্টা করুন।",
+    "ms-2": "ফাইলটি অনেক বড়ো। সর্বোচ্চ ১০ মেগাবাইট।",
+    "ms-3": "এখনো কিছু নেই। শুরু করতে প্রথম লেখাটি যোগ করুন।",
+    "ms-4": "সংরক্ষিত হয়েছে",
+    "vc-1": (
+        "আমি ছোটো, যত্নে গড়া সফটওয়্যার বানাই। কোনো কিছুর সীমা থাকলে সেটা "
+        "এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না।"
+    ),
+    "gb-1": "স্বাগতম",
+    "gb-2": "নাম",
+    "gb-3": "চিহ্ন",
+    "gb-4": "রং",
+    "gb-5": "হরফ",
+    "gb-6": "ফাঁক ও আকার",
+    "gb-7": "উপাদান",
+    "gb-8": "গতি",
+    "gb-9": "কণ্ঠস্বর",
+    "gb-10": "যা এই পদ্ধতি করে না",
+}
+
+BN_ENGLISH = {
+    "bt-1": "Save the entry",
+    "bt-2": "Cancel",
+    "bt-3": "Delete the file",
+    "bt-4": "Try again",
+    "bt-5": "Copy the code",
+    "ms-1": "Couldn't save. Your work is still here — try again in a moment.",
+    "ms-2": "That file is too large. 10 MB at most.",
+    "ms-3": "Nothing here yet. Add your first entry to begin.",
+    "ms-4": "Saved",
+}
+
+# Composed from two verified strings each. Neither compound was itself put in
+# front of the reviewer, so both are named in the gap list rather than presented
+# as verified.
+BN_COMPOSED = {
+    "hc-light": f"{BN['th-3']} — {BN['th-1']}",
+    "hc-dark": f"{BN['th-3']} — {BN['th-2']}",
+}
+
+# ---------------------------------------------------------------------------
+# Chapters
+# ---------------------------------------------------------------------------
+
+# 06_type/bangla-strings.json was written after the BN table above and holds 94
+# approved strings under readable keys — `chapter.icons`, `card.button.name` and so
+# on — each carrying the rule number or dictionary page it rests on. Merging it
+# here rather than copying strings across keeps one maintained source: two copies
+# of a translation drift, and the one that drifts is the one nobody is looking at.
+_STRINGS = ROOT / "06_type" / "bangla-strings.json"
+if _STRINGS.exists():
+    for _k, _v in json.loads(_STRINGS.read_text(encoding="utf-8")).items():
+        if _v.get("bn"):
+            BN[_k] = _v["bn"]
+
+
+CHAPTERS = [
+    # (number, slug, English title, Bangla title id or None, source)
+    ("01", "welcome", "Welcome", "gb-1", "file"),
+    ("02", "the-name", "The name", "gb-2", "file"),
+    ("03", "the-mark", "The mark", "gb-3", "file"),
+    ("04", "icons", "Icons", "chapter.icons", "file"),
+    ("05", "colour", "Colour", "gb-4", "generated"),
+    ("06", "type", "Type", "gb-5", "generated"),
+    ("07", "space-and-shape", "Space and shape", "gb-6", "generated"),
+    ("08", "components", "Components", "gb-7", "generated"),
+    ("09", "motion", "Motion", "gb-8", "generated"),
+    ("10", "voice", "Voice", "gb-9", "file"),
+    ("11", "writing-in-bangla", "Writing in Bangla", "chapter.writing-in-bangla", "file"),
+    ("12", "applying-it", "Applying it", "chapter.applying-it", "file"),
+    ("13", "licence-and-trademarks", "Licence and trademarks", "chapter.licence-and-trademarks", "file"),
+    ("14", "what-this-system-does-not-do", "What this system does not do", "gb-10", "file"),
+]
+
+CHAPTER_STANDFIRST = {
+    "01": "What this is, who wrote it, and why the brand and the design system are two artefacts rather than one.",
+    "02": "Aninda Studio in two scripts, and the one difference between them that looks like a mistake and is not.",
+    "03": "A circle tangent to a stem that overruns downward. One geometry, two weights, and the mistake that produced it.",
+    "04": "One rounded icon on every surface, Apple included — and exactly what that trades away.",
+    "05": "Every ramp, every role and every measured ratio in four themes, read out of the token files.",
+    "06": "Two scripts, one scale, a measured multiplier for Bangla and a floor it never goes below.",
+    "07": "A 4 px scale in ten steps, four radii, four target sizes and one focus ring.",
+    "08": "Thirty cards in three groups, and the three rules the component layer is built to keep.",
+    "09": "Two durations, three curves, and why Material's spring system was read and not adopted.",
+    "10": "Plain international English, British spelling, and the six words that are banned outright.",
+    "11": "Standard Bangla by the Bangla Academy's own rules, and the policy of never inventing any.",
+    "12": "How to install it, theme it, check it, and rebuild this book.",
+    "13": "Three licences, one thing with no licence at all, and where the boundary falls.",
+    "14": "The honest list. Not a disclaimer — every item changes how much weight to put on something earlier.",
+}
+
+
+class BuildError(Exception):
+    pass
+
+
+# ---------------------------------------------------------------------------
+# Small helpers
+# ---------------------------------------------------------------------------
+
+
+def e(text) -> str:
+    return html_mod.escape(str(text), quote=True)
+
+
+def bn_span(key: str, large: bool = False) -> str:
+    text = BN[key]
+    cls = ' class="as-bn-large"' if large else ""
+    return f'<span lang="bn"{cls}>{e(text)}</span>'
+
+
+def bn_raw(text: str, large: bool = False) -> str:
+    cls = ' class="as-bn-large"' if large else ""
+    return f'<span lang="bn"{cls}>{e(text)}</span>'
+
+
+def read_json(path: Path):
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def fmt_ratio(value: float) -> str:
+    return f"{value:.2f}:1"
+
+
+def fmt_bytes(n: int) -> str:
+    if n >= 1024 * 1024:
+        return f"{n / (1024 * 1024):.1f} MB"
+    if n >= 1024:
+        return f"{n / 1024:.0f} kB"
+    return f"{n} bytes"
+
+
+def table(headers: list[str], rows: list[list[str]], cls: str = "gb-table",
+          caption: str = "") -> str:
+    head = "".join(f"<th scope=\"col\">{h}</th>" for h in headers)
+    body = []
+    for row in rows:
+        cells = "".join(f"<td>{c}</td>" for c in row)
+        body.append(f"<tr>{cells}</tr>")
+    cap = f"<caption>{caption}</caption>" if caption else ""
+    return (
+        f'<div class="gb-scroll-x"><table class="{cls}">{cap}'
+        f"<thead><tr>{head}</tr></thead><tbody>{''.join(body)}</tbody></table></div>"
+    )
+
+
+def details(summary: str, body: str) -> str:
+    return f"<details class=\"gb-details\"><summary>{summary}</summary>{body}</details>"
+
+
+def note(body: str, kind: str = "note") -> str:
+    return f'<aside class="gb-note gb-note--{kind}">{body}</aside>'
+
+
+# ---------------------------------------------------------------------------
+# Token access
+# ---------------------------------------------------------------------------
+
+
+class Tokens:
+    """Reads the DTCG files and resolves aliases. Nothing here invents a value."""
+
+    def __init__(self) -> None:
+        self.primitive = read_json(TOKENS_DIR / "primitive.tokens.json")
+        self.semantic = {t: read_json(TOKENS_DIR / f"semantic.{t}.tokens.json")
+                         for t in THEMES}
+        self.forced = read_json(TOKENS_DIR / "forced-colors.map.json")
+        self.proof = read_json(PROOF_JSON)
+
+    def prim(self, dotted: str):
+        node = self.primitive
+        for part in dotted.split("."):
+            node = node[part]
+        return node
+
+    def resolve_colour(self, value):
+        """A semantic $value is either an inline colour object or {alias}."""
+        if isinstance(value, str) and value.startswith("{") and value.endswith("}"):
+            return self.prim(value[1:-1])["$value"]
+        return value
+
+    def ramp(self, family: str) -> dict:
+        return self.prim(f"color.ramp.{family}")
+
+    def surfaces(self, theme: str) -> dict:
+        return self.semantic[theme]["color"]["surface"]
+
+    def roles(self, theme: str) -> list[tuple[str, dict]]:
+        """Flatten the semantic colour tree to (role-name, node) in file order,
+        skipping the surfaces, which are presented separately."""
+        out: list[tuple[str, dict]] = []
+        colour = self.semantic[theme]["color"]
+        for group, node in colour.items():
+            if group.startswith("$") or group == "surface":
+                continue
+            for name, leaf in node.items():
+                if name.startswith("$"):
+                    continue
+                label = group if name == "default" else f"{group}-{name}"
+                out.append((label, leaf))
+        return out
+
+    @staticmethod
+    def proof_of(leaf: dict) -> dict:
+        return leaf["$extensions"]["studio.aninda"]["proof"]
+
+    @staticmethod
+    def ext(leaf: dict) -> dict:
+        return leaf["$extensions"]["studio.aninda"]
+
+
+# ---------------------------------------------------------------------------
+# Assets
+# ---------------------------------------------------------------------------
+
+
+def load_fonts() -> dict[str, str]:
+    cards = read_json(CARDS_JSON)
+    out = {}
+    for spec in cards["_fonts"]:
+        path = ROOT / "08_components" / spec["file"]
+        out[spec["family"]] = base64.b64encode(path.read_bytes()).decode("ascii")
+    return out
+
+
+def font_face_css(encoded: dict[str, str]) -> str:
+    weights = {"Literata": "400 700", "Noto Serif Bengali": "400 700", "Aninda Mono": "400"}
+    blocks = []
+    for family, data in encoded.items():
+        blocks.append(
+            "@font-face {\n"
+            f'  font-family: "{family}";\n'
+            "  font-style: normal;\n"
+            f"  font-weight: {weights[family]};\n"
+            "  font-display: block;\n"
+            f'  src: url(data:font/woff2;base64,{data}) format("woff2");\n'
+            "}"
+        )
+    return "\n".join(blocks)
+
+
+def inline_svg(name: str, cls: str, title: str, theme_aware: bool = False) -> str:
+    """Take a mark file and make it safe to drop inside a page: force a class,
+    replace the file's own <title>, and drop the export dimensions so the page
+    sizes it.
+
+    `theme_aware` removes the `style="color:…"` the export sets on the root
+    element. The artwork is drawn in `currentColor`, so with that inline colour
+    gone the mark inherits the theme — which is the point of drawing it that way,
+    and without this the mark is invisible in the dark themes. It is applied to
+    the bare mark and the wordmarks, and NOT to the icons, whose ground and
+    foreground colours are deliberate parts of the artwork.
+    """
+    raw = (SVG_DIR / name).read_text(encoding="utf-8").strip()
+    raw = re.sub(r"<title>.*?</title>", f"<title>{e(title)}</title>", raw, count=1,
+                 flags=re.S)
+    if theme_aware:
+        raw = re.sub(r'(<svg[^>]*?)\s+style="color:#[0-9A-Fa-f]{3,8}"', r"\1", raw,
+                     count=1)
+    raw = raw.replace("<svg ", f'<svg class="{cls}" ', 1)
+    # width and height on the source files are export sizes; the page sizes them.
+    raw = re.sub(r'\swidth="[\d.]+"\s*height="[\d.]+"', "", raw, count=1)
+    return raw
+
+
+# ---------------------------------------------------------------------------
+# The kit — every file a download link points at
+# ---------------------------------------------------------------------------
+
+
+def kit_files() -> list[tuple[str, Path, str]]:
+    """(display path, real path, what it is). Order is stable, so --check works."""
+    items: list[tuple[str, Path, str]] = []
+
+    for name in ("primitive", "semantic.light", "semantic.dark",
+                 "semantic.hc-light", "semantic.hc-dark"):
+        items.append((f"07_tokens/build/{name}.tokens.json",
+                      TOKENS_DIR / f"{name}.tokens.json",
+                      "Design tokens, DTCG 2025.10"))
+    items.append(("07_tokens/build/forced-colors.map.json",
+                  TOKENS_DIR / "forced-colors.map.json",
+                  "Which system colour each role gives way to in forced colours"))
+    items.append(("07_tokens/css/tokens.css", TOKENS_CSS,
+                  "Every token as a CSS custom property, in five layers"))
+    items.append(("08_components/src/components.css", COMPONENTS_CSS,
+                  "The component layer. No literal colour in it"))
+
+    for spec in read_json(CARDS_JSON)["_fonts"]:
+        items.append((f"08_components/{spec['file']}",
+                      ROOT / "08_components" / spec["file"],
+                      f"{spec['family']} subset, {spec['licence']}"))
+        items.append((f"08_components/{spec['licence_file']}",
+                      ROOT / "08_components" / spec["licence_file"],
+                      f"The full licence text for {spec['family']}"))
+
+    manifest = read_json(MARK_DIR / "manifest.json")
+    for name in manifest["files"]:
+        items.append((f"04_mark/svg/{name}", SVG_DIR / name, "Identity artwork"))
+    items.append(("04_mark/manifest.json", MARK_DIR / "manifest.json",
+                  "The mark's construction, with every check it passed"))
+    items.append(("05_colour/generated/estuary.proof.json", PROOF_JSON,
+                  "Every colour, every ramp, every measured ratio"))
+
+    for path in sorted(NPM_DIST.iterdir()):
+        if path.is_file():
+            items.append((f"12_packages/npm/dist/{path.name}", path,
+                          "Published package build output"))
+
+    for card in read_json(CARDS_JSON)["cards"]:
+        items.append((f"08_components/{card['path']}",
+                      ROOT / "08_components" / card["path"],
+                      f"{card['group']} card — {card['name']}"))
+
+    return items
+
+
+def data_uri(path: Path) -> str:
+    mime, _ = mimetypes.guess_type(path.name)
+    if path.suffix == ".woff2":
+        mime = "font/woff2"
+    elif path.suffix in (".mjs", ".cjs"):
+        mime = "text/javascript"
+    elif path.suffix == ".ts":
+        mime = "text/plain"
+    mime = mime or "application/octet-stream"
+    return f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+
+
+# ---------------------------------------------------------------------------
+# Blocks the hand-written chapters ask for by name
+# ---------------------------------------------------------------------------
+
+
+def block_figure_marks() -> str:
+    manifest = read_json(MARK_DIR / "manifest.json")
+    strokes = manifest["strokes"]
+    reg = inline_svg("mark-regular.svg", "gb-mark", "The mark, regular weight",
+                     theme_aware=True)
+    heavy = inline_svg("mark-heavy.svg", "gb-mark", "The mark, heavy weight",
+                       theme_aware=True)
+    return (
+        '<figure class="gb-figure gb-figure--marks">'
+        f'<div class="gb-markbox"><div class="gb-markbox__art">{reg}</div>'
+        f'<figcaption class="gb-caption">Regular — stroke {strokes["regular"]:g}</figcaption></div>'
+        f'<div class="gb-markbox"><div class="gb-markbox__art">{heavy}</div>'
+        f'<figcaption class="gb-caption">Heavy — stroke {strokes["heavy"]:g}</figcaption></div>'
+        "</figure>"
+    )
+
+
+def block_figure_construction() -> str:
+    m = read_json(MARK_DIR / "manifest.json")
+    g = m["geometry"]
+    c, sx, st, sb = g["circle"], g["stem_x"], g["stem_top"], g["stem_bottom"]
+    grid = "".join(
+        f'<line x1="0" y1="{v}" x2="100" y2="{v}"/><line x1="{v}" y1="0" x2="{v}" y2="100"/>'
+        for v in range(10, 100, 10)
+    )
+    return (
+        '<figure class="gb-figure">'
+        '<svg class="gb-construction" viewBox="-6 -6 112 112" role="img" '
+        'aria-label="The mark on its 100-unit construction grid">'
+        f'<g class="gb-c-grid">{grid}</g>'
+        '<rect class="gb-c-frame" x="0" y="0" width="100" height="100"/>'
+        f'<circle class="gb-c-guide" cx="{c["cx"]:g}" cy="{c["cy"]:g}" r="{c["r"]:g}"/>'
+        f'<line class="gb-c-guide" x1="{sx:g}" y1="-4" x2="{sx:g}" y2="104"/>'
+        f'<circle class="gb-c-art" cx="{c["cx"]:g}" cy="{c["cy"]:g}" r="{c["r"]:g}"/>'
+        f'<path class="gb-c-art" d="M{sx:g} {st:g}V{sb:g}"/>'
+        f'<circle class="gb-c-dot" cx="{sx:g}" cy="{c["cy"]:g}" r="2.4"/>'
+        "</svg>"
+        '<figcaption class="gb-caption">The circle, the tangent stem, and the '
+        "downward overrun. Read from <code>04_mark/manifest.json</code>."
+        "</figcaption></figure>"
+    )
+
+
+def block_figure_icons() -> str:
+    order = [
+        ("icon-1024.svg", "icon-1024", "The everyday icon, every platform"),
+        ("icon-512.svg", "icon-512", "Avatars and progressive web apps"),
+        ("icon-192.svg", "icon-192", "Progressive web apps"),
+        ("icon-1088-watch.svg", "icon-1088-watch", "watchOS, masked to a circle"),
+        ("tile-web.svg", "tile-web", "Web tile, heavy weight"),
+        ("icon-appstore-square-1024.svg", "icon-appstore", "App Store submission only"),
+    ]
+    cells = []
+    for name, ident, caption in order:
+        art = inline_svg(name, "gb-icon", caption)
+        cells.append(
+            f'<div class="gb-iconbox"><div class="gb-iconbox__art">{art}</div>'
+            f'<p class="gb-caption"><code>{e(name)}</code><br>{e(caption)}</p></div>'
+        )
+    return f'<figure class="gb-figure gb-figure--icons">{"".join(cells)}</figure>'
+
+
+def block_figure_wordmarks() -> str:
+    latin = inline_svg("wordmark-latin.svg", "gb-wordmark",
+                       "The Latin wordmark — aninda studio", theme_aware=True)
+    bangla = inline_svg("wordmark-bangla.svg", "gb-wordmark",
+                        f"The Bangla wordmark — {BN['wm-1']}", theme_aware=True)
+    return (
+        '<figure class="gb-figure gb-figure--wordmarks">'
+        f'<div class="gb-wordbox">{latin}'
+        '<figcaption class="gb-caption">Latin — aninda studio</figcaption></div>'
+        f'<div class="gb-wordbox">{bangla}'
+        f'<figcaption class="gb-caption">Bangla — {bn_span("wm-1", large=True)}</figcaption></div>'
+        "</figure>"
+    )
+
+
+def block_mark_geometry() -> str:
+    m = read_json(MARK_DIR / "manifest.json")
+    g = m["geometry"]
+    c = g["circle"]
+    rows = [
+        ["Grid", f"{m['grid']:g} × {m['grid']:g} units"],
+        ["Circle centre", f"x {c['cx']:g}, y {c['cy']:g}"],
+        ["Circle radius", f"{c['r']:g} units"],
+        ["Stem x", f"{g['stem_x']:g} — the circle's right edge, so the two are tangent"],
+        ["Stem top", f"y {g['stem_top']:g} — level with the top of the circle"],
+        ["Stem bottom", f"y {g['stem_bottom']:g} — "
+                        f"{g['stem_bottom'] - (c['cy'] + c['r']):g} units below the circle"],
+        ["Clear space", e(m["clear_space"])],
+        ["Safe field inside an icon", f"{m['safe_field']:g} of {m['grid']:g} units"],
+    ]
+    return (block_figure_construction()
+            + table(["Measure", "Value"], rows,
+                    caption="Read from 04_mark/manifest.json at build time."))
+
+
+def block_mark_strokes() -> str:
+    m = read_json(MARK_DIR / "manifest.json")
+    s = m["strokes"]
+    rows = [
+        ["Regular", f"{s['regular']:g}", "24 px and above", "65 × 73 units", "36.5 units"],
+        ["Heavy", f"{s['heavy']:g}", "below 24 px", "71 × 79 units", "39.5 units"],
+    ]
+    return table(
+        ["Weight", "Stroke", "Use at", "Drawn extent", "Clear space"],
+        rows,
+        caption=f"The rule, in the manifest's own words: {e(s['rule'])}.",
+    )
+
+
+def block_mark_files() -> str:
+    m = read_json(MARK_DIR / "manifest.json")
+    rows = []
+    for name in m["files"]:
+        path = SVG_DIR / name
+        rows.append([f"<code>{e(name)}</code>", fmt_bytes(path.stat().st_size)])
+    checks = "".join(f"<li>{e(c)}</li>" for c in m["checks"])
+    return (
+        table(["File", "Size"], rows)
+        + details("Every check the mark build ran, and passed",
+                  f'<ul class="gb-list">{checks}</ul>')
+    )
+
+
+def block_icon_files() -> str:
+    m = read_json(MARK_DIR / "manifest.json")
+    pol = m["icon_policy"]
+    rows = []
+    for name in pol["everyday"]:
+        rows.append([f"<code>{e(name)}</code>", "Everyday — used on every platform"])
+    rows.append([f"<code>{e(pol['app_store_only'])}</code>",
+                 "App Store submission only. Square, unmasked, fully opaque"])
+    return (
+        table(["File", "Where it is used"], rows)
+        + note(f"<p><strong>The decision.</strong> {e(pol['decision'])} "
+               f"Verified against the {e(pol['verified_against'])}.</p>")
+    )
+
+
+def block_voice_strings() -> str:
+    rows = []
+    for key in ("bt-1", "bt-2", "bt-3", "bt-4", "bt-5"):
+        rows.append([e(BN_ENGLISH[key]), bn_span(key)])
+    for key in ("ms-1", "ms-2", "ms-3", "ms-4"):
+        rows.append([e(BN_ENGLISH[key]), bn_span(key)])
+    return table(["English", "Bangla"], rows)
+
+
+def block_bn_strings_buttons() -> str:
+    rows = [[bn_span(k), e(BN_ENGLISH[k])] for k in ("bt-1", "bt-2", "bt-3", "bt-4", "bt-5")]
+    return table(["Bangla", "English"], rows, caption="Buttons.")
+
+
+def block_bn_strings_messages() -> str:
+    rows = [[bn_span(k), e(BN_ENGLISH[k])] for k in ("ms-1", "ms-2", "ms-3", "ms-4")]
+    return table(["Bangla", "English"], rows, caption="Messages.")
+
+
+def block_bangla_provenance() -> str:
+    cards = read_json(CARDS_JSON)
+    gaps = cards["_bangla_gaps"]
+    rows = [
+        ["Reviewed strings", "27"],
+        ["Changed by the review", "6"],
+        ["Unchanged", "21"],
+        ["Verified strings available to this book", str(len(BN))],
+        ["Component cards with no verified Bangla name",
+         str(len(gaps["name_bn"])) + " of 30"],
+        ["Component cards with no verified Bangla subtitle",
+         str(len(gaps["subtitle_bn"])) + " of 30"],
+    ]
+    return table(["Measure", "Count"], rows,
+                 caption="From the final table of 06_type/BANGLA-STANDARD.md.")
+
+
+def block_bangla_gaps() -> str:
+    rows = []
+    for num, slug, title, bn_key, _src in CHAPTERS:
+        if bn_key:
+            rows.append([f"{num} — {e(title)}", bn_span(bn_key),
+                         "Body prose. Only the verified strings appear."])
+        else:
+            rows.append([f"{num} — {e(title)}", "<em>none</em>",
+                         "Title <strong>and</strong> body. Both stay in English."])
+    extra = [
+        ["High contrast light", bn_raw(BN_COMPOSED["hc-light"]),
+         "Composed from two verified strings. The compound was not itself reviewed."],
+        ["High contrast dark", bn_raw(BN_COMPOSED["hc-dark"]),
+         "Composed from two verified strings. The compound was not itself reviewed."],
+    ]
+    cards = read_json(CARDS_JSON)
+    gaps = cards["_bangla_gaps"]
+    card_names = ", ".join(gaps["name_bn"])
+    return (
+        table(["Chapter", "Verified Bangla title", "What is missing"], rows,
+              caption="Four of the fourteen chapters have no verified Bangla "
+                      "title. All fourteen lack verified Bangla body prose.")
+        + table(["Label", "String used", "Standing"], extra,
+                caption="Two composed strings, named rather than presented as verified.")
+        + details(
+            f"The {len(gaps['name_bn'])} component cards with no verified Bangla name",
+            f'<p class="gb-caption">{e(card_names)}</p>'
+            f'<p class="gb-caption">All 30 cards lack a verified Bangla subtitle '
+            f'except the five foundations named above, which have none either.</p>')
+    )
+
+
+def block_font_licences() -> str:
+    cards = read_json(CARDS_JSON)
+    rows = []
+    for spec in cards["_fonts"]:
+        rows.append([
+            e(spec["family"]),
+            e(spec["licence"]),
+            "Yes — renamed" if spec["renamed"] else "No",
+            fmt_bytes(spec["bytes"]),
+            f"<code>{e(spec['licence_file'])}</code>",
+        ])
+    return table(["Family", "Licence", "Reserved Font Name", "Subset size",
+                  "Licence text"], rows)
+
+
+def block_output_files(print_mode: bool) -> str:
+    items = kit_files()
+    on_disk = sum(p.stat().st_size for _, p, _ in items)
+    encoded = on_disk * 4 / 3
+    rows = [
+        ["<code>Aninda-Studio-Guidebook.html</code>",
+         "The whole kit inline. Every file in the kit is a download link whose "
+         "href is its own data URI. Opens from a file path with no network."],
+        ["<code>Aninda-Studio-Guidebook-print.html</code>",
+         "The same book with the download data URIs stripped and their labels "
+         "kept as text. Adds A4 page geometry and page-break rules."],
+        ["<code>Aninda-Studio-Guidebook.pdf</code>",
+         "A4, printed from the second file by Playwright. No other tool is "
+         "involved: no ghostscript, no qpdf."],
+    ]
+    reason = (
+        "<p><strong>Why two HTML files, and what was measured.</strong> The "
+        f"interactive file carries {len(items)} kit files — about "
+        f"{fmt_bytes(on_disk)} on disk, about {fmt_bytes(int(encoded))} once "
+        "base64-encoded. A paper page cannot be clicked, so those payloads buy a "
+        "printed reader nothing.</p>"
+        "<p>They also cost a great deal. Printing the print build gives a PDF of "
+        "about 1.4 MB. Printing the interactive build gives one of about 14.2 MB, "
+        "because Chromium carries every data URI into the PDF as a link target — "
+        "ten times the size, for links nobody on paper can follow. The "
+        "interactive build also has no A4 page geometry and no page-break rules, "
+        "so its layout breaks in the wrong places throughout.</p>"
+        "<p><strong>One correction, since this split is usually justified with a "
+        "stronger claim.</strong> Chromium's PDF pipeline is known to emit blank "
+        "pages once the inlined base64 gets large, at somewhere around 24 MB. "
+        "<em>That was not reproduced here.</em> At the present size the "
+        "interactive build printed, with no blank page. The split rests on the "
+        "two costs above, not on a failure this build has seen. Run "
+        "<code>scripts/pdf.py --probe-interactive</code> to re-measure it after "
+        "the kit grows.</p>"
+        "<p>Fonts and images stay in both builds. Without the embedded fonts the "
+        "Bangla prints in a fallback face, which is the one thing this book must "
+        "not do.</p>"
+    )
+    return table(["File", "What it is"], rows) + note(reason)
+
+
+def block_kit_index() -> str:
+    items = kit_files()
+    total = sum(p.stat().st_size for _, p, _ in items)
+    rows = [
+        ["Files in the kit", str(len(items))],
+        ["Total size on disk", fmt_bytes(total)],
+        ["Themes", "4 — light, dark, high contrast light, high contrast dark"],
+        ["Component cards", "30 — 6 foundations, 16 components, 8 patterns"],
+        ["Identity files", "10"],
+        ["Typefaces", "3, each SIL OFL 1.1"],
+    ]
+    return table(["Measure", "Value"], rows) + (
+        '<p>The full list, with a download link for each, is at the end of this '
+        "book.</p>"
+    )
+
+
+def block_gap_notice(bn_key: str | None) -> str:
+    if bn_key:
+        head = (
+            "<p><strong>The title of this chapter is verified. Its body prose is "
+            "not written.</strong></p>"
+        )
+    else:
+        head = (
+            "<p><strong>Neither the title nor the body of this chapter exists in "
+            "verified Bangla.</strong></p>"
+        )
+    return note(
+        head
+        + "<p>Only Bangla that has been checked against the Bangla Academy's 2012 "
+        "spelling rules and its own dictionary is shipped in this system. No "
+        "Bangla is written for this book. Where a verified string does not exist, "
+        "the English stays and the gap is named here and in chapter 14.</p>"
+        "<p>The English section of this chapter carries the full text. Whatever "
+        "Bangla appears below is verified, and there is no more of it.</p>",
+        kind="gap",
+    )
+
+
+def block_bn_block(key: str) -> str:
+    return f'<blockquote class="gb-quote" lang="bn">{e(BN[key])}</blockquote>'
+
+
+def block_banned_words() -> str:
+    """The one place the blocklist itself is printed. It is marked
+    `data-verbatim` so the English guard skips it — a list of banned words is the
+    single case where naming them is the point rather than the failure."""
+    return ('<p class="gb-verbatim" data-verbatim><b>'
+            + " · ".join(BANNED_WORDS[:4] + ["of course"] + BANNED_WORDS[4:])
+            + "</b></p>")
+
+
+def block_bangla_punctuation() -> str:
+    """Also `data-verbatim`: naming the exclamation mark as a character is not
+    the same as using one, and the guard cannot tell the difference."""
+    return ('<p class="gb-verbatim" data-verbatim>'
+            "Statement <b>।</b> U+0964 · question <b>?</b> U+003F · "
+            "exclamation <b>!</b> U+0021. Phrase level: <b>,</b> <b>;</b> "
+            "<b>:</b> — the ordinary Western marks. There is no "
+            "Bengali-specific question or exclamation mark.</p>")
+
+
+def block_banned_latin() -> str:
+    return ('<p class="gb-verbatim" data-verbatim>Banned: <b>'
+            + "</b>, <b>".join(p for p in BANNED_PHRASES if p.endswith("."))
+            + "</b>. Write <i>for example</i>, <i>that is</i>, <i>and so on</i>.</p>")
+
+
+# ---------------------------------------------------------------------------
+# Generated chapter — Colour
+#
+# Sources: 07_tokens/build/primitive.tokens.json,
+#          07_tokens/build/semantic.{light,dark,hc-light,hc-dark}.tokens.json,
+#          07_tokens/build/forced-colors.map.json,
+#          05_colour/generated/estuary.proof.json (names and premise only).
+# Every ratio below is read from the proof carried inside the token file. None
+# of them is transcribed.
+# ---------------------------------------------------------------------------
+
+
+def chapter_colour_en(tok: Tokens) -> str:
+    out: list[str] = []
+    proof = tok.proof
+
+    out.append("<h2>Three terms, first</h2>")
+    out.append(
+        "<dl class=\"gb-defs\">"
+        "<dt>Contrast ratio</dt><dd>How far apart two colours are in brightness, "
+        "written as a ratio. Black on white is 21:1; two colours you cannot tell "
+        "apart are 1:1.</dd>"
+        "<dt>WCAG AA</dt><dd>The middle of the three conformance levels in the "
+        "Web Content Accessibility Guidelines: 4.5:1 for normal text and 3:1 for "
+        "borders, icons and controls. This system is held to it.</dd>"
+        "<dt>WCAG AAA</dt><dd>The strictest level: 7:1 for normal text. This "
+        "system reaches it in places, and the high contrast themes are generated "
+        "against it rather than patched towards it.</dd>"
+        "</dl>"
+    )
+    out.append(note(
+        "<p><strong>WCAG defines no AAA level for non-text contrast.</strong> "
+        "Criterion 1.4.11 has a single requirement of 3:1 and no enhanced tier "
+        "above it. So a border measured at 3.9:1 has <em>fully met</em> 1.4.11. "
+        "It is not an AA-only compromise waiting to be improved, and nothing in "
+        "this book will describe it as one.</p>"))
+
+    out.append("<h2>The direction</h2>")
+    out.append(
+        f'<p class="gb-lead">{e(proof["name"])} — {bn_span("col-1", large=True)}</p>'
+    )
+    out.append(f"<p>{e(proof['premise'])}</p>")
+
+    out.append("<h2>The six ramps</h2>")
+    out.append(
+        "<p>Each ramp is computed in OKLCH — a colour space where a fixed change "
+        "in lightness looks like the same change to the eye at every hue — then "
+        "mapped into sRGB. Each rung is at least 0.9 ΔE2000 from the one before "
+        "it, which is the smallest difference a person reliably sees. The 11 "
+        "steps run 50 to 950.</p>"
+    )
+    steps = proof["steps"]
+    bn_for_family = {"ground": "col-1", "accent": "col-2", "success": "col-3",
+                     "warning": "col-4", "danger": "col-5", "info": "col-6"}
+    for family, fam in proof["families"].items():
+        ramp = tok.ramp(family)
+        ext = ramp["$extensions"]["studio.aninda"]
+        swatches = []
+        for step in steps:
+            leaf = ramp[str(step)]
+            hexv = leaf["$value"]["hex"]
+            swatches.append(
+                f'<div class="gb-swatch"><div class="gb-swatch__chip" '
+                f'style="background:{e(hexv)}"></div>'
+                f'<div class="gb-swatch__meta"><b>{step}</b>'
+                f'<code>{e(hexv)}</code></div></div>'
+            )
+        meta = table(
+            ["Hue (OKLCH)", "Chroma ceiling", "Anchor", "Anchor step", "Kind"],
+            [[f"{ext['hueOklch']}°", f"{ext['chromaCeiling']}",
+              f"<code>{e(ext['anchor'])}</code>", str(ext["anchorStep"]),
+              e(fam["kind"])]],
+        )
+        note_text = fam["note"] or ramp["$description"]
+        out.append(
+            f'<section class="gb-ramp"><h3>{e(fam["label"])} — '
+            f'{bn_span(bn_for_family[family], large=True)} '
+            f'<span class="gb-muted">/ {e(family)}</span></h3>'
+            f"<p>{e(note_text)}</p>"
+            f'<div class="gb-swatches">{"".join(swatches)}</div>'
+            f"{meta}</section>"
+        )
+
+    out.append("<h2>The four themes</h2>")
+    out.append(
+        "<p>Not four skins over one palette. Each theme was generated against its "
+        "own contrast target, which is why the high contrast pair is a different "
+        "set of colours rather than the same colours pushed further apart.</p>"
+    )
+    for theme in THEMES:
+        out.append(theme_section(tok, theme))
+
+    out.append("<h2>Forced colours</h2>")
+    out.append(
+        "<p>Forced colours is the mode where the operating system replaces every "
+        "colour on the page with its own. Every brand value gives way. A hex that "
+        "survives this mode has defeated it, which is why the token file maps "
+        "each role to a system colour keyword instead.</p>"
+    )
+    forced = tok.forced
+    rows = [[f"<code>{e(k)}</code>", f"<code>{e(v)}</code>"]
+            for k, v in forced["map"].items()]
+    out.append(table(["Token", "System colour it becomes"], rows))
+    out.append(
+        '<ul class="gb-list">'
+        + "".join(f"<li>{e(r)}</li>" for r in forced["rules"])
+        + "</ul>")
+    out.append(note(f"<p>{e(forced['$description'])}</p>"))
+
+    out.append("<h2>How every figure above was produced</h2>")
+    m = proof["measurement"]
+    out.append(table(
+        ["Step", "How"],
+        [["Library", e(m["library"])],
+         ["Contrast method", e(m["contrast_method"])],
+         ["Perceptual difference", f"ΔE{e(m['delta_e_method'])}"],
+         ["Ramp space", e(m["ramp_space"])],
+         ["Gamut mapping", e(m["gamut_map"])]],
+    ))
+    out.append(f"<p>{e(m['note'])}</p>")
+    out.append(note(
+        "<p><strong>What the worst-case column means.</strong> A colour written "
+        "as a hex is rounded to 8 bits per channel. Nudging every channel of both "
+        "colours by one bit, in the direction that hurts, gives the worst ratio "
+        "the pair can actually produce on a screen. That figure is published "
+        "beside the measured one. Where the two differ, trust the worst case.</p>"))
+    return "".join(out)
+
+
+def theme_section(tok: Tokens, theme: str) -> str:
+    proof_theme = tok.proof["themes"][theme]
+    ext = tok.semantic[theme]["$extensions"]["studio.aninda"]
+    label = proof_theme["label"]
+    if theme == "light":
+        bn_label = bn_span("th-1", large=True)
+    elif theme == "dark":
+        bn_label = bn_span("th-2", large=True)
+    else:
+        bn_label = bn_raw(BN_COMPOSED[theme], large=True)
+
+    surfaces = tok.surfaces(theme)
+    chips = []
+    for name, leaf in surfaces.items():
+        if name.startswith("$"):
+            continue
+        hexv = leaf["$value"]["hex"]
+        lum = leaf["$extensions"]["studio.aninda"]["luminance"]
+        chips.append(
+            f'<div class="gb-swatch"><div class="gb-swatch__chip gb-swatch__chip--bordered" '
+            f'style="background:{e(hexv)}"></div>'
+            f'<div class="gb-swatch__meta"><b>{e(name)}</b><code>{e(hexv)}</code>'
+            f'<span class="gb-muted">luminance {lum:.4f}</span></div></div>'
+        )
+
+    rows = []
+    matrix_rows = []
+    surface_names = [n for n in surfaces if not n.startswith("$")]
+    for role, leaf in tok.roles(theme):
+        p = tok.proof_of(leaf)
+        x = tok.ext(leaf)
+        hexv = tok.resolve_colour(leaf["$value"])["hex"]
+        rows.append([
+            f'<span class="gb-dot" style="background:{e(hexv)}"></span> <b>{e(role)}</b>',
+            f"<code>{e(hexv)}</code>",
+            f"{e(x['family'])} {x['step']}",
+            e(x["kind"]),
+            fmt_ratio(p["required"]),
+            f"<b>{fmt_ratio(p['measured'])}</b>",
+            fmt_ratio(p["worstCaseLsb"]),
+            e(p["hardestGround"]),
+            e(p["level"]),
+            e(p["criterion"]),
+        ])
+        matrix_rows.append(
+            [f"<b>{e(role)}</b>"]
+            + [fmt_ratio(p["againstEverySurface"][s]) for s in surface_names]
+        )
+
+    return (
+        f'<section class="gb-theme" data-theme="{e(theme)}">'
+        f"<h3>{e(label)} — {bn_label}</h3>"
+        + table(["Setting", "Value"],
+                [["Polarity", e(ext["polarity"])],
+                 ["High contrast", "yes" if ext["highContrast"] else "no"],
+                 ["Text target", fmt_ratio(ext["textTarget"])],
+                 ["Non-text target", fmt_ratio(ext["nonTextTarget"])]])
+        + "<h4>Surfaces</h4>"
+        + f'<div class="gb-swatches gb-swatches--surfaces">{"".join(chips)}</div>'
+        + "<h4>Roles</h4>"
+        + table(["Role", "Value", "Ramp step", "Kind", "Required", "Measured",
+                 "Worst case ±1 bit", "Hardest surface", "Level", "Criterion"], rows)
+        + details(
+            "Every role against every one of the seven surfaces",
+            table(["Role"] + surface_names, matrix_rows))
+        + "</section>"
+    )
+
+
+def chapter_colour_bn(tok: Tokens) -> str:
+    """The colour chapter is the one place the Bangla is substantial, because
+    the colour names and two of the four theme names are verified strings."""
+    out = [block_gap_notice("gb-4")]
+    proof = tok.proof
+    bn_for_family = {"ground": "col-1", "accent": "col-2", "success": "col-3",
+                     "warning": "col-4", "danger": "col-5", "info": "col-6"}
+    out.append("<h2>The six colour names</h2>")
+    out.append(
+        "<p>All six are brand names. Rule 4 of the Bangla Academy's 2012 rules "
+        "exempts names from the spelling rules, and each is in any case spelled "
+        "correctly — পলি takes a short ই-কার under rule 2.1, and বর্ষা keeps its ষ "
+        "as an unchanged তৎসম under rule 1.1.</p>")
+    rows = []
+    for family, fam in proof["families"].items():
+        ramp = tok.ramp(family)
+        anchor = ramp["$extensions"]["studio.aninda"]["anchor"]
+        rows.append([
+            bn_span(bn_for_family[family], large=True),
+            e(fam["label"]),
+            f"<code>{e(anchor)}</code>",
+            e(family),
+        ])
+    out.append(table(["Bangla", "English", "Anchor", "Role"], rows))
+
+    out.append("<h2>The four themes</h2>")
+    rows = []
+    for theme in THEMES:
+        label = proof["themes"][theme]["label"]
+        if theme == "light":
+            bnv, standing = bn_span("th-1", large=True), "Verified"
+        elif theme == "dark":
+            bnv, standing = bn_span("th-2", large=True), "Verified"
+        else:
+            bnv, standing = (bn_raw(BN_COMPOSED[theme], large=True),
+                             "Composed from two verified strings, not itself reviewed")
+        rows.append([bnv, e(label), standing])
+    out.append(table(["Bangla", "English", "Standing"], rows))
+    out.append(note(
+        "<p>The draft Bangla for high contrast was উচ্চ বৈসাদৃশ্য, and the review "
+        "rejected it on two grounds. বৈসাদৃশ্য means dissimilarity — an abstract "
+        "comparison between two things — and not the tonal contrast of a display; "
+        "and উচ্চ is a তৎসম register that clashes with the plain voice used "
+        "everywhere else. বেশি কনট্রাস্ট is the recommended form, licensed as a "
+        "loanword by rule 2.6.</p>"))
+
+    out.append("<h2>The ramps</h2>")
+    out.append(
+        "<p>The numbers do not change between languages. Every ramp, every "
+        "measured ratio and every proof is in the English section, read from the "
+        "same token files.</p>")
+    return "".join(out)
+
+
+# ---------------------------------------------------------------------------
+# Generated chapter — Type
+#
+# Sources: 07_tokens/build/primitive.tokens.json, 08_components/_cards.json,
+#          06_type/_data/measurements.json, 06_type/_data/font_facts.json.
+# ---------------------------------------------------------------------------
+
+
+def chapter_type_en(tok: Tokens) -> str:
+    out: list[str] = []
+    cards = read_json(CARDS_JSON)
+    meas = read_json(MEASUREMENTS_JSON)
+    facts = read_json(FONT_FACTS_JSON)
+    pairing = meas["ratios"]["08-editorial-revised"]
+
+    out.append("<h2>Three families</h2>")
+    rows = []
+    for spec in cards["_fonts"]:
+        key = {"Literata": "literata", "Noto Serif Bengali": "notoserifbengali",
+               "Aninda Mono": "ibmplexmono"}[spec["family"]]
+        f = facts[key]
+        axes = ", ".join(f"{a['tag']} {a['min']:g}–{a['max']:g}" for a in f["axes"]) or "none"
+        rows.append([
+            e(spec["family"]),
+            e(f["version"]),
+            e(spec["licence"]),
+            axes,
+            "yes" if f["rfn"] else "no",
+            fmt_bytes(spec["bytes"]),
+        ])
+    out.append(table(["Family", "Version", "Licence", "Variable axes",
+                      "Reserved Font Name", "Subset"], rows))
+    out.append(
+        "<p>The mono face is IBM Plex Mono, subset and <strong>renamed</strong>. "
+        "IBM Plex carries a Reserved Font Name, and subsetting counts as "
+        "modification under clause 3 of the Open Font Licence, so the subset "
+        "cannot keep the name. Chapter 13 sets out why the other two keep "
+        "theirs.</p>")
+
+    out.append("<h2>The scale</h2>")
+    ratio = tok.prim("number.scale.ratio")["$value"]
+    out.append(
+        f"<p>One ratio of {ratio} — a perfect fourth — from caption to display. "
+        "Sizes are in rem, so they follow the reader's own text-size setting. The "
+        "pixel column assumes the browser default of 16 px.</p>")
+    scale_names = ["caption", "body", "lead", "h3", "h2", "h1", "display"]
+    bn_scale_for = {"caption": "caption", "body": "body", "lead": "body",
+                    "h3": "heading", "h2": "heading", "h1": "title",
+                    "display": "display"}
+    rows = []
+    bn_min = tok.prim("dimension.type.bangla-min")["$value"]["value"]
+    for name in scale_names:
+        rem = tok.prim(f"dimension.type.{name}")["$value"]["value"]
+        px = rem * 16
+        mult_key = bn_scale_for[name]
+        mult = tok.prim(f"number.scale.bangla.{mult_key}")["$value"]
+        bn_px = px * mult
+        clamped = bn_px < bn_min
+        bn_cell = f"{max(bn_px, bn_min):.1f} px"
+        if clamped:
+            bn_cell += f' <span class="gb-muted">(clamped up from {bn_px:.1f})</span>'
+        rows.append([
+            f"<code>--as-text-{e(name)}</code>",
+            f"{rem:g} rem",
+            f"{px:.1f} px",
+            f"×{mult}",
+            bn_cell,
+        ])
+    out.append(table(["Token", "Size", "At 16 px root", "Bangla multiplier",
+                      "Bangla size"], rows))
+
+    out.append("<h2>Why Bangla needs a multiplier at all</h2>")
+    out.append(
+        "<p>Bangla and Latin do not look the same size at the same size. Bangla's "
+        "reading height — the distance from the baseline to the মাত্রা, the "
+        "headline stroke running along the top of the letters — sits at about "
+        "0.62 em. Latin's reading height, its x-height, sits at about 0.51 em. "
+        "Setting both at 16 px makes the Bangla look a fifth larger, so the "
+        "Bangla is multiplied down until the two measured heights match.</p>")
+    rows = []
+    for size in ("11", "12", "16", "28", "56", "100"):
+        p = pairing["per_size"][size]
+        rows.append([
+            f"{size} px",
+            f"{p['latin_x_height_px']:.3f} px ({p['latin_x_height_em']:.4f} em)",
+            f"{p['bangla_matra_height_px']:.3f} px ({p['bangla_matra_height_em']:.4f} em)",
+            f"×{p['bangla_appears_larger_by']:.4f}",
+            f"<b>×{p['bangla_size_multiplier']:.3f}</b>",
+        ])
+    out.append(table(["Nominal size", "Literata x-height",
+                      "Noto Serif Bengali baseline to মাত্রা",
+                      "Bangla appears larger by", "Multiplier"], rows))
+    out.append(
+        f"<p>The headline figure is <strong>×{pairing['bangla_size_multiplier_at_16']}"
+        "</strong> at body size. It barely moves across the scale, because "
+        "Literata's x-height is nearly flat across its optical-size axis. Every "
+        "figure above was read off real rendered ink in Chromium using the "
+        "Canvas text-metrics interface, not from what the font declares about "
+        "itself.</p>")
+    out.append(note(
+        "<p><strong>Why declared metrics were not trusted.</strong> Noto Sans "
+        "Bengali declares a cap height of 622 units. That is not the height of "
+        "its capital H — it is the মাত্রা height. The field has been repurposed. A "
+        "design system that read it to align two scripts would be aligning to the "
+        "wrong thing entirely.</p>"))
+
+    out.append("<h2>The floor, and the weight bump</h2>")
+    bump = tok.prim("dimension.type.bangla-weight-bump-below")["$value"]["value"]
+    out.append(
+        f"<p><strong>Bangla never goes below {bn_min:g} px</strong>, whatever the "
+        "multiplier would otherwise say. Applying the multiplier strictly all the "
+        "way down drives Bangla under the size at which its মাত্রা and its "
+        "conjuncts survive.</p>")
+    out.append(
+        f"<p><strong>Below {bump:g} px Bangla gains one weight step.</strong> "
+        "Measured at a device scale factor of 1: at 12 px and weight 400 the "
+        "মাত্রা renders at luminance 123 on white, which reads as grey rather than "
+        "black. At weight 500 it holds at 108. Body size lands at 13.1 px and "
+        "caption size lower still, so both gain the step; anything at lead size "
+        "or larger is exempt.</p>")
+    nsb = meas["matra"]["notoserifbengali"]
+    out.append(table(
+        ["Measure", "Noto Serif Bengali"],
+        [["মাত্রা thickness", f"{nsb['matra_thickness_em']} em"],
+         ["At 16 px", f"{nsb['matra_thickness_px_at_16']} device px"],
+         ["At 11 px", f"{nsb['matra_thickness_px_at_11']} device px"],
+         ["Continuity across কলকাতা at 240 px",
+          f"{nsb['columns_carrying_headline']} of {nsb['columns_total']} columns "
+          f"({nsb['continuity_ratio']:.3f})"]]))
+    out.append(
+        "<p>The thinnest মাত্রা of any text face measured, which is the price of "
+        "the editorial register. It is why the weight bump exists and why the "
+        "floor is not negotiable.</p>")
+    out.append(note(
+        "<p>The floor is a <strong>judgement built on the measurements, not "
+        "itself a measurement</strong>. The trade is between exact size parity "
+        "and Bangla legibility, and legibility wins.</p>"))
+
+    out.append("<h2>Line height</h2>")
+    lh = tok.prim("number.lineHeight.bangla")["$value"]
+    floor = meas["line_height"]["notoserifbengali"]["min_line_height_unitless"]
+    out.append(
+        f"<p>Bangla runs at {lh}. The collision floor — the first line-height at "
+        f"which a descender-heavy Bangla line stacked above a headline-heavy one "
+        f"separates into two bands of ink with clear white between them — was "
+        f"measured at {floor}. The token is the floor plus air, because ink that "
+        "merely stops touching is a low bar.</p>")
+    out.append(note(
+        "<p><strong>Do not use the fonts' own declared line spacing.</strong> The "
+        "default line box a browser computes from declared metrics is wildly "
+        "inconsistent between Bangla faces — one declares 1.866 em, another "
+        "1.325. Setting <code>line-height: normal</code> would give a different "
+        "rhythm per face. Set the token.</p>"))
+
+    out.append("<h2>Shaping</h2>")
+    shaping = meas["shaping"]["notoserifbengali"]
+    words = shaping["words"]
+    rows = []
+    for key, w in words.items():
+        rows.append([
+            bn_raw(w["text"], large=True),
+            str(w["in_chars"]),
+            str(w["out_glyphs"]),
+            "none" if not w["notdef"] else "yes",
+            "none" if not w["dotted_circle"] else "yes",
+        ])
+    out.append(table(["Test string", "Code points", "Glyphs", "Missing glyph",
+                      "Dotted circle"], rows,
+                     caption=f"Conjuncts passed: {shaping['passed']}."))
+    out.append(
+        "<p>Sixteen conjuncts and five words were shaped with HarfBuzz. No "
+        "dotted circles, no missing glyphs, no stray hasantas. The studio name "
+        "shapes 16 code points into 11 glyphs, which is the conjunct formation "
+        "working. A negative control confirmed it: a naive count gives 16 "
+        "glyphs, and shaped output gives 11.</p>")
+    out.append(note(
+        "<p><strong>That is a test for failure, not for quality.</strong> It "
+        "proves nothing is broken. Whether these conjuncts read as well-drawn "
+        "Bangla to a Bangla reader is a judgement no measurement can make, and "
+        "no Bangla reader has been asked.</p>"))
+
+    out.append("<h2>The families this one was chosen over</h2>")
+    rows = []
+    for key, p in meas["ratios"].items():
+        info = meas["pairings"][key]
+        chosen = key == "08-editorial-revised"
+        name = (f"<b>{e(info['title'])}</b>" if chosen else e(info["title"]))
+        rows.append([
+            name,
+            e(info["latin"]),
+            e(info["bangla"]),
+            f"×{p['bangla_size_multiplier_at_16']}",
+            "yes" if p["varies_with_size"] else "no",
+        ])
+    out.append(table(["Pairing", "Latin", "Bangla", "Multiplier at 16 px",
+                      "Varies with size"], rows,
+                     caption="Eight pairings measured out of thirty families."))
+    out.append(
+        "<p>The obvious editorial pairing was Newsreader with Noto Serif Bengali, "
+        "and the measurements rejected it: at ×0.708 the Bangla column is visibly "
+        "smaller and lighter than the English beside it. For a brand whose two "
+        "audiences are equal, that is the one failure that is not acceptable. "
+        "Literata has an x-height a full pixel taller, which lifts the multiplier "
+        "to ×0.816 and holds it nearly flat across the whole scale.</p>")
+    return "".join(out)
+
+
+def chapter_type_bn(tok: Tokens) -> str:
+    out = [block_gap_notice("gb-5")]
+    meas = read_json(MEASUREMENTS_JSON)
+    out.append("<h2>The word this chapter turns on</h2>")
+    out.append(
+        "<p><strong>মাত্রা</strong> — the headline stroke running along the top of "
+        "the letters. Every size rule in this system exists because of it. It is "
+        "the height that governs how large Bangla looks, and it is the first "
+        "thing to go pale when the type gets small.</p>")
+    shaping = meas["shaping"]["notoserifbengali"]["words"]
+    rows = [[bn_raw(w["text"], large=True), str(w["in_chars"]), str(w["out_glyphs"])]
+            for w in shaping.values()]
+    out.append("<h2>The shaping test strings</h2>")
+    out.append(table(["String", "Code points", "Glyphs"], rows))
+    out.append(
+        "<p>These five strings and sixteen conjuncts were shaped with HarfBuzz "
+        "and produced no dotted circles, no missing glyphs and no stray hasantas. "
+        "The English section carries the full measurement set, the multipliers, "
+        "the 12 px floor and the weight bump — all of them numbers rather than "
+        "prose, identical in both languages.</p>")
+    return "".join(out)
+
+
+# ---------------------------------------------------------------------------
+# Generated chapter — Space and shape
+#
+# Source: 07_tokens/build/primitive.tokens.json.
+# ---------------------------------------------------------------------------
+
+
+def chapter_space_en(tok: Tokens) -> str:
+    out: list[str] = []
+    out.append("<h2>The space scale</h2>")
+    out.append(
+        "<p>Ten steps built on 4 px. Everything in the system sits on one of "
+        "them: no padding, gap or margin anywhere in the component layer is a "
+        "number typed by hand.</p>")
+    space = tok.prim("dimension.space")
+    rows = []
+    bars = []
+    for key in sorted((k for k in space if not k.startswith("$")), key=int):
+        v = space[key]["$value"]["value"]
+        rows.append([f"<code>--as-space-{key}</code>", f"{v:g} px",
+                     f"{v / 16:g} rem"])
+        bars.append(
+            f'<div class="gb-bar"><div class="gb-bar__fill" style="width:{v}px"></div>'
+            f'<span class="gb-bar__label"><code>{key}</code> {v:g} px</span></div>')
+    out.append(f'<div class="gb-bars">{"".join(bars)}</div>')
+    out.append(table(["Token", "Value", "At 16 px root"], rows))
+
+    out.append("<h2>Four radii</h2>")
+    radius = tok.prim("dimension.radius")
+    chips = []
+    rows = []
+    for key in ("badge", "control", "card", "hero"):
+        v = radius[key]["$value"]["value"]
+        rows.append([f"<code>--as-radius-{key}</code>", f"{v:g} px",
+                     {"badge": "Badges and small pills",
+                      "control": "Buttons, inputs, selects",
+                      "card": "Cards, dialogs, panels",
+                      "hero": "The icon tile, and large surfaces"}[key]])
+        chips.append(
+            f'<div class="gb-radius"><div class="gb-radius__box" '
+            f'style="border-radius:{v}px"></div>'
+            f'<span class="gb-caption"><code>{key}</code><br>{v:g} px</span></div>')
+    out.append(f'<div class="gb-radii">{"".join(chips)}</div>')
+    out.append(table(["Token", "Value", "Where"], rows))
+    manifest = read_json(MARK_DIR / "manifest.json")
+    out.append(note(
+        f"<p>The hero radius is also the icon's corner rounding, at "
+        f"{manifest['tile_radius_percent']:g}% of the icon width. The manifest "
+        f"records where that number comes from: {e(manifest['tile_radius_source'])} "
+        "Apple publishes no corner radius and does not use the word squircle "
+        "anywhere in current guidance.</p>"))
+
+    out.append("<h2>Target sizes</h2>")
+    out.append(
+        "<p>A target is the area a finger or a pointer can hit. Three "
+        "authorities give three different minimums, and they are not "
+        "interchangeable. All four figures are tokens, so the platform decides "
+        "rather than habit.</p>")
+    target = tok.prim("dimension.target")
+    sources = {
+        "min": "WCAG 2.2 criterion 2.5.8, in CSS pixels. The floor this system is held to.",
+        "apple-min": "Apple's published minimum, in points, for iOS and iPadOS.",
+        "comfortable": "Apple's published default, in points. The size to use unless there is a reason not to.",
+        "android-min": "Android's minimum touch target, in density-independent pixels.",
+    }
+    rows = []
+    for key in ("min", "apple-min", "comfortable", "android-min"):
+        v = target[key]["$value"]["value"]
+        rows.append([f"<code>--as-target-{key}</code>", f"{v:g}", sources[key]])
+    out.append(table(["Token", "Size", "Where the figure comes from"], rows))
+    out.append(note(
+        "<p>A CSS pixel is the web's device-independent unit of length. It is "
+        "not the same as a physical screen pixel, an Apple point or an Android "
+        "density-independent pixel, which is why the three figures above cannot "
+        "be compared directly or collapsed into one number.</p>"))
+
+    out.append("<h2>The focus ring</h2>")
+    fw = tok.prim("dimension.focus.ring-width")["$value"]["value"]
+    fo = tok.prim("dimension.focus.ring-offset")["$value"]["value"]
+    out.append(table(
+        ["Token", "Value", "Why"],
+        [[f"<code>--as-focus-ring-width</code>", f"{fw:g} px",
+          "WCAG 2.2 criterion 2.4.13 asks for a perimeter at least 2 CSS pixels "
+          "thick. 3 px clears it with room for a rounded corner."],
+         [f"<code>--as-focus-ring-offset</code>", f"{fo:g} px",
+          "Separates the ring from the control's own border so the two do not "
+          "read as one thick edge."]]))
+    out.append(
+        "<p>The ring is drawn on <code>:focus</code>, not "
+        "<code>:focus-visible</code>. <code>:focus-visible</code> is a browser "
+        "heuristic, and a heuristic can decide not to draw the ring. Showing it "
+        "once too often is a smaller failure than losing it once.</p>")
+    out.append(note(
+        "<p>Apple publishes <strong>no numeric focus-indicator specification at "
+        "all</strong>, and its focus guidance page predates its current material "
+        "system entirely. There was nothing to inherit here, so this system "
+        "specifies its own numbers and meets WCAG's instead.</p>"))
+    return "".join(out)
+
+
+def chapter_space_bn(tok: Tokens) -> str:
+    out = [block_gap_notice("gb-6")]
+    out.append(
+        "<p>This chapter is ten numbers, four numbers, four numbers and two "
+        "numbers. None of them changes between languages, and the English "
+        "section carries all of them with the reason for each.</p>")
+    space = tok.prim("dimension.space")
+    values = [f"{space[k]['$value']['value']:g}"
+              for k in sorted((k for k in space if not k.startswith("$")), key=int)]
+    radii = [f"{tok.prim(f'dimension.radius.{k}')['$value']['value']:g}"
+             for k in ("badge", "control", "card", "hero")]
+    targets = [f"{tok.prim(f'dimension.target.{k}')['$value']['value']:g}"
+               for k in ("min", "apple-min", "comfortable", "android-min")]
+    fw = tok.prim("dimension.focus.ring-width")["$value"]["value"]
+    fo = tok.prim("dimension.focus.ring-offset")["$value"]["value"]
+    out.append(table(
+        ["Scale", "Steps"],
+        [["Space", ", ".join(values)],
+         ["Radii", ", ".join(radii)],
+         ["Targets", ", ".join(targets)],
+         ["Focus ring", f"{fw:g} wide, {fo:g} offset"]],
+        caption="All values in px, read from the token file."))
+    return "".join(out)
+
+
+# ---------------------------------------------------------------------------
+# Generated chapter — Components
+#
+# Source: 08_components/_cards.json and the header of
+#         08_components/src/components.css.
+# ---------------------------------------------------------------------------
+
+
+def chapter_components_en(tok: Tokens) -> str:
+    cards = read_json(CARDS_JSON)
+    out: list[str] = []
+    counts = cards["counts"]
+    total = sum(counts.values())
+    out.append(
+        f"<p class=\"gb-lead\">{total} cards — "
+        + ", ".join(f"{v} {k.lower()}" for k, v in counts.items())
+        + ". Each is a single self-contained HTML file with the tokens, the "
+          "component layer and the three fonts inlined. A card opens from a file "
+          "path with no network at all.</p>")
+
+    out.append("<h2>The three rules the layer enforces</h2>")
+    out.append(
+        "<ol class=\"gb-list gb-list--numbered\">"
+        "<li><b>No literal colour.</b> Every colour in the component layer is a "
+        "<code>var(--as-…)</code> from the token file. The build scans for hex, "
+        "<code>rgb()</code>, <code>hsl()</code>, <code>lab()</code>, "
+        "<code>oklch()</code> and the CSS named colours, and refuses to build if "
+        "it finds one. Two keywords are allowed and nothing else: "
+        "<code>currentColor</code>, which is a reference rather than a value, and "
+        "<code>transparent</code>, which is the only way CSS lets you express "
+        "the absence of a colour.</li>"
+        "<li><b>Focus is always visible.</b> Every focusable control gets a ring "
+        "from <code>:focus</code>. No rule in the layer sets "
+        "<code>outline: none</code>.</li>"
+        "<li><b>Nothing relies on colour alone.</b> Every state carries a word "
+        "and a glyph as well as a colour — a danger badge says Failed and shows a "
+        "cross, a selected tab is bold and underlined, the current navigation "
+        "item has a bar.</li>"
+        "</ol>")
+    out.append(note(
+        "<p><strong>CSS cannot enforce rule 3, and this book will say so.</strong> "
+        "A stylesheet has no way to know whether the markup it is styling carries "
+        "a word next to the colour. A danger modifier will happily colour an "
+        "empty element red. Rules 1 and 2 are machine-checked. Rule 3 lives in "
+        "the markup and in review, and it is a promise rather than a "
+        "guarantee.</p>"))
+
+    out.append("<h2>Glyphs are drawn, not typed</h2>")
+    out.append(
+        "<p>Every glyph in the system is an inline SVG in "
+        "<code>currentColor</code>. Literata has no tick, no cross and no warning "
+        "triangle, so a glyph typed as a character would fall back silently to "
+        "whatever font the reader's machine happens to have. Drawing them keeps "
+        "the shape, the weight and the colour under the system's control, and "
+        "<code>currentColor</code> means each glyph inherits both the theme and "
+        "the forced-colours palette.</p>")
+
+    for group in ("Foundations", "Components", "Patterns"):
+        rows = []
+        for card in cards["cards"]:
+            if card["group"] != group:
+                continue
+            name_bn = (bn_raw(card["name_bn"], large=True) if card["name_bn"]
+                       else '<span class="gb-muted">no verified Bangla</span>')
+            rows.append([
+                f"<b>{e(card['name'])}</b>",
+                name_bn,
+                card["subtitle"],
+                f"{card['width']} × {card['height']}",
+            ])
+        out.append(f"<h2>{group} — {counts[group]}</h2>")
+        out.append(table(["Card", "Bangla", "What it shows", "Design canvas"], rows))
+
+    out.append("<h2>The fonts each card carries</h2>")
+    out.append(block_font_licences())
+
+    out.append("<h2>How the cards are checked</h2>")
+    out.append(
+        "<p>Every card is opened in a real Chromium at 360, 768 and 1280 CSS "
+        "pixels and in all four themes, and then measured. A static reading of "
+        "the CSS can tell you a rule exists; it cannot tell you whether the rule "
+        "reached the pixel.</p>"
+        "<ul class=\"gb-list\">"
+        "<li>Contrast is read off the composited effective background, walking "
+        "ancestors and blending partly transparent layers. Reading an element's "
+        "own background colour returns a fully transparent value for nearly every "
+        "element in a real page and proves nothing.</li>"
+        "<li>Interaction states are driven by a real pointer — move, down, up — "
+        "and the pressed style is compared against the hovered one. Two identical "
+        "readings are what a dead rule looks like from outside the browser.</li>"
+        "<li>The focus indicator is measured from pixels: the element is captured "
+        "unfocused and focused, the two buffers are differenced, and the changed "
+        "pixels are checked for a ring at least 2 CSS pixels thick at 3:1.</li>"
+        "<li>Forced colours runs a liveness probe first. If the emulation is "
+        "inert the run fails as not-equipped rather than passing silently. A "
+        "check that cannot fail is not a check.</li>"
+        "</ul>")
+    return "".join(out)
+
+
+def chapter_components_bn(tok: Tokens) -> str:
+    cards = read_json(CARDS_JSON)
+    gaps = cards["_bangla_gaps"]
+    out = [block_gap_notice("gb-7")]
+    out.append("<h2>The cards that do have a verified Bangla name</h2>")
+    rows = [[bn_raw(c["name_bn"], large=True), e(c["name"]), e(c["group"])]
+            for c in cards["cards"] if c["name_bn"]]
+    out.append(table(["Bangla", "English", "Group"], rows))
+    out.append(
+        f"<p>Five of the thirty cards carry a verified Bangla name, because five "
+        f"of them share a name with a chapter of this book. The other "
+        f"{len(gaps['name_bn'])} do not, and <strong>none of the thirty has a "
+        f"verified Bangla subtitle</strong>. Those cards keep their English, and "
+        "the gap is recorded in the card registry itself rather than filled.</p>")
+    return "".join(out)
+
+
+# ---------------------------------------------------------------------------
+# Generated chapter — Motion
+#
+# Source: 07_tokens/build/primitive.tokens.json and 07_tokens/css/tokens.css.
+# ---------------------------------------------------------------------------
+
+
+def chapter_motion_en(tok: Tokens) -> str:
+    out: list[str] = []
+    colour_ms = tok.prim("duration.motion.colour")["$value"]["value"]
+    move_ms = tok.prim("duration.motion.move")["$value"]["value"]
+
+    out.append(
+        f'<p class="gb-lead">{colour_ms:g} ms for a colour change. {move_ms:g} ms '
+        "for something arriving or leaving. Nothing in this system goes over "
+        "300 ms.</p>")
+    out.append(table(
+        ["Token", "Value", "What it is for"],
+        [[f"<code>--as-duration-colour</code>", f"{colour_ms:g} ms",
+          "Anything that changes in place: a hover tint, a border, a background, "
+          "a text colour."],
+         [f"<code>--as-duration-move</code>", f"{move_ms:g} ms",
+          "Anything that arrives or leaves: a dialog, a toast, a panel, a menu."]]))
+
+    out.append("<h2>Three curves</h2>")
+    out.append(
+        "<p>A cubic Bézier curve is four numbers describing how a change "
+        "accelerates and slows. These three are the whole set.</p>")
+    rows = []
+    curves = {
+        "standard": "Anything that stays on screen throughout — a colour, a size, a position.",
+        "enter": "Something arriving. Fast at the start, settling at the end.",
+        "exit": "Something leaving. Slow to commit, then quick to go.",
+    }
+    for key, why in curves.items():
+        v = tok.prim(f"cubicBezier.motion.{key}")["$value"]
+        nums = ", ".join(f"{n:g}" for n in v)
+        rows.append([
+            f"<code>--as-ease-{key}</code>",
+            f"<code>cubic-bezier({nums})</code>",
+            f'<svg class="gb-curve" viewBox="-8 -18 116 136" aria-hidden="true">'
+            f'<rect class="gb-curve__frame" x="0" y="0" width="100" height="100"/>'
+            f'<path class="gb-curve__line" d="M0 100C{v[0]*100:.1f} {100-v[1]*100:.1f} '
+            f'{v[2]*100:.1f} {100-v[3]*100:.1f} 100 0"/></svg>',
+            why,
+        ])
+    out.append(table(["Token", "Curve", "Shape", "Where"], rows))
+
+    out.append("<h2>Material's spring system was read, and not adopted</h2>")
+    out.append(
+        "<p>Material 3 publishes a spring-based motion system: two schemes, each "
+        "with six specifications on a grid of three speeds by two kinds of "
+        "motion. The expressive scheme's spatial values are damping 0.8 with "
+        "stiffness 380 at default, 0.6 with 800 fast, and 0.8 with 200 slow; its "
+        "effects values are damping 1.0 with stiffness 1600, 3800 and 800. Those "
+        "figures were checked on 14 August 2026.</p>")
+    out.append(
+        "<p><strong>This system does not adopt them, for three reasons.</strong> "
+        "A spring needs a physics integrator at run time, and this kit is a "
+        "stylesheet — it has no run time of its own. A spring's duration is an "
+        "outcome rather than a setting, which makes it far harder to hold to a "
+        "stated ceiling. And Material did not replace its own duration and easing "
+        "tokens when it added springs: 16 durations and 10 easing curves remain "
+        "published. A kit built on durations and cubic Bézier curves is not out "
+        "of date relative to Material. It is using the other half of a system "
+        "that publishes both halves.</p>")
+    out.append(note(
+        "<p><strong>The principle underneath their numbers does transfer, and "
+        "this system takes it.</strong> Every effects damping in Material's "
+        "scheme is exactly 1.0 — critically damped, meaning it never overshoots. "
+        "Every spatial damping is below 1.0 — underdamped, meaning it overshoots "
+        "and settles. So: <b>things that move may overshoot; things that only "
+        "change colour never do.</b> That is why "
+        "<code>--as-duration-colour</code> and <code>--as-duration-move</code> "
+        "are two tokens and not one, and why the enter and exit curves are only "
+        "ever applied to things that arrive or leave.</p>"))
+
+    out.append("<h2>Apple publishes no durations at all</h2>")
+    out.append(
+        "<p>Apple's motion guidance is principled rather than numeric: add motion "
+        "purposefully, keep it brief, show restraint on frequent interactions, "
+        "let people cancel it. The only two figures anywhere in it are that games "
+        "should run at 30 to 60 frames per second, and that visionOS should avoid "
+        "sustained oscillation at around 0.2 Hz. Neither applies to a studio "
+        "identity system. <strong>Every duration and curve in this kit is this "
+        "kit's own, and presenting any of them as Apple-aligned would be "
+        "false.</strong></p>")
+
+    out.append("<h2>Reduced motion</h2>")
+    out.append(
+        "<p>When the reader has asked their system for reduced motion, both "
+        "durations collapse to 1 ms at the root. Nothing is left half-animated "
+        "and nothing needs a second rule further down the tree.</p>")
+    out.append(
+        "<pre class=\"gb-code\"><code>@media (prefers-reduced-motion: reduce) {\n"
+        "  :root {\n"
+        "    --as-duration-colour: 1ms;\n"
+        "    --as-duration-move: 1ms;\n"
+        "  }\n}</code></pre>")
+    out.append(
+        "<p>The substitution rule, inherited from Apple's own reduced-motion "
+        "techniques, is to replace a movement with a <strong>fade</strong> — "
+        "never a spatial move and never a blur, and never an animation into or "
+        "out of a blur.</p>")
+    return "".join(out)
+
+
+def chapter_motion_bn(tok: Tokens) -> str:
+    out = [block_gap_notice("gb-8")]
+    colour_ms = tok.prim("duration.motion.colour")["$value"]["value"]
+    move_ms = tok.prim("duration.motion.move")["$value"]["value"]
+    def curve(key: str) -> str:
+        nums = ", ".join(f"{n:g}" for n in tok.prim(f"cubicBezier.motion.{key}")["$value"])
+        return f"<code>cubic-bezier({nums})</code>"
+
+    out.append(table(
+        ["Token", "Value"],
+        [["<code>--as-duration-colour</code>", f"{colour_ms:g} ms"],
+         ["<code>--as-duration-move</code>", f"{move_ms:g} ms"],
+         ["<code>--as-ease-standard</code>", curve("standard")],
+         ["<code>--as-ease-enter</code>", curve("enter")],
+         ["<code>--as-ease-exit</code>", curve("exit")]]))
+    out.append(
+        "<p>Five tokens, and one rule that holds them together: things that move "
+        "may overshoot, things that only change colour never do. The English "
+        "section sets out where that rule came from and why Material's spring "
+        "system was read and not adopted.</p>")
+    return "".join(out)
+
+
+# ---------------------------------------------------------------------------
+# Markdown chapters
+# ---------------------------------------------------------------------------
+
+def render_markdown(path: Path, bn_key: str | None, print_mode: bool) -> str:
+    text = path.read_text(encoding="utf-8")
+
+    # Inline placeholders first: they belong inside sentences and table cells.
+    def inline_bn(match):
+        return bn_span(match.group(1))
+
+    text = re.sub(r"\{\{bn:([a-z0-9\-]+)\}\}", inline_bn, text)
+
+    # Block placeholders become a marker paragraph, replaced after conversion.
+    markers: dict[str, str] = {}
+    counter = [0]
+
+    def stash(html_fragment: str) -> str:
+        counter[0] += 1
+        key = f"GBBLOCK{counter[0]}ZZ"
+        markers[key] = html_fragment
+        return key
+
+    def block_sub(match):
+        kind = match.group(1)
+        name = match.group(2) if match.re.groups > 1 else ""
+        if kind == "gap-notice":
+            return stash(block_gap_notice(bn_key))
+        if kind == "bn-block":
+            return stash(block_bn_block(name))
+        if kind == "figure":
+            return stash({
+                "marks": block_figure_marks,
+                "icons": block_figure_icons,
+                "wordmarks": block_figure_wordmarks,
+                "construction": block_figure_construction,
+            }[name]())
+        if kind == "data":
+            builders = {
+                "mark-geometry": block_mark_geometry,
+                "mark-strokes": block_mark_strokes,
+                "mark-files": block_mark_files,
+                "icon-files": block_icon_files,
+                "voice-strings": block_voice_strings,
+                "bn-strings-buttons": block_bn_strings_buttons,
+                "bn-strings-messages": block_bn_strings_messages,
+                "bangla-provenance": block_bangla_provenance,
+                "bangla-gaps": block_bangla_gaps,
+                "font-licences": block_font_licences,
+                "kit-index": block_kit_index,
+                "banned-words": block_banned_words,
+                "banned-latin": block_banned_latin,
+                "bangla-punctuation": block_bangla_punctuation,
+            }
+            if name == "output-files":
+                return stash(block_output_files(print_mode))
+            return stash(builders[name]())
+        raise BuildError(f"{path.name}: unknown placeholder {{{{{kind}:{name}}}}}")
+
+    text = re.sub(r"\{\{(gap-notice)\}\}", block_sub, text)
+    text = re.sub(r"\{\{(figure|data|bn-block):([a-z0-9\-]+)\}\}", block_sub, text)
+
+    md = markdown_mod.Markdown(extensions=["tables", "fenced_code", "sane_lists"])
+    body = md.convert(text)
+
+    for key, fragment in markers.items():
+        body = body.replace(f"<p>{key}</p>", fragment)
+        body = body.replace(key, fragment)
+    return body
+
+
+# ---------------------------------------------------------------------------
+# Stylesheet
+#
+# Every colour here is a var(--as-…) from the token file. The build refuses to
+# finish if a literal colour reaches this string. `transparent` and
+# `currentColor` are the two allowed keywords, for the same reason the component
+# layer allows them: one is the absence of a colour, the other is a reference.
+# ---------------------------------------------------------------------------
+
+GUIDEBOOK_CSS = """
+.gb-page {
+  background-color: var(--as-surface-low);
+  color: var(--as-ink);
+  font-family: var(--as-font-latin);
+  font-size: var(--as-text-body);
+  line-height: 1.6;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+.gb-shell { max-width: 62rem; margin: 0 auto; padding: var(--as-space-4); }
+.gb-prose { max-width: 42rem; }
+
+.gb-bar-top {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--as-space-2);
+  padding: var(--as-space-2) var(--as-space-4);
+  background-color: var(--as-surface-bright);
+  border-block-end: 1px solid var(--as-line);
+}
+.gb-bar-top__name { font-weight: 700; margin-inline-end: auto; }
+.gb-bar-top__name svg { inline-size: 1.4em; block-size: 1.4em; vertical-align: -0.3em; }
+.gb-langbtn {
+  font: inherit; font-size: var(--as-text-caption);
+  padding: var(--as-space-0) var(--as-space-2);
+  min-block-size: var(--as-target-min);
+  border: 1px solid var(--as-line);
+  border-radius: var(--as-radius-control);
+  background-color: var(--as-surface-lowest);
+  color: var(--as-ink);
+  cursor: pointer;
+  transition: background-color var(--as-duration-colour) var(--as-ease-standard),
+              color var(--as-duration-colour) var(--as-ease-standard);
+}
+.gb-langbtn[aria-pressed="true"] {
+  background-color: var(--as-accent); color: var(--as-surface-lowest);
+  border-color: var(--as-accent);
+}
+.gb-page :is(a, button, summary, [tabindex]):focus {
+  outline: var(--as-focus-ring-width) solid var(--as-focus-ring);
+  outline-offset: var(--as-focus-ring-offset);
+}
+
+.gb-cover { padding-block: var(--as-space-8) var(--as-space-7); }
+.gb-cover__mark svg { inline-size: 7rem; block-size: 7rem; color: var(--as-ink); }
+.gb-cover h1 { font-size: var(--as-text-display); line-height: 1.05; margin: var(--as-space-4) 0 0; }
+.gb-cover__bn { font-size: var(--as-text-h2); color: var(--as-ink-muted); margin: var(--as-space-1) 0 0; }
+.gb-cover__lede { font-size: var(--as-text-lead); max-width: 34rem; margin-block-start: var(--as-space-4); }
+.gb-cover__meta { margin-block-start: var(--as-space-5); font-size: var(--as-text-caption); color: var(--as-ink-muted); }
+
+.gb-toc ol { list-style: none; padding: 0; margin: 0; }
+.gb-toc li { border-block-start: 1px solid var(--as-line); }
+.gb-toc a { display: flex; gap: var(--as-space-3); padding: var(--as-space-2) 0; color: var(--as-ink); text-decoration: none; align-items: baseline; }
+.gb-toc a:hover { color: var(--as-accent); }
+.gb-toc__num { font-family: var(--as-font-mono); font-variant-ligatures: none; color: var(--as-ink-muted); font-size: var(--as-text-caption); }
+.gb-toc__title { font-weight: 600; }
+.gb-toc__bn { color: var(--as-ink-muted); }
+.gb-toc__stand { display: block; font-size: var(--as-text-caption); color: var(--as-ink-muted); font-weight: 400; }
+
+.gb-chapter { padding-block-start: var(--as-space-7); }
+.gb-chapter__head { border-block-start: 2px solid var(--as-accent); padding-block-start: var(--as-space-3); }
+.gb-chapter__num { font-family: var(--as-font-mono); font-variant-ligatures: none; color: var(--as-accent); font-size: var(--as-text-caption); }
+.gb-chapter h2.gb-chapter__title { font-size: var(--as-text-h1); line-height: 1.1; margin: var(--as-space-1) 0 0; }
+.gb-chapter__stand { font-size: var(--as-text-lead); color: var(--as-ink-muted); max-width: 38rem; margin-block-start: var(--as-space-2); }
+.gb-section { margin-block-start: var(--as-space-5); }
+.gb-section__label {
+  display: inline-block; font-size: var(--as-text-caption);
+  font-family: var(--as-font-mono); font-variant-ligatures: none;
+  border: 1px solid var(--as-line); border-radius: var(--as-radius-badge);
+  padding: 0 var(--as-space-0); color: var(--as-ink-muted);
+  margin-block-end: var(--as-space-2);
+}
+.gb-section h2 { font-size: var(--as-text-h2); line-height: 1.15; margin-block: var(--as-space-6) var(--as-space-2); }
+.gb-section h3 { font-size: var(--as-text-h3); line-height: 1.2; margin-block: var(--as-space-5) var(--as-space-2); }
+.gb-section h4 { font-size: var(--as-text-lead); margin-block: var(--as-space-4) var(--as-space-1); }
+.gb-section p, .gb-section ul, .gb-section ol, .gb-section dl { max-width: 42rem; }
+/* components.css zeroes every block margin, which is right for a component and
+   wrong for running prose. Paragraph rhythm is restored here and nowhere else. */
+.gb-section > p, .gb-section > ul, .gb-section > ol, .gb-section > dl,
+.gb-section > blockquote, .gb-section > pre, .gb-ramp > p, .gb-theme > p {
+  margin-block: 0 var(--as-space-3);
+}
+.gb-note p + p { margin-block-start: var(--as-space-2); }
+.gb-lead { font-size: var(--as-text-lead); }
+.gb-muted { color: var(--as-ink-muted); }
+
+.gb-scroll-x { overflow-x: auto; margin-block: var(--as-space-3); }
+.gb-table { border-collapse: collapse; inline-size: 100%; font-size: var(--as-text-caption); }
+.gb-table caption { text-align: start; color: var(--as-ink-muted); padding-block-end: var(--as-space-1); }
+.gb-table th, .gb-table td { text-align: start; vertical-align: top; padding: var(--as-space-1) var(--as-space-2); border-block-end: 1px solid var(--as-line); }
+.gb-table thead th { border-block-end: 2px solid var(--as-line); white-space: nowrap; }
+.gb-table code { font-family: var(--as-font-mono); font-variant-ligatures: none; }
+
+.gb-note {
+  border-inline-start: 3px solid var(--as-accent-edge);
+  background-color: var(--as-surface-high);
+  padding: var(--as-space-3);
+  border-radius: var(--as-radius-control);
+  margin-block: var(--as-space-3);
+  max-width: 42rem;
+}
+.gb-note--gap { border-inline-start-color: var(--as-warning); }
+.gb-note p { margin: 0 0 var(--as-space-1); }
+.gb-note p:last-child { margin-block-end: 0; }
+
+.gb-quote {
+  margin: var(--as-space-3) 0; padding: var(--as-space-3);
+  border-inline-start: 3px solid var(--as-accent);
+  background-color: var(--as-surface-high);
+  border-radius: var(--as-radius-control);
+  font-size: var(--as-text-lead);
+}
+.gb-defs dt { font-weight: 700; margin-block-start: var(--as-space-2); }
+.gb-defs dd { margin: 0 0 0 var(--as-space-3); }
+.gb-list { padding-inline-start: var(--as-space-4); }
+.gb-list li { margin-block-end: var(--as-space-1); }
+.gb-code, pre {
+  font-family: var(--as-font-mono); font-variant-ligatures: none;
+  font-size: var(--as-text-caption);
+  background-color: var(--as-surface-highest);
+  border: 1px solid var(--as-line);
+  border-radius: var(--as-radius-control);
+  padding: var(--as-space-2); overflow-x: auto;
+}
+code { font-family: var(--as-font-mono); font-variant-ligatures: none; }
+
+.gb-figure { display: flex; flex-wrap: wrap; gap: var(--as-space-4); margin: var(--as-space-4) 0; padding: 0; }
+.gb-caption { font-size: var(--as-text-caption); color: var(--as-ink-muted); margin: var(--as-space-1) 0 0; }
+.gb-markbox__art, .gb-iconbox__art {
+  background-color: var(--as-surface-bright);
+  border: 1px solid var(--as-line);
+  border-radius: var(--as-radius-card);
+  padding: var(--as-space-4);
+  display: grid; place-items: center;
+}
+.gb-mark { inline-size: 7rem; block-size: 7rem; color: var(--as-ink); }
+.gb-icon { inline-size: 5rem; block-size: 5rem; }
+.gb-iconbox { inline-size: 9rem; }
+.gb-wordbox { flex: 1 1 18rem; background-color: var(--as-surface-bright); border: 1px solid var(--as-line); border-radius: var(--as-radius-card); padding: var(--as-space-4); }
+.gb-wordmark { inline-size: 100%; block-size: auto; color: var(--as-ink); }
+.gb-construction { inline-size: 16rem; block-size: 16rem; }
+.gb-c-grid { stroke: var(--as-line); stroke-width: 0.25; opacity: 0.45; }
+.gb-c-frame { fill: none; stroke: var(--as-line); stroke-width: 0.5; }
+.gb-c-guide { fill: none; stroke: var(--as-accent-edge); stroke-width: 0.5; stroke-dasharray: 2 2; }
+.gb-c-art { fill: none; stroke: var(--as-ink); stroke-width: 9; stroke-linecap: round; }
+.gb-c-dot { fill: var(--as-danger); stroke: none; }
+
+.gb-swatches { display: flex; flex-wrap: wrap; gap: var(--as-space-1); margin-block: var(--as-space-2); }
+.gb-swatch { inline-size: 5.5rem; }
+.gb-swatch__chip { block-size: 3rem; border-radius: var(--as-radius-badge); }
+.gb-swatch__chip--bordered { border: 1px solid var(--as-line); }
+.gb-swatch__meta { font-size: var(--as-text-caption); display: flex; flex-direction: column; }
+.gb-swatch__meta code { font-size: 0.85em; }
+.gb-dot { display: inline-block; inline-size: 0.8em; block-size: 0.8em; border-radius: var(--as-radius-badge); border: 1px solid var(--as-line); vertical-align: -0.05em; }
+.gb-ramp { margin-block-start: var(--as-space-5); }
+.gb-theme { margin-block-start: var(--as-space-6); }
+
+.gb-bars { margin-block: var(--as-space-3); }
+.gb-bar { display: flex; align-items: center; gap: var(--as-space-2); margin-block-end: var(--as-space-0); }
+.gb-bar__fill { block-size: 0.75rem; background-color: var(--as-accent-edge); border-radius: var(--as-radius-badge); flex: none; }
+.gb-bar__label { font-size: var(--as-text-caption); color: var(--as-ink-muted); }
+.gb-radii { display: flex; flex-wrap: wrap; gap: var(--as-space-3); margin-block: var(--as-space-3); }
+.gb-radius { text-align: center; }
+.gb-radius__box { inline-size: 4rem; block-size: 4rem; background-color: var(--as-surface-highest); border: 1px solid var(--as-line); }
+.gb-curve { inline-size: 4rem; block-size: 4rem; }
+.gb-curve__frame { fill: none; stroke: var(--as-line); stroke-width: 1.5; }
+.gb-curve__line { fill: none; stroke: var(--as-accent); stroke-width: 4; }
+
+.gb-details { border: 1px solid var(--as-line); border-radius: var(--as-radius-control); padding: var(--as-space-2); margin-block: var(--as-space-3); }
+.gb-details summary { cursor: pointer; font-weight: 600; }
+
+.gb-kit li { margin-block-end: var(--as-space-1); }
+.gb-kit__label { font-family: var(--as-font-mono); font-variant-ligatures: none; font-size: var(--as-text-caption); }
+.gb-kit__what { color: var(--as-ink-muted); font-size: var(--as-text-caption); }
+
+.gb-colophon { margin-block-start: var(--as-space-8); border-block-start: 1px solid var(--as-line); padding-block-start: var(--as-space-4); font-size: var(--as-text-caption); color: var(--as-ink-muted); }
+
+@media (max-width: 40rem) {
+  .gb-shell { padding: var(--as-space-3); }
+  .gb-cover h1 { font-size: var(--as-text-h1); }
+}
+"""
+
+PRINT_CSS = """
+@page { size: A4; margin: 14mm; }
+.gb-bar-top { display: none; }
+.gb-page { background-color: var(--as-surface-bright); font-size: 10.5pt; }
+.gb-shell { max-width: none; padding: 0; }
+.gb-cover { padding-block: 0 var(--as-space-6); break-after: page; }
+.gb-toc { break-after: page; }
+.gb-toc li, .gb-toc a { break-inside: avoid; }
+/* Fifteen entries have to fit one A4 page, or the break-after rule leaves a
+   near-empty page 3 carrying one line. */
+.gb-toc h2 { font-size: 16pt; margin-block: 0 6pt; }
+.gb-toc a { padding: 3.2pt 0; }
+.gb-toc__stand { font-size: 7.6pt; }
+.gb-chapter { break-before: page; padding-block-start: 0; }
+.gb-chapter__head, .gb-section h2, .gb-section h3, .gb-section h4 { break-after: avoid; }
+.gb-table, .gb-figure, .gb-note, .gb-quote, .gb-swatch, .gb-radius,
+.gb-markbox, .gb-iconbox, .gb-wordbox, .gb-ramp, .gb-bar, pre { break-inside: avoid; }
+.gb-theme { break-before: page; }
+.gb-scroll-x { overflow-x: visible; }
+.gb-details { border: none; padding: 0; }
+.gb-details summary { list-style: none; }
+.gb-details summary::-webkit-details-marker { display: none; }
+.gb-table { font-size: 8pt; }
+.gb-table th, .gb-table td { padding: 2pt 4pt; }
+.gb-cover h1 { font-size: 32pt; }
+.gb-section h2 { font-size: 18pt; }
+.gb-chapter h2.gb-chapter__title { font-size: 24pt; }
+a { color: var(--as-ink); text-decoration: none; }
+"""
+
+TOGGLE_JS = """
+(function () {
+  var buttons = document.querySelectorAll('[data-set-lang]');
+  function apply(lang) {
+    document.querySelectorAll('[data-lang]').forEach(function (node) {
+      node.hidden = node.getAttribute('data-lang') !== lang;
+    });
+    buttons.forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-set-lang') === lang));
+    });
+  }
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { apply(b.getAttribute('data-set-lang')); });
+  });
+  apply('en');
+})();
+"""
+
+
+# ---------------------------------------------------------------------------
+# Assembly
+# ---------------------------------------------------------------------------
+
+
+def build_document(print_mode: bool) -> str:
+    tok = Tokens()
+    fonts = load_fonts()
+    tokens_css = TOKENS_CSS.read_text(encoding="utf-8")
+    components_css = COMPONENTS_CSS.read_text(encoding="utf-8")
+
+    generated_en = {
+        "05": chapter_colour_en, "06": chapter_type_en, "07": chapter_space_en,
+        "08": chapter_components_en, "09": chapter_motion_en,
+    }
+    generated_bn = {
+        "05": chapter_colour_bn, "06": chapter_type_bn, "07": chapter_space_bn,
+        "08": chapter_components_bn, "09": chapter_motion_bn,
+    }
+
+    # --- chapters ---------------------------------------------------------
+    chapter_html: list[str] = []
+    toc_items: list[str] = []
+    for num, slug, title, bn_key, source in CHAPTERS:
+        if source == "file":
+            en_body = render_markdown(HERE / "chapters" / f"{num}-{slug}.md",
+                                      bn_key, print_mode)
+            bn_body = render_markdown(HERE / "chapters" / "bn" / f"{num}-{slug}.md",
+                                      bn_key, print_mode)
+        else:
+            en_body = generated_en[num](tok)
+            bn_body = generated_bn[num](tok)
+
+        # A chapter with no verified Bangla title says so rather than repeating
+        # the English and letting it look like a translation.
+        bn_title_html = (bn_span(bn_key, large=True) if bn_key
+                         else '<span class="gb-muted">no verified Bangla title</span>')
+        bn_title_plain = BN[bn_key] if bn_key else "no verified Bangla title"
+
+        chapter_html.append(
+            f'<article class="gb-chapter" id="ch-{num}">'
+            f'<header class="gb-chapter__head">'
+            f'<p class="gb-chapter__num">Chapter {num}</p>'
+            f'<h2 class="gb-chapter__title">{e(title)}'
+            f'<span class="gb-muted"> · </span>{bn_title_html}</h2>'
+            f'<p class="gb-chapter__stand">{e(CHAPTER_STANDFIRST[num])}</p>'
+            f"</header>"
+            f'<section class="gb-section" data-lang="en" lang="en" id="ch-{num}-en">'
+            f'<p class="gb-section__label">English</p>{en_body}</section>'
+            f'<section class="gb-section" data-lang="bn" id="ch-{num}-bn">'
+            f'<p class="gb-section__label">Bangla · {bn_raw("বাংলা")}</p>{bn_body}</section>'
+            f"</article>"
+        )
+        toc_items.append(
+            f'<li><a href="#ch-{num}"><span class="gb-toc__num">{num}</span>'
+            f'<span class="gb-toc__title">{e(title)} '
+            f'<span class="gb-toc__bn">· {e(bn_title_plain)}</span>'
+            f'<span class="gb-toc__stand">{e(CHAPTER_STANDFIRST[num])}</span>'
+            f"</span></a></li>"
+        )
+
+    # --- the kit ----------------------------------------------------------
+    items = kit_files()
+    kit_rows = []
+    for display, path, what in items:
+        size = fmt_bytes(path.stat().st_size)
+        if print_mode:
+            link = f'<span class="gb-kit__label">{e(display)}</span>'
+        else:
+            uri = data_uri(path)
+            link = (f'<a class="gb-kit__label" href="{uri}" '
+                    f'download="{e(Path(display).name)}">{e(display)}</a>')
+        kit_rows.append(
+            f'<li>{link} <span class="gb-kit__what">— {e(what)} · {size}</span></li>')
+    kit_note = (
+        "<p>Each name below is a download link, and the link's target is the "
+        "file itself, carried inside this document. Nothing is fetched.</p>"
+        if not print_mode else
+        "<p><strong>The download links are stripped in the print build.</strong> "
+        "Their names are kept. A paper page cannot be clicked, so the payloads "
+        "buy a printed reader nothing while making the PDF about ten times "
+        "larger. Chapter 12 gives the measured figures. Open "
+        "<code>Aninda-Studio-Guidebook.html</code> for the files themselves.</p>")
+
+    kit_section = (
+        '<article class="gb-chapter" id="kit">'
+        '<header class="gb-chapter__head">'
+        '<p class="gb-chapter__num">The kit</p>'
+        '<h2 class="gb-chapter__title">Every file, in this file</h2>'
+        f'<p class="gb-chapter__stand">{len(items)} files, '
+        f'{fmt_bytes(sum(p.stat().st_size for _, p, _ in items))} on disk.</p>'
+        "</header>"
+        f'<section class="gb-section">{kit_note}'
+        f'<ul class="gb-list gb-kit">{"".join(kit_rows)}</ul></section></article>'
+    )
+
+    # --- head and frame ---------------------------------------------------
+    cover_mark = inline_svg("mark-regular.svg", "gb-cover-mark",
+                            "The Aninda Studio mark", theme_aware=True)
+    bar_mark = inline_svg("mark-regular.svg", "gb-bar-mark", "Aninda Studio",
+                          theme_aware=True)
+
+    style = "\n".join([
+        font_face_css(fonts),
+        tokens_css,
+        components_css,
+        GUIDEBOOK_CSS,
+        PRINT_CSS if print_mode else "",
+    ])
+
+    header_comment = (
+        "<!--\n"
+        f"  Aninda Studio — the brand guidebook. Version {VERSION}.\n"
+        f"  GENERATED FILE, written by {GENERATOR}. Do not hand-edit:\n"
+        "  change the chapter markdown or the token sources and re-run.\n"
+        f"      Build:  ./.venv/bin/python {GENERATOR}\n"
+        f"      Verify: ./.venv/bin/python {GENERATOR} --check\n"
+        f"  Sources verified {SOURCE_DATE}.\n"
+        + ("  This is the PRINT build: the download data URIs are stripped and\n"
+           "  their labels kept as text, and A4 page geometry is applied.\n"
+           if print_mode else
+           "  This is the INTERACTIVE build: every file in the kit is inlined as\n"
+           "  its own base64 data URI. Use the print build for the PDF.\n")
+        + "  The design system is Apache-2.0. The writing is\n"
+          "  PolyForm-Noncommercial-1.0.0. The identity is not licensed.\n"
+          "  Copyright 2026 Aninda Sundar Howlader.\n"
+        "-->\n"
+    )
+
+    toggle = "" if print_mode else (
+        '<div class="gb-bar-top" role="group" aria-label="Language">'
+        f'<span class="gb-bar-top__name">{bar_mark} Aninda Studio</span>'
+        '<button type="button" class="gb-langbtn" data-set-lang="en" '
+        'aria-pressed="true">English</button>'
+        f'<button type="button" class="gb-langbtn" data-set-lang="bn" '
+        f'aria-pressed="false">{bn_raw("বাংলা")}</button>'
+        "</div>"
+    )
+    script = "" if print_mode else f"<script>{TOGGLE_JS}</script>"
+
+    cover = (
+        '<header class="gb-cover">'
+        f'<div class="gb-cover__mark">{cover_mark}</div>'
+        "<h1>The Aninda Studio guidebook</h1>"
+        f'<p class="gb-cover__bn">{bn_span("wm-1", large=True)}</p>'
+        '<p class="gb-cover__lede">The mark, the colour, the type, the '
+        "components, the words, the licences, and the honest list of what is "
+        "missing. One file, no network.</p>"
+        f'<p class="gb-cover__meta">Version {e(VERSION)} · sources verified '
+        f"{e(SOURCE_DATE)} · Aninda Sundar Howlader, Barishal, Bangladesh · "
+        "aninda.sh15@gmail.com<br>"
+        f"Generated by <code>{e(GENERATOR)}</code>. This file is not "
+        "hand-edited.</p>"
+        "</header>"
+    )
+
+    toc = (
+        '<nav class="gb-toc" aria-labelledby="toc-h">'
+        '<h2 id="toc-h">Contents</h2>'
+        f'<ol>{"".join(toc_items)}'
+        '<li><a href="#kit"><span class="gb-toc__num">—</span>'
+        '<span class="gb-toc__title">Every file, in this file'
+        '<span class="gb-toc__stand">The whole kit, with a download link for '
+        "each file.</span></span></a></li>"
+        "</ol></nav>"
+    )
+
+    colophon = (
+        '<footer class="gb-colophon">'
+        f"<p>Generated by <code>{e(GENERATOR)}</code> from the sources in this "
+        "repository. Do not hand-edit this file — change the sources and re-run. "
+        f"<code>build.py --check</code> proves it has not drifted.</p>"
+        f"<p>Version {e(VERSION)} · sources verified {e(SOURCE_DATE)} · "
+        "design system Apache-2.0 · writing PolyForm-Noncommercial-1.0.0 · "
+        "typefaces SIL OFL 1.1 · the name, mark, wordmark, tile and lockups are "
+        "not licensed. Copyright 2026 Aninda Sundar Howlader. Not legal advice.</p>"
+        "</footer>"
+    )
+
+    return (
+        "<!DOCTYPE html>\n"
+        + header_comment
+        + '<html lang="en">\n<head>\n'
+        '<meta charset="utf-8">\n'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        "<title>The Aninda Studio guidebook</title>\n"
+        '<meta name="author" content="Aninda Sundar Howlader">\n'
+        '<meta name="generator" content="' + e(GENERATOR) + '">\n'
+        f"<style>{style}</style>\n"
+        "</head>\n"
+        '<body class="as-root gb-page">\n'
+        + toggle
+        + '<main class="gb-shell">'
+        + cover + toc + "".join(chapter_html) + kit_section + colophon
+        + "</main>\n"
+        + script
+        + "\n</body>\n</html>\n"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Guards — all of them run before anything is written
+# ---------------------------------------------------------------------------
+
+BANNED_WORDS = ["simply", "just", "easy", "obviously", "clearly"]
+BANNED_PHRASES = ["of course", "e.g.", "i.e.", "etc."]
+
+BENGALI_RUN = re.compile(r"[ঀ-৿‌‍]+")
+LITERAL_COLOUR = re.compile(
+    r"#[0-9a-fA-F]{3,8}\b|\b(?:rgb|rgba|hsl|hsla|lab|lch|oklch|oklab|color)\s*\(",
+)
+
+
+def strip_tags(html_text: str) -> str:
+    """Reduce a document to the words a reader sees.
+
+    Script, style and comments go, because none of them is prose. So does any
+    element marked `data-verbatim`: that attribute marks the one place in the
+    book where a banned word is printed on purpose, which is the chapter that
+    bans it. The exemption is narrow, it is named here, and it is the only one.
+    """
+    text = re.sub(r"<script\b.*?</script>", " ", html_text, flags=re.S | re.I)
+    text = re.sub(r"<style\b.*?</style>", " ", text, flags=re.S | re.I)
+    text = re.sub(r"<!--.*?-->", " ", text, flags=re.S)
+    text = re.sub(r"<p\b[^>]*\bdata-verbatim\b[^>]*>.*?</p>", " ", text,
+                  flags=re.S | re.I)
+    text = re.sub(r"<[^>]+>", " ", text)
+    return html_mod.unescape(text)
+
+
+def guard_english(documents: dict[str, str]) -> None:
+    for label, doc in documents.items():
+        text = strip_tags(doc)
+        # Quoted matter and code identifiers are not this book's own prose, but
+        # nothing in this book quotes a banned word, so the check is unqualified.
+        for word in BANNED_WORDS:
+            hit = re.search(rf"\b{word}\b", text, flags=re.I)
+            if hit:
+                context = text[max(0, hit.start() - 70):hit.end() + 70]
+                raise BuildError(
+                    f"{label}: the ENGLISH-STANDARD blocklist word '{word}' "
+                    f"reached the book. Context: …{context.strip()}…")
+        for phrase in BANNED_PHRASES:
+            if re.search(re.escape(phrase), text, flags=re.I):
+                raise BuildError(
+                    f"{label}: the banned phrase '{phrase}' reached the book.")
+        if "!" in text:
+            hit = text.index("!")
+            raise BuildError(
+                f"{label}: an exclamation mark reached the book. Context: "
+                f"…{text[max(0, hit - 70):hit + 70].strip()}…")
+
+
+def verified_bangla_vocabulary() -> set[str]:
+    vocab: set[str] = set()
+    for path in VERIFIED_BN_SOURCES:
+        for run in BENGALI_RUN.findall(path.read_text(encoding="utf-8")):
+            vocab.add(run)
+    for value in BN.values():
+        for run in BENGALI_RUN.findall(value):
+            vocab.add(run)
+    return vocab
+
+
+def guard_bangla(documents: dict[str, str]) -> None:
+    vocab = verified_bangla_vocabulary()
+    for label, doc in documents.items():
+        text = strip_tags(doc)
+        for run in BENGALI_RUN.findall(text):
+            if run not in vocab:
+                raise BuildError(
+                    f"{label}: the Bangla run '{run}' does not appear in any "
+                    "verified source. No Bangla may be written for this book — "
+                    "leave the English and name the gap instead.")
+
+
+def guard_placeholders(documents: dict[str, str]) -> None:
+    for label, doc in documents.items():
+        hit = re.search(r"\{\{[^}]{0,60}\}\}", doc)
+        if hit:
+            raise BuildError(f"{label}: unresolved placeholder {hit.group(0)}")
+        hit = re.search(r"GBBLOCK\d+ZZ", doc)
+        if hit:
+            raise BuildError(f"{label}: a block marker survived: {hit.group(0)}")
+
+
+def guard_own_css() -> None:
+    for name, sheet in (("GUIDEBOOK_CSS", GUIDEBOOK_CSS), ("PRINT_CSS", PRINT_CSS)):
+        hit = LITERAL_COLOUR.search(sheet)
+        if hit:
+            raise BuildError(
+                f"{name}: literal colour '{hit.group(0)}' — every colour in this "
+                "book's own stylesheet must be a var(--as-…) from the tokens.")
+
+
+def guard_no_external(documents: dict[str, str]) -> None:
+    pattern = re.compile(
+        r"""(?:src|href)\s*=\s*["'](?:https?:)?//""", re.I)
+    for label, doc in documents.items():
+        # Links in prose are allowed; asset references are not. Scan attributes
+        # that cause a fetch, plus every url() in CSS.
+        for match in re.finditer(r"""<(?:img|script|link|source|iframe|object|embed)\b[^>]*>""",
+                                 doc, flags=re.I):
+            if pattern.search(match.group(0)):
+                raise BuildError(f"{label}: external asset reference {match.group(0)[:120]}")
+        for match in re.finditer(r"url\(\s*['\"]?([^)'\"]+)", doc):
+            target = match.group(1).strip()
+            if target.startswith(("http:", "https:", "//")):
+                raise BuildError(f"{label}: external url() in CSS — {target[:80]}")
+
+
+def guard_kit(documents: dict[str, str]) -> None:
+    items = kit_files()
+    for _, path, _ in items:
+        if not path.is_file():
+            raise BuildError(f"kit file missing: {path}")
+    interactive = documents["Aninda-Studio-Guidebook.html"]
+    if interactive.count('download="') != len(items):
+        raise BuildError(
+            f"interactive build has {interactive.count('download=')} download "
+            f"links for {len(items)} kit files.")
+    printed = documents["Aninda-Studio-Guidebook-print.html"]
+    if 'download="' in printed:
+        raise BuildError("the print build still carries download links.")
+    if "data:application/json;base64" in printed or "data:text/css;base64" in printed:
+        raise BuildError("the print build still carries kit data URIs.")
+    if "data:font/woff2;base64" not in printed:
+        raise BuildError(
+            "the print build has no embedded fonts. Without them the Bangla "
+            "prints in a fallback face.")
+
+    # A download link that points at the wrong bytes is worse than no link, so
+    # one payload is decoded and compared against the file it claims to be. The
+    # smallest file is chosen because the check costs nothing then and the
+    # encoder is the same for all 67.
+    display, path, _ = min(items, key=lambda row: row[1].stat().st_size)
+    name = Path(display).name
+    hit = re.search(
+        r'href="data:[^"]+;base64,([A-Za-z0-9+/=]+)"\s+download="'
+        + re.escape(name) + '"', interactive)
+    if not hit:
+        raise BuildError(f"no data URI found for the kit file {display}")
+    if base64.b64decode(hit.group(1)) != path.read_bytes():
+        raise BuildError(
+            f"the inlined payload for {display} does not match the file on disk.")
+
+
+def guard_bn_sections(documents: dict[str, str]) -> None:
+    """One book, not two: every chapter must carry both sections in both files."""
+    for label, doc in documents.items():
+        for num, _slug, _title, _bn, _src in CHAPTERS:
+            for lang in ("en", "bn"):
+                if f'id="ch-{num}-{lang}"' not in doc:
+                    raise BuildError(f"{label}: chapter {num} has no {lang} section.")
+        if doc.count('data-lang="bn"') != len(CHAPTERS):
+            raise BuildError(
+                f"{label}: {doc.count('data-lang=\"bn\"')} Bangla sections for "
+                f"{len(CHAPTERS)} chapters.")
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+
+def build_all() -> dict[str, str]:
+    docs = {
+        OUT_INTERACTIVE.name: build_document(print_mode=False),
+        OUT_PRINT.name: build_document(print_mode=True),
+    }
+    guard_own_css()
+    guard_placeholders(docs)
+    guard_english(docs)
+    guard_bangla(docs)
+    guard_no_external(docs)
+    guard_kit(docs)
+    guard_bn_sections(docs)
+    return docs
+
+
+def main(argv: list[str]) -> int:
+    check = "--check" in argv
+    only_print = os.environ.get("PRINT_MODE") == "1"
+
+    try:
+        docs = build_all()
+    except BuildError as exc:
+        print(f"BUILD FAILED — nothing written.\n  {exc}", file=sys.stderr)
+        return 1
+    except KeyError as exc:
+        print(f"BUILD FAILED — nothing written.\n  missing key {exc}", file=sys.stderr)
+        return 1
+
+    targets = {OUT_INTERACTIVE.name: OUT_INTERACTIVE, OUT_PRINT.name: OUT_PRINT}
+    if only_print and not check:
+        targets = {OUT_PRINT.name: OUT_PRINT}
+
+    if check:
+        drift = []
+        for name, path in targets.items():
+            if not path.exists():
+                drift.append(f"{name}: not on disk")
+                continue
+            on_disk = path.read_text(encoding="utf-8")
+            if on_disk != docs[name]:
+                drift.append(
+                    f"{name}: differs — on disk {len(on_disk)} bytes, "
+                    f"regenerated {len(docs[name])} bytes")
+        if drift:
+            print("CHECK FAILED — the outputs have drifted from their sources.",
+                  file=sys.stderr)
+            for line in drift:
+                print(f"  {line}", file=sys.stderr)
+            return 1
+        for name in targets:
+            print(f"  {name}: identical")
+        print("CHECK PASSED — both files match their sources byte for byte.")
+        return 0
+
+    for name, path in targets.items():
+        path.write_text(docs[name], encoding="utf-8")
+        print(f"  wrote {path.relative_to(ROOT)} — {fmt_bytes(path.stat().st_size)}")
+    print(f"  chapters: {len(CHAPTERS)} · kit files: {len(kit_files())}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

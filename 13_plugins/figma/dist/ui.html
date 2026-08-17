@@ -1,0 +1,360 @@
+<!--
+  Aninda Studio — the plugin's own window.
+  SPDX-License-Identifier: Apache-2.0
+  Copyright 2026 Aninda Sundar Howlader
+-->
+<meta charset="utf-8" />
+<style>
+  /* Figma supplies its own chrome colours as --figma-color-* custom properties,
+     and the plugin window belongs to Figma's interface rather than to a page of
+     this brand. The hex after each comma is the fallback for the case where those
+     properties are absent, and it is the matching Aninda Studio Light value. That
+     is why literal hexes appear here and nowhere else. */
+  :root {
+    color-scheme: light dark;
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 12px;
+  }
+  body {
+    margin: 0;
+    padding: 16px;
+    background: var(--figma-color-bg, #ffffff);
+    color: var(--figma-color-text, #1b2f2a);
+  }
+  h1 {
+    font-size: 14px;
+    margin: 0 0 4px;
+  }
+  p.lede {
+    margin: 0 0 16px;
+    color: var(--figma-color-text-secondary, #41655c);
+    line-height: 1.5;
+  }
+  fieldset {
+    border: 1px solid var(--figma-color-border, #c8e1da);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 0 0 12px;
+  }
+  legend {
+    padding: 0 4px;
+    font-weight: 600;
+  }
+  label {
+    display: block;
+    margin: 8px 0;
+    line-height: 1.5;
+  }
+  label span.hint {
+    display: block;
+    color: var(--figma-color-text-secondary, #41655c);
+  }
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 84px;
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    border: 1px solid var(--figma-color-border, #c8e1da);
+    border-radius: 8px;
+    padding: 8px;
+    background: var(--figma-color-bg-secondary, #f8faf9);
+    color: inherit;
+  }
+  .row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+  }
+  button {
+    font: inherit;
+    padding: 12px 16px;
+    min-height: 44px;
+    border-radius: 8px;
+    border: 1px solid var(--figma-color-border-brand-strong, #126974);
+    background: var(--figma-color-bg, #ffffff);
+    color: var(--figma-color-text-brand, #126974);
+    cursor: pointer;
+  }
+  button.quiet {
+    border-color: var(--figma-color-border, #c8e1da);
+    color: inherit;
+  }
+  button:focus-visible {
+    outline: 3px solid var(--figma-color-border-brand-strong, #278492);
+    outline-offset: 2px;
+  }
+  #progress {
+    margin: 12px 0 0;
+    min-height: 18px;
+    color: var(--figma-color-text-secondary, #41655c);
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 8px;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--figma-color-border, #e3f0ec);
+    vertical-align: top;
+  }
+  td.number {
+    text-align: right;
+    font-family: ui-monospace, monospace;
+  }
+  .same {
+    color: var(--figma-color-text-success, #2d6c42);
+  }
+  .different {
+    color: var(--figma-color-text-danger, #9b3728);
+    font-weight: 600;
+  }
+  ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+    line-height: 1.5;
+  }
+  .sha {
+    font-family: ui-monospace, monospace;
+    font-size: 10px;
+    word-break: break-all;
+    color: var(--figma-color-text-secondary, #41655c);
+  }
+  [hidden] {
+    display: none !important;
+  }
+</style>
+
+<h1>Aninda Studio — build the library</h1>
+<p class="lede">
+  Everything this plugin makes is tagged, so the third command removes exactly what it
+  made and nothing else. Running the build twice makes one library, not two.
+</p>
+
+<fieldset>
+  <legend>What would you like me to do?</legend>
+  <label>
+    <input type="radio" name="command" value="build" checked />
+    Build the library
+    <span class="hint">Variables, styles, marks, components and the 30 card frames.</span>
+  </label>
+  <label>
+    <input type="radio" name="command" value="probe" />
+    Probe only
+    <span class="hint">Report what this file allows, and make nothing at all.</span>
+  </label>
+  <label>
+    <input type="radio" name="command" value="wipe" />
+    Remove everything this plugin made
+    <span class="hint">Only items carrying this plugin's tag are touched.</span>
+  </label>
+</fieldset>
+
+<fieldset>
+  <legend>Use different tokens (optional)</legend>
+  <p class="lede" style="margin-bottom: 8px">
+    Leave this empty to use the tokens compiled into the plugin. To try another set,
+    paste one JSON object shaped
+    <code>{"primitive": …, "semantic": {"light": …, "dark": …, "hc-light": …, "hc-dark": …}}</code>.
+  </p>
+  <textarea id="tokens" aria-label="Paste a different token set" spellcheck="false"></textarea>
+</fieldset>
+
+<div class="row">
+  <button id="run" type="button">Start</button>
+  <button id="close" type="button" class="quiet">Close</button>
+</div>
+
+<p id="progress" role="status" aria-live="polite"></p>
+
+<div id="result" hidden>
+  <fieldset>
+    <legend>Receipt</legend>
+    <p id="mode"></p>
+    <p id="stopped" hidden></p>
+    <div id="probe"></div>
+    <table id="counts">
+      <thead>
+        <tr>
+          <th scope="col">What</th>
+          <th scope="col" style="text-align: right">Expected</th>
+          <th scope="col" style="text-align: right">Made</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="skipped"></div>
+    <div id="decisions"></div>
+    <div id="gaps"></div>
+    <p class="sha">tokens SHA-256 <span id="sha">bd4fa5d72d208ab10590e5dc6508618fac6c2c737fd4d98a86ca09c5053d312d</span></p>
+    <div class="row">
+      <button id="copy" type="button" class="quiet">Copy the whole receipt</button>
+    </div>
+    <textarea id="raw" aria-label="The receipt as JSON" readonly></textarea>
+  </fieldset>
+</div>
+
+<script>
+  (function () {
+    var lastReceipt = null;
+    var expected = {};
+
+    function el(id) {
+      return document.getElementById(id);
+    }
+    function text(node, value) {
+      node.textContent = value;
+    }
+    function list(container, heading, items, describe) {
+      container.innerHTML = '';
+      if (!items || items.length === 0) return;
+      var h = document.createElement('p');
+      h.innerHTML = '<strong>' + heading + ' (' + items.length + ')</strong>';
+      container.appendChild(h);
+      var ul = document.createElement('ul');
+      items.forEach(function (item) {
+        var li = document.createElement('li');
+        li.textContent = describe(item);
+        ul.appendChild(li);
+      });
+      container.appendChild(ul);
+    }
+
+    el('run').addEventListener('click', function () {
+      var chosen = document.querySelector('input[name="command"]:checked').value;
+      el('result').hidden = true;
+      text(el('progress'), 'Working…');
+      parent.postMessage(
+        { pluginMessage: { type: 'run', command: chosen, tokens: el('tokens').value } },
+        '*'
+      );
+    });
+
+    el('close').addEventListener('click', function () {
+      parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+    });
+
+    el('copy').addEventListener('click', function () {
+      var raw = el('raw');
+      raw.removeAttribute('readonly');
+      raw.select();
+      try {
+        document.execCommand('copy');
+        text(el('progress'), 'The receipt is on your clipboard.');
+      } catch (error) {
+        text(el('progress'), 'Copying did not work. Select the text below and copy it.');
+      }
+      raw.setAttribute('readonly', 'readonly');
+    });
+
+    window.onmessage = function (event) {
+      var message = event.data && event.data.pluginMessage;
+      if (!message) return;
+
+      if (message.type === 'ready') {
+        expected = message.expected || {};
+        el('sha').textContent = message.sha;
+        var selected = document.querySelector('input[name="command"][value="' + message.command + '"]');
+        if (selected) selected.checked = true;
+        text(
+          el('progress'),
+          'Fonts this needs: ' + (message.fonts || []).join(', ') + '.'
+        );
+        return;
+      }
+
+      if (message.type === 'progress') {
+        text(el('progress'), message.message);
+        return;
+      }
+
+      if (message.type === 'fatal') {
+        text(el('progress'), message.message);
+        return;
+      }
+
+      if (message.type !== 'receipt') return;
+
+      lastReceipt = message.receipt;
+      expected = message.expected || expected;
+      text(el('progress'), 'Finished.');
+      el('result').hidden = false;
+
+      text(
+        el('mode'),
+        'Ran the "' +
+          lastReceipt.command +
+          '" command in ' +
+          lastReceipt.mode +
+          ' mode, from tokens ' +
+          lastReceipt.tokensSource +
+          '.'
+      );
+
+      var stopped = el('stopped');
+      stopped.hidden = !lastReceipt.stopped;
+      if (lastReceipt.stopped) text(stopped, lastReceipt.stopped);
+
+      var probe = el('probe');
+      probe.innerHTML = '';
+      if (lastReceipt.probe) {
+        var p = lastReceipt.probe;
+        var rows = [
+          'Fonts: ' + (p.fonts.ok ? 'all present' : 'missing ' + p.fonts.missing.join(', ')),
+          'Variables: ' + (p.variables.ok ? 'available' : 'not available — ' + p.variables.reason),
+          'Modes per collection: ' + p.variableModes.limit + ' — ' + p.variableModes.reason,
+          'createNodeFromSvg: ' +
+            (p.createNodeFromSvg.ok ? 'available' : 'not available — ' + p.createNodeFromSvg.reason),
+          'combineAsVariants: ' +
+            (p.combineAsVariants.ok ? 'available' : 'not available — ' + p.combineAsVariants.reason),
+        ];
+        list(probe, 'Probe', rows, function (row) {
+          return row;
+        });
+      }
+
+      var body = el('counts').querySelector('tbody');
+      body.innerHTML = '';
+      var keys = Object.keys(expected).concat(
+        Object.keys(lastReceipt.created).filter(function (k) {
+          return !Object.prototype.hasOwnProperty.call(expected, k);
+        })
+      );
+      keys.forEach(function (key) {
+        var want = Object.prototype.hasOwnProperty.call(expected, key) ? expected[key] : '—';
+        var got = Object.prototype.hasOwnProperty.call(lastReceipt.created, key)
+          ? lastReceipt.created[key]
+          : 0;
+        var tr = document.createElement('tr');
+        var same = want === got;
+        tr.innerHTML =
+          '<td>' +
+          key +
+          '</td><td class="number">' +
+          want +
+          '</td><td class="number ' +
+          (want === '—' ? '' : same ? 'same' : 'different') +
+          '">' +
+          got +
+          '</td>';
+        body.appendChild(tr);
+      });
+
+      list(el('skipped'), 'Skipped, with the reason', lastReceipt.skipped, function (item) {
+        return item.what + ' — ' + item.why;
+      });
+      list(el('decisions'), 'Decisions taken on purpose', lastReceipt.decisions, function (item) {
+        return item.what + ' — ' + item.why;
+      });
+      list(el('gaps'), 'Known gaps in the source', lastReceipt.knownGaps, function (item) {
+        return item.what + ' — ' + item.why;
+      });
+
+      el('raw').value = JSON.stringify(lastReceipt, null, 2);
+    };
+  })();
+</script>

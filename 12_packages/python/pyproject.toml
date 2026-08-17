@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aninda-studio-tokens"
+version = "1.0.0"
+description = "The Aninda Studio design tokens: colour, type, space, shape and motion, in four themes — light, dark, and a high-contrast pair. Every colour pairing was measured rather than chosen, against WCAG 2.2 AA in the ordinary themes and AAA in the high-contrast ones."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Aninda Sundar Howlader", email = "aninda.sh15@gmail.com" }]
+keywords = ["design-tokens", "dtcg", "design-system", "accessibility", "wcag"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: User Interfaces",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://anindastudio.com"
+Source = "https://github.com/GRU-953/aninda-studio"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aninda_studio_tokens"]

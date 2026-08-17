@@ -1,0 +1,66 @@
+{
+  "generated_by": "04_mark/build.py",
+  "warning": "Generated. Do not hand-edit \u2014 change the script and re-run.",
+  "grid": 100.0,
+  "geometry": {
+    "circle": {
+      "cx": 44.0,
+      "cy": 58.0,
+      "r": 28.0
+    },
+    "stem_x": 72.0,
+    "stem_top": 30.0,
+    "stem_bottom": 94.0
+  },
+  "strokes": {
+    "regular": 9.0,
+    "heavy": 15.0,
+    "rule": "stroke 9 at 24px and above; stroke 15 below"
+  },
+  "clear_space": "half the mark's own height on all four sides",
+  "safe_field": 90.0,
+  "tile_radius_percent": 24.0,
+  "tile_radius_source": "the system's own radius-hero token. Apple publishes no corner radius; this number is ours and is not claimed to be theirs.",
+  "icon_policy": {
+    "decision": "One rounded icon is used on every surface, Apple included. Owner's decision, 14 August 2026.",
+    "everyday": [
+      "icon-1024.svg",
+      "icon-1088-watch.svg",
+      "icon-512.svg",
+      "icon-192.svg",
+      "tile-web.svg"
+    ],
+    "app_store_only": "icon-appstore-square-1024.svg",
+    "trade_off": "Apple's current guidance asks for square, unmasked artwork: the system applies the mask and derives Liquid Glass specular highlights from the layer edges, so a pre-rounded edge sits inside the mask and the highlight follows the wrong geometry. Apple's own wording is that pre-masked artwork 'negatively impacts specular highlight effects' and makes edges 'look jagged'. Measured here: in a static render the difference is small, and on watchOS and visionOS it is nil because the circular mask cuts well inside the rounding. The dynamic cost could not be measured outside Apple's own renderer.",
+    "if_you_ever_submit_to_the_app_store": "Use icon-appstore-square-1024.svg, not the rounded icon. Icon Composer expects unmasked layers.",
+    "verified_against": "Apple Human Interface Guidelines, checked 14 August 2026"
+  },
+  "files": [
+    "mark-regular.svg",
+    "mark-heavy.svg",
+    "wordmark-latin.svg",
+    "wordmark-bangla.svg",
+    "tile-web.svg",
+    "icon-1024.svg",
+    "icon-1088-watch.svg",
+    "icon-512.svg",
+    "icon-192.svg",
+    "icon-appstore-square-1024.svg"
+  ],
+  "checks": [
+    "uharfbuzz present, HarfBuzz 14.3.0",
+    "Bangla wordmark: 16 code points \u2192 11 glyphs, advance 520.1",
+    "Latin wordmark: 13 code points \u2192 13 glyphs, advance 653.2",
+    "conjuncts formed: 15 code points \u2192 11 glyphs",
+    "negative control passed: naive 16 glyphs \u2260 shaped 11 glyphs",
+    "icon at stroke 9: mark 65.0\u00d773.0 scaled \u00d70.9208, worst corner 45.00 of 45 units from centre \u2014 inside both the 90-unit field and the circle watchOS and visionOS mask to",
+    "icon at stroke 15: mark 71.0\u00d779.0 scaled \u00d70.8473, worst corner 45.00 of 45 units from centre \u2014 inside both the 90-unit field and the circle watchOS and visionOS mask to",
+    "4 recolourable files carry no root colour and draw in currentColor",
+    "tile-web.svg: 4.7% background showing \u2014 rounded",
+    "icon-1024.svg: 4.7% background showing \u2014 rounded \u2014 the everyday icon, all platforms",
+    "icon-1088-watch.svg: 4.7% background showing \u2014 rounded",
+    "icon-512.svg: 4.7% background showing \u2014 rounded",
+    "icon-192.svg: 4.7% background showing \u2014 rounded",
+    "icon-appstore-square-1024.svg: 0.0% background showing \u2014 square and fully opaque \u2014 App Store only"
+  ]
+}

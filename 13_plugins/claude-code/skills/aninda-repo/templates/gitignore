@@ -1,0 +1,50 @@
+# Rename this file to .gitignore at the repository root.
+#
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Aninda Sundar Howlader
+
+# macOS
+.DS_Store
+.AppleDouble
+._*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+npm-debug.log*
+*.tsbuildinfo
+
+# Project-local browser downloads, if any
+00_sandbox/browsers/
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# Anything genuinely temporary
+*.tmp
+*.log
+
+# NOT ignored, on purpose:
+#
+#   Generated files that are committed. If a generated file is committed, CI
+#   regenerates it and diffs it, which is what catches a generator changing
+#   without its output being regenerated. Ignoring it removes the guard.
+#
+#   A Figma plugin's dist/ folder. Figma loads built JavaScript, and asking
+#   somebody to run a build before opening Figma is one more place to get stuck.
+#
+# Ignored, on purpose:
+#
+#   A Figma plugin's manifest.json. It holds a plugin id issued to one person,
+#   and a committed one would let the build pass with a value nobody checked.
+13_plugins/figma/manifest.json

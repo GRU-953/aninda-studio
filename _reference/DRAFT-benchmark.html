@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Benchmark — Aninda Studio against Apple, Google and Meta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Bengali:wght@400..700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{background:#F6F2E9;color:#16211C;font-family:Archivo,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:#10635A}a:hover{color:#0C3A31}
+.doc{max-width:1216px;margin:0 auto;padding:48px 40px 96px}
+.lbl{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#10635A}
+.top{display:flex;align-items:flex-end;gap:15px;margin-bottom:48px}
+.top .w{font-family:Archivo;font-variation-settings:'wdth' 106,'wght' 500;letter-spacing:.005em;text-transform:lowercase;font-size:37px;line-height:1;color:#0C3A31;transform:translateY(5px)}
+.hd{display:flex;flex-direction:column;gap:16px;margin-bottom:48px;max-width:74ch}
+.hd h1{font-family:Archivo;font-variation-settings:'wdth' 106,'wght' 500;letter-spacing:.005em;text-transform:lowercase;font-size:50.56px;line-height:1.04;color:#0C3A31}
+.hd p{font-size:21.33px;line-height:1.5;color:#54615B}
+section{padding-block:48px;border-top:1px solid #D6D1C2}
+h2{font-variation-settings:'wdth' 106,'wght' 600;font-size:28.44px;margin-bottom:12px}
+h2+p{max-width:70ch;color:#54615B;margin-bottom:32px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:400;color:#10635A;padding:0 16px 12px 0;border-bottom:1px solid #D6D1C2}
+td{padding:20px 16px 20px 0;border-bottom:1px solid #D6D1C2;vertical-align:top}
+td:first-child{font-variation-settings:'wght' 600;width:17%}
+td:nth-child(2){width:29%;color:#54615B}
+td:nth-child(3){width:38%}
+td:last-child{width:16%}
+.v{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:6px 11px;border-radius:6px;white-space:nowrap;display:inline-block}
+.v.ok{background:#E6F3EA;color:#1B6B3A}
+.v.part{background:#F7EEDB;color:#8A5A00}
+.v.bad{background:#FBEAE6;color:#A8301F}
+.tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:32px}
+.tally div{background:#EAE4D7;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.tally b{font-family:Archivo;font-variation-settings:'wdth' 106,'wght' 500;letter-spacing:.005em;text-transform:lowercase;font-size:37.92px;line-height:1;color:#0C3A31}
+.tally span{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#10635A}
+.limits{background:#0C3A31;color:#F6F2E9;border-radius:14px;padding:48px;display:flex;flex-direction:column;gap:24px;margin-top:48px}
+.limits h3{font-family:Archivo;font-variation-settings:'wdth' 106,'wght' 500;letter-spacing:.005em;text-transform:lowercase;font-size:28.44px;color:#F6F2E9}
+.limits ul{display:flex;flex-direction:column;gap:14px;padding-left:22px;max-width:74ch}
+.limits li{color:#79D8B8;font-size:16px;line-height:1.6}
+.src{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:2;color:#54615B;display:flex;flex-direction:column;gap:2px}
+</style></head><body><div class="doc">
+<div class="top"><div style="width:52px;height:52px;flex:none"><svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;width:100%;height:100%"><circle cx="44" cy="62" r="28" stroke="#0C3A31" stroke-width="9"/><path d="M72 18V90" stroke="#0C3A31" stroke-width="9" stroke-linecap="round"/></svg></div><div class="w">aninda studio</div></div>
+
+<div class="hd"><p class="lbl">Benchmark · checked 14 August 2026</p>
+<h1>Where this kit meets Apple and Google, and where it doesn't.</h1>
+<p>Nineteen criteria drawn from Apple's current Human Interface Guidelines, Google's Material 3 Expressive, and the parent-brand architecture Meta operates in public. Each one says what their standard is, where Aninda Studio actually stands, and nothing else. Six are outright gaps. Two of them are things the old GRU953 kit had baked in wrongly.</p></div>
+
+<section style="border-top:0;padding-top:0"><h2>Apple — Human Interface Guidelines</h2>
+<p>Apple's icon guidance changed materially with the Liquid Glass release: the system now owns the corner radius and composites the icon in four appearance variants. Any kit that ships a pre-rounded, single-colourway tile is now describing a platform that no longer exists.</p>
+<table><thead><tr><th>Criterion</th><th>Their standard</th><th>Where this kit stands</th><th>Verdict</th></tr></thead><tbody><tr><td>App icon master</td><td>A 1024×1024 fully opaque square. The system applies the corner radius; do not draw it in. Do not fake borders or bevels.</td><td>The old kit baked a 22.46% squircle into the icon file and reused that number as a token. Under current HIG that is the wrong artefact — the platform masks it now.</td><td><span class="v bad">Gap</span></td></tr><tr><td>Appearance variants</td><td>Light, dark, clear and tinted variants, authored as layers.</td><td>The old kit stated the tile had exactly one colourway and was not recolourable. That rule is now incompatible with the platform it targets.</td><td><span class="v bad">Gap</span></td></tr><tr><td>Icon simplicity</td><td>Keep icons simple, one or two colours, so they survive dynamic lighting.</td><td>Two colours, one geometric form, no gradient, no detail. This is the one criterion the new mark passes outright.</td><td><span class="v ok">Meets</span></td></tr><tr><td>Safe zone</td><td>Essential shapes inside the safe zone; edge bleed can clip under masking.</td><td>The monogram sits on a 100-unit grid with the bowl and stem inside a 90-unit field. Needs stating as a rule, not left implicit.</td><td><span class="v part">Partial</span></td></tr><tr><td>Contrast under material</td><td>Text legible despite transparency; 4.5:1 maintained.</td><td>No transparency and no backdrop blur anywhere in the system, so the question does not arise. Every pair measured.</td><td><span class="v ok">Meets</span></td></tr><tr><td>Type at small sizes</td><td>A single family across the range, optical sizing handled by the system.</td><td>Archivo has a width axis but no optical-size axis. At caption sizes the display width must be dropped to 100 manually — a rule, not an automatic.</td><td><span class="v part">Partial</span></td></tr></tbody></table></section>
+
+<section><h2>Google — Material 3 Expressive</h2>
+<p>Material is the harder comparison, because it is a full product design system and this is a studio identity. The criteria below are the ones that would actually bite if a product were built on these tokens for Android.</p>
+<table><thead><tr><th>Criterion</th><th>Their standard</th><th>Where this kit stands</th><th>Verdict</th></tr></thead><tbody><tr><td>Tonal surfaces</td><td>Seven tone-based surface containers replace opacity layers: surfaceContainerLowest through Highest.</td><td>Three surfaces: ground, raised, sunken. Enough for flat design, short of Material’s depth vocabulary if this system ever ships an Android app.</td><td><span class="v bad">Gap</span></td></tr><tr><td>Deprecated role names</td><td>background and onBackground are deprecated in favour of surface and onSurface.</td><td>The old kit named its root role bg. Carrying that name forward would import a role Google has retired.</td><td><span class="v part">Partial</span></td></tr><tr><td>Colour roles</td><td>Primary, secondary and tertiary key colours, each with container and on- pairs.</td><td>Teal primary, four semantic hues, no secondary or tertiary. Deliberate under a two-colour brand, but it means no Material Theme Builder mapping without inventing one.</td><td><span class="v part">Partial</span></td></tr><tr><td>Shape as tokens</td><td>Corner radii as a token scale, with shape morphing and 35 shapes in the library.</td><td>Four fixed radii. Simpler and defensible for a studio brand; not a shape system.</td><td><span class="v part">Partial</span></td></tr><tr><td>Dynamic colour</td><td>Apps may follow the user’s wallpaper-derived palette or hold brand colours.</td><td>No stated position. A bilingual Android product built on this system will hit the question on day one.</td><td><span class="v bad">Gap</span></td></tr><tr><td>Motion</td><td>A motion physics system with springs, introduced in M3 Expressive.</td><td>Two durations, two cubic-bézier curves, nothing over 300ms. Deliberately simpler. Defensible, but it should be written as a choice rather than an omission.</td><td><span class="v part">Partial</span></td></tr><tr><td>Research base</td><td>M3 Expressive drew on 46 global studies with over 18,000 participants.</td><td>Zero studies. One person’s judgement, stated as such. No amount of rigour in the token pipeline substitutes for this.</td><td><span class="v bad">Gap</span></td></tr><tr><td>Accessibility built in</td><td>Accessibility treated as structural, not an add-on, across colour, type, motion and components.</td><td>Every pair computed against WCAG 2.2 AA, reduced motion honoured, no meaning carried by colour alone. Contrast is measured; lived accessibility is not tested.</td><td><span class="v part">Partial</span></td></tr></tbody></table></section>
+
+<section><h2>Meta — parent-brand architecture</h2>
+<p>Not a design system comparison. Meta is here because it is the clearest public example of the structural problem this brand now has: a parent identity over products that carry their own names. These are observations of a visible structure, not citations of a published spec.</p>
+<table><thead><tr><th>Criterion</th><th>The pattern</th><th>Where this kit stands</th><th>Verdict</th></tr></thead><tbody><tr><td>Parent-brand architecture</td><td>A house of individually-named products under a corporate parent, with the parent mark rarely on the product surface.</td><td>Endorsement form settled: <Name> by Aninda Studio on first mention, then the name alone. The rule exists before it is needed, which is the right order.</td><td><span class="v ok">Meets</span></td></tr><tr><td>Naming a house after a person</td><td>Personal-name parents do not scale past the person; the pattern is normally an invented parent over named products.</td><td>Aninda Studio is a personal name serving as a parent brand. Honest today, a constraint later. Named as a known limit rather than solved.</td><td><span class="v part">Partial</span></td></tr><tr><td>One system across many surfaces</td><td>A single token set driving web, mobile, print and internal tooling.</td><td>One token set, ten surfaces planned, five prioritised. The pipeline is Figma-variables-first, so the token set is the single source rather than the code.</td><td><span class="v ok">Meets</span></td></tr><tr><td>Brand governance at scale</td><td>Dedicated teams, review gates, and a licence position on every asset.</td><td>One person, a licence split across four regimes, and no review gate beyond this document. Appropriate to the size; stated rather than dressed up.</td><td><span class="v part">Partial</span></td></tr></tbody></table></section>
+
+<section><h2>The tally</h2>
+<div class="tally">
+<div><b>4</b><span>Meets outright</span></div>
+<div><b>9</b><span>Partial</span></div>
+<div><b>6</b><span>Gap</span></div>
+<div><b>2</b><span>Inherited wrong from GRU953</span></div>
+</div>
+<div class="limits"><h3>What this benchmark does not claim</h3>
+<ul>
+<li>It does not claim parity. Apple and Google run design systems with research budgets and dedicated teams; this is one person's kit, and four "meets" out of nineteen is the honest score, not a disappointing one.</li>
+<li>It compares against published guidance, not against how well those companies follow their own guidance.</li>
+<li>The Meta section is structural observation. No published Meta brand specification was consulted, and it is marked as such rather than dressed up as sourced.</li>
+<li>Nothing here has been tested with a screen reader by a person who uses one. Contrast is computed; lived accessibility is a different claim and this kit does not make it.</li>
+<li>Guidance moves. Apple's icon rules changed inside a year and invalidated a token the old kit treated as permanent. Anything dated after this file supersedes it.</li>
+</ul></div></section>
+
+<section><h2>Sources</h2><div class="src">
+<span>Apple Human Interface Guidelines — app icons, materials, Icon Composer</span>
+<span>Material 3 Expressive — colour roles, tonal surfaces, shape tokens, motion physics</span>
+<span>Material 3 — surface container roles and deprecated role names</span>
+<span>Google Design — expressive design research, 46 studies, 18,000+ participants</span>
+<span>WCAG 2.2 AA — contrast, target size, focus visibility</span>
+<span>Checked 14 August 2026. Availability and platform guidance both go stale; the date is the claim.</span>
+</div></section>
+</div></body></html>

@@ -1,0 +1,26 @@
+/* Aninda Studio — the dark theme alone.
+ * A convenience view. The complete stylesheet is tokens.css, and the
+ * authoritative source is aninda.tokens.json.
+ * GENERATED — do not hand-edit.
+ */
+[data-theme="dark"] {
+  --as-surface-lowest: #0B0C0B;
+  --as-surface-low: #0E100F;
+  --as-surface-base: #111212;
+  --as-surface-high: #111312;
+  --as-surface-highest: #121313;
+  --as-surface-dim: #060707;
+  --as-surface-bright: #121413;
+  --as-ink: #F2F9F7;
+  --as-ink-muted: #6F9B90;
+  --as-line: #578076;
+  --as-accent: #42A0AE;
+  --as-accent-edge: #278492;
+  --as-focus-ring: #278492;
+  --as-success: #59A46F;
+  --as-warning: #B8863E;
+  --as-danger: #E16551;
+  --as-info: #5C96C8;
+  --as-shadow-float: none;
+  --as-color-scheme: dark;
+}

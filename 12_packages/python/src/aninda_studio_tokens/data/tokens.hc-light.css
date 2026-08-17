@@ -1,0 +1,26 @@
+/* Aninda Studio — the hc-light theme alone.
+ * A convenience view. The complete stylesheet is tokens.css, and the
+ * authoritative source is aninda.tokens.json.
+ * GENERATED — do not hand-edit.
+ */
+[data-theme="hc-light"] {
+  --as-surface-lowest: #FCFDFC;
+  --as-surface-low: #FAFAFA;
+  --as-surface-base: #F7F8F7;
+  --as-surface-high: #F5F5F5;
+  --as-surface-highest: #F2F3F2;
+  --as-surface-dim: #F1F1F1;
+  --as-surface-bright: #FFFFFF;
+  --as-ink: #0D1A17;
+  --as-ink-muted: #2E4B43;
+  --as-line: #41655C;
+  --as-accent: #054D56;
+  --as-accent-edge: #126974;
+  --as-focus-ring: #126974;
+  --as-success: #1D502E;
+  --as-warning: #5D3C07;
+  --as-danger: #752519;
+  --as-info: #214767;
+  --as-shadow-float: none;
+  --as-color-scheme: light;
+}

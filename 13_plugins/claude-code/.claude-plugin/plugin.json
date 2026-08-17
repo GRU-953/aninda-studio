@@ -1,0 +1,36 @@
+{
+  "name": "aninda-studio",
+  "version": "1.0.0",
+  "displayName": "Aninda Studio",
+  "description": "The Aninda Studio brand and design system as three skills: make one asset to the rules, set up or upgrade a whole repository, and check something that already exists against the system and WCAG 2.2 AA.",
+  "author": {
+    "name": "Aninda Sundar Howlader",
+    "email": "aninda.sh15@gmail.com",
+    "url": "https://anindastudio.com"
+  },
+  "homepage": "https://anindastudio.com",
+  "repository": "https://github.com/GRU-953/aninda-studio",
+  "license": "Apache-2.0 AND PolyForm-Noncommercial-1.0.0",
+  "keywords": [
+    "brand",
+    "design-system",
+    "design-tokens",
+    "dtcg",
+    "accessibility",
+    "wcag",
+    "wcag-2.2",
+    "contrast",
+    "colour",
+    "typography",
+    "bangla",
+    "bengali",
+    "bilingual",
+    "logo",
+    "icons",
+    "svg",
+    "licensing",
+    "polyform",
+    "apache-2.0",
+    "sil-ofl"
+  ]
+}

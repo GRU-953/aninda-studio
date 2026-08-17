@@ -1,0 +1,627 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Aninda Sundar Howlader
+"""
+WHY THIS FILE EXISTS
+====================
+It draws every Aninda Studio mark, wordmark, lockup and icon artefact, and it
+refuses to draw any of them if it cannot do so correctly.
+
+TWO THINGS THE DRAFT GOT WRONG, BOTH FIXED HERE
+-----------------------------------------------
+1. **The stem ran above the bowl.** A vertical stroke rising above a bowl is an
+   ascender, and a bowl with an ascender is a lowercase 'd'. Rendering the draft
+   showed it immediately: the mark read as "d aninda studio". The overrun that
+   makes this a mark rather than a glyph has to go DOWNWARD.
+
+2. **A 22.46% squircle was baked into the Apple icon.** Verified against Apple's
+   current Human Interface Guidelines on 14 August 2026: Apple publishes no corner
+   radius, no percentage, and the word "squircle" appears nowhere in its guidance.
+   The system applies the mask now, and Apple states plainly that pre-masked
+   artwork "negatively impacts specular highlight effects" and makes edges "look
+   jagged". So the Apple master here is a SQUARE, fully opaque, unmasked 1024 —
+   and the checks below fail the build if a radius ever creeps back in.
+
+   The web tile is different, and the difference is mechanical rather than
+   aesthetic: a browser will not round a favicon for you, so that artefact must
+   carry its own corner radius. Its radius is 24 units per 100, taken from the
+   system's own `radius-hero` token — our decision, derived from our own scale,
+   with no claim that it is Apple's number.
+
+WHY watchOS AND visionOS CHANGE THE SAFE AREA
+---------------------------------------------
+Apple masks to a rounded rectangle on iOS, iPadOS and macOS, but to a CIRCLE on
+watchOS and visionOS. A layout that survives a rounded rectangle can still lose
+its corners to a circle, so every essential shape here is checked against the
+inscribed circle as well as the 90-of-100 safe field.
+
+BANGLA IS SHAPED, NEVER MAPPED
+------------------------------
+The Bangla wordmark goes through HarfBuzz. Conjuncts join and some vowel signs are
+written before the consonant they follow, so pulling glyphs out of a font by code
+point produces nonsense that still looks like Bangla to someone who cannot read it.
+Gate 3 below is a NEGATIVE control: it runs the naive path deliberately and fails
+if the shaped result is identical, because that would mean HarfBuzz is present but
+not actually shaping.
+
+EXIT CODES
+----------
+    0  everything drawn and checked
+    1  a real failure — a check did not pass
+    2  could not run — a font or a library is missing
+
+RUN
+---
+    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    export PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers
+    ./.venv/bin/python 04_mark/build.py
+"""
+
+from __future__ import annotations
+
+import json
+import math
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+TOKENS = ROOT / "07_tokens" / "build"
+FONTS = ROOT / "06_type" / "candidates"
+OUT = HERE / "svg"
+RASTER = HERE / "png"
+
+GRID = 100.0
+STROKE_REGULAR = 9.0     # at 24px and above
+STROKE_HEAVY = 15.0      # below 24px
+SAFE = 90.0              # essential shapes live inside 90 of the 100 units
+TILE_RADIUS_PCT = 24.0   # from the system's own radius-hero token, not from folklore
+
+LATIN_FONT = FONTS / "latin" / "literata" / "Literata[opsz,wght].ttf"
+BANGLA_FONT = FONTS / "bangla" / "notoserifbengali" / "NotoSerifBengali[wdth,wght].ttf"
+
+WORD_LATIN = "aninda studio"
+WORD_BANGLA = "অনিন্দ্য স্টুডিও"
+
+
+class Fail(Exception):
+    """A check did not pass. Nothing is written."""
+
+
+class NotEquipped(Exception):
+    """A tool or font is missing. Distinct from a failure."""
+
+
+# ---------------------------------------------------------------------------
+# The mark
+# ---------------------------------------------------------------------------
+
+CIRCLE = {"cx": 44.0, "cy": 58.0, "r": 28.0}
+STEM_X = CIRCLE["cx"] + CIRCLE["r"]     # tangent to the bowl, by construction
+STEM_TOP = CIRCLE["cy"] - CIRCLE["r"]   # the top of the bowl
+STEM_BOTTOM = 94.0                      # the overrun, downward
+
+
+def mark_paths(stroke: float) -> str:
+    return (
+        f'<circle cx="{CIRCLE["cx"]:g}" cy="{CIRCLE["cy"]:g}" r="{CIRCLE["r"]:g}" '
+        f'fill="none" stroke="currentColor" stroke-width="{stroke:g}"/>'
+        f'<path d="M{STEM_X:g} {STEM_TOP:g}V{STEM_BOTTOM:g}" stroke="currentColor" '
+        f'stroke-width="{stroke:g}" stroke-linecap="round"/>'
+    )
+
+
+def mark_extent(stroke: float) -> tuple[float, float, float, float]:
+    """The mark's true drawn bounds, including half the stroke on every side."""
+    h = stroke / 2
+    return (
+        CIRCLE["cx"] - CIRCLE["r"] - h,
+        CIRCLE["cy"] - CIRCLE["r"] - h,
+        STEM_X + h,
+        STEM_BOTTOM + h,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Text shaping — the Inkscape replacement
+# ---------------------------------------------------------------------------
+
+def shape_to_path(text: str, font_path: Path, size: float,
+                  variations: dict | None = None) -> tuple[str, float, float]:
+    """Shape `text` through HarfBuzz and return it as one SVG path.
+
+    Returns (path_data, advance_width, units_per_em_scale).
+    """
+    try:
+        import uharfbuzz as hb
+        from fontTools.ttLib import TTFont
+        from fontTools.pens.svgPathPen import SVGPathPen
+        from fontTools.varLib import instancer
+    except ImportError as e:
+        raise NotEquipped(f"shaping is unavailable: {e}") from e
+
+    if not font_path.exists():
+        raise NotEquipped(f"font not found: {font_path}")
+
+    tt = TTFont(str(font_path))
+    if variations and "fvar" in tt:
+        tt = instancer.instantiateVariableFont(tt, variations, inplace=False)
+
+    upem = tt["head"].unitsPerEm
+    scale = size / upem
+
+    # Coverage gate: every code point must be in the cmap. A missing glyph renders
+    # as .notdef, which is a visible box no check would otherwise catch.
+    cmap = tt.getBestCmap()
+    missing = sorted({c for c in text if c != " " and ord(c) not in cmap})
+    if missing:
+        raise Fail(f"{font_path.name} has no glyph for: "
+                   f"{', '.join(f'{c!r} U+{ord(c):04X}' for c in missing)}")
+
+    blob = hb.Blob.from_file_path(str(font_path))
+    face = hb.Face(blob)
+    hb_font = hb.Font(face)
+    if variations:
+        hb_font.set_variations(variations)
+
+    buf = hb.Buffer()
+    buf.add_str(text)
+    buf.guess_segment_properties()
+    hb.shape(hb_font, buf)
+
+    glyph_order = tt.getGlyphOrder()
+    glyph_set = tt.getGlyphSet()
+
+    parts: list[str] = []
+    x = 0.0
+    for info, pos in zip(buf.glyph_infos, buf.glyph_positions):
+        name = glyph_order[info.codepoint]
+        pen = SVGPathPen(glyph_set)
+        glyph_set[name].draw(pen)
+        d = pen.getCommands()
+        if d:
+            # Font units are y-up, SVG is y-down. The flip is baked into the
+            # transform we apply to the coordinates rather than left as an SVG
+            # attribute, because an attribute is something a downstream optimiser
+            # can drop — and losing it produces upside-down artwork that still
+            # passes every "does this parse" check.
+            tx = (x + pos.x_offset) * scale
+            ty = -pos.y_offset * scale
+            parts.append(f'<g transform="translate({tx:.3f},{ty:.3f}) '
+                         f'scale({scale:.6f},{-scale:.6f})"><path d="{d}"/></g>')
+        x += pos.x_advance
+
+    return "".join(parts), x * scale, len(buf.glyph_infos)
+
+
+def naive_to_glyphs(text: str, font_path: Path) -> list[int]:
+    """The WRONG way, on purpose. Used only as a negative control."""
+    from fontTools.ttLib import TTFont
+    tt = TTFont(str(font_path))
+    cmap = tt.getBestCmap()
+    order = {n: i for i, n in enumerate(tt.getGlyphOrder())}
+    return [order.get(cmap[ord(c)], 0) for c in text if ord(c) in cmap]
+
+
+def shaping_gates() -> list[str]:
+    """Five gates, all of which must pass before a single byte is written."""
+    import uharfbuzz as hb
+    notes = []
+
+    # G1 — the library is present and reports a version.
+    notes.append(f"uharfbuzz present, HarfBuzz {hb.version_string()}")
+
+    # G2/G3 — coverage and shaping, via a positive control on real strings.
+    for text, font, label in ((WORD_BANGLA, BANGLA_FONT, "Bangla wordmark"),
+                              (WORD_LATIN, LATIN_FONT, "Latin wordmark")):
+        _, adv, n = shape_to_path(text, font, 100.0)
+        if adv <= 0:
+            raise Fail(f"{label}: shaping produced zero advance width")
+        notes.append(f"{label}: {len(text)} code points → {n} glyphs, advance {adv:.1f}")
+
+    # G4 — conjuncts actually formed.
+    _, _, n_shaped = shape_to_path(WORD_BANGLA, BANGLA_FONT, 100.0)
+    n_codepoints = len([c for c in WORD_BANGLA if c != " "])
+    if n_shaped >= n_codepoints:
+        raise Fail(
+            f"Bangla shaping produced {n_shaped} glyphs from {n_codepoints} code "
+            f"points — no conjunct formed. HarfBuzz is present but the font's GSUB "
+            f"table is not being applied."
+        )
+    notes.append(f"conjuncts formed: {n_codepoints} code points → {n_shaped} glyphs")
+
+    # G5 — THE NEGATIVE CONTROL. The naive path must produce a different result.
+    # A positive control alone cannot catch a fallback shaper that silently does
+    # nothing; this can.
+    naive = naive_to_glyphs(WORD_BANGLA, BANGLA_FONT)
+    import uharfbuzz as _hb
+    blob = _hb.Blob.from_file_path(str(BANGLA_FONT))
+    buf = _hb.Buffer(); buf.add_str(WORD_BANGLA); buf.guess_segment_properties()
+    f = _hb.Font(_hb.Face(blob)); _hb.shape(f, buf)
+    shaped = [g.codepoint for g in buf.glyph_infos]
+    if naive == shaped:
+        raise Fail(
+            "NEGATIVE CONTROL FAILED: mapping each code point straight through the "
+            "cmap produced exactly the same glyphs as HarfBuzz. Shaping is not "
+            "happening, and the Bangla would be drawn wrong in a way that still "
+            "looks like Bangla."
+        )
+    notes.append(f"negative control passed: naive {len(naive)} glyphs ≠ shaped "
+                 f"{len(shaped)} glyphs")
+    return notes
+
+
+# ---------------------------------------------------------------------------
+# Artefacts
+# ---------------------------------------------------------------------------
+
+def svg_doc(body: str, w: float, h: float, colour: str, title: str,
+            view: str | None = None, recolourable: bool = False) -> str:
+    """One SVG document. Two kinds, and the difference matters.
+
+    `recolourable=True` — the marks and wordmarks. These are drawn entirely in
+    `currentColor` and the root carries NO colour of its own, so they take the
+    colour of wherever they are placed. That is what lets one file serve all four
+    themes.
+
+    The first version put `style="color:#0D1A17"` on the root of every file,
+    including these. Inside a page that strips the attribute it looked fine, which
+    is exactly why it survived: the marks were invisible on any dark ground for
+    every OTHER consumer — a README, a slide, someone else's site — and nothing in
+    this repository would ever have noticed. A default that only works because one
+    caller patches it is not a default.
+
+    A file with no root colour inherits `currentColor` from its context, and falls
+    back to the browser's own text colour when opened on its own. Both are right.
+
+    `recolourable=False` — the tile and the icons. These are fixed artwork: a dark
+    ground carrying a light mark, meant to look identical everywhere. Their colours
+    are explicit on purpose, and recolouring them would break them.
+    """
+    root_style = "" if recolourable else f' style="color:{colour}"'
+    note = ("<!-- Recolourable: drawn in currentColor, with no colour on the root. "
+            "Set `color` on this element or an ancestor. -->") if recolourable else ""
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{view or f"0 0 {w:g} {h:g}"}" '
+        f'width="{w:g}" height="{h:g}" role="img" fill="none"{root_style}>'
+        f"<title>{title}</title>{note}{body}</svg>\n"
+    )
+
+
+def check_apple_master(svg: str) -> None:
+    """Apple's current rules, enforced rather than described."""
+    lowered = svg.lower()
+    for banned, why in (
+        ("rx=", "a corner radius is baked in — the system applies the mask now"),
+        ("ry=", "a corner radius is baked in — the system applies the mask now"),
+        ("opacity", "the master must be fully opaque"),
+        ("filter", "blurs and shadows must be stripped; the platform adds them"),
+        ("fegaussianblur", "blurs must be stripped"),
+        ("clip-path", "masking is the system's job, not the artwork's"),
+    ):
+        if banned in lowered:
+            raise Fail(f"Apple master: {why} (found '{banned}')")
+
+
+def icon_placement(stroke: float) -> tuple[float, float, float, str]:
+    """Derive the scale and offset that put the mark safely inside an icon.
+
+    The 90-of-100 safe field is a constraint on an ICON, not on the mark drawn on
+    its own — a wordmark lockup has no masking to survive. The first version of
+    this check applied it to the bare mark and failed the build for a mark that was
+    fine; the constraint belongs here, on the composition.
+
+    The binding constraint is the CIRCLE, not the rounded rectangle, because
+    watchOS and visionOS mask to a circle. Fitting the mark's diagonal inside the
+    inscribed circle therefore satisfies both masks at once. The scale is computed
+    from the mark's own measured bounds rather than chosen by eye, so it stays
+    correct if the geometry ever changes.
+    """
+    x0, y0, x1, y1 = mark_extent(stroke)
+    w, h = x1 - x0, y1 - y0
+    radius = SAFE / 2
+
+    half_diagonal = math.hypot(w, h) / 2
+    scale = radius / half_diagonal
+    if scale > 1.0:
+        scale = 1.0
+
+    # Place the mark's centre at the icon's centre.
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    tx = GRID / 2 - cx * scale
+    ty = GRID / 2 - cy * scale
+
+    # Prove it, rather than trusting the arithmetic above.
+    corners = [(x0, y0), (x1, y0), (x0, y1), (x1, y1)]
+    worst = max(math.hypot(px * scale + tx - GRID / 2, py * scale + ty - GRID / 2)
+                for px, py in corners)
+    if worst > radius + 1e-6:
+        raise Fail(f"icon placement at stroke {stroke:g}: a corner still sits "
+                   f"{worst:.2f} units from centre, outside the {radius:g}-unit "
+                   f"inscribed circle")
+    for px, py in corners:
+        sx, sy = px * scale + tx, py * scale + ty
+        if not (5 - 1e-6 <= sx <= 95 + 1e-6 and 5 - 1e-6 <= sy <= 95 + 1e-6):
+            raise Fail(f"icon placement at stroke {stroke:g}: a corner lands at "
+                       f"({sx:.2f},{sy:.2f}), outside the {SAFE:g}-unit safe field")
+
+    note = (f"icon at stroke {stroke:g}: mark {w:.1f}×{h:.1f} scaled ×{scale:.4f}, "
+            f"worst corner {worst:.2f} of {radius:g} units from centre — inside both "
+            f"the {SAFE:g}-unit field and the circle watchOS and visionOS mask to")
+    return scale, tx, ty, note
+
+
+def render_check() -> list[str]:
+    """Render each icon artefact over a garish background and measure what covers it.
+
+    An Apple master must cover 100% of its frame: square, full-bleed, fully opaque.
+    A web tile must NOT, because its rounded corners are the whole point of it —
+    a browser will not round a favicon for you.
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+        from PIL import Image
+    except ImportError as e:
+        raise NotEquipped(f"render check unavailable: {e}") from e
+    import io
+
+    notes: list[str] = []
+
+    # A recolourable file must carry NO colour on its root. If it does, it is
+    # invisible on any ground that matches that colour, for every consumer that
+    # does not happen to strip the attribute — a README, a slide, someone else's
+    # page. This is checked by reading the file rather than by rendering, because
+    # the failure is in the file and a render inside a page that patches it looks
+    # perfectly fine.
+    for name in ("mark-regular.svg", "mark-heavy.svg",
+                 "wordmark-latin.svg", "wordmark-bangla.svg"):
+        head = (OUT / name).read_text()[:400]
+        if "style=\"color:" in head.split("<title>")[0]:
+            raise Fail(
+                f"{name} sets a colour on its root element. It is meant to be "
+                f"recolourable, so it must inherit currentColor — otherwise it "
+                f"disappears on a ground of that colour everywhere except in pages "
+                f"that strip the attribute."
+            )
+        if "currentColor" not in head:
+            raise Fail(f"{name} is not drawn in currentColor, so it cannot recolour")
+    notes.append(f"4 recolourable files carry no root colour and draw in currentColor")
+
+    PROBE = (255, 0, 255)
+    expectations = {
+        "tile-web.svg": (2.0, 12.0, "rounded"),
+        "icon-1024.svg": (2.0, 12.0, "rounded — the everyday icon, all platforms"),
+        "icon-1088-watch.svg": (2.0, 12.0, "rounded"),
+        "icon-512.svg": (2.0, 12.0, "rounded"),
+        "icon-192.svg": (2.0, 12.0, "rounded"),
+        "icon-appstore-square-1024.svg": (0.0, 0.5,
+                                          "square and fully opaque — App Store only"),
+    }
+    with sync_playwright() as p:
+        try:
+            browser = p.chromium.launch()
+        except Exception as e:
+            raise NotEquipped(f"chromium unavailable: {e}") from e
+        for name, (lo, hi, why) in expectations.items():
+            page = browser.new_page(viewport={"width": 256, "height": 256})
+            doc = (OUT / name).read_text().replace(
+                "<svg ", '<svg style="width:256px;height:256px;display:block" ', 1)
+            page.set_content(f'<body style="margin:0;background:rgb(255,0,255)">{doc}</body>')
+            page.wait_for_timeout(250)
+            im = Image.open(io.BytesIO(page.screenshot())).convert("RGB")
+            W, H = im.size
+            showing = sum(1 for x in range(0, W, 2) for y in range(0, H, 2)
+                          if im.getpixel((x, y)) == PROBE)
+            pct = 100 * showing / ((W // 2) * (H // 2))
+            page.close()
+            if not (lo <= pct <= hi):
+                browser.close()
+                raise Fail(
+                    f"{name}: {pct:.1f}% of the frame is still background, expected "
+                    f"between {lo}% and {hi}% ({why}). A value near 100 usually means "
+                    f"the viewBox does not match the grid the artwork is drawn on."
+                )
+            notes.append(f"{name}: {pct:.1f}% background showing — {why}")
+        browser.close()
+    return notes
+
+
+def main() -> int:
+    try:
+        light = json.loads((TOKENS / "semantic.light.tokens.json").read_text())
+        prim = json.loads((TOKENS / "primitive.tokens.json").read_text())
+    except FileNotFoundError as e:
+        print(f"could not run: {e}. Run 07_tokens/build.py first.", file=sys.stderr)
+        return 2
+
+    def resolve(v):
+        if isinstance(v, str) and v.startswith("{"):
+            node = prim
+            for part in v.strip("{}").split("."):
+                node = node[part]
+            return node["$value"]["hex"]
+        return v["hex"]
+
+    ink = resolve(light["color"]["ink"]["default"]["$value"])
+    paper = light["color"]["surface"]["bright"]["$value"]["hex"]
+
+    notes: list[str] = []
+    place: dict[float, tuple[float, float, float]] = {}
+    try:
+        notes += shaping_gates()
+        for s in (STROKE_REGULAR, STROKE_HEAVY):
+            scale, tx, ty, note = icon_placement(s)
+            place[s] = (scale, tx, ty)
+            notes.append(note)
+    except NotEquipped as e:
+        print(f"could not run: {e}", file=sys.stderr)
+        return 2
+    except Fail as e:
+        print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
+        return 1
+
+    OUT.mkdir(parents=True, exist_ok=True)
+    written: list[tuple[str, str]] = []
+
+    def write(name: str, content: str) -> None:
+        (OUT / name).write_text(content)
+        written.append((name, f"{len(content)} bytes"))
+
+    # --- the mark, two weights, one geometry -------------------------------
+    for label, stroke in (("regular", STROKE_REGULAR), ("heavy", STROKE_HEAVY)):
+        write(f"mark-{label}.svg",
+              svg_doc(mark_paths(stroke), GRID, GRID, ink,
+                      f"Aninda Studio — the mark, {label} weight",
+                      recolourable=True))
+
+    # --- wordmarks, from real shaped outlines ------------------------------
+    for name, text, font, var in (
+        ("wordmark-latin", WORD_LATIN, LATIN_FONT, {"opsz": 72, "wght": 500}),
+        ("wordmark-bangla", WORD_BANGLA, BANGLA_FONT, {"wght": 500}),
+    ):
+        try:
+            body, adv, _ = shape_to_path(text, font, 100.0, var)
+        except (Fail, NotEquipped) as e:
+            print(f"FAILED — nothing further written:\n  {e}", file=sys.stderr)
+            return 1
+        write(f"{name}.svg",
+              svg_doc(f'<g fill="currentColor">{body}</g>', adv, 140.0, ink,
+                      f"Aninda Studio — wordmark, {text}",
+                      view=f"0 -100 {adv:g} 140", recolourable=True))
+
+    # --- the web tile: rounded, because a browser will not round it for you --
+    s, tx, ty = place[STROKE_HEAVY]
+    tile_body = (
+        f'<rect width="{GRID:g}" height="{GRID:g}" rx="{TILE_RADIUS_PCT:g}" '
+        f'ry="{TILE_RADIUS_PCT:g}" fill="{ink}"/>'
+        f'<g style="color:{paper}" transform="translate({tx:.4f},{ty:.4f}) '
+        f'scale({s:.6f})">{mark_paths(STROKE_HEAVY)}</g>'
+    )
+    write("tile-web.svg", svg_doc(tile_body, GRID, GRID, paper,
+                                  "Aninda Studio — web tile"))
+
+    # --- the delivery icons: one rounded artefact, used everywhere ----------
+    # OWNER'S DECISION, 14 August 2026: use the rounded tile everywhere, Apple
+    # included, so the icon is identical on every surface.
+    #
+    # What that trades away, recorded here so nobody has to rediscover it: Apple's
+    # current guidance asks for square, unmasked artwork because the system applies
+    # the mask itself and derives Liquid Glass specular highlights from the layer
+    # edges. A pre-rounded edge sits inside the mask, so the highlight follows the
+    # wrong geometry, and the already-anti-aliased corner gets re-sampled by the
+    # system mask. In a static render the difference is small; under Apple's live
+    # materials it is not measurable from here.
+    #
+    # The square master is still produced, as the LAST file below, for the one
+    # place it is actually required: an App Store submission through Icon Composer.
+    s, tx, ty = place[STROKE_REGULAR]
+    rounded_body = (
+        f'<rect width="{GRID:g}" height="{GRID:g}" rx="{TILE_RADIUS_PCT:g}" '
+        f'ry="{TILE_RADIUS_PCT:g}" fill="{ink}"/>'
+        f'<g style="color:{paper}" transform="translate({tx:.4f},{ty:.4f}) '
+        f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>'
+    )
+    for name, size, what in (
+        ("icon-1024", 1024, "the icon, 1024px — rounded, used everywhere"),
+        ("icon-1088-watch", 1088, "the icon, 1088px for watchOS — rounded"),
+        ("icon-512", 512, "the icon, 512px — avatars and PWA"),
+        ("icon-192", 192, "the icon, 192px — PWA"),
+    ):
+        # The artwork is drawn on the 100-unit grid, so the viewBox stays
+        # 0 0 100 100 while width and height carry the delivery size. Setting the
+        # viewBox to the delivery size instead put a 100-unit square inside a
+        # 1024-unit frame and produced a tiny mark in the corner of a white field —
+        # which every structural check passed, because the file was valid SVG.
+        write(f"{name}.svg",
+              svg_doc(rounded_body, size, size, paper,
+                      f"Aninda Studio — {what}", view=f"0 0 {GRID:g} {GRID:g}"))
+
+    # The square, unmasked master. Not the everyday icon any more — kept because
+    # Icon Composer and an App Store submission still require it, and producing it
+    # costs one file.
+    square_body = (
+        f'<rect width="{GRID:g}" height="{GRID:g}" fill="{ink}"/>'
+        f'<g style="color:{paper}" transform="translate({tx:.4f},{ty:.4f}) '
+        f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>'
+    )
+    doc = svg_doc(square_body, 1024, 1024, paper,
+                  "Aninda Studio — square unmasked master, for Icon Composer and "
+                  "App Store submission only",
+                  view=f"0 0 {GRID:g} {GRID:g}")
+    try:
+        check_apple_master(doc)
+    except Fail as e:
+        print(f"FAILED — nothing further written:\n  {e}", file=sys.stderr)
+        return 1
+    write("icon-appstore-square-1024.svg", doc)
+
+    # --- render the icons and MEASURE them ---------------------------------
+    # Every check above reads the source. None of them can see what a renderer
+    # actually produces, and that gap hid a real bug: the Apple master was written
+    # with a 1024-unit viewBox around 100-unit artwork, so it rendered as a tiny
+    # mark in the corner of a white field. The file was valid SVG, the geometry
+    # checks passed, and the artefact was useless.
+    try:
+        notes += render_check()
+    except NotEquipped as e:
+        notes.append(f"NOT CHECKED — {e}")
+    except Fail as e:
+        print(f"FAILED — artwork written but a render check did not pass:\n  {e}",
+              file=sys.stderr)
+        return 1
+
+    manifest = {
+        "generated_by": "04_mark/build.py",
+        "warning": "Generated. Do not hand-edit — change the script and re-run.",
+        "grid": GRID,
+        "geometry": {"circle": CIRCLE, "stem_x": STEM_X, "stem_top": STEM_TOP,
+                     "stem_bottom": STEM_BOTTOM},
+        "strokes": {"regular": STROKE_REGULAR, "heavy": STROKE_HEAVY,
+                    "rule": "stroke 9 at 24px and above; stroke 15 below"},
+        "clear_space": "half the mark's own height on all four sides",
+        "safe_field": SAFE,
+        "tile_radius_percent": TILE_RADIUS_PCT,
+        "tile_radius_source": ("the system's own radius-hero token. Apple publishes "
+                               "no corner radius; this number is ours and is not "
+                               "claimed to be theirs."),
+        "icon_policy": {
+            "decision": ("One rounded icon is used on every surface, Apple included. "
+                         "Owner's decision, 14 August 2026."),
+            "everyday": ["icon-1024.svg", "icon-1088-watch.svg", "icon-512.svg",
+                         "icon-192.svg", "tile-web.svg"],
+            "app_store_only": "icon-appstore-square-1024.svg",
+            "trade_off": (
+                "Apple's current guidance asks for square, unmasked artwork: the "
+                "system applies the mask and derives Liquid Glass specular "
+                "highlights from the layer edges, so a pre-rounded edge sits inside "
+                "the mask and the highlight follows the wrong geometry. Apple's own "
+                "wording is that pre-masked artwork 'negatively impacts specular "
+                "highlight effects' and makes edges 'look jagged'. Measured here: in "
+                "a static render the difference is small, and on watchOS and "
+                "visionOS it is nil because the circular mask cuts well inside the "
+                "rounding. The dynamic cost could not be measured outside Apple's "
+                "own renderer."),
+            "if_you_ever_submit_to_the_app_store": (
+                "Use icon-appstore-square-1024.svg, not the rounded icon. Icon "
+                "Composer expects unmasked layers."),
+            "verified_against": "Apple Human Interface Guidelines, checked 14 August 2026",
+        },
+        "files": [n for n, _ in written],
+        "checks": notes,
+    }
+    (HERE / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+
+    for n in notes:
+        print(f"  ok    {n}")
+    print()
+    for name, size in written:
+        print(f"  wrote {name:<28} {size}")
+    print(f"  wrote manifest.json")
+    print("\nThis script CANNOT check: whether the mark is any good, whether the "
+          "Bangla wordmark reads correctly to a Bangla reader, or how the icon looks "
+          "once Apple's own materials are composited over it.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,27 @@
+{
+  "key": "instrument",
+  "name": "Instrument",
+  "name_bn": "যন্ত্র",
+  "premise": "Precise and tool-like. There is no pictorial mark at all — the identity is the wordmark plus a grid device, which is the register a developer audience trusts fastest and the one that survives being rendered at 16 pixels in a browser tab. Colour is near-monochrome: a cool slate carrying every surface and every text role, with exactly one functional blue for anything interactive. The discipline is the point. Nothing in this direction is decorative, and the risk it carries is that nothing in it is memorable either.",
+  "families": {
+    "ground": {
+      "label": "Slate",
+      "label_bn": "শিলা",
+      "kind": "neutral",
+      "anchor": "#14181B",
+      "max_chroma": 0.016,
+      "note": "Deliberately almost achromatic. The chroma ceiling is held low by hand so the neutral never reads as a colour."
+    },
+    "accent": {
+      "label": "Signal",
+      "label_bn": "সংকেত",
+      "kind": "brand",
+      "anchor": "#1F5FBF",
+      "note": "The one colour in the system. If something is this blue, it does something."
+    },
+    "success": { "label": "Pass", "label_bn": "উত্তীর্ণ", "kind": "semantic", "anchor": "#16704A" },
+    "warning": { "label": "Check", "label_bn": "সতর্ক", "kind": "semantic", "anchor": "#7E5A08" },
+    "danger":  { "label": "Fail", "label_bn": "ব্যর্থ", "kind": "semantic", "anchor": "#A32B22" },
+    "info":    { "label": "Note", "label_bn": "টীকা", "kind": "semantic", "anchor": "#2A6E9E" }
+  }
+}

@@ -1,0 +1,83 @@
+{PROJECT NAME}
+Copyright 2026 {AUTHOR}
+
+===============================================================================
+FOUR LICENCES APPLY TO DIFFERENT PARTS OF THIS REPOSITORY
+===============================================================================
+
+Most projects have one licence. This one has four, because the parts genuinely
+differ: code that anyone should be able to use commercially, writing that should
+stay free to read but not to resell, typefaces that carry their designers' own
+terms, and an identity that belongs to one person and is not being given away.
+Each is stated below with what it covers and where the full text lives.
+
+-------------------------------------------------------------------------------
+1. THE SYSTEM — Apache License 2.0
+-------------------------------------------------------------------------------
+   Covers   {the design tokens, the stylesheets, the component code, and every
+            build and verification script}
+   Means    Anyone may use, change and redistribute it, including commercially,
+            with attribution and a note of what they changed.
+   Text     LICENSE
+   SPDX     Apache-2.0  (OSI-approved open source)
+
+-------------------------------------------------------------------------------
+2. THE WRITING — PolyForm Noncommercial 1.0.0
+-------------------------------------------------------------------------------
+   Covers   {the guidebook, the reference documents, and the templates}
+   Means    Free to read, copy, adapt and share for any noncommercial purpose,
+            including personal study, research, hobby projects, and use by
+            charities, educational institutions, public research bodies, public
+            safety and health organisations, and government bodies. Not for
+            resale.
+   Text     LICENSE-DOCS.md
+   SPDX     PolyForm-Noncommercial-1.0.0
+   URL      https://polyformproject.org/licenses/noncommercial/1.0.0
+            (no trailing slash — the trailing-slash form returns 404)
+   Note     SOURCE-AVAILABLE, NOT OPEN SOURCE. It is not OSI-approved, because
+            the Open Source Definition does not allow a restriction on a field of
+            use. Licence scanners and company allowlists often flag it. That is
+            stated here rather than left to be discovered.
+
+-------------------------------------------------------------------------------
+3. THE TYPEFACES — SIL Open Font License 1.1
+-------------------------------------------------------------------------------
+   Covers   {list each family}
+   Means    Each keeps its own terms, and its licence file travels beside it.
+   Text     One -OFL.txt next to each font file, not one shared copy.
+   Note     There is no OFL version 1.2. Version 1.1 dates from 26 February 2007
+            and the canonical home is now https://openfontlicense.org/
+
+   RESERVED FONT NAME
+            {If any font here was subset or otherwise modified, and carries a
+            Reserved Font Name, say so and say what it was renamed to. Subsetting
+            counts as modifying under OFL 1.1 clause 3, and a modified version may
+            not use the reserved name. Keep the unmodified family as the next
+            fallback in the stack, so anyone who already has the original gets the
+            original. Delete this block if no font here was modified.}
+
+-------------------------------------------------------------------------------
+4. THE IDENTITY — not licensed at all
+-------------------------------------------------------------------------------
+   Covers   {the name, the Bangla name, the mark, the wordmark, the tile, the
+            icons, and any lockup of them}
+   Means    No licence is granted to any of it, by this file or any other. They
+            are not open source, not source-available, and not free to use.
+   Detail   TRADEMARKS.md
+   Why      The system is meant to be reused. The identity is not. Fork the
+            system and put your own name and mark on it — that is the intended
+            use, and it costs you nothing.
+
+===============================================================================
+
+The combined SPDX expression for this repository is:
+   Apache-2.0 AND PolyForm-Noncommercial-1.0.0 AND OFL-1.1
+
+AND means each applies to its own parts. It is not a choice offered to the
+reader, and it is not a dual licence.
+
+Contact for questions and permissions: {email}
+Source: {repository URL}
+Site:   {site URL}
+
+Not legal advice. Written by the author of this repository, who is not a lawyer.

@@ -1,0 +1,204 @@
+# Aninda Studio — continuous integration
+#
+# The jobs are ordered so the CHEAPEST FAILURE SURFACES FIRST. A typo fails in
+# fifteen seconds; the browser job that takes several minutes never starts. That
+# ordering is the whole design of this file.
+#
+# The job that matters most is `tokens`. It regenerates every generated file and
+# then runs `git diff --exit-code`. A non-empty diff means one of two things: a
+# generator changed without its output being regenerated, or somebody hand-edited
+# an output file instead of its input. Both are silent failures in every other
+# kind of check, and both have happened to real projects.
+#
+# That check only works because generation is deterministic — which is why nothing
+# generated in this repository contains a timestamp. Build time lives in the CI
+# log, never in a file that gets diffed.
+
+name: brand
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/00_sandbox/browsers
+
+jobs:
+  # 1 ── seconds. Catches the things that need no build at all.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Every JSON parses
+        run: |
+          find . -name '*.json' -not -path './00_sandbox/node_modules/*' \
+                 -not -path './.venv/*' -print0 \
+          | xargs -0 -I{} python3 -c "import json,sys; json.load(open('{}'))"
+      - name: No .DS_Store committed
+        run: |
+          if find . -name '.DS_Store' -not -path './.git/*' | grep -q .; then
+            echo "::error::.DS_Store files are committed"; exit 1
+          fi
+      - name: Generated files still say they are generated
+        run: |
+          for f in 07_tokens/css/tokens.css; do
+            grep -q "GENERATED" "$f" || { echo "::error::$f lost its header"; exit 1; }
+          done
+      - name: The PolyForm URL has no trailing slash
+        # The trailing-slash form returns 404. It takes one keystroke to add and a
+        # long time to notice.
+        run: |
+          if grep -rnE "noncommercial/1\\.0\\.0/" \
+               --include='*.md' --include='*.json' --include='*.py' . ; then
+            echo "::error::PolyForm URL must not have a trailing slash"; exit 1
+          fi
+
+  # 2 ── under a minute. The drift guard. This is the important one.
+  tokens:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - name: Regenerate the palette proofs
+        run: python 05_colour/engine.py
+      - name: Regenerate the token set
+        run: python 07_tokens/build.py
+      - name: Regenerate the stylesheet
+        run: python 07_tokens/emit_css.py
+      - name: Nothing generated may differ from what was committed
+        run: |
+          git diff --exit-code 05_colour/generated 07_tokens/build 07_tokens/css \
+            || { echo "::error::A generated file differs. Either a generator changed
+                 without regenerating its output, or an output was hand-edited."; exit 1; }
+
+  # 3 ── about a minute. Shaping and geometry.
+  marks:
+    runs-on: ubuntu-latest
+    needs: tokens
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Rebuild the marks — the shaping gates run inside
+        run: python 04_mark/build.py
+      - name: The marks must not have changed
+        run: git diff --exit-code 04_mark/svg 04_mark/manifest.json
+
+  # 4 ── a couple of minutes. Everything that has a --check mode.
+  build:
+    runs-on: ubuntu-latest
+    needs: tokens
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '26'
+      - run: pip install -r requirements.txt
+      - name: The READMEs must still describe the repository they are in
+        run: python scripts/readme.py --check
+      - run: python 12_packages/build.py --check
+      - run: python 08_components/build.py --check
+      - run: test ! -f 11_site/build.py || python 11_site/build.py --check
+      - run: test ! -f 09_guidebook/build.py || python 09_guidebook/build.py --check
+      - name: The npm package must actually resolve
+        run: |
+          cd 12_packages/npm
+          node -e "
+            const p = require('./package.json'), fs = require('fs');
+            for (const [k, v] of Object.entries(p.exports)) {
+              const f = typeof v === 'string' ? v : (v.import || v.types);
+              if (!fs.existsSync(f)) { console.error('missing export target', k, f); process.exit(1); }
+            }
+            require('./dist/index.cjs');
+          "
+
+  # 5 ── under two minutes. The two plugins, and the two drift guards on them.
+  #
+  # The Figma plugin commits its dist/ folder, because Figma loads built
+  # JavaScript and asking the owner to run a build before opening Figma is one
+  # more place to get stuck. Committed build output drifts unless something
+  # watches it, so this job rebuilds and diffs, exactly as the tokens job does.
+  #
+  # build.mjs runs with --code-only here. That flag compiles the artefacts and
+  # stops before the manifest gate. It is not a way to ship an unadopted
+  # manifest — the manifest is not committed at all, because it holds a plugin
+  # id issued to one person, and CI has no way to obtain one.
+  plugins:
+    runs-on: ubuntu-latest
+    needs: tokens
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '26'
+      - name: Install the project's own build tools
+        run: npm ci
+        working-directory: 00_sandbox
+      - name: The Figma plugin must typecheck
+        run: ../../00_sandbox/node_modules/.bin/tsc --noEmit -p tsconfig.json
+        working-directory: 13_plugins/figma
+      - name: Rebuild the Figma plugin
+        run: node build.mjs --code-only
+        working-directory: 13_plugins/figma
+      - name: Nothing built may differ from what was committed
+        run: |
+          git diff --exit-code 13_plugins/figma/dist \
+            13_plugins/figma/src/tokens.generated.ts \
+            13_plugins/figma/RECEIPT-EXPECTED.json \
+            || { echo "::error::The committed Figma plugin build differs from a
+                 fresh one. Run 'node build.mjs --code-only' and commit dist/."; exit 1; }
+      - name: A placeholder manifest must stop the build
+        run: |
+          cd 13_plugins/figma
+          printf '{"id":"x","api":"REPLACE_ME__FIGMA_GENERATES_THIS"}\n' > manifest.json
+          if node build.mjs > /dev/null 2>&1; then
+            echo "::error::The manifest gate let a placeholder through"; rm -f manifest.json; exit 1
+          fi
+          rm -f manifest.json
+      - name: The Claude Code plugin must be well formed
+        run: python 13_plugins/claude-code/scripts/check_plugin.py
+      - name: The skill bundles must be reproducible
+        run: python 13_plugins/claude-code/scripts/build_skills.py --prove
+      - name: Nothing bundled may differ from what was committed
+        run: git diff --exit-code 13_plugins/claude-code/dist
+
+  # 6 ── slowest, and last. Its failures are usually symptoms of jobs 1 to 5.
+  render:
+    runs-on: ubuntu-latest
+    needs: [marks, build]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Measure the tokens in a real browser
+        run: python 00_sandbox/measure.py
+      - name: Measure every component card
+        run: test ! -f 08_components/check.py || python 08_components/check.py
+      - name: Measure the site
+        run: test ! -f 11_site/check.py || python 11_site/check.py

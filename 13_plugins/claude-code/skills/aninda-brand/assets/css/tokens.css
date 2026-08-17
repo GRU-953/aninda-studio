@@ -1,0 +1,289 @@
+/* Aninda Studio — design tokens
+ *
+ * GENERATED FILE. Do not hand-edit.
+ *   Regenerate:  ./.venv/bin/python 07_tokens/emit_css.py
+ *   Source:      07_tokens/build/*.tokens.json  (DTCG 2025.10)
+ *
+ * Not one colour in this file was typed by a person. Every value was computed by
+ * 05_colour/engine.py and measured against every surface it can land on.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2026 Aninda Sundar Howlader
+ */
+/* 1. The default. Light values, unscoped. */
+:root {
+  --as-space-0: 4px;
+  --as-space-1: 8px;
+  --as-space-2: 12px;
+  --as-space-3: 16px;
+  --as-space-4: 24px;
+  --as-space-5: 32px;
+  --as-space-6: 48px;
+  --as-space-7: 64px;
+  --as-space-8: 96px;
+  --as-space-9: 128px;
+  --as-radius-badge: 4px;
+  --as-radius-control: 8px;
+  --as-radius-card: 14px;
+  --as-radius-hero: 24px;
+  --as-target-min: 24px;
+  --as-target-apple-min: 28px;
+  --as-target-comfortable: 44px;
+  --as-target-android-min: 48px;
+  --as-focus-ring-width: 3px;
+  --as-focus-ring-offset: 2px;
+  --as-text-caption: 0.7502rem;
+  --as-text-body: 1rem;
+  --as-text-lead: 1.333rem;
+  --as-text-h3: 1.7769rem;
+  --as-text-h2: 2.3686rem;
+  --as-text-h1: 3.1573rem;
+  --as-text-display: 4.2087rem;
+  --as-text-bangla-min: 12px;
+  --as-text-bangla-weight-bump-below: 14px;
+  --as-font-latin: Literata, Georgia, serif;
+  --as-font-bangla: "Noto Serif Bengali", serif;
+  --as-font-mono: "Aninda Mono", "IBM Plex Mono", ui-monospace, monospace;
+  --as-duration-colour: 120ms;
+  --as-duration-move: 220ms;
+  --as-ease-standard: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+  --as-ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1.0);
+  --as-ease-exit: cubic-bezier(0.3, 0.0, 0.8, 0.15);
+  --as-scale-ratio: 1.333;
+  --as-bangla-scale-caption: 0.815;
+  --as-bangla-scale-body: 0.816;
+  --as-bangla-scale-heading: 0.817;
+  --as-bangla-scale-title: 0.822;
+  --as-bangla-scale-display: 0.825;
+  --as-bangla-line-height: 1.6;
+  --as-surface-lowest: #FDFFFE;
+  --as-surface-low: #FBFCFC;
+  --as-surface-base: #F8FAF9;
+  --as-surface-high: #F6F7F7;
+  --as-surface-highest: #F3F5F4;
+  --as-surface-dim: #F1F2F2;
+  --as-surface-bright: #FFFFFF;
+  --as-ink: #0D1A17;
+  --as-ink-muted: #41655C;
+  --as-line: #578076;
+  --as-accent: #126974;
+  --as-accent-edge: #278492;
+  --as-focus-ring: #278492;
+  --as-success: #2D6C42;
+  --as-warning: #7C5414;
+  --as-danger: #9B3728;
+  --as-info: #316189;
+  --as-shadow-float: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.08);
+  --as-color-scheme: light;
+}
+:root { color-scheme: light dark; }
+
+/* 2. Follow the reader's system setting — but only where nobody
+   has chosen explicitly. `:not([data-theme])` is what makes an
+   explicit choice further down the tree possible at all. */
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme]) {
+      --as-surface-lowest: #0B0C0B;
+      --as-surface-low: #0E100F;
+      --as-surface-base: #111212;
+      --as-surface-high: #111312;
+      --as-surface-highest: #121313;
+      --as-surface-dim: #060707;
+      --as-surface-bright: #121413;
+      --as-ink: #F2F9F7;
+      --as-ink-muted: #6F9B90;
+      --as-line: #578076;
+      --as-accent: #42A0AE;
+      --as-accent-edge: #278492;
+      --as-focus-ring: #278492;
+      --as-success: #59A46F;
+      --as-warning: #B8863E;
+      --as-danger: #E16551;
+      --as-info: #5C96C8;
+      --as-shadow-float: none;
+      --as-color-scheme: dark;
+  }
+}
+
+/* 3. The same, for high contrast. */
+@media (prefers-contrast: more) {
+:root:not([data-theme]) {
+      --as-surface-lowest: #FCFDFC;
+      --as-surface-low: #FAFAFA;
+      --as-surface-base: #F7F8F7;
+      --as-surface-high: #F5F5F5;
+      --as-surface-highest: #F2F3F2;
+      --as-surface-dim: #F1F1F1;
+      --as-surface-bright: #FFFFFF;
+      --as-ink: #0D1A17;
+      --as-ink-muted: #2E4B43;
+      --as-line: #41655C;
+      --as-accent: #054D56;
+      --as-accent-edge: #126974;
+      --as-focus-ring: #126974;
+      --as-success: #1D502E;
+      --as-warning: #5D3C07;
+      --as-danger: #752519;
+      --as-info: #214767;
+      --as-shadow-float: none;
+      --as-color-scheme: light;
+  }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+:root:not([data-theme]) {
+      --as-surface-lowest: #070807;
+      --as-surface-low: #0C0C0C;
+      --as-surface-base: #0E0F0E;
+      --as-surface-high: #111111;
+      --as-surface-highest: #111211;
+      --as-surface-dim: #030303;
+      --as-surface-bright: #121212;
+      --as-ink: #F2F9F7;
+      --as-ink-muted: #8BB5AA;
+      --as-line: #6F9B90;
+      --as-accent: #65BAC7;
+      --as-accent-edge: #42A0AE;
+      --as-focus-ring: #42A0AE;
+      --as-success: #77BE8B;
+      --as-warning: #D2A15F;
+      --as-danger: #FB836F;
+      --as-info: #7AB1E1;
+      --as-shadow-float: none;
+      --as-color-scheme: dark;
+  }
+}
+
+/* 4. An explicit choice, on ANY element — which is what lets a dark
+   panel sit inside a light page. These come last so they win. */
+[data-theme="light"] {
+  --as-surface-lowest: #FDFFFE;
+  --as-surface-low: #FBFCFC;
+  --as-surface-base: #F8FAF9;
+  --as-surface-high: #F6F7F7;
+  --as-surface-highest: #F3F5F4;
+  --as-surface-dim: #F1F2F2;
+  --as-surface-bright: #FFFFFF;
+  --as-ink: #0D1A17;
+  --as-ink-muted: #41655C;
+  --as-line: #578076;
+  --as-accent: #126974;
+  --as-accent-edge: #278492;
+  --as-focus-ring: #278492;
+  --as-success: #2D6C42;
+  --as-warning: #7C5414;
+  --as-danger: #9B3728;
+  --as-info: #316189;
+  --as-shadow-float: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.08);
+  --as-color-scheme: light;
+}
+[data-theme="dark"] {
+  --as-surface-lowest: #0B0C0B;
+  --as-surface-low: #0E100F;
+  --as-surface-base: #111212;
+  --as-surface-high: #111312;
+  --as-surface-highest: #121313;
+  --as-surface-dim: #060707;
+  --as-surface-bright: #121413;
+  --as-ink: #F2F9F7;
+  --as-ink-muted: #6F9B90;
+  --as-line: #578076;
+  --as-accent: #42A0AE;
+  --as-accent-edge: #278492;
+  --as-focus-ring: #278492;
+  --as-success: #59A46F;
+  --as-warning: #B8863E;
+  --as-danger: #E16551;
+  --as-info: #5C96C8;
+  --as-shadow-float: none;
+  --as-color-scheme: dark;
+}
+[data-theme="hc-light"] {
+  --as-surface-lowest: #FCFDFC;
+  --as-surface-low: #FAFAFA;
+  --as-surface-base: #F7F8F7;
+  --as-surface-high: #F5F5F5;
+  --as-surface-highest: #F2F3F2;
+  --as-surface-dim: #F1F1F1;
+  --as-surface-bright: #FFFFFF;
+  --as-ink: #0D1A17;
+  --as-ink-muted: #2E4B43;
+  --as-line: #41655C;
+  --as-accent: #054D56;
+  --as-accent-edge: #126974;
+  --as-focus-ring: #126974;
+  --as-success: #1D502E;
+  --as-warning: #5D3C07;
+  --as-danger: #752519;
+  --as-info: #214767;
+  --as-shadow-float: none;
+  --as-color-scheme: light;
+}
+[data-theme="hc-dark"] {
+  --as-surface-lowest: #070807;
+  --as-surface-low: #0C0C0C;
+  --as-surface-base: #0E0F0E;
+  --as-surface-high: #111111;
+  --as-surface-highest: #111211;
+  --as-surface-dim: #030303;
+  --as-surface-bright: #121212;
+  --as-ink: #F2F9F7;
+  --as-ink-muted: #8BB5AA;
+  --as-line: #6F9B90;
+  --as-accent: #65BAC7;
+  --as-accent-edge: #42A0AE;
+  --as-focus-ring: #42A0AE;
+  --as-success: #77BE8B;
+  --as-warning: #D2A15F;
+  --as-danger: #FB836F;
+  --as-info: #7AB1E1;
+  --as-shadow-float: none;
+  --as-color-scheme: dark;
+}
+
+/* 5. Forced colours. The operating system supplies the palette, so every
+   brand value must give way. A hex that survives this mode defeats it.
+   Both `:root` and `[data-theme]` are targeted, or a themed island keeps
+   its own colours while the rest of the page gives them up. */
+@media (forced-colors: active) {
+:root, [data-theme] {
+      --as-surface-base: Canvas;
+      --as-surface-lowest: Canvas;
+      --as-surface-low: Canvas;
+      --as-surface-high: Canvas;
+      --as-surface-highest: Canvas;
+      --as-surface-dim: Canvas;
+      --as-surface-bright: Canvas;
+      --as-ink: CanvasText;
+      --as-ink-muted: GrayText;
+      --as-line: CanvasText;
+      --as-accent: LinkText;
+      --as-accent-edge: CanvasText;
+      --as-focus-ring: Highlight;
+      --as-success: CanvasText;
+      --as-warning: CanvasText;
+      --as-danger: CanvasText;
+      --as-info: CanvasText;
+      --as-shadow-float: none;
+  }
+}
+
+/* 6. Reduced motion, honoured at the root. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --as-duration-colour: 1ms;
+    --as-duration-move: 1ms;
+  }
+}
+
+/* 7. Bangla. `clamp()` applies the measured multiplier but refuses to go below the
+   floor, so the rule and its exception live in one declaration instead of relying
+   on anyone remembering the exception. */
+:lang(bn), [lang="bn"] {
+  font-family: var(--as-font-bangla);
+  line-height: var(--as-bangla-line-height);
+  font-size: clamp(var(--as-text-bangla-min), calc(1em * var(--as-bangla-scale-body)), 100em);
+  text-transform: none;
+  letter-spacing: normal;
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
+}

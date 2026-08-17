@@ -1,0 +1,26 @@
+/* Aninda Studio — the light theme alone.
+ * A convenience view. The complete stylesheet is tokens.css, and the
+ * authoritative source is aninda.tokens.json.
+ * GENERATED — do not hand-edit.
+ */
+[data-theme="light"] {
+  --as-surface-lowest: #FDFFFE;
+  --as-surface-low: #FBFCFC;
+  --as-surface-base: #F8FAF9;
+  --as-surface-high: #F6F7F7;
+  --as-surface-highest: #F3F5F4;
+  --as-surface-dim: #F1F2F2;
+  --as-surface-bright: #FFFFFF;
+  --as-ink: #0D1A17;
+  --as-ink-muted: #41655C;
+  --as-line: #578076;
+  --as-accent: #126974;
+  --as-accent-edge: #278492;
+  --as-focus-ring: #278492;
+  --as-success: #2D6C42;
+  --as-warning: #7C5414;
+  --as-danger: #9B3728;
+  --as-info: #316189;
+  --as-shadow-float: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.08);
+  --as-color-scheme: light;
+}

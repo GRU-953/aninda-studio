@@ -1,0 +1,41 @@
+{
+  "_generator": "11_site/build.py",
+  "_warning": "GENERATED FILE. Written by 11_site/build.py. Do not hand-edit — the next build overwrites it, and --check fails on any difference.",
+  "name": "Aninda Studio",
+  "short_name": "Aninda",
+  "description": "Small, careful software, and the design system it is built on.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "id": "/",
+  "display": "minimal-ui",
+  "background_color": "#F8FAF9",
+  "theme_color": "#F8FAF9",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

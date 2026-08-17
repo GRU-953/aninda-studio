@@ -1,0 +1,104 @@
+{
+  "$comment": "What a clean run of the plugin should report. It is written by build.mjs from the same plan code the plugin runs, so comparing it against the receipt the plugin prints is a comparison of two numbers, not a reading of two documents. There is no date in this file on purpose: it is a pure function of the tokens, and the SHA-256 below changes only when they do.",
+  "generatedBy": "13_plugins/figma/build.mjs",
+  "tokensSha256": "bd4fa5d72d208ab10590e5dc6508618fac6c2c737fd4d98a86ca09c5053d312d",
+  "sources": {
+    "07_tokens/build/primitive.tokens.json": "376477e33402598222f77ac8778a698348ddaed3e1616f75717a370c7ae4ea68",
+    "07_tokens/build/semantic.light.tokens.json": "534accf8100efb3ff853cfe026a4d00646e5e493f3ca38fdbf3ab8f8dfafc610",
+    "07_tokens/build/semantic.dark.tokens.json": "fe0cc6711edb27002371282611b59da5bf801a503a424cf7af77394f4f885f78",
+    "07_tokens/build/semantic.hc-light.tokens.json": "b07f11f482d055cded17f089668a1afccb09046756c7746e50c850c796e7828c",
+    "07_tokens/build/semantic.hc-dark.tokens.json": "a54f1325076dbd613c6a41de8f4f8775fbbf5732531cfec4a95c647b6d1a36c6",
+    "07_tokens/build/forced-colors.map.json": "f4a01647597461616b592257d968bc948d9c0f2af0516406c05f8a8453962852",
+    "04_mark/svg/icon-1024.svg": "9ff31c7bfa022fdd1cfbcf6782320b84d83422ddd617f97a8ab41248409407bd",
+    "04_mark/svg/icon-1088-watch.svg": "f0dd4c249a78419af2855f90344cb05d1335444194c1ac9059e1b81c5b6bd6cb",
+    "04_mark/svg/icon-192.svg": "58b7f359ff0841f399214b16ec5790932106dc66854b6c87c7dee88dc20eadb7",
+    "04_mark/svg/icon-512.svg": "3b00945f46b41e8017622d73e3eafb49c63209f2a2e8ac9342b91fd0de5caac1",
+    "04_mark/svg/icon-appstore-square-1024.svg": "a7d60253c14a9f9b7e494fa9aa4182a732bd507f3800e1677afea829a5e93a3c",
+    "04_mark/svg/mark-heavy.svg": "43544b56cd14e0d65fdb63a68d0e2113ae4428f1bdf73cdc4b4016d0f7423fbc",
+    "04_mark/svg/mark-regular.svg": "dae564226af690e7dd0a00d14a4a56c80535ec2a8284b7c8b9cd181082220787",
+    "04_mark/svg/tile-web.svg": "b631c922ebb4287e9d227fd4303864e7373dbf38467ca086fbde9cbee573600b",
+    "04_mark/svg/wordmark-bangla.svg": "6b42edde179882a29c3147a78e333ef3e341fbd16913ec8fd70519599d8b464d",
+    "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
+    "04_mark/manifest.json": "4c2b1c0cc6402bd9d068f7003a1045b9b1a9118eb6c475ee0ae660e025210c2f",
+    "08_components/_cards.json": "87ff3fa5cceecde135019674c4391a027f2afdf8b5e2e6f6937a094d38d70daa"
+  },
+  "fontsRequired": [
+    {
+      "family": "Literata",
+      "style": "Regular",
+      "usedFor": "every Latin text style"
+    },
+    {
+      "family": "Noto Serif Bengali",
+      "style": "Regular",
+      "usedFor": "Bangla text styles"
+    },
+    {
+      "family": "Noto Serif Bengali",
+      "style": "Medium",
+      "usedFor": "Bangla text styles"
+    },
+    {
+      "family": "Aninda Mono",
+      "style": "Regular",
+      "usedFor": "the two monospaced text styles"
+    }
+  ],
+  "pages": [
+    "Aninda Studio · Marks",
+    "Aninda Studio · Components",
+    "Aninda Studio · Cards"
+  ],
+  "expected": {
+    "collections": 2,
+    "variables": 127,
+    "primitiveVariables": 110,
+    "themeVariables": 17,
+    "themeModes": 4,
+    "variableAliases": 40,
+    "paintStyles": 17,
+    "textStyles": 16,
+    "effectStyles": 1,
+    "gridStyles": 2,
+    "marks": 10,
+    "markSetVariants": 2,
+    "components": 11,
+    "componentSets": 3,
+    "cardFrames": 30,
+    "pages": 3
+  },
+  "themeModes": [
+    "Light",
+    "Dark",
+    "High contrast light",
+    "High contrast dark"
+  ],
+  "decisions": [
+    {
+      "what": "No paint style was made for the 66 primitive ramp steps.",
+      "why": "They exist as variables in the Primitives collection. A designer should reach for a role such as Theme/Ink/Default, which follows the theme, rather than for a fixed ramp step, which does not."
+    },
+    {
+      "what": "No elevation or shadow effect styles were made.",
+      "why": "The token set has no shadow or elevation token. Inventing blur radii and opacities here would put numbers in the library that the system never agreed to."
+    },
+    {
+      "what": "Buttons are outlined, not filled.",
+      "why": "The seventeen semantic roles include no \"on accent\" or \"on danger\" text colour, so the label colour on a filled button is not defined anywhere in the system. An outlined button uses only roles that were measured: the label sits on a surface, which is exactly the pairing the colour engine checked."
+    },
+    {
+      "what": "Component borders are 1 px.",
+      "why": "The token set has no border-width token. 1 px is stated here rather than hidden in the drawing code."
+    },
+    {
+      "what": "Every badge carries a word, never colour alone.",
+      "why": "In forced-colors mode all four status colours resolve to CanvasText, so a badge that carried only a colour would carry nothing. forced-colors.map.json states this as a rule."
+    }
+  ],
+  "knownGaps": [
+    {
+      "what": "Latin and monospaced text styles carry no line height.",
+      "why": "The token set defines number/lineHeight/bangla and nothing for Latin. Figma’s automatic line height is used rather than a number I would have had to invent."
+    }
+  ]
+}

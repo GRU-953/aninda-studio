@@ -1,0 +1,22 @@
+Aninda Studio design tokens
+Copyright 2026 Aninda Sundar Howlader
+
+This package is licensed under the Apache License, Version 2.0.
+You may obtain a copy at http://www.apache.org/licenses/LICENSE-2.0
+
+WHAT IS AND IS NOT COVERED
+
+  Covered by Apache-2.0
+    The token files, the stylesheets, and the code in this package.
+
+  NOT licensed at all
+    The name "Aninda Studio", the mark, the wordmark, the tile, and any lockup of
+    them. They are not included in this package, and no licence to them is granted
+    by it. Fork the system and put your own identity on it.
+
+  Typefaces
+    Not included here. Literata, Noto Serif Bengali and IBM Plex Mono are each
+    under the SIL Open Font Licence 1.1 and keep their own terms.
+
+Contact: aninda.sh15@gmail.com
+Source:  https://github.com/GRU-953/aninda-studio

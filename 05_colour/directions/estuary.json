@@ -1,0 +1,26 @@
+{
+  "key": "estuary",
+  "name": "Estuary",
+  "name_bn": "মোহনা",
+  "premise": "Quiet editorial competence. A deep green-teal ground against a bone paper, with the warmth coming from the paper rather than from a second expressive colour. Barishal sits in a river delta; an estuary is where fresh water meets salt, which is also what a studio serving two audiences in two scripts is doing. This is Direction A: the existing draft, corrected. One correction is substantive — the draft declares no accent at all, and a system whose accent equals its text colour cannot express a link, a selected row, or a primary action. A cyan-teal accent is therefore introduced: a near neighbour of the ground, discriminable from it, and still honouring 'no second expressive colour'.",
+  "families": {
+    "ground": {
+      "label": "Estuary",
+      "label_bn": "মোহনা",
+      "kind": "brand",
+      "anchor": "#0C3A31",
+      "note": "The ground, and the source of every surface tint and every text role."
+    },
+    "accent": {
+      "label": "Tidewater",
+      "label_bn": "জোয়ার",
+      "kind": "brand",
+      "anchor": "#0E7C8A",
+      "note": "A cyan-teal one hue-step off the ground. Carries links, focus and the primary action."
+    },
+    "success": { "label": "Silt", "label_bn": "পলি", "kind": "semantic", "anchor": "#1B6B3A" },
+    "warning": { "label": "Kans", "label_bn": "কাশ", "kind": "semantic", "anchor": "#8A5A00" },
+    "danger":  { "label": "Laterite", "label_bn": "লাল মাটি", "kind": "semantic", "anchor": "#A8301F" },
+    "info":    { "label": "Monsoon", "label_bn": "বর্ষা", "kind": "semantic", "anchor": "#235E8C" }
+  }
+}

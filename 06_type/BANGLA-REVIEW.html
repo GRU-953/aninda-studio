@@ -1,0 +1,475 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aninda Studio — Bangla review sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,200..900&family=Noto+Serif+Bengali:wght@100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{background:#FFFFFF;color:#0D1A17;font-family:Literata,Georgia,serif;font-size:16px;
+  line-height:1.55;padding:40px 28px 80px;-webkit-font-smoothing:antialiased}
+.doc{max-width:1220px;margin:0 auto}
+h1{font-size:38px;line-height:1.15;margin-bottom:14px;font-weight:600}
+.lede{max-width:74ch;color:#41655C;margin-bottom:10px}
+.rule{background:#F8FAF9;border:1px solid #578076;border-left:4px solid #126974;
+  border-radius:10px;padding:18px 20px;margin:24px 0 32px;max-width:88ch}
+.rule b{display:block;margin-bottom:6px}
+.rule ul{margin:8px 0 0 20px;color:#41655C;font-size:15px}
+.rule li{margin-bottom:5px}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+  letter-spacing:.11em;text-transform:uppercase;font-weight:400;color:#126974;
+  padding:0 12px 10px 0;border-bottom:2px solid #578076;vertical-align:bottom}
+td{padding:18px 12px 18px 0;border-bottom:1px solid #578076;vertical-align:top}
+.n{width:26px;color:#41655C;font-family:'IBM Plex Mono',monospace;font-size:12px}
+.meta{width:15%}
+.meta code{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#126974;display:block}
+.meta .where{display:block;font-size:12.5px;color:#41655C;margin-top:3px}
+.meta .size{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+  color:#41655C;margin-top:5px;opacity:.8}
+.en{width:22%;font-size:14.5px;color:#41655C}
+.bn{width:26%}
+.bn span{font-family:'Noto Serif Bengali',serif;line-height:1.6;display:block}
+.ck{width:27%;font-size:13px;color:#41655C}
+.mark{width:150px}
+.mark label{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;
+  margin-right:10px;cursor:pointer}
+.mark input{accent-color:#126974;width:16px;height:16px;cursor:pointer}
+.mark textarea{width:100%;margin-top:7px;font-family:'Noto Serif Bengali',Literata,serif;
+  font-size:13px;border:1px solid #578076;border-radius:6px;padding:5px 6px;
+  background:#FFFFFF;color:#0D1A17;resize:vertical}
+.mark textarea:focus{outline:3px solid #126974;outline-offset:2px}
+#bar{position:sticky;bottom:0;background:#F8FAF9;border-top:2px solid #126974;
+  padding:14px 18px;margin-top:28px;display:flex;gap:14px;align-items:center;
+  flex-wrap:wrap;border-radius:10px 10px 0 0}
+#bar button{font:inherit;font-size:15px;padding:11px 20px;border-radius:8px;
+  border:1px solid #126974;background:#126974;color:#FFFFFF;cursor:pointer;
+  min-height:44px}
+#bar button.ghost{background:transparent;color:#126974}
+#bar button:focus-visible{outline:3px solid #0D1A17;outline-offset:2px}
+#count{font-size:14px;color:#41655C}
+#out{width:100%;margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+  border:1px solid #578076;border-radius:8px;padding:10px;min-height:90px;display:none;
+  background:#FFFFFF;color:#0D1A17}
+.foot{margin-top:36px;padding-top:20px;border-top:1px solid #578076;color:#41655C;
+  font-size:14px;max-width:80ch}
+@media print{body{padding:0} tr{break-inside:avoid} .rule{break-inside:avoid}}
+</style></head><body><div class="doc">
+<h1>Bangla review sheet</h1>
+<p class="lede">Every Bangla string the Aninda Studio system currently intends to
+ship, at the exact size and in the exact face it will ship in — Noto Serif Bengali,
+beside Literata.</p>
+<p class="lede">The automated checks have already proved that none of this is
+<em>broken</em>: the মাত্রা is continuous across all 866 pixel columns measured, all
+sixteen tested conjuncts shape correctly, no glyph is missing. What no check can
+prove is whether it is <em>good</em>.</p>
+
+<div class="rule"><b>What to look for, in order of how much it matters</b>
+<ul>
+<li><b>Does it read as Bangla, or as English in Bangla script?</b> The rule this
+system sets itself is that Bangla is written as Bangla — same meaning, different
+sentences — never translated word by word. Row 18 sets the register for
+everything else, so start there.</li>
+<li><b>Is the word the one a Bangladeshi reader would actually use?</b> Several
+rows below offer a formal Bangla word and an English loanword, because I genuinely
+do not know which is right. Pick.</li>
+<li><b>Is the register consistent?</b> A studio run by one person should not sound
+like a government form.</li>
+<li><b>Do any conjuncts look wrong?</b> Row 23 is the stress test. If a form
+there looks broken, that is the font or the shaping, not the wording — tell me and
+I will fix it at that level.</li>
+<li><b>Row 24 is at the 12px floor.</b> If the মাত্রা has greyed out on your
+screen, the floor is too low and I will raise it.</li>
+</ul></div>
+
+<table>
+<thead><tr><th></th><th>Where it appears</th><th>English</th><th>Bangla, at size</th>
+<th>What I am unsure about</th><th>OK / Change</th></tr></thead>
+<tbody>
+<tr id="wm-1">
+  <td class="n">1</td>
+  <td class="meta"><code>wm-1</code><span class="where">The wordmark, everywhere</span>
+      <span class="size">Latin 44px → Bangla 36.2px</span></td>
+  <td class="en">aninda studio</td>
+  <td class="bn"><span lang="bn" style="font-size:36.2px">অনিন্দ্য স্টুডিও</span></td>
+  <td class="ck">Is স্টুডিও right, or should the Bangla lockup be just অনিন্দ্য? Does the ন্দ্য conjunct look correct at this size?</td>
+  <td class="mark">
+    <label><input type="radio" name="wm-1" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="wm-1" value="change"><span>Change</span></label>
+    <textarea data-for="wm-1" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="wm-2">
+  <td class="n">2</td>
+  <td class="meta"><code>wm-2</code><span class="where">Favicon, avatar, tight lockups</span>
+      <span class="size">Latin 32px → Bangla 26.3px</span></td>
+  <td class="en">Aninda Studio (short form)</td>
+  <td class="bn"><span lang="bn" style="font-size:26.3px">অনিন্দ্য</span></td>
+  <td class="ck">Does the name alone read as a studio name, or does it read as just a person?</td>
+  <td class="mark">
+    <label><input type="radio" name="wm-2" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="wm-2" value="change"><span>Change</span></label>
+    <textarea data-for="wm-2" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="th-1">
+  <td class="n">3</td>
+  <td class="meta"><code>th-1</code><span class="where">Theme switcher</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">Light</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">আলো</span></td>
+  <td class="ck">আলো means 'light' as in illumination. Is that right for a UI theme, or is উজ্জ্বল (bright) or দিন (day) more natural?</td>
+  <td class="mark">
+    <label><input type="radio" name="th-1" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="th-1" value="change"><span>Change</span></label>
+    <textarea data-for="th-1" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="th-2">
+  <td class="n">4</td>
+  <td class="meta"><code>th-2</code><span class="where">Theme switcher</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">Dark</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">অন্ধকার</span></td>
+  <td class="ck">অন্ধকার is literally 'darkness' and may be too heavy. Is গাঢ় (deep) or রাত (night) better?</td>
+  <td class="mark">
+    <label><input type="radio" name="th-2" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="th-2" value="change"><span>Change</span></label>
+    <textarea data-for="th-2" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="th-3">
+  <td class="n">5</td>
+  <td class="meta"><code>th-3</code><span class="where">Theme switcher, accessibility settings</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">More contrast</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">বেশি কনট্রাস্ট</span></td>
+  <td class="ck">CHANGED. বৈসাদৃশ্য was not merely heavy — it means 'dissimilarity', not display contrast, so it was the right word for the wrong sense. কনট্রাস্ট is licensed as a loanword by rule ২.৬, and বেশি avoids the তৎসম register clash that উচ্চ would have kept.</td>
+  <td class="mark">
+    <label><input type="radio" name="th-3" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="th-3" value="change"><span>Change</span></label>
+    <textarea data-for="th-3" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="cl-1">
+  <td class="n">6</td>
+  <td class="meta"><code>cl-1</code><span class="where">Guidebook, colour chapter</span>
+      <span class="size">Latin 21px → Bangla 17.2px</span></td>
+  <td class="en">Estuary — the ground colour</td>
+  <td class="bn"><span lang="bn" style="font-size:17.2px">মোহনা</span></td>
+  <td class="ck">মোহনা is where a river meets the sea. Does it carry the right feeling for a deep green-teal?</td>
+  <td class="mark">
+    <label><input type="radio" name="cl-1" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="cl-1" value="change"><span>Change</span></label>
+    <textarea data-for="cl-1" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="cl-2">
+  <td class="n">7</td>
+  <td class="meta"><code>cl-2</code><span class="where">Guidebook, colour chapter</span>
+      <span class="size">Latin 21px → Bangla 17.2px</span></td>
+  <td class="en">Tidewater — the accent</td>
+  <td class="bn"><span lang="bn" style="font-size:17.2px">জোয়ার</span></td>
+  <td class="ck">জোয়ার is the incoming tide. Right for a brighter cyan-teal?</td>
+  <td class="mark">
+    <label><input type="radio" name="cl-2" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="cl-2" value="change"><span>Change</span></label>
+    <textarea data-for="cl-2" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="cl-3">
+  <td class="n">8</td>
+  <td class="meta"><code>cl-3</code><span class="where">Guidebook, the four status colours</span>
+      <span class="size">Latin 21px → Bangla 17.2px</span></td>
+  <td class="en">Silt / Kans / Laterite / Monsoon</td>
+  <td class="bn"><span lang="bn" style="font-size:17.2px">পলি · কাশ · লাল মাটি · বর্ষা</span></td>
+  <td class="ck">These name success, warning, danger and information. Do they read as a set? Is লাল মাটি too literal for an error colour?</td>
+  <td class="mark">
+    <label><input type="radio" name="cl-3" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="cl-3" value="change"><span>Change</span></label>
+    <textarea data-for="cl-3" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="bt-1">
+  <td class="n">9</td>
+  <td class="meta"><code>bt-1</code><span class="where">Primary button</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">Save the entry</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">লেখাটি সংরক্ষণ করুন</span></td>
+  <td class="ck">The voice rule is that buttons are verbs with their object. Is সংরক্ষণ করুন too formal for a small studio's tools? Would সেভ করুন be more honest?</td>
+  <td class="mark">
+    <label><input type="radio" name="bt-1" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="bt-1" value="change"><span>Change</span></label>
+    <textarea data-for="bt-1" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="bt-2">
+  <td class="n">10</td>
+  <td class="meta"><code>bt-2</code><span class="where">Secondary button</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">Cancel</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">বাতিল করুন</span></td>
+  <td class="ck">Natural, or stiff?</td>
+  <td class="mark">
+    <label><input type="radio" name="bt-2" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="bt-2" value="change"><span>Change</span></label>
+    <textarea data-for="bt-2" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="bt-3">
+  <td class="n">11</td>
+  <td class="meta"><code>bt-3</code><span class="where">Destructive button</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">Delete the file</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">ফাইলটি মুছে ফেলুন</span></td>
+  <td class="ck">Does this carry enough weight for an action that cannot be undone?</td>
+  <td class="mark">
+    <label><input type="radio" name="bt-3" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="bt-3" value="change"><span>Change</span></label>
+    <textarea data-for="bt-3" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="bt-4">
+  <td class="n">12</td>
+  <td class="meta"><code>bt-4</code><span class="where">Error recovery</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">Try again</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">আবার চেষ্টা করুন</span></td>
+  <td class="ck">Natural?</td>
+  <td class="mark">
+    <label><input type="radio" name="bt-4" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="bt-4" value="change"><span>Change</span></label>
+    <textarea data-for="bt-4" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="bt-5">
+  <td class="n">13</td>
+  <td class="meta"><code>bt-5</code><span class="where">Code block</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">Copy the code</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">কোডটি কপি করুন</span></td>
+  <td class="ck">কপি is an English loanword written in Bangla. Right, or should it be অনুলিপি করুন?</td>
+  <td class="mark">
+    <label><input type="radio" name="bt-5" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="bt-5" value="change"><span>Change</span></label>
+    <textarea data-for="bt-5" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="ms-1">
+  <td class="n">14</td>
+  <td class="meta"><code>ms-1</code><span class="where">Error message</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">Couldn't save. Your work is still here — try again in a moment.</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">সংরক্ষণ করা যায়নি। আপনার লেখা এখনো আছে — একটু পরে আবার চেষ্টা করুন।</span></td>
+  <td class="ck">CHANGED এখনও → এখনো. The Academy dictionary lists এখনও only as a cross-reference (দ্র এখনো); এখনো carries the entry. Says what happened, then what happens next, and does not blame the reader.</td>
+  <td class="mark">
+    <label><input type="radio" name="ms-1" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="ms-1" value="change"><span>Change</span></label>
+    <textarea data-for="ms-1" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="ms-2">
+  <td class="n">15</td>
+  <td class="meta"><code>ms-2</code><span class="where">Error message</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">That file is too large. The limit is 10 MB.</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">ফাইলটি অনেক বড়ো। সর্বোচ্চ ১০ মেগাবাইট।</span></td>
+  <td class="ck">CHANGED twice: বড় → বড়ো (the dictionary headword; বড় has no entry, rule ২.৩), and সর্বোচ্চ সীমা → সর্বোচ্চ, which was a doublet adding only weight. Bengali digits ১০ are kept — Academy standard for Bangla running text.</td>
+  <td class="mark">
+    <label><input type="radio" name="ms-2" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="ms-2" value="change"><span>Change</span></label>
+    <textarea data-for="ms-2" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="ms-3">
+  <td class="n">16</td>
+  <td class="meta"><code>ms-3</code><span class="where">Empty state</span>
+      <span class="size">Latin 16px → Bangla 13.1px</span></td>
+  <td class="en">Nothing here yet. Add your first entry to begin.</td>
+  <td class="bn"><span lang="bn" style="font-size:13.1px">এখনো কিছু নেই। শুরু করতে প্রথম লেখাটি যোগ করুন।</span></td>
+  <td class="ck">CHANGED এখনও → এখনো, same ruling as ms-1. Tells the reader what to do next rather than only what is absent.</td>
+  <td class="mark">
+    <label><input type="radio" name="ms-3" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="ms-3" value="change"><span>Change</span></label>
+    <textarea data-for="ms-3" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="ms-4">
+  <td class="n">17</td>
+  <td class="meta"><code>ms-4</code><span class="where">Success toast</span>
+      <span class="size">Latin 14px → Bangla 12px</span></td>
+  <td class="en">Saved</td>
+  <td class="bn"><span lang="bn" style="font-size:12px">সংরক্ষিত হয়েছে</span></td>
+  <td class="ck">Kept. Agrees with the Save button, so the two never disagree about the word.</td>
+  <td class="mark">
+    <label><input type="radio" name="ms-4" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="ms-4" value="change"><span>Change</span></label>
+    <textarea data-for="ms-4" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="vc-1">
+  <td class="n">18</td>
+  <td class="meta"><code>vc-1</code><span class="where">The voice sample, used in the guidebook and on the website</span>
+      <span class="size">Latin 21px → Bangla 17.2px</span></td>
+  <td class="en">I build small, careful software. If something has a limit, you'll find it written down here — nothing gets hidden.</td>
+  <td class="bn"><span lang="bn" style="font-size:17.2px">আমি ছোটো, যত্নে গড়া সফটওয়্যার বানাই। কোনো কিছুর সীমা থাকলে সেটা এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না।</span></td>
+  <td class="ck">CHANGED ছোট → ছোটো. Doubly sourced: rule ২.৩ names ছোটো in its own example list (কালো, খাটো, ছোটো, ভালো), and ছোটো is the dictionary headword while ছোট has no entry. This one string sets the register for every Bangla sentence in the system, so the spelling had to be right. The English was also rewritten to be warmer and less defensive.</td>
+  <td class="mark">
+    <label><input type="radio" name="vc-1" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="vc-1" value="change"><span>Change</span></label>
+    <textarea data-for="vc-1" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="gb-1">
+  <td class="n">19</td>
+  <td class="meta"><code>gb-1</code><span class="where">Guidebook chapter titles</span>
+      <span class="size">Latin 21px → Bangla 17.2px</span></td>
+  <td class="en">Welcome · The name · The mark</td>
+  <td class="bn"><span lang="bn" style="font-size:17.2px">স্বাগতম · নাম · চিহ্ন</span></td>
+  <td class="ck">চিহ্ন means 'mark' or 'sign'. Right for a logo, or is লোগো clearer?</td>
+  <td class="mark">
+    <label><input type="radio" name="gb-1" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="gb-1" value="change"><span>Change</span></label>
+    <textarea data-for="gb-1" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="gb-2">
+  <td class="n">20</td>
+  <td class="meta"><code>gb-2</code><span class="where">Guidebook chapter titles</span>
+      <span class="size">Latin 21px → Bangla 17.2px</span></td>
+  <td class="en">Colour · Type · Space and shape</td>
+  <td class="bn"><span lang="bn" style="font-size:17.2px">রং · হরফ · ফাঁক ও আকার</span></td>
+  <td class="ck">হরফ means letterform. Is it right for a typography chapter, or is টাইপোগ্রাফি expected?</td>
+  <td class="mark">
+    <label><input type="radio" name="gb-2" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="gb-2" value="change"><span>Change</span></label>
+    <textarea data-for="gb-2" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="gb-3">
+  <td class="n">21</td>
+  <td class="meta"><code>gb-3</code><span class="where">Guidebook chapter titles</span>
+      <span class="size">Latin 21px → Bangla 17.2px</span></td>
+  <td class="en">Components · Motion · Voice</td>
+  <td class="bn"><span lang="bn" style="font-size:17.2px">উপাদান · গতি · কণ্ঠস্বর</span></td>
+  <td class="ck">Do these read as a set of chapter titles?</td>
+  <td class="mark">
+    <label><input type="radio" name="gb-3" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="gb-3" value="change"><span>Change</span></label>
+    <textarea data-for="gb-3" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="gb-4">
+  <td class="n">22</td>
+  <td class="meta"><code>gb-4</code><span class="where">Guidebook chapter title — the honest list</span>
+      <span class="size">Latin 21px → Bangla 17.2px</span></td>
+  <td class="en">What this system does not do</td>
+  <td class="bn"><span lang="bn" style="font-size:17.2px">যা এই পদ্ধতি করে না</span></td>
+  <td class="ck">CHANGED ব্যবস্থা → পদ্ধতি. ব্যবস্থা reads administrative in Bangladeshi usage (ব্যবস্থা নেওয়া — 'to take measures'); পদ্ধতি is a dictionary headword and the plain Bangla for a system.</td>
+  <td class="mark">
+    <label><input type="radio" name="gb-4" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="gb-4" value="change"><span>Change</span></label>
+    <textarea data-for="gb-4" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="cj-1">
+  <td class="n">23</td>
+  <td class="meta"><code>cj-1</code><span class="where">Not shipped — a rendering check</span>
+      <span class="size">Latin 32px → Bangla 26.3px</span></td>
+  <td class="en">Conjunct stress test</td>
+  <td class="bn"><span lang="bn" style="font-size:26.3px">ক্ষ ত্র জ্ঞ ঙ্গ ন্দ্য স্ত্র ষ্ণ ন্ত্র হ্ম দ্ধ</span></td>
+  <td class="ck">Every one of these should be a single joined form with no dotted circle and no visible hasanta. If any looks wrong, the font or the shaping is at fault, not the wording.</td>
+  <td class="mark">
+    <label><input type="radio" name="cj-1" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="cj-1" value="change"><span>Change</span></label>
+    <textarea data-for="cj-1" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr>
+<tr id="cj-2">
+  <td class="n">24</td>
+  <td class="meta"><code>cj-2</code><span class="where">Not shipped — the size-floor check</span>
+      <span class="size">Latin 12px → Bangla 12px</span></td>
+  <td class="en">The মাত্রা at caption size</td>
+  <td class="bn"><span lang="bn" style="font-size:12px">বাংলা লেখা ছোট আকারে</span></td>
+  <td class="ck">This is at the 12px floor. Is the মাত্রা still solid, or has it greyed out? This is the single measurement that set the floor.</td>
+  <td class="mark">
+    <label><input type="radio" name="cj-2" value="ok"><span>OK</span></label>
+    <label><input type="radio" name="cj-2" value="change"><span>Change</span></label>
+    <textarea data-for="cj-2" rows="2" placeholder="what it should say"></textarea>
+  </td>
+</tr></tbody></table>
+
+<div id="bar">
+  <button type="button" id="copy">Copy my answers</button>
+  <button type="button" class="ghost" id="dl">Save as a file</button>
+  <span id="count">Nothing marked yet</span>
+  <textarea id="out" readonly aria-label="Your answers, ready to paste"></textarea>
+</div>
+
+<p class="foot">Choose <b>OK</b> or <b>Change</b> for each row, and type the correction
+where you choose Change. Then press <b>Copy my answers</b> and paste the result back
+to me — or press <b>Save as a file</b> and send that. Anything you change here changes
+at the source: these strings are generated into the guidebook, the component library,
+the website and both plugins from one place, so nothing is ever corrected twice.</p>
+
+<p class="foot"><b>Why this page has buttons instead of printed boxes.</b> The first
+version of this sheet was a PDF with boxes to tick. It came back with nothing in it —
+the annotations were made in a viewer that never wrote them into the file, and there
+was no way to tell that had happened until the boxes were read back and found empty.
+Marks made here are read straight out of the page, so they cannot go missing the same
+way.</p>
+</div>
+
+<script>
+(function () {
+  const ids = ["wm-1", "wm-2", "th-1", "th-2", "th-3", "cl-1", "cl-2", "cl-3", "bt-1", "bt-2", "bt-3", "bt-4", "bt-5", "ms-1", "ms-2", "ms-3", "ms-4", "vc-1", "gb-1", "gb-2", "gb-3", "gb-4", "cj-1", "cj-2"];
+  const out = document.getElementById('out');
+  const count = document.getElementById('count');
+
+  function collect() {
+    const lines = [];
+    let done = 0;
+    for (const id of ids) {
+      const picked = document.querySelector('input[name="' + id + '"]:checked');
+      const note = document.querySelector('textarea[data-for="' + id + '"]').value.trim();
+      if (!picked && !note) continue;
+      done++;
+      const verdict = picked ? picked.value : 'change';
+      lines.push(id + '\t' + verdict + (note ? '\t' + note : ''));
+    }
+    count.textContent = done + ' of ' + ids.length + ' rows marked';
+    return lines.length
+      ? 'ANINDA STUDIO — Bangla review\nid\tverdict\tcorrection\n' + lines.join('\n')
+      : '';
+  }
+
+  document.addEventListener('change', collect);
+  document.addEventListener('input', collect);
+
+  document.getElementById('copy').addEventListener('click', async function () {
+    const text = collect();
+    if (!text) { count.textContent = 'Nothing marked yet'; return; }
+    out.style.display = 'block';
+    out.value = text;
+    try {
+      await navigator.clipboard.writeText(text);
+      count.textContent = 'Copied. Paste it back to me.';
+    } catch (e) {
+      out.select();
+      count.textContent = 'Could not reach the clipboard — the text is below, select and copy it.';
+    }
+  });
+
+  document.getElementById('dl').addEventListener('click', function () {
+    const text = collect();
+    if (!text) { count.textContent = 'Nothing marked yet'; return; }
+    out.style.display = 'block';
+    out.value = text;
+    out.select();
+    count.textContent = 'Downloads are blocked in some viewers — the text is below, select and copy it.';
+  });
+
+  collect();
+})();
+</script>
+</body></html>

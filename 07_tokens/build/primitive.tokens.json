@@ -1,0 +1,1645 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "$description": "Aninda Studio primitive tokens. Generated — do not hand-edit. Colour ramps are computed in OKLCH and gamut-mapped into sRGB; every value is the rounded 8-bit hex a browser will actually produce.",
+  "$extensions": {
+    "studio.aninda": {
+      "direction": "estuary",
+      "generatedBy": "07_tokens/build.py",
+      "spec": "DTCG 2025.10 (Final Community Group Report, 28 October 2025) — a W3C Community Group specification, NOT a W3C Standard"
+    }
+  },
+  "color": {
+    "$type": "color",
+    "ramp": {
+      "ground": {
+        "50": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.94902,
+              0.976471,
+              0.968627
+            ],
+            "hex": "#F2F9F7"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 50,
+              "luminance": 0.933438,
+              "isAnchor": false
+            }
+          }
+        },
+        "100": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.890196,
+              0.941176,
+              0.92549
+            ],
+            "hex": "#E3F0EC"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 100,
+              "luminance": 0.847068,
+              "isAnchor": false
+            }
+          }
+        },
+        "200": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.784314,
+              0.882353,
+              0.854902
+            ],
+            "hex": "#C8E1DA"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 200,
+              "luminance": 0.711911,
+              "isAnchor": false
+            }
+          }
+        },
+        "300": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.666667,
+              0.807843,
+              0.768627
+            ],
+            "hex": "#AACEC4"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 300,
+              "luminance": 0.566734,
+              "isAnchor": false
+            }
+          }
+        },
+        "400": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.545098,
+              0.709804,
+              0.666667
+            ],
+            "hex": "#8BB5AA"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 400,
+              "luminance": 0.414382,
+              "isAnchor": false
+            }
+          }
+        },
+        "500": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.435294,
+              0.607843,
+              0.564706
+            ],
+            "hex": "#6F9B90"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 500,
+              "luminance": 0.288352,
+              "isAnchor": false
+            }
+          }
+        },
+        "600": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.341176,
+              0.501961,
+              0.462745
+            ],
+            "hex": "#578076"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 600,
+              "luminance": 0.187721,
+              "isAnchor": false
+            }
+          }
+        },
+        "700": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.254902,
+              0.396078,
+              0.360784
+            ],
+            "hex": "#41655C"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 700,
+              "luminance": 0.112036,
+              "isAnchor": false
+            }
+          }
+        },
+        "800": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.180392,
+              0.294118,
+              0.262745
+            ],
+            "hex": "#2E4B43"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 800,
+              "luminance": 0.060181,
+              "isAnchor": false
+            }
+          }
+        },
+        "900": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.105882,
+              0.184314,
+              0.164706
+            ],
+            "hex": "#1B2F2A"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 900,
+              "luminance": 0.024331,
+              "isAnchor": true
+            }
+          }
+        },
+        "950": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.05098,
+              0.101961,
+              0.090196
+            ],
+            "hex": "#0D1A17"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 950,
+              "luminance": 0.008862,
+              "isAnchor": false
+            }
+          }
+        },
+        "$description": "Estuary (মোহনা) — The ground, and the source of every surface tint and every text role.",
+        "$extensions": {
+          "studio.aninda": {
+            "hueOklch": 176.896,
+            "chromaCeiling": 0.05127,
+            "anchor": "#0C3A31",
+            "anchorStep": 900
+          }
+        }
+      },
+      "accent": {
+        "50": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.929412,
+              0.980392,
+              0.992157
+            ],
+            "hex": "#EDFAFD"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 50,
+              "luminance": 0.934671,
+              "isAnchor": false
+            }
+          }
+        },
+        "100": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.85098,
+              0.94902,
+              0.968627
+            ],
+            "hex": "#D9F2F7"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 100,
+              "luminance": 0.849706,
+              "isAnchor": false
+            }
+          }
+        },
+        "200": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.709804,
+              0.894118,
+              0.92549
+            ],
+            "hex": "#B5E4EC"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 200,
+              "luminance": 0.713654,
+              "isAnchor": false
+            }
+          }
+        },
+        "300": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.556863,
+              0.823529,
+              0.866667
+            ],
+            "hex": "#8ED2DD"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 300,
+              "luminance": 0.570629,
+              "isAnchor": false
+            }
+          }
+        },
+        "400": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.396078,
+              0.729412,
+              0.780392
+            ],
+            "hex": "#65BAC7"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 400,
+              "luminance": 0.420066,
+              "isAnchor": false
+            }
+          }
+        },
+        "500": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.258824,
+              0.627451,
+              0.682353
+            ],
+            "hex": "#42A0AE"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 500,
+              "luminance": 0.293546,
+              "isAnchor": false
+            }
+          }
+        },
+        "600": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.152941,
+              0.517647,
+              0.572549
+            ],
+            "hex": "#278492"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 600,
+              "luminance": 0.190083,
+              "isAnchor": true
+            }
+          }
+        },
+        "700": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.070588,
+              0.411765,
+              0.454902
+            ],
+            "hex": "#126974"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 700,
+              "luminance": 0.114921,
+              "isAnchor": false
+            }
+          }
+        },
+        "800": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.019608,
+              0.301961,
+              0.337255
+            ],
+            "hex": "#054D56"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 800,
+              "luminance": 0.060116,
+              "isAnchor": false
+            }
+          }
+        },
+        "900": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.003922,
+              0.192157,
+              0.215686
+            ],
+            "hex": "#013137"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 900,
+              "luminance": 0.024788,
+              "isAnchor": false
+            }
+          }
+        },
+        "950": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0,
+              0.105882,
+              0.12549
+            ],
+            "hex": "#001B20"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 950,
+              "luminance": 0.008881,
+              "isAnchor": false
+            }
+          }
+        },
+        "$description": "Tidewater (জোয়ার) — A cyan-teal one hue-step off the ground. Carries links, focus and the primary action.",
+        "$extensions": {
+          "studio.aninda": {
+            "hueOklch": 208.996,
+            "chromaCeiling": 0.0899,
+            "anchor": "#0E7C8A",
+            "anchorStep": 600
+          }
+        }
+      },
+      "success": {
+        "50": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.937255,
+              0.984314,
+              0.94902
+            ],
+            "hex": "#EFFBF2"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 50,
+              "luminance": 0.937556,
+              "isAnchor": false
+            }
+          }
+        },
+        "100": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.870588,
+              0.956863,
+              0.886275
+            ],
+            "hex": "#DEF4E2"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 100,
+              "luminance": 0.857214,
+              "isAnchor": false
+            }
+          }
+        },
+        "200": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.745098,
+              0.901961,
+              0.780392
+            ],
+            "hex": "#BEE6C7"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 200,
+              "luminance": 0.716634,
+              "isAnchor": false
+            }
+          }
+        },
+        "300": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.607843,
+              0.835294,
+              0.666667
+            ],
+            "hex": "#9BD5AA"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 300,
+              "luminance": 0.574582,
+              "isAnchor": false
+            }
+          }
+        },
+        "400": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.466667,
+              0.745098,
+              0.545098
+            ],
+            "hex": "#77BE8B"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 400,
+              "luminance": 0.426118,
+              "isAnchor": false
+            }
+          }
+        },
+        "500": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.34902,
+              0.643137,
+              0.435294
+            ],
+            "hex": "#59A46F"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 500,
+              "luminance": 0.298216,
+              "isAnchor": false
+            }
+          }
+        },
+        "600": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.25098,
+              0.533333,
+              0.341176
+            ],
+            "hex": "#408857"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 600,
+              "luminance": 0.193858,
+              "isAnchor": false
+            }
+          }
+        },
+        "700": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.176471,
+              0.423529,
+              0.258824
+            ],
+            "hex": "#2D6C42"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 700,
+              "luminance": 0.11676,
+              "isAnchor": true
+            }
+          }
+        },
+        "800": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.113725,
+              0.313725,
+              0.180392
+            ],
+            "hex": "#1D502E"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 800,
+              "luminance": 0.061956,
+              "isAnchor": false
+            }
+          }
+        },
+        "900": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.058824,
+              0.196078,
+              0.105882
+            ],
+            "hex": "#0F321B"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 900,
+              "luminance": 0.024618,
+              "isAnchor": false
+            }
+          }
+        },
+        "950": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.019608,
+              0.113725,
+              0.05098
+            ],
+            "hex": "#051D0D"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 950,
+              "luminance": 0.0094,
+              "isAnchor": false
+            }
+          }
+        },
+        "$description": "Silt (পলি) — semantic",
+        "$extensions": {
+          "studio.aninda": {
+            "hueOklch": 152.008,
+            "chromaCeiling": 0.10913,
+            "anchor": "#1B6B3A",
+            "anchorStep": 700
+          }
+        }
+      },
+      "warning": {
+        "50": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              1.0,
+              0.964706,
+              0.921569
+            ],
+            "hex": "#FFF6EB"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 50,
+              "luminance": 0.931701,
+              "isAnchor": false
+            }
+          }
+        },
+        "100": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.984314,
+              0.917647,
+              0.839216
+            ],
+            "hex": "#FBEAD6"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 100,
+              "luminance": 0.842106,
+              "isAnchor": false
+            }
+          }
+        },
+        "200": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.952941,
+              0.835294,
+              0.686275
+            ],
+            "hex": "#F3D5AF"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 200,
+              "luminance": 0.697394,
+              "isAnchor": false
+            }
+          }
+        },
+        "300": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.901961,
+              0.741176,
+              0.529412
+            ],
+            "hex": "#E6BD87"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 300,
+              "luminance": 0.549688,
+              "isAnchor": false
+            }
+          }
+        },
+        "400": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.823529,
+              0.631373,
+              0.372549
+            ],
+            "hex": "#D2A15F"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 400,
+              "luminance": 0.400189,
+              "isAnchor": false
+            }
+          }
+        },
+        "500": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.721569,
+              0.52549,
+              0.243137
+            ],
+            "hex": "#B8863E"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 500,
+              "luminance": 0.275894,
+              "isAnchor": false
+            }
+          }
+        },
+        "600": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.607843,
+              0.423529,
+              0.145098
+            ],
+            "hex": "#9B6C25"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 600,
+              "luminance": 0.178281,
+              "isAnchor": false
+            }
+          }
+        },
+        "700": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.486275,
+              0.329412,
+              0.078431
+            ],
+            "hex": "#7C5414"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 700,
+              "luminance": 0.106767,
+              "isAnchor": true
+            }
+          }
+        },
+        "800": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.364706,
+              0.235294,
+              0.027451
+            ],
+            "hex": "#5D3C07"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 800,
+              "luminance": 0.055745,
+              "isAnchor": false
+            }
+          }
+        },
+        "900": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.231373,
+              0.145098,
+              0.007843
+            ],
+            "hex": "#3B2502"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 900,
+              "luminance": 0.022574,
+              "isAnchor": false
+            }
+          }
+        },
+        "950": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.137255,
+              0.07451,
+              0.0
+            ],
+            "hex": "#231300"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 950,
+              "luminance": 0.008231,
+              "isAnchor": false
+            }
+          }
+        },
+        "$description": "Kans (কাশ) — semantic",
+        "$extensions": {
+          "studio.aninda": {
+            "hueOklch": 73.298,
+            "chromaCeiling": 0.108,
+            "anchor": "#8A5A00",
+            "anchorStep": 700
+          }
+        }
+      },
+      "danger": {
+        "50": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              1.0,
+              0.94902,
+              0.929412
+            ],
+            "hex": "#FFF2ED"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 50,
+              "luminance": 0.908792,
+              "isAnchor": false
+            }
+          }
+        },
+        "100": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              1.0,
+              0.886275,
+              0.854902
+            ],
+            "hex": "#FFE2DA"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 100,
+              "luminance": 0.807156,
+              "isAnchor": false
+            }
+          }
+        },
+        "200": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              1.0,
+              0.780392,
+              0.72549
+            ],
+            "hex": "#FFC7B9"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 200,
+              "luminance": 0.656114,
+              "isAnchor": false
+            }
+          }
+        },
+        "300": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              1.0,
+              0.65098,
+              0.576471
+            ],
+            "hex": "#FFA693"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 300,
+              "luminance": 0.506415,
+              "isAnchor": false
+            }
+          }
+        },
+        "400": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.984314,
+              0.513725,
+              0.435294
+            ],
+            "hex": "#FB836F"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 400,
+              "luminance": 0.378925,
+              "isAnchor": false
+            }
+          }
+        },
+        "500": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.882353,
+              0.396078,
+              0.317647
+            ],
+            "hex": "#E16551"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 500,
+              "luminance": 0.259115,
+              "isAnchor": false
+            }
+          }
+        },
+        "600": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.752941,
+              0.298039,
+              0.227451
+            ],
+            "hex": "#C04C3A"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 600,
+              "luminance": 0.166826,
+              "isAnchor": false
+            }
+          }
+        },
+        "700": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.607843,
+              0.215686,
+              0.156863
+            ],
+            "hex": "#9B3728"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 700,
+              "luminance": 0.098553,
+              "isAnchor": true
+            }
+          }
+        },
+        "800": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.458824,
+              0.145098,
+              0.098039
+            ],
+            "hex": "#752519"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 800,
+              "luminance": 0.051759,
+              "isAnchor": false
+            }
+          }
+        },
+        "900": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.298039,
+              0.082353,
+              0.047059
+            ],
+            "hex": "#4C150C"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 900,
+              "luminance": 0.020996,
+              "isAnchor": false
+            }
+          }
+        },
+        "950": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.180392,
+              0.031373,
+              0.015686
+            ],
+            "hex": "#2E0804"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 950,
+              "luminance": 0.007634,
+              "isAnchor": false
+            }
+          }
+        },
+        "$description": "Laterite (লাল মাটি) — semantic",
+        "$extensions": {
+          "studio.aninda": {
+            "hueOklch": 31.189,
+            "chromaCeiling": 0.15914,
+            "anchor": "#A8301F",
+            "anchorStep": 700
+          }
+        }
+      },
+      "info": {
+        "50": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.937255,
+              0.976471,
+              1.0
+            ],
+            "hex": "#EFF9FF"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 50,
+              "luminance": 0.933217,
+              "isAnchor": false
+            }
+          }
+        },
+        "100": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.870588,
+              0.937255,
+              1.0
+            ],
+            "hex": "#DEEFFF"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 100,
+              "luminance": 0.84482,
+              "isAnchor": false
+            }
+          }
+        },
+        "200": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.745098,
+              0.870588,
+              0.988235
+            ],
+            "hex": "#BEDEFC"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 200,
+              "luminance": 0.702169,
+              "isAnchor": false
+            }
+          }
+        },
+        "300": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.615686,
+              0.792157,
+              0.952941
+            ],
+            "hex": "#9DCAF3"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 300,
+              "luminance": 0.55879,
+              "isAnchor": false
+            }
+          }
+        },
+        "400": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.478431,
+              0.694118,
+              0.882353
+            ],
+            "hex": "#7AB1E1"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 400,
+              "luminance": 0.410169,
+              "isAnchor": false
+            }
+          }
+        },
+        "500": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.360784,
+              0.588235,
+              0.784314
+            ],
+            "hex": "#5C96C8"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 500,
+              "luminance": 0.282572,
+              "isAnchor": false
+            }
+          }
+        },
+        "600": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.270588,
+              0.486275,
+              0.666667
+            ],
+            "hex": "#457CAA"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 600,
+              "luminance": 0.185821,
+              "isAnchor": false
+            }
+          }
+        },
+        "700": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.192157,
+              0.380392,
+              0.537255
+            ],
+            "hex": "#316189"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 700,
+              "luminance": 0.110081,
+              "isAnchor": true
+            }
+          }
+        },
+        "800": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.129412,
+              0.278431,
+              0.403922
+            ],
+            "hex": "#214767"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 800,
+              "luminance": 0.058088,
+              "isAnchor": false
+            }
+          }
+        },
+        "900": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.070588,
+              0.176471,
+              0.258824
+            ],
+            "hex": "#122D42"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 900,
+              "luminance": 0.023986,
+              "isAnchor": false
+            }
+          }
+        },
+        "950": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.027451,
+              0.098039,
+              0.156863
+            ],
+            "hex": "#071928"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 950,
+              "luminance": 0.008936,
+              "isAnchor": false
+            }
+          }
+        },
+        "$description": "Monsoon (বর্ষা) — semantic",
+        "$extensions": {
+          "studio.aninda": {
+            "hueOklch": 245.674,
+            "chromaCeiling": 0.0962,
+            "anchor": "#235E8C",
+            "anchorStep": 700
+          }
+        }
+      }
+    }
+  },
+  "dimension": {
+    "$type": "dimension",
+    "space": {
+      "0": {
+        "$value": {
+          "value": 4,
+          "unit": "px"
+        },
+        "$description": "Step 0 of the 4px spacing scale"
+      },
+      "1": {
+        "$value": {
+          "value": 8,
+          "unit": "px"
+        },
+        "$description": "Step 1 of the 4px spacing scale"
+      },
+      "2": {
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        },
+        "$description": "Step 2 of the 4px spacing scale"
+      },
+      "3": {
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        },
+        "$description": "Step 3 of the 4px spacing scale"
+      },
+      "4": {
+        "$value": {
+          "value": 24,
+          "unit": "px"
+        },
+        "$description": "Step 4 of the 4px spacing scale"
+      },
+      "5": {
+        "$value": {
+          "value": 32,
+          "unit": "px"
+        },
+        "$description": "Step 5 of the 4px spacing scale"
+      },
+      "6": {
+        "$value": {
+          "value": 48,
+          "unit": "px"
+        },
+        "$description": "Step 6 of the 4px spacing scale"
+      },
+      "7": {
+        "$value": {
+          "value": 64,
+          "unit": "px"
+        },
+        "$description": "Step 7 of the 4px spacing scale"
+      },
+      "8": {
+        "$value": {
+          "value": 96,
+          "unit": "px"
+        },
+        "$description": "Step 8 of the 4px spacing scale"
+      },
+      "9": {
+        "$value": {
+          "value": 128,
+          "unit": "px"
+        },
+        "$description": "Step 9 of the 4px spacing scale"
+      }
+    },
+    "radius": {
+      "badge": {
+        "$value": {
+          "value": 4,
+          "unit": "px"
+        },
+        "$description": "Corner radius for a badge"
+      },
+      "control": {
+        "$value": {
+          "value": 8,
+          "unit": "px"
+        },
+        "$description": "Corner radius for a control"
+      },
+      "card": {
+        "$value": {
+          "value": 14,
+          "unit": "px"
+        },
+        "$description": "Corner radius for a card"
+      },
+      "hero": {
+        "$value": {
+          "value": 24,
+          "unit": "px"
+        },
+        "$description": "Corner radius for a hero"
+      }
+    },
+    "target": {
+      "min": {
+        "$value": {
+          "value": 24,
+          "unit": "px"
+        },
+        "$description": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA",
+        "$extensions": {
+          "studio.aninda": {
+            "source": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA"
+          }
+        }
+      },
+      "apple-min": {
+        "$value": {
+          "value": 28,
+          "unit": "px"
+        },
+        "$description": "Apple HIG minimum control size, iOS and iPadOS",
+        "$extensions": {
+          "studio.aninda": {
+            "source": "Apple HIG minimum control size, iOS and iPadOS"
+          }
+        }
+      },
+      "comfortable": {
+        "$value": {
+          "value": 44,
+          "unit": "px"
+        },
+        "$description": "Apple HIG default control size, iOS and iPadOS",
+        "$extensions": {
+          "studio.aninda": {
+            "source": "Apple HIG default control size, iOS and iPadOS"
+          }
+        }
+      },
+      "android-min": {
+        "$value": {
+          "value": 48,
+          "unit": "px"
+        },
+        "$description": "Android accessibility guidance minimum touch target, in dp",
+        "$extensions": {
+          "studio.aninda": {
+            "source": "Android accessibility guidance minimum touch target, in dp"
+          }
+        }
+      }
+    },
+    "focus": {
+      "ring-width": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$description": "Focus indicator geometry. WCAG 2.2 SC 2.4.13 Focus Appearance is Level AAA, adopted here by choice; Level AA requires only SC 2.4.11."
+      },
+      "ring-offset": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$description": "Focus indicator geometry. WCAG 2.2 SC 2.4.13 Focus Appearance is Level AAA, adopted here by choice; Level AA requires only SC 2.4.11."
+      }
+    },
+    "type": {
+      "caption": {
+        "$value": {
+          "value": 0.7502,
+          "unit": "rem"
+        },
+        "$description": "12.0px at a 16px root — step -1 of a 1.333 scale"
+      },
+      "body": {
+        "$value": {
+          "value": 1.0,
+          "unit": "rem"
+        },
+        "$description": "16.0px at a 16px root — step +0 of a 1.333 scale"
+      },
+      "lead": {
+        "$value": {
+          "value": 1.333,
+          "unit": "rem"
+        },
+        "$description": "21.33px at a 16px root — step +1 of a 1.333 scale"
+      },
+      "h3": {
+        "$value": {
+          "value": 1.7769,
+          "unit": "rem"
+        },
+        "$description": "28.43px at a 16px root — step +2 of a 1.333 scale"
+      },
+      "h2": {
+        "$value": {
+          "value": 2.3686,
+          "unit": "rem"
+        },
+        "$description": "37.9px at a 16px root — step +3 of a 1.333 scale"
+      },
+      "h1": {
+        "$value": {
+          "value": 3.1573,
+          "unit": "rem"
+        },
+        "$description": "50.52px at a 16px root — step +4 of a 1.333 scale"
+      },
+      "display": {
+        "$value": {
+          "value": 4.2087,
+          "unit": "rem"
+        },
+        "$description": "67.34px at a 16px root — step +5 of a 1.333 scale"
+      },
+      "bangla-min": {
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        },
+        "$description": "Hard floor for Bangla — never apply the multiplier past it. At 12px the মাত্রা renders at luminance 123 on white at weight 400, which reads as grey rather than ink; at weight 500 it is 108 and holds. So this floor is only safe together with the weight bump.",
+        "$extensions": {
+          "studio.aninda": {
+            "measuredAt": "device_scale_factor=1",
+            "luminanceByWeight": {
+              "400": 123,
+              "500": 108,
+              "600": 90
+            }
+          }
+        }
+      },
+      "bangla-weight-bump-below": {
+        "$value": {
+          "value": 14,
+          "unit": "px"
+        },
+        "$description": "Below this size, step Bangla up one weight. Measured: 12px/400 fails at luminance 123, 12px/500 holds at 108, 13px/400 already holds at 94. The threshold is set at 14 rather than 13 because the relationship is not monotonic — it depends on how the stroke lands on the pixel grid — and one size of margin is cheap."
+      }
+    }
+  },
+  "number": {
+    "$type": "number",
+    "scale": {
+      "ratio": {
+        "$value": 1.333,
+        "$description": "A perfect fourth. The jumps are large on purpose: hierarchy is unmistakable and fewer levels are needed to express it."
+      },
+      "bangla": {
+        "$description": "How much to shrink Bangla so it looks the same size as Latin. Measured on rendered specimens, not estimated. Bangla's reading height is about 0.62 em against Latin's 0.51, so equal nominal sizes do not look equal. These barely move across the scale because Literata's x-height is nearly flat across its optical range — a face without that property would need a wider spread.",
+        "caption": {
+          "$value": 0.815,
+          "$description": "Bangla multiplier at caption size"
+        },
+        "body": {
+          "$value": 0.816,
+          "$description": "Bangla multiplier at body size"
+        },
+        "heading": {
+          "$value": 0.817,
+          "$description": "Bangla multiplier at heading size"
+        },
+        "title": {
+          "$value": 0.822,
+          "$description": "Bangla multiplier at title size"
+        },
+        "display": {
+          "$value": 0.825,
+          "$description": "Bangla multiplier at display size"
+        }
+      }
+    },
+    "lineHeight": {
+      "bangla": {
+        "$value": 1.6,
+        "$description": "Bangla needs more leading than Latin: the মাত্রা sits above the letters and the vowel signs hang below, so lines collide sooner. Collision measured at 1.25."
+      }
+    }
+  },
+  "fontFamily": {
+    "$type": "fontFamily",
+    "latin": {
+      "$value": [
+        "Literata",
+        "Georgia",
+        "serif"
+      ],
+      "$description": "Literata, by Veronika Burian and José Scaglione (TypeTogether). An optical-size axis from 7 to 72, so the letterforms are redrawn for the size rather than merely scaled. Its x-height is almost flat across that range (0.5166 to 0.5130 em), which is why the Bangla multiplier below barely moves.",
+      "$extensions": {
+        "studio.aninda": {
+          "licence": "SIL OFL 1.1"
+        }
+      }
+    },
+    "bangla": {
+      "$value": [
+        "Noto Serif Bengali",
+        "serif"
+      ],
+      "$description": "Never uppercased, never letter-spaced, never synthetically emboldened. A serif Bangla answers Bengali's own letterpress tradition rather than importing a Latin UI convention.",
+      "$extensions": {
+        "studio.aninda": {
+          "licence": "SIL OFL 1.1"
+        }
+      }
+    },
+    "mono": {
+      "$value": [
+        "Aninda Mono",
+        "IBM Plex Mono",
+        "ui-monospace",
+        "monospace"
+      ],
+      "$description": "IBM Plex Mono, by Mike Abbink and Bold Monday. It carries the Reserved Font Name 'IBM Plex', and subsetting a font counts as modifying it under OFL 1.1 clause 3 — so the subset shipped here is renamed 'Aninda Mono'. The unmodified family name is kept as the next fallback, so anyone who already has IBM Plex Mono installed gets the real thing.",
+      "$extensions": {
+        "studio.aninda": {
+          "licence": "SIL OFL 1.1"
+        }
+      }
+    }
+  },
+  "duration": {
+    "$type": "duration",
+    "motion": {
+      "colour": {
+        "$value": {
+          "value": 120,
+          "unit": "ms"
+        }
+      },
+      "move": {
+        "$value": {
+          "value": 220,
+          "unit": "ms"
+        }
+      }
+    }
+  },
+  "cubicBezier": {
+    "$type": "cubicBezier",
+    "motion": {
+      "standard": {
+        "$value": [
+          0.2,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "$description": "Things that move may overshoot; things that only change colour or opacity never do."
+      },
+      "enter": {
+        "$value": [
+          0.05,
+          0.7,
+          0.1,
+          1.0
+        ],
+        "$description": "Things that move may overshoot; things that only change colour or opacity never do."
+      },
+      "exit": {
+        "$value": [
+          0.3,
+          0.0,
+          0.8,
+          0.15
+        ],
+        "$description": "Things that move may overshoot; things that only change colour or opacity never do."
+      }
+    }
+  }
+}
