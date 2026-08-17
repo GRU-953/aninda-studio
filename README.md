@@ -105,8 +105,9 @@ Stated here rather than discovered later:
 - **The Bangla has not been reviewed by a second Bangla reader.** Spelling follows
   the Bangla Academy standard and every ruling is sourced, but sourced is not the
   same as read well. 30 of 30 cards carry Bangla names.
-- **Rendering checks are Chromium on macOS only.** Safari, Firefox and real
-  Windows High Contrast were not run.
+- **Rendering checks are Chromium only.** They run on macOS locally and on Ubuntu
+  in CI, from a clean checkout, so the results are not particular to one machine.
+  Safari, Firefox and real Windows High Contrast were not run.
 - **The icons are rounded everywhere, Apple included.** That is a deliberate
   choice against Apple's current guidance, and what it trades away is recorded in
   `04_mark/manifest.json`.
