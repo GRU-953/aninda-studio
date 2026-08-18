@@ -29,3 +29,12 @@ _review_pages2/
 # whether its guard fires, reverted the source but left the output, and the light
 # theme's ink was silently left near-white. These are disposable by design.
 .claude/worktrees/
+
+# ── The superseded Aninda drafts ──────────────────────────────────────────────
+# The pre-decision reference sheet and benchmark were copied in at the start as
+# input. They were never removed, so the published repository shipped a page that
+# draws the mark as the lowercase 'd' the project abandoned, alongside a palette,
+# type stack and tile radius that are all superseded. Chapter 03 names that 'd' as
+# "the one mistake this mark has already made" — so the repo documented the error
+# and distributed it at the same time. They are gone; this stops them returning.
+_reference/

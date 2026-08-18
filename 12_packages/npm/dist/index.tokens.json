@@ -1,0 +1,15 @@
+{
+  "$comment": "THIS FILE IS AN INDEX, NOT A TOKEN DOCUMENT. Do not hand it to a DTCG tool — it would fail validation, because it is not trying to be DTCG. The conformant documents are the files it lists, under tokens/. DTCG 2025.10 has no theming concept, so there is deliberately no single combined document: each theme is its own file with identical token paths.",
+  "version": "1.0.0",
+  "spec": "Design Tokens Format Module 2025.10 (W3C Community Group report, not a W3C Standard)",
+  "primitive": "tokens/primitive.tokens.json",
+  "themes": {
+    "light": "tokens/semantic.light.tokens.json",
+    "dark": "tokens/semantic.dark.tokens.json",
+    "hc-light": "tokens/semantic.hc-light.tokens.json",
+    "hc-dark": "tokens/semantic.hc-dark.tokens.json"
+  },
+  "notDtcg": {
+    "tokens/forced-colors.map.json": "Deliberately not DTCG. Its values are CSS system colour keywords supplied by the operating system, which have no colour space, no components and no hex, and DTCG's thirteen types include nothing that fits."
+  }
+}

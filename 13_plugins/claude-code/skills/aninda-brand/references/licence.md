@@ -89,7 +89,7 @@ always wrong.
 **One `-OFL.txt` travels beside each font file.** Not one shared copy at the
 root — one per font, next to the font.
 
-**Reserved Font Names.** IBM Plex Mono carries the Reserved Font Name `IBM Plex`.
+**Reserved Font Names.** IBM Plex Mono carries the Reserved Font Name "Plex".
 Subsetting a font counts as modifying it under OFL 1.1 clause 3, and a modified
 version may not use a reserved name. The subset here is therefore renamed
 **Aninda Mono**, with the unmodified family kept as the next fallback in the

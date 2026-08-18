@@ -132,9 +132,9 @@ FONTS = {
                        "emboldened. A serif Bangla answers Bengali's own letterpress "
                        "tradition rather than importing a Latin UI convention."},
     "mono": {"family": ["Aninda Mono", "IBM Plex Mono", "ui-monospace", "monospace"],
-             "licence": "SIL OFL 1.1", "rfn": "IBM Plex",
+             "licence": "SIL OFL 1.1", "rfn": "Plex",  # the exact string in its own OFL, NOT "IBM Plex"
              "note": "IBM Plex Mono, by Mike Abbink and Bold Monday. It carries the "
-                     "Reserved Font Name 'IBM Plex', and subsetting a font counts as "
+                     "Reserved Font Name 'Plex', and subsetting a font counts as "
                      "modifying it under OFL 1.1 clause 3 — so the subset shipped "
                      "here is renamed 'Aninda Mono'. The unmodified family name is "
                      "kept as the next fallback, so anyone who already has IBM Plex "

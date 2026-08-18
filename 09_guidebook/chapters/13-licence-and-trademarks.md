@@ -63,7 +63,7 @@ copy is not allowed to keep. Subsetting a font counts as modification under
 clause 3 of the licence, so a subset of a font with a Reserved Font Name has to
 be renamed before it is distributed.
 
-**IBM Plex Mono carries the Reserved Font Name "IBM Plex".** The subset used in
+**IBM Plex Mono carries the Reserved Font Name "Plex".** The subset used in
 this system is therefore renamed **Aninda Mono** in its `name` table, and the
 build refuses to finish if any Reserved Font Name survives the rename.
 

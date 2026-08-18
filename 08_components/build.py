@@ -28,7 +28,7 @@ Fail-closed
 Fonts and the licence point
     All three fonts are SIL OFL 1.1. Subsetting a font is modifying it under
     clause 3 of that licence. IBM Plex Mono carries the Reserved Font Name
-    "IBM Plex", so the subset MUST NOT present itself under that name: its name
+    "Plex" — the exact string from its own licence, not "IBM Plex" — so the subset MUST NOT present itself under that name: its name
     table is rewritten to "Aninda Mono". Literata and Noto Serif Bengali carry no
     Reserved Font Name, so they keep their real names — renaming those would make
     the system harder to trace, not safer. Each OFL.txt is copied next to the
@@ -152,7 +152,11 @@ NAMED_COLOURS = {
 ALLOWED_COLOUR_KEYWORDS = {"currentcolor", "transparent"}
 
 _HEX = re.compile(r"#[0-9a-fA-F]{3,8}\b")
-_FUNC = re.compile(r"\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\s*\(")
+# (?i) because CSS colour functions are case-insensitive and RGB(255 0 0) is
+# valid CSS. Without it this guard let every uppercase form through while
+# reporting a clean pass — the worst kind of check.
+_FUNC = re.compile(r"\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\s*\(",
+                   re.IGNORECASE)
 _DECL = re.compile(r"[-a-zA-Z][-a-zA-Z0-9]*\s*:\s*([^;{}]+)[;}]")
 
 
@@ -202,10 +206,16 @@ def guard_stylesheet(text: str, name: str) -> None:
         )
 
 
+# re.IGNORECASE as a flag, not an inline (?i): Python requires a global flag to
+# sit at position 0 of the pattern, and this one is built from several fragments.
+# Case matters here because RGB(255 0 0) and OKLCH(...) are valid CSS, and while
+# this guard was case-sensitive every uppercase form passed it while the build
+# reported a clean run.
 _MARKUP_COLOUR = re.compile(
     r"(?:fill|stroke|stop-color|flood-color|lighting-color|color|background|"
     r"background-color|border-color|outline-color)\s*[:=]\s*[\"']?\s*"
-    r"(#[0-9a-fA-F]{3,8}|rgba?\(|hsla?\(|oklch\(|oklab\(|lab\(|lch\()"
+    r"(#[0-9a-f]{3,8}|rgba?\(|hsla?\(|hwb\(|oklch\(|oklab\(|lab\(|lch\()",
+    re.IGNORECASE,
 )
 
 

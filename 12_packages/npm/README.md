@@ -30,12 +30,20 @@ sit inside a light page.
 ## Use the tokens directly
 
 ```js
-import tokens from 'aninda-studio-tokens/tokens.json';
+import primitive from 'aninda-studio-tokens/tokens/primitive';
+import light     from 'aninda-studio-tokens/tokens/light';
+import hcDark    from 'aninda-studio-tokens/tokens/hc-dark';
 ```
 
-That file is [Design Tokens Format Module 2025.10](https://www.designtokens.org/tr/2025.10/format/),
+Each of those is [Design Tokens Format Module 2025.10](https://www.designtokens.org/tr/2025.10/format/),
 a Final Community Group Report of the W3C Design Tokens Community Group. It is a
 Community Group specification and **not** a W3C Standard.
+
+**There is no single combined token document, and that is deliberate.** DTCG has no
+theming concept, so each theme is its own file with identical token paths. An
+earlier version of this package shipped all six wrapped in one object and called
+that DTCG; it was not, and no tool could read it. `tokens/index` lists the files
+and says plainly that it is an index rather than a token document.
 
 Each colour carries its proof under `$extensions["studio.aninda"].proof` — the
 ratio required, the ratio measured, the worst case under a one-bit perturbation of
@@ -46,7 +54,9 @@ meets. You can check the claim rather than trust it.
 
 | Path | What it is |
 |---|---|
-| `tokens.json` | The DTCG source. Authoritative |
+| `tokens/primitive` | The ramps, scales, families and durations. DTCG |
+| `tokens/light`, `tokens/dark`, `tokens/hc-light`, `tokens/hc-dark` | One theme each. DTCG, identical token paths |
+| `tokens/index` | An index of the above. **Not** a token document |
 | `css` | Every theme in one stylesheet |
 | `css/light`, `css/dark`, `css/hc-light`, `css/hc-dark` | One theme each |
 | `typography.css`, `layout.css` | Type and layout properties |
@@ -59,8 +69,9 @@ package, and an OFL font inside an Apache-2.0 package muddies the licence
 declaration. `typography.css` declares the families and leaves the loading to you.
 
 One thing to know if you subset IBM Plex Mono yourself: it carries the Reserved
-Font Name "IBM Plex", and subsetting counts as modifying it under OFL 1.1 clause 3,
-so a subset has to be renamed. The design system's own subset is called
+Font Name **"Plex"** — that is the exact string, from the first line of its own
+licence file — and subsetting counts as modifying it under OFL 1.1 clause 3, so a
+subset may not use that name. The design system's own subset is called
 "Aninda Mono" for exactly that reason.
 
 ## Licence

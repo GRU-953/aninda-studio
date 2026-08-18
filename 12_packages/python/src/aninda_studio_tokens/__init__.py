@@ -6,7 +6,8 @@ GENERATED — do not hand-edit. Regenerate with 12_packages/build.py.
 
     css("hc-dark")        # the stylesheet text for one theme
     css_path("dark")      # a pathlib.Path, for copying into a build
-    TOKENS                # the parsed DTCG document
+    TOKENS                # the primitive DTCG document
+    THEME_TOKENS["dark"]  # one DTCG document per theme
 """
 
 from __future__ import annotations
@@ -19,8 +20,17 @@ THEMES = ['light', 'dark', 'hc-light', 'hc-dark']
 
 _DATA = Path(__file__).parent / "data"
 
-with (_DATA / "aninda.tokens.json").open(encoding="utf-8") as _f:
-    TOKENS = json.load(_f)
+def _load(name: str) -> dict:
+    with (_DATA / "tokens" / name).open(encoding="utf-8") as f:
+        return json.load(f)
+
+
+#: The primitive DTCG document — ramps, scales, families, durations.
+TOKENS = _load("primitive.tokens.json")
+
+#: One DTCG document per theme, with identical token paths in each. There is no
+#: combined document because DTCG has no theming concept.
+THEME_TOKENS = {t: _load(f"semantic.{t}.tokens.json") for t in THEMES}
 
 
 def css_path(theme: str | None = None) -> Path:
@@ -37,4 +47,4 @@ def css(theme: str | None = None) -> str:
     return css_path(theme).read_text(encoding="utf-8")
 
 
-__all__ = ["TOKENS", "THEMES", "css", "css_path", "__version__"]
+__all__ = ["TOKENS", "THEME_TOKENS", "THEMES", "css", "css_path", "__version__"]

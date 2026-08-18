@@ -95,7 +95,7 @@ def split_css(css: str) -> dict[str, str]:
         out[theme] = (
             f"/* Aninda Studio — the {theme} theme alone.\n"
             f" * A convenience view. The complete stylesheet is tokens.css, and the\n"
-            f" * authoritative source is aninda.tokens.json.\n"
+            f" * authoritative source is the DTCG documents under tokens/.\n"
             f" * GENERATED — do not hand-edit.\n"
             f" */\n{block}\n"
         )
@@ -147,12 +147,20 @@ sit inside a light page.
 ## Use the tokens directly
 
 ```js
-import tokens from '{NPM_NAME}/tokens.json';
+import primitive from '{NPM_NAME}/tokens/primitive';
+import light     from '{NPM_NAME}/tokens/light';
+import hcDark    from '{NPM_NAME}/tokens/hc-dark';
 ```
 
-That file is [Design Tokens Format Module 2025.10](https://www.designtokens.org/tr/2025.10/format/),
+Each of those is [Design Tokens Format Module 2025.10](https://www.designtokens.org/tr/2025.10/format/),
 a Final Community Group Report of the W3C Design Tokens Community Group. It is a
 Community Group specification and **not** a W3C Standard.
+
+**There is no single combined token document, and that is deliberate.** DTCG has no
+theming concept, so each theme is its own file with identical token paths. An
+earlier version of this package shipped all six wrapped in one object and called
+that DTCG; it was not, and no tool could read it. `tokens/index` lists the files
+and says plainly that it is an index rather than a token document.
 
 Each colour carries its proof under `$extensions["studio.aninda"].proof` — the
 ratio required, the ratio measured, the worst case under a one-bit perturbation of
@@ -163,7 +171,9 @@ meets. You can check the claim rather than trust it.
 
 | Path | What it is |
 |---|---|
-| `tokens.json` | The DTCG source. Authoritative |
+| `tokens/primitive` | The ramps, scales, families and durations. DTCG |
+| `tokens/light`, `tokens/dark`, `tokens/hc-light`, `tokens/hc-dark` | One theme each. DTCG, identical token paths |
+| `tokens/index` | An index of the above. **Not** a token document |
 | `css` | Every theme in one stylesheet |
 | `css/light`, `css/dark`, `css/hc-light`, `css/hc-dark` | One theme each |
 | `typography.css`, `layout.css` | Type and layout properties |
@@ -176,8 +186,9 @@ package, and an OFL font inside an Apache-2.0 package muddies the licence
 declaration. `typography.css` declares the families and leaves the loading to you.
 
 One thing to know if you subset IBM Plex Mono yourself: it carries the Reserved
-Font Name "IBM Plex", and subsetting counts as modifying it under OFL 1.1 clause 3,
-so a subset has to be renamed. The design system's own subset is called
+Font Name **"Plex"** — that is the exact string, from the first line of its own
+licence file — and subsetting counts as modifying it under OFL 1.1 clause 3, so a
+subset may not use that name. The design system's own subset is called
 "Aninda Mono" for exactly that reason.
 
 ## Licence
@@ -231,7 +242,10 @@ Source:  {REPO}
         "exports": {
             ".": {"types": "./dist/index.d.ts", "import": "./dist/index.mjs",
                   "require": "./dist/index.cjs"},
-            "./tokens.json": "./dist/aninda.tokens.json",
+            "./tokens.json": "./dist/tokens/primitive.tokens.json",
+            "./tokens/index": "./dist/index.tokens.json",
+            "./tokens/primitive": "./dist/tokens/primitive.tokens.json",
+            **{f"./tokens/{t}": f"./dist/tokens/semantic.{t}.tokens.json" for t in THEMES},
             "./css": "./dist/tokens.css",
             **{f"./css/{t}": f"./dist/tokens.{t}.css" for t in THEMES},
             "./typography.css": "./dist/typography.css",
@@ -243,10 +257,48 @@ Source:  {REPO}
     files[npm / "README.md"] = readme
     files[npm / "NOTICE"] = notice
 
-    bundle = {"$description": BLURB, "version": version,
-              "files": {k: v for k, v in docs.items()}}
-    files[npm / "dist" / "aninda.tokens.json"] = json.dumps(bundle, indent=2,
-                                                            ensure_ascii=False) + "\n"
+    # Ship each DTCG document VERBATIM, under its own name. The first version
+    # wrapped all six inside {"$description", "version", "files": {filename: doc}}
+    # and the README then told consumers that wrapper WAS
+    # "Design Tokens Format Module 2025.10". It was not, and it could not be:
+    #   · six group names ended in ".json", and DTCG forbids "." in a name outright
+    #   · every one of the 40 aliases dangled, because nesting moved their targets
+    #   · the top-level "version" was a bare string where a token or group belongs
+    # An independent validator found 84 errors in it while the four source files
+    # under 07_tokens/build/ passed clean. The defect was entirely in this step.
+    #
+    # There is no combined token document any more, because DTCG has no way to
+    # express one — it has no theming concept, which is why the source is four
+    # files with identical token paths in the first place. An index is shipped
+    # alongside them, and it says plainly that it is an index.
+    for name, doc in docs.items():
+        files[npm / "dist" / "tokens" / name] = json.dumps(doc, indent=2,
+                                                          ensure_ascii=False) + "\n"
+    index = {
+        "$comment": (
+            "THIS FILE IS AN INDEX, NOT A TOKEN DOCUMENT. Do not hand it to a DTCG "
+            "tool — it would fail validation, because it is not trying to be DTCG. "
+            "The conformant documents are the files it lists, under tokens/. "
+            "DTCG 2025.10 has no theming concept, so there is deliberately no "
+            "single combined document: each theme is its own file with identical "
+            "token paths."
+        ),
+        "version": version,
+        "spec": "Design Tokens Format Module 2025.10 (W3C Community Group report, "
+                "not a W3C Standard)",
+        "primitive": "tokens/primitive.tokens.json",
+        "themes": {t: f"tokens/semantic.{t}.tokens.json" for t in THEMES},
+        "notDtcg": {
+            "tokens/forced-colors.map.json": (
+                "Deliberately not DTCG. Its values are CSS system colour keywords "
+                "supplied by the operating system, which have no colour space, no "
+                "components and no hex, and DTCG's thirteen types include nothing "
+                "that fits."
+            )
+        },
+    }
+    files[npm / "dist" / "index.tokens.json"] = json.dumps(index, indent=2,
+                                                           ensure_ascii=False) + "\n"
     files[npm / "dist" / "tokens.css"] = css
     for t, block in per_theme.items():
         files[npm / "dist" / f"tokens.{t}.css"] = block
@@ -270,7 +322,7 @@ Source:  {REPO}
 
     index_body = (
         "// Aninda Studio design tokens. GENERATED — do not hand-edit.\n"
-        "import tokens from './aninda.tokens.json' with { type: 'json' };\n"
+        "import primitive from './tokens/primitive.tokens.json' with { type: 'json' };\n"
         "export const themes = %s;\n"
         "export { tokens };\n"
         "export default tokens;\n" % json.dumps(list(THEMES))
@@ -278,7 +330,7 @@ Source:  {REPO}
     files[npm / "dist" / "index.mjs"] = index_body
     files[npm / "dist" / "index.cjs"] = (
         "// Aninda Studio design tokens. GENERATED — do not hand-edit.\n"
-        "const tokens = require('./aninda.tokens.json');\n"
+        "const tokens = require('./tokens/primitive.tokens.json');\n"
         "module.exports = tokens;\n"
         "module.exports.tokens = tokens;\n"
         "module.exports.themes = %s;\n" % json.dumps(list(THEMES))
@@ -336,7 +388,8 @@ GENERATED — do not hand-edit. Regenerate with 12_packages/build.py.
 
     css("hc-dark")        # the stylesheet text for one theme
     css_path("dark")      # a pathlib.Path, for copying into a build
-    TOKENS                # the parsed DTCG document
+    TOKENS                # the primitive DTCG document
+    THEME_TOKENS["dark"]  # one DTCG document per theme
 """
 
 from __future__ import annotations
@@ -349,8 +402,17 @@ THEMES = {list(THEMES)!r}
 
 _DATA = Path(__file__).parent / "data"
 
-with (_DATA / "aninda.tokens.json").open(encoding="utf-8") as _f:
-    TOKENS = json.load(_f)
+def _load(name: str) -> dict:
+    with (_DATA / "tokens" / name).open(encoding="utf-8") as f:
+        return json.load(f)
+
+
+#: The primitive DTCG document — ramps, scales, families, durations.
+TOKENS = _load("primitive.tokens.json")
+
+#: One DTCG document per theme, with identical token paths in each. There is no
+#: combined document because DTCG has no theming concept.
+THEME_TOKENS = {{t: _load(f"semantic.{{t}}.tokens.json") for t in THEMES}}
 
 
 def css_path(theme: str | None = None) -> Path:
@@ -367,9 +429,11 @@ def css(theme: str | None = None) -> str:
     return css_path(theme).read_text(encoding="utf-8")
 
 
-__all__ = ["TOKENS", "THEMES", "css", "css_path", "__version__"]
+__all__ = ["TOKENS", "THEME_TOKENS", "THEMES", "css", "css_path", "__version__"]
 '''
-    files[mod / "data" / "aninda.tokens.json"] = files[npm / "dist" / "aninda.tokens.json"]
+    for _n in docs:
+        files[mod / "data" / "tokens" / _n] = files[npm / "dist" / "tokens" / _n]
+    files[mod / "data" / "index.tokens.json"] = files[npm / "dist" / "index.tokens.json"]
     files[mod / "data" / "tokens.css"] = css
     for t, block in per_theme.items():
         files[mod / "data" / f"tokens.{t}.css"] = block
@@ -384,17 +448,32 @@ __all__ = ["TOKENS", "THEMES", "css", "css_path", "__version__"]
 def verify(files: dict[Path, str]) -> list[str]:
     """Prove the CSS and the DTCG source still agree, rather than assuming."""
     problems = []
-    tokens_blob = next(v for k, v in files.items() if k.name == "aninda.tokens.json")
+    # Prove every shipped DTCG document is byte-identical to its source. The
+    # previous version verified a wrapper it had built itself, which is why it
+    # reported "6 DTCG documents shipped verbatim" about a file that failed
+    # DTCG validation with 84 errors. A check that only inspects its own output
+    # cannot catch a packaging bug.
+    for src in sorted(TOKENS.glob("*.json")):
+        shipped = files.get(HERE / "npm" / "dist" / "tokens" / src.name)
+        if shipped is None:
+            problems.append(f"{src.name} is in the source but was not packaged")
+            continue
+        if json.loads(shipped) != json.loads(src.read_text()):
+            problems.append(f"{src.name} was altered on the way into the package")
     css_blob = next(v for k, v in files.items() if k.name == "tokens.css")
-    bundle = json.loads(tokens_blob)
 
-    for name in ("primitive.tokens.json", *[f"semantic.{t}.tokens.json" for t in THEMES]):
-        if name not in bundle["files"]:
-            problems.append(f"the bundle is missing {name}")
+    def shipped_doc(name: str) -> dict:
+        blob = files.get(HERE / "npm" / "dist" / "tokens" / name)
+        return json.loads(blob) if blob else {}
+
+    for name in ("primitive.tokens.json", *[f"semantic.{t}.tokens.json" for t in THEMES],
+                 "forced-colors.map.json"):
+        if not shipped_doc(name):
+            problems.append(f"{name} was not packaged")
 
     # Every hex in every semantic theme file must appear in the stylesheet.
     for t in THEMES:
-        doc = bundle["files"].get(f"semantic.{t}.tokens.json", {})
+        doc = shipped_doc(f"semantic.{t}.tokens.json")
         missing = []
 
         def walk(node):

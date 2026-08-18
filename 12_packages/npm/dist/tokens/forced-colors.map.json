@@ -1,0 +1,29 @@
+{
+  "format": "non-dtcg",
+  "$description": "Forced-colors mode cannot be expressed in DTCG. Its values are CSS system colour keywords supplied by the operating system — they have no colour space, no components and no hex, and DTCG's thirteen types include nothing that fits. Bending them into a colour token would be a lie about what they are, so this file sits deliberately outside the DTCG tree.",
+  "generatedBy": "07_tokens/build.py",
+  "map": {
+    "color.surface.base": "Canvas",
+    "color.surface.lowest": "Canvas",
+    "color.surface.low": "Canvas",
+    "color.surface.high": "Canvas",
+    "color.surface.highest": "Canvas",
+    "color.surface.dim": "Canvas",
+    "color.surface.bright": "Canvas",
+    "color.ink.default": "CanvasText",
+    "color.ink.muted": "GrayText",
+    "color.line.default": "CanvasText",
+    "color.accent.default": "LinkText",
+    "color.accent.edge": "CanvasText",
+    "color.focus.ring": "Highlight",
+    "color.status.success": "CanvasText",
+    "color.status.warning": "CanvasText",
+    "color.status.danger": "CanvasText",
+    "color.status.info": "CanvasText"
+  },
+  "rules": [
+    "Every brand colour must be overridden. A hex that survives forced-colors mode defeats the whole point of it.",
+    "forced-color-adjust: none is forbidden except where explicitly allow-listed with a stated reason.",
+    "Because status colours all resolve to CanvasText, nothing may rely on colour alone — every state carries a glyph and a word regardless."
+  ]
+}

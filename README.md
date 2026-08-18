@@ -51,7 +51,7 @@ number a person types is a number that can be wrong and stay wrong.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (14.3 MB) that needs no network, plus a 1.5 MB PDF |
+| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (14.1 MB) that needs no network, plus a 1.6 MB PDF |
 | `07_tokens/` | The design tokens: DTCG source, and 63 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
 | `04_mark/` | 10 mark, wordmark and icon files |
