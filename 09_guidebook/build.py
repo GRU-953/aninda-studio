@@ -34,8 +34,10 @@ WHY THERE ARE TWO OUTPUT FILES, AND WHY IT MATTERS
     download payloads buy a printed reader nothing at all, and they cost the whole
     document. Measured with `scripts/pdf.py --probe-interactive`:
 
-      * printing the print build gives a 1.4 MB PDF;
-      * printing the interactive build gives a 14.2 MB PDF, because Chromium
+      * printing the print build gives a PDF of about 1.8 MB — the exact size is
+        read from the file and never typed, by _pdf_sizes();
+      * printing the interactive build gave a 14.2 MB PDF when measured once,
+        while deciding this split, because Chromium
         carries every data URI into the PDF as a link target — ten times the size,
         for links nobody on paper can follow;
       * and the interactive build has no A4 page geometry and no page-break
@@ -331,10 +333,19 @@ def fmt_ratio(value: float) -> str:
 
 
 def fmt_bytes(n: int) -> str:
-    if n >= 1024 * 1024:
-        return f"{n / (1024 * 1024):.1f} MB"
-    if n >= 1024:
-        return f"{n / 1024:.0f} kB"
+    """SI, not binary. MB is 10^6 bytes and kB is 10^3 — that is what the prefixes
+    mean, it is what macOS and every browser report, and it is what
+    scripts/readme.py has always used.
+
+    This divided by 1024 and wrote "MB", so the book called the shipped PDF
+    1.7 MB while the generated README called the same file 1.8 MB. Two documents
+    in one repository disagreeing about the size of a file both describe is the
+    kind of small wrongness that makes a reader doubt the large claims.
+    """
+    if n >= 1_000_000:
+        return f"{n / 1_000_000:.1f} MB"
+    if n >= 1_000:
+        return f"{n / 1_000:.0f} kB"
     return f"{n} bytes"
 
 
@@ -460,7 +471,12 @@ class Tokens:
 def load_fonts() -> dict[str, str]:
     cards = read_json(CARDS_JSON)
     out = {}
+    # Subsets only. The inventory now also lists the desktop TTF, which is a
+    # deliverable rather than a webfont: inlining 136 kB of unsubset TrueType as
+    # an @font-face would add weight to every page and draw nothing.
     for spec in cards["_fonts"]:
+        if not spec.get("subset", True):
+            continue
         path = ROOT / "08_components" / spec["file"]
         out[spec["family"]] = base64.b64encode(path.read_bytes()).decode("ascii")
     return out
@@ -528,13 +544,19 @@ def kit_files() -> list[tuple[str, Path, str]]:
     items.append(("08_components/src/components.css", COMPONENTS_CSS,
                   "The component layer. No literal colour in it"))
 
+    seen_licences = set()
     for spec in read_json(CARDS_JSON)["_fonts"]:
+        form = "subset" if spec.get("subset", True) else "whole face, not subset"
         items.append((f"08_components/{spec['file']}",
                       ROOT / "08_components" / spec["file"],
-                      f"{spec['family']} subset, {spec['licence']}"))
-        items.append((f"08_components/{spec['licence_file']}",
-                      ROOT / "08_components" / spec["licence_file"],
-                      f"The full licence text for {spec['family']}"))
+                      f"{spec['family']} {form}, {spec['licence']}"))
+        # The desktop face shares its licence file with the subset it came from,
+        # and the same path twice would be two rows for one artefact.
+        if spec["licence_file"] not in seen_licences:
+            seen_licences.add(spec["licence_file"])
+            items.append((f"08_components/{spec['licence_file']}",
+                          ROOT / "08_components" / spec["licence_file"],
+                          f"The full licence text for {spec['family']}"))
 
     manifest = read_json(MARK_DIR / "manifest.json")
     for name in manifest["files"]:
@@ -956,13 +978,47 @@ def block_font_licences() -> str:
             e(spec["family"]),
             e(spec["licence"]),
             "Yes — renamed" if spec["renamed"] else "No",
+            "Subset" if spec.get("subset", True) else "Whole face",
             fmt_bytes(spec["bytes"]),
             f"<code>{e(spec['licence_file'])}</code>",
         ])
-    return table(["Family", "Licence", "Reserved Font Name", "Subset size",
+    subsets = sum(1 for f in cards["_fonts"] if f.get("subset", True))
+    whole = len(cards["_fonts"]) - subsets
+    return table(["Family", "Licence", "Reserved Font Name", "Form", "Size on disk",
                   "Licence text"], rows,
-                 caption="The three typefaces, their licences, and the size of "
-                         "each subset as written to disk.")
+                 caption=(f"Every font artefact this kit redistributes: {subsets} "
+                          f"subsets and {whole} whole face, each with its licence "
+                          f"and its size as written to disk. The whole face is the "
+                          f"desktop file, listed here because a reader is more "
+                          f"likely to install or pass on that one than any subset."))
+
+
+def _pdf_sizes() -> str:
+    """The two PDF sizes, read from disk where a file exists.
+
+    These were the typed figures "about 1.4 MB" and "about 14.2 MB" in the
+    paragraph that justifies shipping two HTML builds. The shipped PDF is 1.8 MB
+    and README.md — which is generated — said so, so the book and its own README
+    disagreed about a file both of them describe.
+
+    The print PDF is read at build time. The interactive one is not shipped and
+    never has been: 14.2 MB was a single measurement taken while deciding the
+    split, so it is now labelled as that rather than stated as a property of a
+    file. On a clean tree the print PDF does not exist yet either — the PDF is
+    printed FROM this HTML — and in that case the sentence says the measurement
+    has not been taken rather than quoting a number for a file that is not there.
+    """
+    pdf = HERE / "Aninda-Studio-Guidebook.pdf"
+    if pdf.exists():
+        printed = (f"Printing the print build gives a PDF of "
+                   f"{fmt_bytes(pdf.stat().st_size)}, read from the file in this "
+                   f"repository. ")
+    else:
+        printed = ("The print build's PDF has not been produced in this tree, so "
+                   "its size is not quoted here. ")
+    return (printed + "Printing the interactive build gave one of about 14.2 MB "
+            "when that was measured, once, while deciding this split; that PDF is "
+            "not shipped, ")
 
 
 def block_output_files(print_mode: bool) -> str:
@@ -986,10 +1042,9 @@ def block_output_files(print_mode: bool) -> str:
         f"{fmt_bytes(on_disk)} on disk, about {fmt_bytes(int(encoded))} once "
         "base64-encoded. A paper page cannot be clicked, so those payloads buy a "
         "printed reader nothing.</p>"
-        "<p>They also cost a great deal. Printing the print build gives a PDF of "
-        "about 1.4 MB. Printing the interactive build gives one of about 14.2 MB, "
+        "<p>They also cost a great deal. " + _pdf_sizes() +
         "because Chromium carries every data URI into the PDF as a link target — "
-        "ten times the size, for links nobody on paper can follow. The "
+        "for links nobody on paper can follow. The "
         "interactive build also has no A4 page geometry and no page-break rules, "
         "so its layout breaks in the wrong places throughout.</p>"
         "<p><strong>One correction, since this split is usually justified with a "
@@ -1401,7 +1456,14 @@ def chapter_type_en(tok: Tokens) -> str:
 
     out.append("<h2>Three families</h2>")
     rows = []
+    # The three FAMILIES, so the desktop file is not a fourth row here — it is
+    # the same face as the mono subset, in a different form, and the licence
+    # chapter is where the artefacts are inventoried. This loop reads the same
+    # list, so it has to say which entries it means rather than assume the list
+    # only ever holds three.
     for spec in cards["_fonts"]:
+        if not spec.get("subset", True):
+            continue
         key = {"Literata": "literata", "Noto Serif Bengali": "notoserifbengali",
                "Aninda Mono": "ibmplexmono"}[spec["family"]]
         f = facts[key]

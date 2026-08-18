@@ -70,6 +70,12 @@ jobs:
           done
           exit $fail
 
+      - name: The derived figures in MEASUREMENTS.md match the measurements
+        # MEASUREMENTS.md opens by saying every number in it is a measurement, and
+        # nothing compared it to 06_type/_data/measurements.json. Three x/cap cells
+        # disagreed, in opposite directions, so it was not a rounding convention.
+        run: python scripts/check_measurements.py
+
       - name: Every Reserved Font Name claim matches the licence we ship
         # This claim was corrected twice by hand and was wrong both times. The
         # second review found it still wrong in 35 files, including the two NOTICE

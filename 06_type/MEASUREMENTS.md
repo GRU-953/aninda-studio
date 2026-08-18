@@ -35,7 +35,7 @@ All values in CSS pixels at `font-size: 16px`, `font-weight: 400` **[rendered]**
 | Literata | 11.23 | 8.12 | **12.26** | 3.46 | 0.723 | **26.0** |
 | Work Sans | 10.56 | 8.00 | 11.68 | 3.36 | 0.758 | 25.0 |
 | Source Sans 3 | 10.50 | 7.78 | 11.40 | 3.28 | 0.741 | 25.0 |
-| Source Serif 4 | 10.72 | 7.78 | 11.79 | 3.76 | 0.726 | 25.0 |
+| Source Serif 4 | 10.72 | 7.78 | 11.79 | 3.76 | 0.725 | 25.0 |
 | Newsreader | 10.82 | **7.05** | 11.44 | **3.99** | **0.651** | 25.0 |
 
 **Spread:** x-height varies by 1.63px — 23% — between the largest (Inter) and
@@ -54,11 +54,11 @@ statement about how big text looks.
 | Martian Mono | **12.80** | **9.60** | 0.750 | **0.700 em** | 25.0 |
 | JetBrains Mono | 11.68 | 8.80 | 0.753 | 0.600 em | 25.0 |
 | Noto Sans Mono | 11.42 | 8.58 | 0.751 | 0.600 em | 25.0 |
-| Geist Mono | 11.36 | 8.48 | 0.747 | 0.600 em | 25.0 |
+| Geist Mono | 11.36 | 8.48 | 0.746 | 0.600 em | 25.0 |
 | Roboto Mono | 11.38 | 8.45 | 0.743 | 0.600 em | 25.0 |
 | IBM Plex Mono | 11.17 | 8.26 | 0.739 | 0.600 em | 25.0 |
 | Source Code Pro | 10.50 | 7.78 | 0.741 | 0.600 em | 25.0 |
-| Inconsolata | **9.97** | **7.31** | 0.733 | **0.500 em** | 25.0 |
+| Inconsolata | **9.97** | **7.31** | 0.734 | **0.500 em** | 25.0 |
 
 **Advance** was measured as the rendered width of the string `0123456789` divided
 by ten, then by the font size **[rendered]**. Six of the eight sit at exactly

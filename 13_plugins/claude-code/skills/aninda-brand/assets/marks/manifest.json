@@ -31,7 +31,9 @@
   "clear_space": "half the mark's own height on all four sides",
   "safe_field": 90.0,
   "tile_radius_percent": 24.0,
-  "tile_radius_source": "the system's own radius-hero token. Apple publishes no corner radius; this number is ours and is not claimed to be theirs.",
+  "tile_radius_grid_units_per_100": 24.0,
+  "tile_radius_px_at_1024": 245.8,
+  "tile_radius_source": "read at build time from dimension.radius.hero. That token is 24 px; this is 24 units per 100 on the icon grid, which is 245.8 px of rounding on the 1024 px icon. The numeral is reused deliberately, so the icon corner belongs to the same family as every other rounded corner in the kit \u2014 it is an echo, not a unit conversion. Apple publishes no corner radius; this number is ours and is not claimed to be theirs.",
   "icon_policy": {
     "decision": "One rounded icon is used on every surface, Apple included. Owner's decision, 14 August 2026.",
     "everyday": [

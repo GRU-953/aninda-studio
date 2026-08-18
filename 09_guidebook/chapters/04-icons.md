@@ -65,8 +65,15 @@ is square, fully opaque and carries no baked mask.
 
 ## The corner radius is this kit's own number
 
-The rounding is 24% of the icon width. That comes from this system's own
-`radius-hero` token and from nowhere else.
+The rounding is 24% of the icon width. The build reads that numeral from this
+system's own `radius-hero` token, so it is not typed anywhere.
+
+Be precise about what that means. `radius-hero` is **24 px**; the icon rounds by
+24 units per 100 on its grid, which is 245.8 px on the 1024 px icon. The number
+is reused on purpose, so the icon's corner belongs to the same family as every
+other rounded corner in the kit — an echo, not a unit conversion. This page used
+to say the radius "comes from" the token "and from nowhere else", which claimed a
+derivation the build could not perform.
 
 **Apple publishes no corner radius, no percentage, and does not use the word
 "squircle" anywhere in current guidance.** The widely circulated community

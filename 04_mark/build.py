@@ -83,7 +83,8 @@ STROKE_REGULAR = 9.0     # at STROKE_SWITCH_PX and above
 STROKE_HEAVY = 15.0      # below it
 STROKE_SWITCH_PX = 24    # the size the weight changes at
 SAFE = 90.0              # essential shapes live inside 90 of the 100 units
-TILE_RADIUS_PCT = 24.0   # from the system's own radius-hero token, not from folklore
+# Read from the token at build time by tile_radius_pct() below, never typed.
+TILE_RADIUS_PCT: float | None = None
 
 LATIN_FONT = FONTS / "latin" / "literata" / "Literata[opsz,wght].ttf"
 BANGLA_FONT = FONTS / "bangla" / "notoserifbengali" / "NotoSerifBengali[wdth,wght].ttf"
@@ -593,13 +594,46 @@ def proof_sheet(docs: dict[str, str], ink: str, paper: str) -> tuple[str, str]:
                    f"written to 04_mark/svg, every caption read out of the artwork")
 
 
+def tile_radius_pct(prim: dict) -> float:
+    """The icon tile's corner radius, in units of the 100-unit grid.
+
+    This was the typed constant 24.0 with a comment saying it came "from the
+    system's own radius-hero token". It did not. The token is 24 PIXELS; the icon
+    uses 24 units per 100 on a 0 0 100 100 grid delivered at 1024px, which is
+    245.8px of rounding. The agreement was between the digit 24 and the digit 24,
+    and a citation the build cannot verify is worth less than no citation at all.
+
+    So the numeral is now genuinely read from the token, and what it means is
+    stated exactly: this system reuses radius-hero's NUMBER as a percentage, on
+    purpose, so the icon's corner belongs to the same family as every other
+    rounded corner in the kit. It is a deliberate echo, not a unit conversion.
+
+    The load-bearing half is unchanged and still true: the figure is ours. Apple
+    publishes no corner radius, and none is claimed from them.
+    """
+    try:
+        token = prim["dimension"]["radius"]["hero"]["$value"]
+    except (KeyError, TypeError) as exc:
+        raise Fail(
+            f"dimension.radius.hero is missing from the token build ({exc}), so the "
+            f"icon's corner radius has nothing to come from. It must not fall back "
+            f"to a typed number — that is the state this function replaced."
+        )
+    if token.get("unit") != "px":
+        raise Fail(f"dimension.radius.hero is in {token.get('unit')!r}, not px. The "
+                   f"echo this build relies on is of the px numeral.")
+    return float(token["value"])
+
+
 def main() -> int:
+    global TILE_RADIUS_PCT
     try:
         light = json.loads((TOKENS / "semantic.light.tokens.json").read_text())
         prim = json.loads((TOKENS / "primitive.tokens.json").read_text())
     except FileNotFoundError as e:
         print(f"could not run: {e}. Run 07_tokens/build.py first.", file=sys.stderr)
         return 2
+    TILE_RADIUS_PCT = tile_radius_pct(prim)
 
     def resolve(v):
         if isinstance(v, str) and v.startswith("{"):
@@ -794,8 +828,16 @@ def main() -> int:
         "clear_space": "half the mark's own height on all four sides",
         "safe_field": SAFE,
         "tile_radius_percent": TILE_RADIUS_PCT,
-        "tile_radius_source": ("the system's own radius-hero token. Apple publishes "
-                               "no corner radius; this number is ours and is not "
+        "tile_radius_grid_units_per_100": TILE_RADIUS_PCT,
+        "tile_radius_px_at_1024": round(TILE_RADIUS_PCT / 100.0 * 1024.0, 1),
+        "tile_radius_source": ("read at build time from dimension.radius.hero. That "
+                               "token is 24 px; this is 24 units per 100 on the "
+                               "icon grid, which is 245.8 px of rounding on the "
+                               "1024 px icon. The numeral is reused deliberately, "
+                               "so the icon corner belongs to the same family as "
+                               "every other rounded corner in the kit — it is an "
+                               "echo, not a unit conversion. Apple publishes no "
+                               "corner radius; this number is ours and is not "
                                "claimed to be theirs."),
         "icon_policy": {
             "decision": ("One rounded icon is used on every surface, Apple included. "

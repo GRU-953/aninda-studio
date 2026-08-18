@@ -54,7 +54,16 @@ ROOT = HERE.parent
 TOKENS_CSS = ROOT / "07_tokens" / "css" / "tokens.css"
 COMPONENTS_CSS = HERE / "src" / "components.css"
 TOKENS_BUILD = ROOT / "07_tokens" / "build"
-MARKS_DIR = ROOT / "03_directions" / "marks"
+# 04_mark/svg, not 03_directions/marks. This card — the one whose subject is the
+# identity — was the only consumer in the system reading from the EXPLORATION
+# stage, which 03_directions/build.py documents as writing rejected material and
+# which is deliberately outside the rebuild chain. Proved by changing the circle
+# radius in 04_mark/build.py: all ten SVGs updated, every gate passed, the cards
+# rebuilt still drawing the superseded shape, --check reporting "No drift. 38
+# files match", and the 138-second harness printing PASS. The two drawings were
+# geometrically identical at the time, so nothing wrong ever shipped; any future
+# redraw would have shipped everywhere except the page that teaches it.
+MARKS_DIR = ROOT / "04_mark" / "svg"
 # The mark's own rules live with the mark. This card used to state "Clear space:
 # one stroke width", typed here by hand, against the manifest's "half the mark's
 # own height on all four sides" — a factor of about four, presented on the card
@@ -1491,8 +1500,8 @@ def d_motion(p, th, T):
 
 
 def d_marks(p, th, T):
-    regular = read_mark("estuary-mark-regular.svg")
-    heavy = read_mark("estuary-mark-heavy.svg")
+    regular = read_mark("mark-regular.svg")
+    heavy = read_mark("mark-heavy.svg")
     sizes = "".join(
         f'<div class="as-stack as-stack--tight" style="align-items: center">'
         f'{mark_at(regular, s)}<span class="as-doc-swatch__meta">{s} px</span></div>'
@@ -1881,9 +1890,22 @@ def d_validation(p, th, T):
 
 
 def read_mark(name: str) -> str:
-    raw = (MARKS_DIR / name).read_text("utf-8")
+    """The shipped mark, stripped of everything mark_at() sets for itself.
+
+    width and height are stripped too: the 04_mark masters carry them and mark_at
+    adds its own, and two of each on one element is a silent, valid-looking way to
+    draw the wrong size.
+    """
+    path = MARKS_DIR / name
+    if not path.exists():
+        raise BuildError(
+            f"{path} is missing. This card draws the shipped mark; run "
+            f"04_mark/build.py first. It must never fall back to another folder."
+        )
+    raw = path.read_text("utf-8")
     raw = re.sub(r'\s*style="color:[^"]*"', "", raw)
     raw = re.sub(r"<title>.*?</title>", "", raw, flags=re.S)
+    raw = re.sub(r'\s(?:width|height)="[^"]*"', "", raw, count=2)
     raw = raw.replace('role="img"', "")
     return raw.strip()
 
@@ -2397,6 +2419,35 @@ def build() -> dict[str, bytes]:
     return out
 
 
+def desktop_font_row() -> list[dict]:
+    """The desktop TTF, if it is on disk — the fourth OFL artefact this kit ships.
+
+    The licence chapter said "Three faces ship with this system, each as a
+    subset", and a fourth sat in the same directory: AnindaMono-Regular.ttf, the
+    whole IBM Plex Mono renamed but NOT subset, and the largest single
+    redistributed font in the tree. The OFL obligations were met — the licence
+    file sits beside it and the rename is what clause 3 requires — but the file
+    was named on no licence surface, and it is the one a reader is most likely to
+    install or pass on. An inventory a reader is told is complete has to be.
+
+    Generated rather than typed, so it appears the moment the file does and
+    disappears if the desktop build is dropped.
+    """
+    path = FONTS_DIR / DESKTOP_FONT_OUT
+    if not path.exists():
+        return []
+    return [{
+        "file": f"fonts/{DESKTOP_FONT_OUT}",
+        "family": "Aninda Mono (desktop)",
+        "source": str(FONT_SOURCES["mono"]["path"].relative_to(ROOT)),
+        "licence": "SIL OFL 1.1",
+        "licence_file": f"fonts/{FONT_SOURCES['mono']['ofl_out']}",
+        "bytes": path.stat().st_size,
+        "renamed": True,
+        "subset": False,
+    }]
+
+
 def registry_bytes(fonts: dict[str, bytes]) -> bytes:
     entries = []
     for card in CARDS:
@@ -2430,7 +2481,7 @@ def registry_bytes(fonts: dict[str, bytes]) -> bytes:
                 "renamed": bool(FONT_SOURCES[k]["rename"]),
             }
             for k in ("latin", "bangla", "mono")
-        ],
+        ] + desktop_font_row(),
         "counts": {
             g: sum(1 for c in CARDS if c["group"] == g)
             for g in ("Foundations", "Components", "Patterns")

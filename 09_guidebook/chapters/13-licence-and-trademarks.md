@@ -48,8 +48,18 @@ whole point of splitting them.
 
 ## The typefaces: SIL OFL 1.1
 
-Three faces ship with this system, each as a subset — a copy with the unused
-glyphs stripped out to cut the file size.
+Four font files ship with this system. Three are subsets — copies with the
+unused glyphs stripped out to cut the file size — and one is a whole face: the
+desktop file, which has to carry every glyph because it is meant to be installed
+and used for anything.
+
+The table below is generated from what is actually on disk, so it cannot omit a
+file. It used to say "three faces, each as a subset" while a fourth sat in the
+same directory: the whole IBM Plex Mono, renamed, and the largest single
+redistributed font in the tree. The licence obligations were met for it — the
+OFL text sits beside it and the rename is what clause 3 requires — but it was
+named on no licence surface, and it is the file a reader is most likely to pass
+on to somebody else.
 
 {{data:font-licences}}
 

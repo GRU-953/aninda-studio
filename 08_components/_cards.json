@@ -34,6 +34,16 @@
       "licence_file": "fonts/anindamono-OFL.txt",
       "bytes": 10464,
       "renamed": true
+    },
+    {
+      "file": "fonts/AnindaMono-Regular.ttf",
+      "family": "Aninda Mono (desktop)",
+      "source": "06_type/candidates/mono/ibmplexmono/IBMPlexMono-Regular.ttf",
+      "licence": "SIL OFL 1.1",
+      "licence_file": "fonts/anindamono-OFL.txt",
+      "bytes": 136228,
+      "renamed": true,
+      "subset": false
     }
   ],
   "counts": {

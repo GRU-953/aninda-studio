@@ -78,9 +78,22 @@ def check_manifest(problems: Problems) -> None:
         problems.wrong(f"{MANIFEST} is missing")
         return
     manifest = json.loads(MANIFEST.read_text("utf-8"))
+    # The version is READ from VERSION, not typed here. It used to be the literal
+    # "1.0.0", so this guard obstructed the release it exists to protect: bumping
+    # VERSION and both manifests to 1.1.0 failed with "plugin.json version is
+    # '1.1.0', and should be '1.0.0'". Everything else in the system — guidebook,
+    # packages, site, both READMEs — already follows VERSION; only the plugin did
+    # not, and the one check that could have noticed was the one asserting the
+    # wrong thing.
+    version_file = REPO_ROOT / "VERSION"
+    if not version_file.exists():
+        problems.wrong("VERSION is missing, so the plugin's version has nothing "
+                       "to be checked against")
+        return
+    version = version_file.read_text(encoding="utf-8").strip()
     required = {
         "name": "aninda-studio",
-        "version": "1.0.0",
+        "version": version,
         "license": "Apache-2.0 AND PolyForm-Noncommercial-1.0.0",
     }
     for key, value in required.items():
@@ -442,11 +455,19 @@ def check_marketplace(problems: Problems) -> None:
             f"resolves to {source}, not {PLUGIN_ROOT}"
         )
         return
-    if entry.get("version") != manifest.get("version"):
-        problems.wrong(
-            f"marketplace.json says version {entry.get('version')!r} and plugin.json "
-            f"says {manifest.get('version')!r}"
-        )
+    # Three versions, all compared: the plugin entry, plugin.json, and
+    # marketplace.json's own metadata.version — which was compared to nothing and
+    # could drift on its own with every check green.
+    root_version = (REPO_ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    versions = {
+        "VERSION": root_version,
+        "plugin.json": manifest.get("version"),
+        "marketplace.json plugins[].version": entry.get("version"),
+        "marketplace.json metadata.version": listing.get("metadata", {}).get("version"),
+    }
+    if len(set(versions.values())) != 1:
+        problems.wrong("the version is not the same in every place that states it: "
+                       + ", ".join(f"{k} says {v!r}" for k, v in versions.items()))
         return
     # The README has to say how to install it. A marketplace file nobody is told
     # about is the same failure one step further along.
@@ -458,7 +479,8 @@ def check_marketplace(problems: Problems) -> None:
             return
     problems.ok(
         f"marketplace.json lists {entry['name']} v{entry['version']} at "
-        f"{entry['source']}, and the README shows both install commands"
+        f"{entry['source']}, the README shows both install commands, and all "
+        f"{len(versions)} places that state a version agree with VERSION"
     )
 
 
