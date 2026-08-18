@@ -84,7 +84,19 @@ def main() -> int:
         re.IGNORECASE,
     )
 
+    # The PolyForm URL's trailing-slash form returns 404. This lived in CI as a
+    # grep with --include='*.md' --include='*.json' --include='*.py', which could
+    # see 10 of the 18 places the URL appears and missed the 8 that matter most:
+    # all six NOTICE files, which have no extension and are what a redistributor
+    # is obliged to carry, plus both guidebook builds. Proved by injecting the
+    # trailing slash into 13_plugins/claude-code/NOTICE — the grep found nothing
+    # and the step passed. It is folded in here because this script already walks
+    # the whole tree with a suffix list that includes extensionless files, and one
+    # sweep cannot disagree with itself the way two greps can.
+    POLYFORM = re.compile(r"polyformproject\.org/licenses/noncommercial/1\.0\.0/")
+
     offenders: list[tuple[str, int, str]] = []
+    slashes: list[tuple[str, int]] = []
     scanned = 0
     for path in ROOT.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
@@ -99,6 +111,8 @@ def main() -> int:
             continue
         scanned += 1
         for n, line in enumerate(text.splitlines(), 1):
+            if POLYFORM.search(line):
+                slashes.append((str(path.relative_to(ROOT)), n))
             for m in wrong.finditer(line):
                 named = next((g for g in m.groups() if g), "").strip()
                 if named and named.casefold() != correct.casefold():
@@ -106,6 +120,14 @@ def main() -> int:
 
     print(f"  scanned {scanned} text files")
     print(f"  the Reserved Font Name, read from {OFL.name}: \"{correct}\"")
+
+    if slashes:
+        print(f"\n  {len(slashes)} PolyForm URL(s) with a trailing slash, which 404s:",
+              file=sys.stderr)
+        for f, n in slashes[:8]:
+            print(f"    {f}:{n}", file=sys.stderr)
+        return 0 if expect_failure else 1
+    print(f"  no PolyForm URL carries a trailing slash")
 
     if offenders:
         by_file: dict[str, int] = {}

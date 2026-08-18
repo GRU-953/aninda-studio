@@ -76,14 +76,6 @@ jobs:
         # files a redistributor of the plugin must carry. Two hand-corrections were
         # not enough because nothing checked.
         run: python scripts/check_licence_claims.py
-      - name: The PolyForm URL has no trailing slash
-        # The trailing-slash form returns 404. It takes one keystroke to add and a
-        # long time to notice.
-        run: |
-          if grep -rnE "noncommercial/1\\.0\\.0/" \
-               --include='*.md' --include='*.json' --include='*.py' . ; then
-            echo "::error::PolyForm URL must not have a trailing slash"; exit 1
-          fi
 
   # 2 ── under a minute. The drift guard. This is the important one.
   tokens:
