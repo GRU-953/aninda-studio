@@ -2271,7 +2271,8 @@ BANNED_PHRASES = ["of course", "e.g.", "i.e.", "etc."]
 
 BENGALI_RUN = re.compile(r"[ঀ-৿‌‍]+")
 LITERAL_COLOUR = re.compile(
-    r"#[0-9a-fA-F]{3,8}\b|\b(?:rgb|rgba|hsl|hsla|lab|lch|oklch|oklab|color)\s*\(",
+    r"#[0-9a-f]{3,8}\b|\b(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklch|oklab|color)\s*\(",
+    re.IGNORECASE,   # third copy of the same guard; hwb() was also missing
 )
 
 
@@ -2293,65 +2294,102 @@ def strip_tags(html_text: str) -> str:
 
 
 _BANGLA_RUN = re.compile(r"[\u0980-\u09FF][\u0980-\u09FF\s\u200c\u200d।,;:!?()\u2014-]*[\u0980-\u09FF]|[\u0980-\u09FF]")
+_ENGLISH_RUN = re.compile(
+    r"[A-Za-z][A-Za-z0-9\s.,;:!?()\u2019'\u2014/&%-]*[A-Za-z0-9.)]|[A-Za-z]{2,}"
+)
 _SKIP_ELEMENTS = ("script", "style", "title", "textarea")
 
 
-def tag_inline_bangla(doc: str) -> tuple[str, int]:
-    """Wrap every bare Bangla run in <span lang="bn">, and report how many.
+def walk_language_scopes(doc: str):
+    """Yield (text, nearest_declared_lang) for every text run in the document.
 
-    Chapter prose is hand-written markdown, and it mentions Bangla words inside
-    English sentences constantly — "the মাত্রা", "Silt (পলি)". Those runs came out
-    of the markdown untagged, so a screen reader pronounced them with an English
-    engine and the stylesheet's :lang(bn) rules never reached them: no Noto Serif
-    Bengali, no measured size multiplier, no 12px floor, no weight bump.
+    The single source of truth for "what language is this run in". The tagger and
+    the guard both use it, because the previous version had each carry its own
+    scope tracking and they drifted the moment one was improved: the tagger got a
+    proper element stack, the guard kept a bare counter that closed a scope on the
+    first closing tag of any kind, and the guard then reported 76 faults in a
+    document that was correct.
 
-    Editing fourteen markdown files by hand would fix today's fifty and none of
-    tomorrow's, so it is done here instead — once, in the generator, over the
-    finished HTML.
-
-    Walks the document as alternating tags and text. Text inside an element that
-    already declares lang="bn" is left alone, and so is anything inside script,
-    style, title or textarea. Attribute values are never touched, because they are
-    inside tag tokens and this only ever rewrites text tokens.
-
-    Note the honest limit: a Bangla word inside an ALT attribute cannot be marked
-    up at all — HTML has no way to declare the language of part of an attribute.
-    Those are counted separately by the guard and named in the chapter on what this
-    system does not do.
+    Two implementations of the same rule is one implementation and one liability.
     """
-    out, wrapped = [], 0
-    depth_bn, skip = 0, 0
+    VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
+            "meta", "param", "source", "track", "wbr"}
+    stack: list[tuple[str, str | None]] = []
+
     for token in re.split(r"(<[^>]+>)", doc):
         if token.startswith("<"):
-            name = re.match(r"</?\s*([a-zA-Z0-9-]+)", token)
-            tag = name.group(1).lower() if name else ""
-            closing = token.startswith("</")
-            selfclose = token.rstrip().endswith("/>")
-            if tag in _SKIP_ELEMENTS and not selfclose:
-                skip += -1 if closing else 1
-            if not closing and not selfclose and 'lang="bn"' in token:
-                depth_bn += 1
-            elif closing and depth_bn and tag in ("span", "section", "p", "div",
-                                                  "blockquote", "td", "th", "li"):
-                # Close only if this element opened the Bangla scope. Tracking it
-                # exactly would need a stack; erring toward leaving text alone is
-                # the safe direction, because a double-wrap is harmless and a
-                # missed wrap is the bug being fixed.
-                depth_bn = max(0, depth_bn - 1)
-            out.append(token)
-            continue
-        if skip or depth_bn or not token.strip():
-            out.append(token)
+            m = re.match(r"</?\s*([a-zA-Z0-9-]+)", token)
+            tag = m.group(1).lower() if m else ""
+            if token.startswith("</"):
+                for i in range(len(stack) - 1, -1, -1):
+                    if stack[i][0] == tag:
+                        del stack[i:]
+                        break
+            elif not token.rstrip().endswith("/>") and tag not in VOID:
+                lm = re.search(r'\blang="([a-zA-Z-]+)"', token)
+                stack.append((tag, lm.group(1).lower() if lm else None))
+            yield token, None          # tags pass through unchanged
             continue
 
-        def wrap(m):
-            nonlocal wrapped
-            wrapped += 1
-            return f'<span lang="bn">{m.group(0)}</span>'
+        if any(t in _SKIP_ELEMENTS for t, _ in stack):
+            yield token, "skip"
+            continue
 
-        out.append(_BANGLA_RUN.sub(wrap, token))
-    return "".join(out), wrapped
+        lang = None
+        for _, declared in reversed(stack):
+            if declared:
+                lang = declared
+                break
+        yield token, lang
 
+
+def tag_inline_bangla(doc: str) -> tuple[int, int, str]:
+    """Declare the language of every run that differs from its context.
+
+    WCAG 2.2 SC 3.1.2 Language of Parts asks for the language of any part that
+    differs from the language around it, and that cuts BOTH ways. Chapter prose
+    mentions Bangla words inside English sentences constantly, and the Bangla
+    chapters carry English gap notices, section labels and technical terms.
+
+    Three earlier attempts were each wrong, and instructively so:
+      1. Only the chapter sections were tagged, with data-lang="bn" instead of
+         lang="bn" — so a screen reader read Bengali with an English engine and
+         none of the Bangla typography applied.
+      2. Bangla was tagged but English was not, leaving 439 English text nodes
+         inside the Bangla sections declared Bangla: the same defect reversed.
+      3. Scope was tracked with a bare counter that decremented on any closing
+         tag, so the first </p> closed the section and 14 English runs were
+         wrapped where 439 needed it.
+
+    Returns (bangla_runs, english_runs, document).
+    """
+    out: list[str] = []
+    n_bn = n_en = 0
+
+    # An SVG <title> is an accessible name and cannot nest a span, so its language
+    # has to go on the element itself. Eight of them sit inside Bangla sections
+    # with English names, and they are the last place a screen reader would read
+    # English with a Bengali engine.
+    doc = re.sub(r"<title>(?=[^<]*[A-Za-z]{4})", '<title lang="en">', doc)
+
+    for token, lang in walk_language_scopes(doc):
+        if lang is None or lang == "skip" or not token.strip():
+            out.append(token)
+            continue
+        if lang == "bn":
+            def wrap_en(m):
+                nonlocal n_en
+                n_en += 1
+                return f'<span lang="en">{m.group(0)}</span>'
+            out.append(_ENGLISH_RUN.sub(wrap_en, token))
+        else:
+            def wrap_bn(m):
+                nonlocal n_bn
+                n_bn += 1
+                return f'<span lang="bn">{m.group(0)}</span>'
+            out.append(_BANGLA_RUN.sub(wrap_bn, token))
+
+    return n_bn, n_en, "".join(out)
 
 def guard_english(documents: dict[str, str]) -> None:
     for label, doc in documents.items():
@@ -2489,40 +2527,30 @@ def guard_bn_sections(documents: dict[str, str]) -> None:
 
 
 def guard_inline_bangla(documents: dict[str, str]) -> None:
-    """No Bangla may ship outside a lang="bn" element.
+    """Every run must sit in a scope declaring its own language.
 
-    WCAG 2.2 SC 3.1.2 Language of Parts, Level AA. It is also what makes the
-    Bangla typography apply at all, since tokens.css scopes every Bangla rule to
-    :lang(bn), [lang="bn"]. This ran green for a long time without existing:
-    11_site/check.py had the equivalent check and CI ran nothing at all over the
-    guidebook, which is how 286 Bangla text nodes shipped announced as English.
+    Bangla outside lang="bn" is read by an English speech engine and gets none of
+    the Bangla typography. English inside lang="bn" is the same fault reversed.
+    Both are WCAG 2.2 SC 3.1.2, Level AA.
     """
     bn = re.compile(r"[\u0980-\u09FF]")
     for name, doc in documents.items():
-        depth, skip, offenders = 0, 0, []
-        for token in re.split(r"(<[^>]+>)", doc):
-            if token.startswith("<"):
-                m = re.match(r"</?\s*([a-zA-Z0-9-]+)", token)
-                tag = m.group(1).lower() if m else ""
-                closing, selfclose = token.startswith("</"), token.rstrip().endswith("/>")
-                if tag in _SKIP_ELEMENTS and not selfclose:
-                    skip += -1 if closing else 1
-                if not closing and not selfclose and 'lang="bn"' in token:
-                    depth += 1
-                elif closing and depth:
-                    depth = max(0, depth - 1)
+        bad_bn: list[str] = []
+        bad_en: list[str] = []
+        for token, lang in walk_language_scopes(doc):
+            if lang is None or lang == "skip" or not token.strip():
                 continue
-            if skip or depth:
-                continue
-            if bn.search(token):
-                offenders.append(token.strip()[:50])
-        if offenders:
+            if bn.search(token) and lang != "bn":
+                bad_bn.append(token.strip()[:44])
+            if lang == "bn" and not bn.search(token) and re.search(r"[A-Za-z]{4}", token):
+                bad_en.append(token.strip()[:44])
+        if bad_bn or bad_en:
             raise SystemExit(
-                f"{name}: {len(offenders)} Bangla run(s) outside lang=\"bn\". A screen "
-                f"reader would pronounce them as English and none of the Bangla "
-                f"typography would apply. First few: {offenders[:3]}"
+                f"{name}: {len(bad_bn)} Bangla run(s) outside lang=\"bn\" and "
+                f"{len(bad_en)} English run(s) inside it. A screen reader would "
+                f"pronounce each in the wrong language, and the Bangla typography "
+                f"is keyed on :lang(bn). Bangla: {bad_bn[:2]} English: {bad_en[:2]}"
             )
-
 
 def build_all() -> dict[str, str]:
     docs = {
@@ -2535,9 +2563,9 @@ def build_all() -> dict[str, str]:
     # pass. Chapter prose mentions Bangla words inside English sentences and those
     # runs arrive here untagged.
     for name in list(docs):
-        docs[name], n = tag_inline_bangla(docs[name])
-        if n:
-            print(f"  tagged {n} inline Bangla run(s) in {name}")
+        n_bn, n_en, docs[name] = tag_inline_bangla(docs[name])
+        if n_bn or n_en:
+            print(f"  tagged {n_bn} Bangla and {n_en} English run(s) in {name}")
 
     guard_own_css()
     guard_placeholders(docs)

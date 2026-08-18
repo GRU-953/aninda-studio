@@ -292,7 +292,12 @@ def verify(css: str, prim: dict, sem: dict[str, dict], forced: dict) -> list[str
 
     # No brand colour may survive forced-colors mode.
     fblock = css[i_forced:]
-    if re.search(r"#[0-9A-Fa-f]{6}", fblock):
+    # 3, 4, 6 and 8 digits are all valid CSS hex, and so are the colour
+    # functions. Matching only six digits meant a brand colour written #f00
+    # or #0C3A31FF survived forced-colors mode with the guard reporting clean.
+    if re.search(r"#[0-9a-f]{3,8}\b"
+                 r"|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\s*\(",
+                 fblock, re.IGNORECASE):
         problems.append("a hex colour survives the forced-colors block")
     # Every colour property the themes define must be overridden here — derived
     # from what the CSS actually emits, NOT from the forced-colors map, so the

@@ -197,7 +197,12 @@ BANGLA_GAPS = _bangla_gaps()
 # =========================================================================
 
 _HEX = re.compile(r"#[0-9a-fA-F]{3,8}\b")
-_FUNC = re.compile(r"\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\s*\(")
+# re.IGNORECASE: CSS colour functions are case-insensitive, so RGB(255 0 0)
+# and OKLCH(...) are valid CSS. This guard was case-sensitive and let every
+# uppercase form through while reporting a clean build — the same fault was
+# fixed in 08_components/build.py first, and this second copy was missed.
+_FUNC = re.compile(r"\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\s*\(",
+                   re.IGNORECASE)
 
 BANNED_WORDS = ["simply", "just", "easy", "obviously", "of course", "clearly"]
 BANNED_LATIN = ["e.g.", "i.e.", "etc."]
