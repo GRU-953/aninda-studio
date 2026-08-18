@@ -21,3 +21,11 @@ _review_pages2/
 
 # ── macOS ─────────────────────────────────────────────────────────────────────
 .DS_Store
+
+# ── Isolated worktrees used by the review rounds ──────────────────────────────
+# Each reviewer gets its own checkout here so it can run write-capable generators
+# and break them freely without touching the real tree. Round 1 of this review
+# originally ran without isolation: a reviewer edited the colour engine to test
+# whether its guard fires, reverted the source but left the output, and the light
+# theme's ink was silently left near-white. These are disposable by design.
+.claude/worktrees/
