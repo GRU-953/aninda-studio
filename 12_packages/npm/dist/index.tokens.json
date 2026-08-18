@@ -10,6 +10,6 @@
     "hc-dark": "tokens/semantic.hc-dark.tokens.json"
   },
   "notDtcg": {
-    "tokens/forced-colors.map.json": "Deliberately not DTCG. Its values are CSS system colour keywords supplied by the operating system, which have no colour space, no components and no hex, and DTCG's thirteen types include nothing that fits."
+    "tokens/forced-colors.map.json": "Deliberately not DTCG. Its values are CSS system colour keywords supplied by the operating system, which have no colour space, no components and no hex, and DTCG's thirteen types include nothing that fits. Import it as 'aninda-studio-tokens/tokens/forced-colors'; the paths in this index are files inside the package, and the import subpath for each is in package.json under \"exports\"."
   }
 }

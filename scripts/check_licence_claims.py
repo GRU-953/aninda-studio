@@ -26,6 +26,18 @@ not, and they would breach OFL 1.1 clause 3 believing they had complied.
 Two hand-corrections were not enough because nothing checked. This does, over the
 whole repository, so the claim cannot be wrong in one place while right in another.
 
+TWO OTHER CLAIMS RIDE ALONG, FOR THE SAME REASON
+    * The PolyForm licence URL, whose trailing-slash form 404s.
+    * The two package names. Both packages are `aninda-studio-tokens`, and the
+      guidebook's "How to write it" table and the plugin's naming reference both
+      gave them as `aninda-studio`, which is the repository's name — so a reader
+      following either typed an install command for a package that does not
+      exist under any state of publication. Those two surfaces are hand-written
+      and cannot read package.json, so the sweep reads it for them.
+
+    All three are whole-tree claims about a string held somewhere else in the
+    tree. One sweep cannot disagree with itself the way three greps can.
+
 RUN
 ---
     ./.venv/bin/python scripts/check_licence_claims.py
@@ -47,6 +59,23 @@ TEXT_SUFFIXES = {".py", ".md", ".txt", ".html", ".json", ".css", ".ts", ".js",
 # The exact string, read from the licence rather than typed here, so this checker
 # cannot itself drift from the thing it is checking.
 OFL = ROOT / "06_type" / "candidates" / "mono" / "ibmplexmono" / "OFL.txt"
+
+
+def package_names() -> set[str]:
+    """The two package names, read from the packages, never typed here."""
+    names = set()
+    npm = ROOT / "12_packages" / "npm" / "package.json"
+    pyp = ROOT / "12_packages" / "python" / "pyproject.toml"
+    for src, pat in ((npm, r'"name"\s*:\s*"([^"]+)"'),
+                     (pyp, r'^name\s*=\s*"([^"]+)"')):
+        if not src.exists():
+            raise SystemExit(f"could not run: {src} is missing, so the real "
+                             f"package name cannot be read from source")
+        m = re.search(pat, src.read_text(encoding="utf-8"), re.M)
+        if not m:
+            raise SystemExit(f"could not run: no package name found in {src.name}")
+        names.add(m.group(1))
+    return names
 
 
 def reserved_name() -> str:
@@ -95,8 +124,21 @@ def main() -> int:
     # sweep cannot disagree with itself the way two greps can.
     POLYFORM = re.compile(r"polyformproject\.org/licenses/noncommercial/1\.0\.0/")
 
+    # Two narrow shapes only, so this cannot cry wolf over prose that mentions the
+    # repository, the plugin or the command — all three of which are correctly
+    # named `aninda-studio` and appear far more often than the packages do.
+    #   1. an install command:            npm install X   /   pip install X
+    #   2. a table row that says which:   | npm package | … | `X` |
+    # Anything else is left alone.
+    packages = package_names()
+    INSTALL = re.compile(r"\b(?:npm install|pip install)\s+(?:-e\s+)?"
+                         r"([A-Za-z0-9@][A-Za-z0-9@/._-]*)")
+    PKG_ROW = re.compile(r"^\|[^|]*\b(?:npm|PyPI|pypi)\s+package\b[^|]*\|.*?"
+                         r"`([^`]+)`", re.IGNORECASE)
+
     offenders: list[tuple[str, int, str]] = []
     slashes: list[tuple[str, int]] = []
+    misnamed: list[tuple[str, int, str]] = []
     scanned = 0
     for path in ROOT.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
@@ -113,6 +155,13 @@ def main() -> int:
         for n, line in enumerate(text.splitlines(), 1):
             if POLYFORM.search(line):
                 slashes.append((str(path.relative_to(ROOT)), n))
+            for m in (INSTALL.search(line), PKG_ROW.search(line)):
+                if m and m.group(1) not in packages:
+                    # A local path or a flag is not a registry name.
+                    if m.group(1).startswith((".", "/", "-")):
+                        continue
+                    misnamed.append((str(path.relative_to(ROOT)), n,
+                                     m.group(0).strip()))
             for m in wrong.finditer(line):
                 named = next((g for g in m.groups() if g), "").strip()
                 if named and named.casefold() != correct.casefold():
@@ -128,6 +177,19 @@ def main() -> int:
             print(f"    {f}:{n}", file=sys.stderr)
         return 0 if expect_failure else 1
     print(f"  no PolyForm URL carries a trailing slash")
+
+    if misnamed:
+        print(f"\n  {len(misnamed)} place(s) name a package that is not "
+              f"{' or '.join(sorted(packages))}:", file=sys.stderr)
+        for f, n, s in misnamed[:12]:
+            print(f"    {f}:{n}  {s}", file=sys.stderr)
+        print("\n  Both packages are named in 12_packages/npm/package.json and "
+              "12_packages/python/pyproject.toml. An install command or a package "
+              "row naming anything else sends a reader to a package that does not "
+              "exist.", file=sys.stderr)
+        return 0 if expect_failure else 1
+    print(f"  every install command and package row names "
+          f"{' or '.join(sorted(packages))}")
 
     if offenders:
         by_file: dict[str, int] = {}

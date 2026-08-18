@@ -20,6 +20,7 @@ published, and so they are the part that gets improvised.
 
 This kit is deliberately two artefacts with two licences:
 
+{{table: The two halves of the kit, and the licence each carries.}}
 | Part | What is in it | Licence |
 |---|---|---|
 | The design system | Tokens, colour roles, type scale, space, shape, motion, components | Apache-2.0 |
@@ -46,6 +47,7 @@ sentence of explanation the first time it appears.
 
 ## What was built, and in what order
 
+{{table: Each stage of the work, and what it produced.}}
 | Stage | What it produced |
 |---|---|
 | Research | A benchmark against Apple, Google, WCAG 2.2, DTCG and the font licences |

@@ -10,9 +10,38 @@ page.
 
 ---
 
-## The rule
+## Two rules, and the second is the one that gets forgotten
 
-**Use only a string from the table below. Do not write new Bangla.**
+**1. Use only a string from the table below. Do not write new Bangla.**
+
+**2. Mark every Bangla run with `lang="bn"`.**
+
+```html
+<p>Theme: <span lang="bn">আলো</span></p>
+```
+
+Not `<p>Theme: আলো</p>`. The attribute is not decoration. `assets/css/tokens.css`
+carries one block keyed to it:
+
+```css
+:lang(bn), [lang="bn"] { … }
+```
+
+and that block is the only thing in the whole system that switches on the Bengali
+family, applies the measured size multiplier, holds the 12 px floor and adds the
+weight step below 14 px. Bangla without the attribute gets none of the four. It is
+set in Literata, which has no Bengali glyphs, so the browser falls back to whatever
+Bengali font the reader's machine happens to have — and on a machine with none, to
+tofu boxes. It also fails **WCAG 2.2 SC 3.1.2 Language of Parts (Level AA)**,
+because a screen reader announces it with an English pronunciation engine.
+
+Do **not** apply the multipliers, the floor or the weight bump by hand. The
+attribute applies all three. Doing both applies them twice.
+
+This is written here because the owner's own component library made the mistake:
+two of the thirty cards shipped bare Bangla in an English paragraph, and Chromium
+drew it in macOS's Kohinoor Bangla rather than the Noto Serif Bengali subset the
+card had inlined for it.
 
 If nothing in the table fits what you need, leave the English in place and say
 which string is missing. That is the correct answer, not a failure. Every string
@@ -102,10 +131,19 @@ Say so if any of these comes up, rather than filling the gap.
 
 ## Known gaps in the system's own files
 
-25 of the 30 component cards have no Bangla name, and 30 of 30 have no Bangla
-subtitle, because the verified table holds no entry for them. Those gaps are
-named in `08_components/_cards.json` under `_bangla_gaps` and left empty on
-purpose. Filling them needs the Bangla Academy check, not a translation.
+Where a Bangla string is missing, it is named rather than invented. The live list
+is `08_components/_cards.json` under `_bangla_gaps`, and it is generated — read it
+there rather than trusting a count in this file. An earlier version of this
+paragraph gave a count that had gone stale: it still said 25 of the 30 component
+cards had no Bangla name after every one had been filled in. Filling a gap needs
+the Bangla Academy check, not a translation.
+
+The 31 strings in the table above are the ones reviewed in
+`06_type/BANGLA-STANDARD.md`, which is the governing document for spelling. The
+repository also holds `06_type/bangla-strings.json`, a register of 94 approved
+keys written under those rules, each carrying the rule number or dictionary page
+it rests on; `assets/bangla-verified.json` beside this file is what this skill
+reads.
 
 ---
 

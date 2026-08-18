@@ -11,6 +11,7 @@ which of the two binds.
 **The English section is the binding text.** Both names below are proper names
 and are written in Latin in every language.
 
+{{table: Each part of the kit and its licence.}}
 | Part | Terms |
 |---|---|
 | The design system | Apache-2.0 |

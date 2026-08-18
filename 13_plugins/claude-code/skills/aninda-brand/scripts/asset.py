@@ -35,8 +35,12 @@ THEMES = ("light", "dark", "hc-light", "hc-dark")
 # counter closes and the mark reads as a filled blob.
 MARK_FLOOR_PX = 16
 
-# The stroke rule, from 04_mark/manifest.json.
-STROKE_SWITCH_PX = 24
+# The stroke rule is READ from assets/marks/manifest.json, not typed here. See
+# stroke_rule() below. It used to be the constant `STROKE_SWITCH_PX = 24` with a
+# comment saying where it came from, and guard_mark_size applied it to the
+# standalone mark only — so `asset.py mark --size 16 --weight regular` refused
+# with exit 2 while `asset.py icon --size 16` wrote a file carrying that exact
+# forbidden stroke, one command later.
 
 # The em box a wordmark must reach before its Bangla conjuncts stop being
 # legible. It is the system's own 12 px Bangla floor, applied to an outline.
@@ -268,6 +272,51 @@ def check_ground(
 # ---------------------------------------------------------------------------
 
 
+def stroke_rule() -> dict:
+    """The mark's stroke rule, read from the manifest this skill bundles.
+
+    The manifest carries `switch_px`, the two stroke widths, and `stroke_by_file`
+    measured off each artefact by 04_mark/build.py. Reading it means this script
+    cannot disagree with the artwork about which file carries which weight.
+    """
+    path = MARKS / "manifest.json"
+    if not path.exists():
+        raise NotEquipped(f"{path} is missing. This skill needs its assets/marks folder.")
+    strokes = json.loads(path.read_text("utf-8"))["strokes"]
+    for key in ("regular", "heavy", "switch_px", "stroke_by_file"):
+        if key not in strokes:
+            raise NotEquipped(
+                f"assets/marks/manifest.json has no strokes.{key}, so the stroke "
+                f"rule cannot be read. Re-run 04_mark/build.py and rebuild this "
+                f"skill's assets."
+            )
+    return strokes
+
+
+def rounded_source(size: int, default: str) -> tuple[str, dict]:
+    """Which rounded artefact a request at this size must use, and the rule.
+
+    Below the switch the answer is the heavy artwork; at or above it, `default`.
+    A caller that asks for a size the rule cannot serve gets a Refused, not a
+    quietly-wrong file.
+    """
+    strokes = stroke_rule()
+    if size >= strokes["switch_px"]:
+        return default, strokes
+    heavy = sorted(name for name, width in strokes["stroke_by_file"].items()
+                   if width == strokes["heavy"] and name.startswith(("tile", "icon")))
+    if not heavy:
+        raise Refused(
+            f"No rounded artwork carries the heavy stroke, so nothing can be made "
+            f"below {strokes['switch_px']} px.",
+            f"Asked for {size} px. The rule is \"{strokes['rule']}\", and "
+            f"assets/marks/manifest.json records no rounded file at stroke "
+            f"{strokes['heavy']:g}.",
+            "Re-run 04_mark/build.py and rebuild this skill's assets.",
+        )
+    return heavy[0], strokes
+
+
 def read_mark(name: str) -> str:
     path = MARKS / name
     if not path.exists():
@@ -367,12 +416,15 @@ def guard_mark_size(size: float, weight: str) -> None:
             f"Use --size {MARK_FLOOR_PX} or larger. For anything smaller than a favicon, use no "
             "mark at all rather than an unreadable one.",
         )
-    if size < STROKE_SWITCH_PX and weight == "regular":
+    strokes = stroke_rule()
+    switch, regular = strokes["switch_px"], strokes["regular"]
+    if size < switch and weight == "regular":
         raise Refused(
-            f"The regular weight may not be used below {STROKE_SWITCH_PX} px.",
-            f"Asked for the regular weight at {size:g} px. Its stroke is 9 of 100 units, which "
-            f"renders at {size * 0.09:.2f} px here and thins away.",
-            f"Use --weight heavy below {STROKE_SWITCH_PX} px. That is the whole reason the heavy "
+            f"The regular weight may not be used below {switch} px.",
+            f"Asked for the regular weight at {size:g} px. Its stroke is "
+            f"{regular:g} of 100 units, which renders at "
+            f"{size * regular / 100:.2f} px here and thins away.",
+            f"Use --weight heavy below {switch} px. That is the whole reason the heavy "
             "weight exists.",
         )
 
@@ -494,13 +546,25 @@ def make_icon(args) -> dict:
             f"Use --size {MARK_FLOOR_PX} or larger.",
         )
     published = {192: "icon-192.svg", 512: "icon-512.svg", 1024: "icon-1024.svg", 1088: "icon-1088-watch.svg"}
-    source = published.get(size, "icon-1024.svg")
+    # THE STROKE RULE APPLIES HERE TOO. It did not, and that is why the studio's
+    # own 16 px favicon carried the regular stroke that this same script refuses
+    # to make as a standalone mark: `asset.py mark --size 16 --weight regular`
+    # exited 2 with "The regular weight may not be used below 24 px", and
+    # `asset.py icon --size 16` then wrote stroke-width="9" and exited 0.
+    source, strokes = rounded_source(size, published.get(size, "icon-1024.svg"))
     svg = resized(read_mark(source), size, size)
     where = write_out(svg, args.out)
+    stroke = strokes["stroke_by_file"][source]
     return {
         "made": f"the everyday rounded icon, {size} x {size} px",
         "written to": where,
-        "from": source + ("" if size in published else " scaled — no file is published at that size"),
+        "from": source + ("" if size in published and stroke == strokes["regular"]
+                          else " scaled — no file is published at that size"),
+        "stroke": (
+            f"{stroke:g} of 100 units, the "
+            f"{'heavy' if stroke == strokes['heavy'] else 'regular'} weight. "
+            f"Rule: {strokes['rule']}, from assets/marks/manifest.json"
+        ),
         "corner radius": (
             "24 % of the width, from this system's own radius-hero token. Apple publishes no "
             "app-icon corner radius; this number is the studio's and is not attributed to Apple."
@@ -521,11 +585,26 @@ def make_tile(args) -> dict:
             f"Asked for {size} px. The mark inside it would fall below its own floor.",
             f"Use --size {MARK_FLOOR_PX} or larger.",
         )
+    strokes = stroke_rule()
     svg = resized(read_mark("tile-web.svg"), size, size)
     where = write_out(svg, args.out)
+    stroke = strokes["stroke_by_file"]["tile-web.svg"]
+    if size < strokes["switch_px"] and stroke != strokes["heavy"]:
+        raise Refused(
+            f"The web tile artwork no longer carries the heavy stroke, so it "
+            f"cannot be made below {strokes['switch_px']} px.",
+            f"tile-web.svg is at stroke {stroke:g} and the rule is "
+            f"\"{strokes['rule']}\".",
+            "Re-run 04_mark/build.py and rebuild this skill's assets.",
+        )
     return {
         "made": f"the web tile, {size} x {size} px",
         "written to": where,
+        "stroke": (
+            f"{stroke:g} of 100 units, the "
+            f"{'heavy' if stroke == strokes['heavy'] else 'regular'} weight. "
+            f"Rule: {strokes['rule']}, from assets/marks/manifest.json"
+        ),
         "corner radius": "24 % of the width, from radius-hero",
         "background showing": "4.7 % at the corners, which is what tells you the rounding is baked in",
     }

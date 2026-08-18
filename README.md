@@ -51,7 +51,7 @@ number a person types is a number that can be wrong and stay wrong.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (14.2 MB) that needs no network, plus a 1.6 MB PDF |
+| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (14.7 MB) that needs no network, plus a 1.8 MB PDF |
 | `07_tokens/` | The design tokens: DTCG source, and 63 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
 | `04_mark/` | 10 mark, wordmark and icon files |
@@ -91,11 +91,31 @@ README could not be written.
 
 ## Rebuild everything
 
-Each step reads the output of the ones above it.
+13 generators, in dependency order. Each step reads the output of
+the ones above it, so the order is not interchangeable.
 
 ```bash
-./.venv/bin/python 05_colour/engine.py && ./.venv/bin/python 07_tokens/build.py && ./.venv/bin/python 07_tokens/emit_css.py && ./.venv/bin/python 04_mark/build.py && ./.venv/bin/python 08_components/build.py && ./.venv/bin/python 09_guidebook/build.py
+./.venv/bin/python 05_colour/engine.py && \
+  ./.venv/bin/python 07_tokens/build.py && \
+  ./.venv/bin/python 07_tokens/emit_css.py && \
+  ./.venv/bin/python 04_mark/build.py && \
+  ./.venv/bin/python 08_components/build.py && \
+  ./.venv/bin/python 10_assets/build.py && \
+  ./.venv/bin/python 12_packages/build.py && \
+  ./.venv/bin/python 11_site/build.py && \
+  ./.venv/bin/python 09_guidebook/build.py && \
+  ./.venv/bin/python 09_guidebook/scripts/pdf.py && \
+  ./.venv/bin/python 13_plugins/claude-code/scripts/build_skills.py && \
+  ./.venv/bin/python scripts/readme.py
 ```
+
+Then the Figma plugin bundle, which is Node rather than Python:
+
+```bash
+cd 13_plugins/figma && node build.mjs --code-only
+```
+
+Three generators are deliberately not in that chain: `03_directions/build.py` — one-off exploration: it writes the three rejected colour directions, which are a record of a decision already taken and do not move again; `06_type/specimen.py` — one-off: the type specimen pages that fed the typeface decision; `06_type/review_bangla.py` — a review instrument, run when a Bangla reader is available, not part of the build.
 
 Every generator is fail-closed: if a check does not pass, it writes nothing at
 all. A half-written token set that looks plausible is worse than none.

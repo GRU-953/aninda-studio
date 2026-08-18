@@ -59,9 +59,15 @@ becomes `--as-ink` and `color.status.danger` becomes `--as-danger`. Role names
 keep both parts, which is why `asset.py contrast --fg accent-default` is right
 while a property called `--as-accent-default` does not exist and resolves to
 nothing.
-`check_plugin.py` now measures every `var(--as-...)` in this skill against the
-properties `07_tokens/css/tokens.css` defines, because this document and
-`SKILL.md` both named `--as-accent-default` and nothing caught it.
+`check_plugin.py` measures every `var(...)` reference in every text file across
+the three skills — markdown, Python, JSON, CSS and HTML — against the properties
+`07_tokens/css/tokens.css` defines. It reads more than markdown now because the
+first version read only `*.md`: this document and `SKILL.md` were corrected, and
+`aninda-review/scripts/check.py` went on assembling the same nonexistent name at
+run time and offering it to a reader as the fix. A name a script builds from parts
+is still outside a static sweep, so that script now derives the property with the
+rule `emit_css.py` uses and then checks it against the stylesheet before printing
+it.
 
 ---
 

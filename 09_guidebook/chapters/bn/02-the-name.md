@@ -11,6 +11,7 @@ rules outright. Independently of that exemption, both are correctly formed:
 স্টুডিও takes an initial conjunct under rule 2.9, in the same pattern as স্টেশন,
 and a short ই-কার under rule 2.1.
 
+{{table: The name in Bangla, long form and short.}}
 | Use | String |
 |---|---|
 | Full name | {{bn:wm-1}} |

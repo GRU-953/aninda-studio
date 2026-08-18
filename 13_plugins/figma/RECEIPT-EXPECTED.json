@@ -1,13 +1,13 @@
 {
   "$comment": "What a clean run of the plugin should report. It is written by build.mjs from the same plan code the plugin runs, so comparing it against the receipt the plugin prints is a comparison of two numbers, not a reading of two documents. There is no date in this file on purpose: it is a pure function of the tokens, and the SHA-256 below changes only when they do.",
   "generatedBy": "13_plugins/figma/build.mjs",
-  "tokensSha256": "2cdfc50d825f42ade2c5000560f40e688e7e6f62aae119d5837afa0d487ff68d",
+  "tokensSha256": "d626af6df16c93f74995a295ed43a9e1cee49d8e3485774e98b45969151668aa",
   "sources": {
     "07_tokens/build/primitive.tokens.json": "359b6b214801145054bd3154b51247b2cc3fbf1983f54664b959b30802aaf43f",
     "07_tokens/build/semantic.light.tokens.json": "534accf8100efb3ff853cfe026a4d00646e5e493f3ca38fdbf3ab8f8dfafc610",
     "07_tokens/build/semantic.dark.tokens.json": "fe0cc6711edb27002371282611b59da5bf801a503a424cf7af77394f4f885f78",
-    "07_tokens/build/semantic.hc-light.tokens.json": "b07f11f482d055cded17f089668a1afccb09046756c7746e50c850c796e7828c",
-    "07_tokens/build/semantic.hc-dark.tokens.json": "a54f1325076dbd613c6a41de8f4f8775fbbf5732531cfec4a95c647b6d1a36c6",
+    "07_tokens/build/semantic.hc-light.tokens.json": "3062503096667a1467c692d32fe435510683d518e85cb2758efcc2a43350bc72",
+    "07_tokens/build/semantic.hc-dark.tokens.json": "669c73a84614148a4de4171426746882a309160ad571e3d4ec0dd08ecc90257e",
     "07_tokens/build/forced-colors.map.json": "f4a01647597461616b592257d968bc948d9c0f2af0516406c05f8a8453962852",
     "04_mark/svg/icon-1024.svg": "9ff31c7bfa022fdd1cfbcf6782320b84d83422ddd617f97a8ab41248409407bd",
     "04_mark/svg/icon-1088-watch.svg": "f0dd4c249a78419af2855f90344cb05d1335444194c1ac9059e1b81c5b6bd6cb",
@@ -19,8 +19,8 @@
     "04_mark/svg/tile-web.svg": "b631c922ebb4287e9d227fd4303864e7373dbf38467ca086fbde9cbee573600b",
     "04_mark/svg/wordmark-bangla.svg": "6b42edde179882a29c3147a78e333ef3e341fbd16913ec8fd70519599d8b464d",
     "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
-    "04_mark/manifest.json": "e0feb94e418c4379ba026c07026e68692dbb67e67108f89f59ff1b4087f997cd",
-    "08_components/_cards.json": "470f1858caae9dc091799048ea9222387f2c0e73ca1d53e9b38912967e403768"
+    "04_mark/manifest.json": "c92cc5750503bb8d3a232f732d85a7ef6d5fe9d285530bc9e5ff19b38c29851c",
+    "08_components/_cards.json": "121438f08dfdd372016501e2f5f6dced331410f6c20850bfdbd23196ee927061"
   },
   "fontsRequired": [
     {

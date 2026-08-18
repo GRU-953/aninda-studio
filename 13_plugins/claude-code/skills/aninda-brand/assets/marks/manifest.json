@@ -15,7 +15,18 @@
   "strokes": {
     "regular": 9.0,
     "heavy": 15.0,
-    "rule": "stroke 9 at 24px and above; stroke 15 below"
+    "switch_px": 24,
+    "rule": "stroke 9 at 24 px and above; stroke 15 below",
+    "stroke_by_file": {
+      "mark-regular.svg": 9.0,
+      "mark-heavy.svg": 15.0,
+      "tile-web.svg": 15.0,
+      "icon-1024.svg": 9.0,
+      "icon-1088-watch.svg": 9.0,
+      "icon-512.svg": 9.0,
+      "icon-192.svg": 9.0,
+      "icon-appstore-square-1024.svg": 9.0
+    }
   },
   "clear_space": "half the mark's own height on all four sides",
   "safe_field": 90.0,

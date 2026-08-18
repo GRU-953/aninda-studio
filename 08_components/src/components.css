@@ -953,11 +953,19 @@
   border-block-end: 1px solid var(--as-line);
 }
 
+/* No text-transform and no caps tracking. The rule is sentence case for
+   everything — 09_guidebook/chapters/10-voice.md, 02_strategy/ENGLISH-STANDARD.md
+   and the plugin's references/typography.md all state it, one of them with the
+   reason: capitals are harder to read and Bangla has none, so an all-capitals
+   house style would have nothing to translate into. This rule said
+   `text-transform: uppercase; letter-spacing: 0.08em` and manufactured
+   FOUNDATIONS from the sentence-case string "Foundations" on all thirty cards and
+   on both site pages — in the first words a reader sees. Because the caps came
+   from the stylesheet and not from the copy, no proofreader could have caught it.
+   The eyebrow is now marked by weight and the muted colour instead. */
 .as-doc-eyebrow {
   font-size: var(--as-text-caption);
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--as-ink-muted);
 }
 

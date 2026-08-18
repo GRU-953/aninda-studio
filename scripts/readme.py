@@ -52,6 +52,54 @@ REFUSAL_SCRIPT = "13_plugins/claude-code/skills/aninda-brand/scripts/asset.py"
 REFUSAL_ARGS = ["mark", "--size", "12"]
 REFUSAL_EXIT = 2
 
+# The rebuild order, in dependency order, and the one place it is written down.
+#
+# WHY THIS IS A LIST AND NOT A SENTENCE. The README used to print a six-script
+# chain under the heading "Rebuild everything". It rebuilt six of the sixteen
+# generators, so a reader who edited one token and followed it was left with a
+# stale website, stale npm and PyPI packages, a stale Figma bundle, stale platform
+# assets and a stale PDF — and the first thing that told them was CI failing on
+# `12_packages/build.py --check`, a step the README never named. The chain is now
+# data, and `check_rebuild_chain()` below refuses to write a README when a
+# generator exists in the tree that is neither in this list nor in NOT_IN_CHAIN.
+#
+# Ordering constraints, each taken from the generator's own error message:
+#   10_assets  needs 04_mark (marks) and 08_components (subset fonts)
+#   12_packages needs 07_tokens/build.py and emit_css.py
+#   11_site    needs 12_packages, 10_assets, 04_mark and 08_components
+#   pdf.py     needs the guidebook print build
+#   readme.py  runs last, because it counts what the others produced
+REBUILD_CHAIN = [
+    "05_colour/engine.py",
+    "07_tokens/build.py",
+    "07_tokens/emit_css.py",
+    "04_mark/build.py",
+    "08_components/build.py",
+    "10_assets/build.py",
+    "12_packages/build.py",
+    "11_site/build.py",
+    "09_guidebook/build.py",
+    "09_guidebook/scripts/pdf.py",
+    "13_plugins/claude-code/scripts/build_skills.py",
+    "scripts/readme.py",
+]
+
+# The Figma bundle is Node, not Python, so it is named separately in the prose.
+REBUILD_NODE = "13_plugins/figma/build.mjs"
+
+# Generators deliberately outside the chain, each with the reason. A script here
+# is a script whose output is not a shipped deliverable that drifts with a token.
+NOT_IN_CHAIN = {
+    "03_directions/build.py":
+        "one-off exploration: it writes the three rejected colour directions, "
+        "which are a record of a decision already taken and do not move again",
+    "06_type/specimen.py":
+        "one-off: the type specimen pages that fed the typeface decision",
+    "06_type/review_bangla.py":
+        "a review instrument, run when a Bangla reader is available, not part of "
+        "the build",
+}
+
 
 class BuildError(Exception):
     pass
@@ -90,9 +138,64 @@ def refusal() -> dict:
             "exit": proc.returncode, "rule": rule}
 
 
+def check_rebuild_chain() -> dict:
+    """Find every generator in the tree and refuse if one is unaccounted for.
+
+    A generator whose output is committed and diffed by CI must appear either in
+    REBUILD_CHAIN or in NOT_IN_CHAIN with a reason. Nothing enforced this before,
+    which is how "Rebuild everything" came to name six of sixteen.
+
+    The sweep looks for the file names the repository actually uses for its
+    writers. A new generator under a new name would slip past it, so the names are
+    listed here rather than guessed from content, and this docstring is the place
+    to add one.
+    """
+    names = ("build.py", "build.mjs", "emit_css.py", "engine.py", "readme.py",
+             "pdf.py", "specimen.py", "review_bangla.py", "build_skills.py")
+    # `git ls-files` rather than rglob, because rglob also walks ignored trees —
+    # a stray git worktree under .claude/ made the first version of this guard
+    # report eleven generators that are not part of the repository at all.
+    proc = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT,
+                          capture_output=True, text=True)
+    if proc.returncode != 0:
+        raise BuildError(
+            "could not list the tracked files with `git ls-files`, so the rebuild "
+            f"chain cannot be checked:\n{proc.stderr.strip()[:300]}"
+        )
+    found = {rel for rel in proc.stdout.split("\0")
+             if rel and rel.rsplit("/", 1)[-1] in names
+             and "dist/" not in rel}
+
+    accounted = set(REBUILD_CHAIN) | {REBUILD_NODE} | set(NOT_IN_CHAIN)
+    missing = sorted(found - accounted)
+    if missing:
+        raise BuildError(
+            "these generators are in the tree but in neither REBUILD_CHAIN nor "
+            "NOT_IN_CHAIN:\n  " + "\n  ".join(missing) +
+            "\nAdd each to the chain in dependency order, or to NOT_IN_CHAIN with "
+            "the reason it is not a shipped deliverable. The README's "
+            '"Rebuild everything" heading has to be true of the whole tree.'
+        )
+    stale = sorted(accounted - found)
+    if stale:
+        raise BuildError(
+            "these are named in the rebuild chain but are not in the tree:\n  " +
+            "\n  ".join(stale) + "\nThe README would tell a reader to run a script "
+            "that does not exist."
+        )
+    return {
+        "chain_count": len(REBUILD_CHAIN) + 1,
+        "chain": " && \\\n  ".join(f"./.venv/bin/python {s}" for s in REBUILD_CHAIN),
+        "chain_excluded": "Three generators are deliberately not in that chain: " +
+                          "; ".join(f"`{k}` — {v}" for k, v in NOT_IN_CHAIN.items()) +
+                          ".",
+    }
+
+
 def count() -> dict:
     """Every figure in the README, read from the thing it describes."""
     f: dict = {}
+    f.update(check_rebuild_chain())
 
     reg = json.loads((ROOT / "08_components" / "_cards.json").read_text())
     cards = reg["cards"] if isinstance(reg, dict) and "cards" in reg else reg
@@ -243,11 +346,20 @@ README could not be written.
 
 ## Rebuild everything
 
-Each step reads the output of the ones above it.
+{f['chain_count']} generators, in dependency order. Each step reads the output of
+the ones above it, so the order is not interchangeable.
 
 ```bash
-./.venv/bin/python 05_colour/engine.py && ./.venv/bin/python 07_tokens/build.py && ./.venv/bin/python 07_tokens/emit_css.py && ./.venv/bin/python 04_mark/build.py && ./.venv/bin/python 08_components/build.py && ./.venv/bin/python 09_guidebook/build.py
+{f['chain']}
 ```
+
+Then the Figma plugin bundle, which is Node rather than Python:
+
+```bash
+cd 13_plugins/figma && node build.mjs --code-only
+```
+
+{f['chain_excluded']}
 
 Every generator is fail-closed: if a check does not pass, it writes nothing at
 all. A half-written token set that looks plausible is worse than none.

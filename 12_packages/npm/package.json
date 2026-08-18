@@ -50,6 +50,7 @@
     "./tokens/dark": "./dist/tokens/semantic.dark.tokens.json",
     "./tokens/hc-light": "./dist/tokens/semantic.hc-light.tokens.json",
     "./tokens/hc-dark": "./dist/tokens/semantic.hc-dark.tokens.json",
+    "./tokens/forced-colors": "./dist/tokens/forced-colors.map.json",
     "./css": "./dist/tokens.css",
     "./css/light": "./dist/tokens.light.css",
     "./css/dark": "./dist/tokens.dark.css",

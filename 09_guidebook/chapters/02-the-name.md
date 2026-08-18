@@ -19,13 +19,15 @@ one word.
 
 ## How to write it
 
+{{table: How to write the name in each situation it appears in.}}
 | Situation | Write |
 |---|---|
 | Full name, English | Aninda Studio |
 | Full name, Bangla | {{bn:wm-1}} |
 | Short form, English | Aninda |
 | Short form, Bangla | {{bn:wm-2}} |
-| Package and repository names | `aninda-studio` |
+| Repository name | `aninda-studio` |
+| The two token packages | `aninda-studio-tokens` |
 | Domain | `anindastudio.com` |
 
 Sentence case, always. Not ANINDA STUDIO, not Aninda STUDIO. Capitals are

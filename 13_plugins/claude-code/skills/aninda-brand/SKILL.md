@@ -57,9 +57,9 @@ short list for the job in front of you.
 
 ---
 
-## The seven rules
+## The eight rules
 
-These seven cover most of what goes wrong. Everything else is in the references.
+These eight cover most of what goes wrong. Everything else is in the references.
 
 1. **Never write a raw value.** Use a token. `var(--as-accent)`, never
    `#126974`. `var(--as-space-4)`, never `24px`. A raw value cannot follow a
@@ -75,14 +75,25 @@ These seven cover most of what goes wrong. Everything else is in the references.
 4. **Bangla is not translated English.** Use only a string listed as verified in
    `references/bangla.md`. If none fits, leave the English and say so. Writing
    new Bangla here is not allowed.
-5. **The words *simply*, *just*, *easy*, *obviously*, *of course* and *clearly*
+5. **Every Bangla run carries `lang="bn"`, and nothing else applies the Bangla
+   rules.** Write `<span lang="bn">রং</span>`, never a bare `রং`. The
+   `:lang(bn), [lang="bn"]` block in `assets/css/tokens.css` is the only thing
+   that switches the Bengali family on, applies the measured size multiplier,
+   holds the 12 px floor and adds the weight step below 14 px — so untagged
+   Bangla gets none of the four, falls back to whatever Bengali font the reader's
+   machine happens to have, and fails WCAG 2.2 SC 3.1.2 Language of Parts
+   (Level AA) because a screen reader pronounces it with an English engine. Do
+   not apply the multipliers by hand: the attribute does it, and doing both
+   applies them twice. `references/typography.md` has the figures and says the
+   same.
+6. **The words *simply*, *just*, *easy*, *obviously*, *of course* and *clearly*
    are banned**, and so are exclamation marks. British spelling, plain
    international vocabulary, first person singular. `references/voice.md` has
    the rest.
-6. **The mark carries no colour of its own.** It is drawn in `currentColor` and
+7. **The mark carries no colour of its own.** It is drawn in `currentColor` and
    takes the theme it lands in. Never recolour it, never add a shadow, never
    stretch it.
-7. **Four licences, not one.** System and scripts Apache-2.0; written
+8. **Four licences, not one.** System and scripts Apache-2.0; written
    documentation PolyForm Noncommercial 1.0.0; fonts SIL OFL 1.1; the identity
    not licensed at all. `references/licence.md` has the exact wording.
 

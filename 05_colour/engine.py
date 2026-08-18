@@ -297,11 +297,33 @@ class Theme:
     high_contrast: bool = False
 
 
+# The English labels carry the comma, because that is the wording the approved
+# Bangla was joined to match — see 06_type/bangla-strings.json, theme.hc-light.
+# The two high-contrast labels used to read "High contrast light" here, "High
+# contrast, light" on the 30 cards and "High contrast light" again in the
+# guidebook: three spellings of two names, in a system whose naming rule is one
+# name for one thing.
+#
+# label_bn is READ from 06_type/bangla-strings.json rather than typed. It used to
+# carry "উচ্চ বৈসাদৃশ্য — আলো", which is the draft the Bangla review REJECTED:
+# বৈসাদৃশ্য means dissimilarity, not display contrast, and th-3 was changed to
+# বেশি কনট্রাস্ট because of it. The rejected wording went on being written into
+# estuary.proof.json, which is the file every downstream generator reads.
+def _theme_bn(key: str, fallback: str) -> str:
+    register = ROOT / "06_type" / "bangla-strings.json"
+    if not register.exists():
+        return fallback
+    entry = json.loads(register.read_text(encoding="utf-8")).get(f"theme.{key}", {})
+    return entry.get("bn") or fallback
+
+
 THEMES = (
-    Theme("light", "Light", "আলো", "light", AA_TEXT, AA_NONTEXT),
-    Theme("dark", "Dark", "অন্ধকার", "dark", AA_TEXT, AA_NONTEXT),
-    Theme("hc-light", "High contrast light", "উচ্চ বৈসাদৃশ্য — আলো", "light", AAA_TEXT, HC_NONTEXT, True),
-    Theme("hc-dark", "High contrast dark", "উচ্চ বৈসাদৃশ্য — অন্ধকার", "dark", AAA_TEXT, HC_NONTEXT, True),
+    Theme("light", "Light", _theme_bn("light", "আলো"), "light", AA_TEXT, AA_NONTEXT),
+    Theme("dark", "Dark", _theme_bn("dark", "অন্ধকার"), "dark", AA_TEXT, AA_NONTEXT),
+    Theme("hc-light", "High contrast, light", _theme_bn("hc-light", ""),
+          "light", AAA_TEXT, HC_NONTEXT, True),
+    Theme("hc-dark", "High contrast, dark", _theme_bn("hc-dark", ""),
+          "dark", AAA_TEXT, HC_NONTEXT, True),
 )
 
 

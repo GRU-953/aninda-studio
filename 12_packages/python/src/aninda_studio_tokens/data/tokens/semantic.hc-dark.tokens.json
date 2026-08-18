@@ -1,6 +1,6 @@
 {
   "$schema": "https://tr.designtokens.org/format/",
-  "$description": "Aninda Studio semantic tokens — High contrast dark theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 7.0:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
+  "$description": "Aninda Studio semantic tokens — High contrast, dark theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 7.0:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
   "$extensions": {
     "studio.aninda": {
       "direction": "estuary",
@@ -26,7 +26,7 @@
           ],
           "hex": "#070807"
         },
-        "$description": "Tonal surface 'lowest' for the High contrast dark theme",
+        "$description": "Tonal surface 'lowest' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.002342,
@@ -44,7 +44,7 @@
           ],
           "hex": "#0C0C0C"
         },
-        "$description": "Tonal surface 'low' for the High contrast dark theme",
+        "$description": "Tonal surface 'low' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.003677,
@@ -62,7 +62,7 @@
           ],
           "hex": "#0E0F0E"
         },
-        "$description": "Tonal surface 'base' for the High contrast dark theme",
+        "$description": "Tonal surface 'base' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.004667,
@@ -80,7 +80,7 @@
           ],
           "hex": "#111111"
         },
-        "$description": "Tonal surface 'high' for the High contrast dark theme",
+        "$description": "Tonal surface 'high' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.005605,
@@ -98,7 +98,7 @@
           ],
           "hex": "#111211"
         },
-        "$description": "Tonal surface 'highest' for the High contrast dark theme",
+        "$description": "Tonal surface 'highest' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.005923,
@@ -116,7 +116,7 @@
           ],
           "hex": "#030303"
         },
-        "$description": "Tonal surface 'dim' for the High contrast dark theme",
+        "$description": "Tonal surface 'dim' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.000911,
@@ -134,7 +134,7 @@
           ],
           "hex": "#121212"
         },
-        "$description": "Tonal surface 'bright' for the High contrast dark theme",
+        "$description": "Tonal surface 'bright' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.006049,

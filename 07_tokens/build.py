@@ -514,13 +514,50 @@ def check(files: dict[str, dict], proof: dict) -> list[str]:
             problems.append(f"{name}: wrong or missing $schema")
         for path, tok, type_ in walk(doc):
             v = tok["$value"]
-            if isinstance(v, dict) and "colorSpace" in v:
-                h = v["hex"].lstrip("#")
-                want = [int(h[i:i + 2], 16) for i in (0, 2, 4)]
-                got = [round(c * 255) for c in v["components"]]
-                if want != got:
-                    problems.append(f"{name}:{path}: components {got} do not re-derive "
-                                    f"the hex bytes {want}")
+
+            # A COLOUR IS AN OBJECT, and this is the gate that says so.
+            #
+            # The earlier form of this gate read `if isinstance(v, dict) and
+            # "colorSpace" in v:` — so it ran only on values that had already
+            # passed the thing it was checking, which is the same shape of defect
+            # round 1 found and fixed in the dimension gate. Proved by making
+            # colour() return `f"#{h.upper()}"`, the pre-2025.10 string form:
+            # --check reported "6 files verified, 0 problems", exit 0, and wrote
+            # the files, while an independent validator found 94 errors over 178
+            # tokens. That single change — object, not string — is the most-cited
+            # difference between 2025.10 and what came before, and it is the first
+            # bullet of this file's own docstring.
+            #
+            # It is keyed on the resolved $type rather than on the value's shape,
+            # because the shape is exactly what is in question. An alias is
+            # allowed: a `{…}` reference resolves to the target token's $value.
+            if type_ == "color" and not (isinstance(v, str) and v.startswith("{")):
+                if not isinstance(v, dict):
+                    problems.append(
+                        f"{name}:{path}: color $value is {type(v).__name__} "
+                        f"{v!r}; DTCG 2025.10 requires an object with colorSpace "
+                        f"and components, or an alias")
+                else:
+                    missing = [k for k in ("colorSpace", "components") if k not in v]
+                    if missing:
+                        problems.append(f"{name}:{path}: color object has no "
+                                        f"{' and no '.join(missing)}")
+                    elif "hex" not in v:
+                        # `hex` is this system's own srgb fallback, not required by
+                        # the format — but every colour here carries one, and the
+                        # re-derivation below indexed v["hex"] unconditionally, so
+                        # a colour without it raised KeyError instead of reporting
+                        # a problem. A gate that crashes reports nothing.
+                        problems.append(f"{name}:{path}: color object has no hex, so "
+                                        f"the components cannot be re-derived from it")
+                    else:
+                        h = v["hex"].lstrip("#")
+                        want = [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+                        got = [round(c * 255) for c in v["components"]]
+                        if want != got:
+                            problems.append(
+                                f"{name}:{path}: components {got} do not re-derive "
+                                f"the hex bytes {want}")
 
             # Every token must resolve a $type, from itself or from an ancestor
             # group, and it must be one of the thirteen the format defines.
@@ -563,6 +600,20 @@ def check(files: dict[str, dict], proof: dict) -> list[str]:
                     if node is None:
                         problems.append(f"{name}:{path}: alias {v} does not resolve")
                         break
+                else:
+                    # The walk above only proves the PATH exists. A `{…}` reference
+                    # resolves to the target token's $value, and a group has none,
+                    # so an alias pointing at a group is unresolvable under the
+                    # format. This gate reported such an alias as clean; proved by
+                    # changing a ramp alias from {color.ramp.ground.50} to
+                    # {color.ramp.ground} — --check said 0 problems and exit 0,
+                    # and emit_css.py then died with KeyError: '$value'. The
+                    # downstream crash was the only signal.
+                    if not (isinstance(node, dict) and "$value" in node):
+                        problems.append(
+                            f"{name}:{path}: alias {v} points at a group, not a "
+                            f"token. A reference resolves to the target's $value "
+                            f"and a group has none")
 
     # Theme parity: identical token paths in every theme file, or a consumer that
     # switches theme loses tokens without being told.

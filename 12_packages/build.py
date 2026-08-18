@@ -101,18 +101,122 @@ def publication() -> dict:
     return json.loads(PUBLICATION_FILE.read_text())
 
 
-def publication_note() -> str:
-    """The registry record, as one paragraph, from the record all four artefacts read."""
-    pub = publication()
+def _registries(entries: list[dict]) -> str:
+    return " and ".join(r["registry"] for r in entries)
+
+
+def publication_note(pub: dict | None = None) -> str:
+    """The registry record, as one paragraph, from the record all four artefacts read.
+
+    THREE STATES, THREE BRANCHES, AND WHY THAT MATTERS.
+
+    The published branch used to read `' and '.join(... for r in missing)`, and
+    `missing` is empty in that branch by construction. PUBLICATION.json's own
+    `when_you_publish` instruction says to flip `published` to true and re-run this
+    script; doing exactly that wrote
+
+        Published on , checked 2026-08-18.
+
+    onto the front page of both packages, and nothing reported it. `--check`
+    compares the generated README against this generator, so a sentence the
+    generator gets wrong is a sentence `--check` agrees with. scripts/readme.py
+    fails closed on the same flip, which would stop CI — after its own prose was
+    rewritten, at which point `--check` would go green over this broken text. The
+    guard that fires masked the one that should have.
+
+    The half-published state had no branch at all and fell through to the
+    unpublished one, whose wording is "neither holds this package".
+
+    check_publication_note() below renders all three states on every build, so
+    none of them can go untested again.
+    """
+    pub = pub if pub is not None else publication()
+    published = [r for r in pub["registries"] if r["published"]]
     missing = [r for r in pub["registries"] if not r["published"]]
     if not missing:
-        return (f"Published on {' and '.join(r['registry'] for r in missing)}, "
-                f"checked {pub['checked']}.")
-    where = " and ".join(r["registry"] for r in missing)
-    return (f"**Not published yet.** On {pub['checked']} I checked {where}, and neither "
-            f"holds this package. It is built and it works from a checkout of "
-            f"{REPO}; the command above will work once it is published. I would rather "
-            f"tell you that here than let you find out at the terminal.")
+        return (f"Published on {_registries(published)}, checked "
+                f"{pub['checked']}.")
+    if published:
+        return (f"**On {_registries(published)} but not yet on "
+                f"{_registries(missing)}.** Checked {pub['checked']}. The package "
+                f"is built either way and works from a checkout of {REPO}; the "
+                f"command above works on the registry that holds it. I would "
+                f"rather tell you that here than let you find out at the terminal.")
+    return (f"**Not published yet.** On {pub['checked']} I checked "
+            f"{_registries(missing)}, and neither holds this package. It is built "
+            f"and it works from a checkout of {REPO}; the command above will work "
+            f"once it is published. I would rather tell you that here than let you "
+            f"find out at the terminal.")
+
+
+def guard_exports_reach_dist(files: dict, npm: Path, pkg: dict) -> None:
+    """Every data file shipped in dist/ must be an export target.
+
+    WHY THIS WALKS THE FILES AND NOT THE EXPORTS. CI's npm step iterates
+    `Object.entries(p.exports)` and checks each target exists, so it can only see
+    exports that were declared — an omitted one is invisible to it, and it passed
+    while `tokens/forced-colors.map.json` shipped with no route to it at all.
+    Declaring "exports" turns on Node's subpath encapsulation, so a path that is
+    not listed is not merely undocumented, it is blocked.
+
+    This walks the other way: from what is about to be written into dist/ to the
+    exports map. A new token document therefore cannot ship unreachable.
+    """
+    targets = set()
+    for value in pkg["exports"].values():
+        if isinstance(value, str):
+            targets.add(value)
+        else:
+            targets.update(value.values())
+    unreachable = []
+    for path in sorted(files):
+        try:
+            rel = path.relative_to(npm)
+        except ValueError:
+            continue
+        if rel.parts[0] != "dist" or rel.suffix not in (".json", ".css"):
+            continue
+        if f"./{rel.as_posix()}" not in targets:
+            unreachable.append(rel.as_posix())
+    if unreachable:
+        raise SystemExit(
+            "FAILED — nothing written. These files ship in the npm package but no "
+            'export subpath reaches them, so Node answers '
+            "ERR_PACKAGE_PATH_NOT_EXPORTED:\n  " + "\n  ".join(unreachable) +
+            '\nAdd a subpath for each under "exports" in this script.'
+        )
+
+
+def check_publication_note() -> None:
+    """Render the note for all three publication states and refuse an empty one.
+
+    A branch nobody renders is a branch nobody has read. Each state must name
+    every registry it talks about, so `Published on , checked …` cannot ship
+    again — the failure is an empty enumeration, and that is what this looks for.
+    """
+    real = publication()
+    names = [r["registry"] for r in real["registries"]]
+    states = {
+        "none published": [False] * len(names),
+        "all published": [True] * len(names),
+        "half published": [i == 0 for i in range(len(names))],
+    }
+    problems = []
+    for label, flags in states.items():
+        probe = json.loads(json.dumps(real))
+        for entry, flag in zip(probe["registries"], flags):
+            entry["published"] = flag
+        note = publication_note(probe)
+        expected = [n for n, f in zip(names, flags) if f] or names
+        for name in expected:
+            if name not in note:
+                problems.append(f"{label}: the note never names {name!r} — {note!r}")
+        for bad in (" on ,", " on .", "on  ", " and ,", "**On  "):
+            if bad in note:
+                problems.append(f"{label}: empty enumeration {bad!r} — {note!r}")
+    if problems:
+        raise SystemExit("FAILED — nothing written. publication_note() is broken:\n  "
+                         + "\n  ".join(problems))
 
 
 def py_file_table(files: dict[Path, str], py_root: Path) -> str:
@@ -214,6 +318,7 @@ def build() -> tuple[dict[Path, str], list[str]]:
     version = read_version()
     if not TOKENS.exists() or not CSS.exists():
         raise SystemExit("Missing tokens. Run 07_tokens/build.py and emit_css.py first.")
+    check_publication_note()
 
     css = CSS.read_text()
     per_theme = split_css(css)
@@ -356,6 +461,16 @@ Source:  {REPO}
             "./tokens/index": "./dist/index.tokens.json",
             "./tokens/primitive": "./dist/tokens/primitive.tokens.json",
             **{f"./tokens/{t}": f"./dist/tokens/semantic.{t}.tokens.json" for t in THEMES},
+            # The forced-colors map. It was shipped in dist/ and named by
+            # dist/index.tokens.json, and had no subpath here — so because
+            # "exports" is declared at all, Node's subpath encapsulation blocked
+            # every route to it and a consumer following the package's own index
+            # got ERR_PACKAGE_PATH_NOT_EXPORTED with no way in. The Python package
+            # has always shipped the same file reachable, so the two packages
+            # disagreed about what they contain. guard_exports_reach_dist() below
+            # now walks the shipped files rather than the declared exports, which
+            # is what CI's export check cannot do.
+            "./tokens/forced-colors": "./dist/tokens/forced-colors.map.json",
             "./css": "./dist/tokens.css",
             **{f"./css/{t}": f"./dist/tokens.{t}.css" for t in THEMES},
             "./typography.css": "./dist/typography.css",
@@ -403,7 +518,9 @@ Source:  {REPO}
                 "Deliberately not DTCG. Its values are CSS system colour keywords "
                 "supplied by the operating system, which have no colour space, no "
                 "components and no hex, and DTCG's thirteen types include nothing "
-                "that fits."
+                f"that fits. Import it as '{NPM_NAME}/tokens/forced-colors'; the "
+                "paths in this index are files inside the package, and the import "
+                "subpath for each is in package.json under \"exports\"."
             )
         },
     }
@@ -643,6 +760,9 @@ Questions: {EMAIL}
     notes.append(f"npm '{NPM_NAME}' — {sum(1 for p in files if 'npm' in p.parts)} files")
     notes.append(f"PyPI '{PY_NAME}' — {sum(1 for p in files if 'python' in p.parts)} files")
     notes.append(f"{len(docs)} DTCG documents shipped verbatim")
+    guard_exports_reach_dist(files, npm, pkg)
+    notes.append(f"{len(pkg['exports'])} npm subpaths reach every shipped "
+                 f"stylesheet and token document")
     return files, notes
 
 

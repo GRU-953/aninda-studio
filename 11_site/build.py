@@ -40,9 +40,14 @@ The one file that cannot carry a header
     would break the custom domain. Every other file opens with its header.
 
 Bangla
-    Only strings from the final table of 06_type/BANGLA-STANDARD.md are used.
-    Where the table has no entry, the text stays in English and the gap is
-    printed by this build rather than filled with an invented translation.
+    Two sources, and they are not interchangeable. 06_type/BANGLA-STANDARD.md is
+    the governing document: it holds the Bangla Academy spelling rules, each with
+    its primary source, and the 31 strings reviewed against them.
+    06_type/bangla-strings.json is the string register written under it — 94 keys,
+    each carrying the rule number or dictionary page it rests on — and it is the
+    file this build actually reads. Where neither holds a string, the text stays
+    in English and the gap is printed by this build rather than filled with an
+    invented translation.
 
 SPDX-License-Identifier: Apache-2.0
 Copyright 2026 Aninda Sundar Howlader
@@ -72,7 +77,22 @@ NPM_PACKAGE = ROOT / "12_packages" / "npm" / "package.json"
 PY_PACKAGE = ROOT / "12_packages" / "python" / "pyproject.toml"
 
 GENERATOR = "11_site/build.py"
-BUILT_ON = "2026-08-14"
+
+# There is deliberately no BUILT_ON constant here any more, and no call to
+# date.today() either.
+#
+# WHY. This file used to carry `BUILT_ON = "2026-08-14"`, typed, used in the facts
+# table caption ("counted on …"), in the page footer ("Built on …") and as the
+# sitemap's <lastmod>. Every build after 14 August published that date over freshly
+# counted figures, and the same page states elsewhere that the registries were
+# checked on 2026-08-18 — read from PUBLICATION.json — so the page contradicted
+# itself by four days in two places a reader compares directly.
+#
+# A live date is not the fix. CI's own rule is that nothing generated in this
+# repository contains a timestamp, because a timestamp in a diffed file makes the
+# drift guard fail every day it is not rebuilt. So the counts are described as what
+# they are — read at build time — and the only dates the page carries are dates
+# read from a dated record in the tree. guard_dates() below enforces that.
 
 # The site's only Python usage example. It is a constant because it is EXECUTED
 # against the built package before the page is written — see python_example_runs().
@@ -116,8 +136,10 @@ class BuildError(Exception):
 
 
 # =========================================================================
-# Verified Bangla. Every string below is quoted from the final table of
-# 06_type/BANGLA-STANDARD.md, by its id. Nothing else may appear in Bangla.
+# Verified Bangla. The ids below are quoted from the final table of
+# 06_type/BANGLA-STANDARD.md. 06_type/bangla-strings.json is merged over them
+# fourteen lines further down and supplies most of what actually ships.
+# Nothing outside those two files may appear in Bangla.
 # =========================================================================
 
 BN = {
@@ -326,6 +348,38 @@ def text_runs(markup: str):
         else:
             runs.append(("latin", chunk))
     return runs
+
+
+def guard_dates(out: dict[str, bytes], pub: dict) -> None:
+    """Every date on the site must be read from a dated record in the tree.
+
+    The site published a hand-typed `2026-08-14` as the day the figures were
+    counted, in a footer, and as the sitemap's <lastmod>, while the same page
+    stated — correctly, from PUBLICATION.json — that the registries were checked on
+    2026-08-18. The figures are in fact recounted on every build, so the one date a
+    reader was given to judge them by was wrong on every build after the 14th.
+
+    Nothing checked it, because it was the only typed date in a repository where
+    every other counted fact is generated. This is the check. It permits exactly
+    the dates that a committed record supplies, so a new typed one fails the build
+    rather than shipping.
+    """
+    known = {pub["checked"]}
+    problems = []
+    for name in ("index.html", "404.html", "sitemap.xml", "site.webmanifest",
+                 "robots.txt", "styles.css"):
+        if name not in out:
+            continue
+        text = out[name].decode("utf-8")
+        for found in sorted(set(re.findall(r"\b\d{4}-\d{2}-\d{2}\b", text))):
+            if found not in known:
+                problems.append(
+                    f"{name}: the date {found} is not read from a dated record. "
+                    f"The only date a record supplies is "
+                    f"{', '.join(sorted(known))} (12_packages/PUBLICATION.json)."
+                )
+    if problems:
+        raise BuildError("The typed-date rule failed:\n  " + "\n  ".join(problems))
 
 
 def guard_bangla(pages: dict[str, str]) -> None:
@@ -676,7 +730,7 @@ def section_work(cards: dict, tokens_css: str) -> str:
         'files themselves when this page is built, so the page cannot claim '
         'something the system does not hold.</p>'
         '<div class="as-scroll-x site-facts"><table class="as-table as-table--numeric">'
-        '<caption>What the system contains, counted on ' + BUILT_ON + '.</caption>'
+        '<caption>What the system contains. Every row is counted from the file named in it, each time this page is built.</caption>'
         '<thead><tr><th scope="col">Part</th><th scope="col" class="as-num">Count</th>'
         '<th scope="col">What it is</th></tr></thead>'
         f"<tbody>{body}</tbody></table></div>"
@@ -841,8 +895,8 @@ def footer(cards: dict) -> str:
     )
     return (
         '<footer class="as-doc-foot as-stack">'
-        f"<p>Built on {BUILT_ON} by {GENERATOR}. This page is generated. Editing it "
-        "by hand is undone by the next build.</p>"
+        f"<p>Generated by {GENERATOR} from the files named on this page. Editing "
+        "this page by hand is undone by the next build.</p>"
         f'<ul class="as-doc-list">{fonts}</ul>'
         "<p>Literata and Noto Serif Bengali keep their own names. The monospace "
         "face is a subset of IBM Plex Mono renamed to Aninda Mono, because "
@@ -851,10 +905,13 @@ def footer(cards: dict) -> str:
         "its font in 08_components/fonts/.</p>"
         "<p>The design tokens and this site are licensed Apache-2.0. "
         "Copyright 2026 Aninda Sundar Howlader.</p>"
-        "<p>Bangla appears only where the verified table in "
-        "06_type/BANGLA-STANDARD.md holds a string. Everywhere else the text stays "
-        "in English rather than being translated by guesswork, and those places are "
-        "listed in this build's output.</p>"
+        "<p>Bangla appears only where an approved string exists. The spelling "
+        "rules and their sources are in 06_type/BANGLA-STANDARD.md, which governs; "
+        "the strings themselves are in 06_type/bangla-strings.json, which is the "
+        "file this build reads and which carries the rule number or dictionary page "
+        "each string rests on. Everywhere else the text stays in English rather "
+        "than being translated by guesswork, and those places are listed in this "
+        "build's output.</p>"
         "</footer>"
     )
 
@@ -1061,7 +1118,10 @@ def sitemap_xml() -> str:
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         "  <url>\n"
         f"    <loc>{ORIGIN}/</loc>\n"
-        f"    <lastmod>{BUILT_ON}</lastmod>\n"
+        # No <lastmod>. It is optional in the sitemaps.org 0.9 schema, and the only
+        # value available here was a hand-typed date that went stale on 15 August
+        # and then told crawlers the page had not changed since. A wrong lastmod is
+        # worse than none: a crawler that believes it skips the fetch.
         "  </url>\n"
         "</urlset>\n"
     )
@@ -1150,6 +1210,8 @@ def build() -> dict[str, bytes]:
             if target.startswith(("http://", "https://", "//")):
                 raise BuildError(f"{name} fetches {target} from the network.")
 
+    guard_dates(out, pub)
+
     return out
 
 
@@ -1195,8 +1257,9 @@ def main(argv: list[str]) -> int:
     print("\nCNAME carries no header comment. GitHub Pages parses the whole file as "
           "the hostname, so a comment would break the custom domain. It is the only "
           "file here without one.")
-    print(f"\nBangla left in English, because "
-          f"06_type/BANGLA-STANDARD.md has no verified string ({len(BANGLA_GAPS)}):")
+    print(f"\nBangla left in English, because neither "
+          f"06_type/BANGLA-STANDARD.md nor 06_type/bangla-strings.json holds an "
+          f"approved string ({len(BANGLA_GAPS)}):")
     for gap in BANGLA_GAPS:
         print(f"  · {gap}")
     return 0

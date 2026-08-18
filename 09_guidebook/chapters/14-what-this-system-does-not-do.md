@@ -65,9 +65,15 @@ system says.
 
 ## The icon decision's untested dynamic cost
 
-One rounded icon is used on every surface, Apple included. The static penalty
-was measured and is small. On watchOS and visionOS it is nil, because the
-circular mask cuts inside the rounding.
+One rounded icon is used on every surface, Apple included. One part of the
+static cost is measured: under the circle watchOS and visionOS mask to, the
+rounded icon and the square master are the same image in every pixel, so there
+the penalty is nil. The other part is a judgement, not a measurement — under
+Apple's rounded-rectangle mask the difference looks slight to me in a static
+render, and it cannot be measured, because Apple publishes no corner radius and
+so there is no mask to composite against without substituting this kit's own
+radius for Apple's and measuring the substitution. Chapter 04 separates the two
+at length, and `04_mark/manifest.json` records the same split.
 
 **The dynamic cost was not measured and is not known.** Liquid Glass specular
 highlights are generated at run time by Apple's own renderer from the layer

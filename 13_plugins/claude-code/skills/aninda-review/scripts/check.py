@@ -171,8 +171,47 @@ def _flatten(node, prefix: str, out: dict) -> dict:
     return out
 
 
+def properties_from_css(text: str) -> dict[str, str]:
+    """Every `--as-*` property tokens.css defines, mapped to its light-theme value.
+
+    WHY THIS IS READ AND NOT DERIVED. This checker used to recommend a fix by
+    substituting hyphens for the dots in a DTCG role name — `accent.default`
+    became `--as-accent-default` inside a var(). 07_tokens/emit_css.py drops a trailing
+    `default` segment and a leading `status` one, so `--as-accent-default` is not a
+    property this system has; in a browser the undefined name resolves to nothing
+    and the text falls back to inherited black. Seven of the seventeen roles this
+    checker can name produced a property that does not exist, and it handed each
+    one to a user as the recommended fix.
+
+    Reading the names out of the stylesheet means the recommendation is measured
+    against the artefact the user will actually link.
+    """
+    out: dict[str, str] = {}
+    for name, value in re.findall(r"(--as-[a-z0-9-]+)\s*:\s*([^;}]+)", text):
+        out.setdefault(name, value.strip())
+    return out
+
+
+def property_for_role(role: str, properties: dict[str, str]) -> str | None:
+    """The CSS property for a DTCG role, by the rule emit_css.py uses.
+
+    `color.` has already been stripped from `role` by the caller. The rule is
+    emit_css.py's prop_for(): drop a leading `status` segment, drop a trailing
+    `default` one. The result is then CHECKED against the properties the
+    stylesheet defines, so a change to that rule cannot silently reappear here as
+    advice to write a name that resolves to nothing.
+    """
+    parts = role.split(".")
+    if parts and parts[0] == "status":
+        parts = parts[1:]
+    if len(parts) > 1 and parts[-1] == "default":
+        parts = parts[:-1]
+    name = "--as-" + "-".join(parts)
+    return name if name in properties else None
+
+
 def load_system() -> dict:
-    """The role hexes, the token values and the verified Bangla.
+    """The role hexes, the token values, the CSS property names and the Bangla.
 
     Two layouts are supported. Installed as a plugin, the three skills sit side
     by side and this reads the brand skill's own assets, so there is one source
@@ -181,7 +220,8 @@ def load_system() -> dict:
     """
     tokens_dir = SKILL_ROOT.parent / "aninda-brand" / "assets" / "tokens"
     bangla_path = SKILL_ROOT.parent / "aninda-brand" / "assets" / "bangla-verified.json"
-    if tokens_dir.is_dir() and bangla_path.exists():
+    css_path = SKILL_ROOT.parent / "aninda-brand" / "assets" / "css" / "tokens.css"
+    if tokens_dir.is_dir() and bangla_path.exists() and css_path.exists():
         primitives = _flatten(json.loads((tokens_dir / "primitive.tokens.json").read_text("utf-8")), "", {})
 
         def hex_of(value):
@@ -208,6 +248,7 @@ def load_system() -> dict:
         return {
             "themes": themes,
             "targets": targets,
+            "properties": properties_from_css(css_path.read_text("utf-8")),
             "bangla": [s["bangla"] for s in bangla["strings"]],
             "source": "the aninda-brand skill's own token files",
         }
@@ -220,8 +261,9 @@ def load_system() -> dict:
 
     raise NotEquipped(
         "I cannot find the system's numbers. This skill reads them from the "
-        "aninda-brand skill's assets/tokens folder when both are installed together, "
-        "or from data/system.json inside a standalone .skill bundle. Neither is here."
+        "aninda-brand skill's assets/tokens folder and assets/css/tokens.css when "
+        "both are installed together, or from data/system.json inside a standalone "
+        ".skill bundle. Neither is here."
     )
 
 
@@ -367,16 +409,33 @@ def check_css(text: str, where: str, system: dict, found: Findings, aaa: bool) -
                 literal = HEX.search(value)
                 if literal:
                     hex_value = literal.group(0).upper()
+                    properties = system.get("properties", {})
                     for theme in THEMES:
                         for role, role_hex in system["themes"][theme].items():
-                            if role_hex.upper() == hex_value:
-                                found.note(
-                                    f"{where}  {selector}",
-                                    f"{prop} is the raw hex {hex_value}, and a token exists for it",
-                                    f"That is {role} in the {theme} theme. "
-                                    f"Use var(--as-{role.replace('.', '-')}) so it follows the theme.",
+                            if role_hex.upper() != hex_value:
+                                continue
+                            css_property = property_for_role(role, properties)
+                            if css_property:
+                                advice = (f"That is {role} in the {theme} theme. "
+                                          f"Use var({css_property}) so it follows "
+                                          f"the theme.")
+                            else:
+                                # No invented name. Naming the role and admitting
+                                # the property could not be found is worth more
+                                # than a name that resolves to nothing.
+                                advice = (
+                                    f"That is {role} in the {theme} theme. I could "
+                                    f"not find a custom property for it in the "
+                                    f"tokens.css this skill carries, so read the "
+                                    f"property name off that file rather than "
+                                    f"taking one from me."
                                 )
-                                break
+                            found.note(
+                                f"{where}  {selector}",
+                                f"{prop} is the raw hex {hex_value}, and a token exists for it",
+                                advice,
+                            )
+                            break
                         else:
                             continue
                         break

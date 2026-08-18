@@ -745,8 +745,8 @@
     },
     "hc-light": {
       "key": "hc-light",
-      "label": "High contrast light",
-      "label_bn": "\u0989\u099a\u09cd\u099a \u09ac\u09c8\u09b8\u09be\u09a6\u09c3\u09b6\u09cd\u09af \u2014 \u0986\u09b2\u09cb",
+      "label": "High contrast, light",
+      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0986\u09b2\u09cb",
       "polarity": "light",
       "high_contrast": true,
       "text_target": 7.0,
@@ -994,8 +994,8 @@
     },
     "hc-dark": {
       "key": "hc-dark",
-      "label": "High contrast dark",
-      "label_bn": "\u0989\u099a\u09cd\u099a \u09ac\u09c8\u09b8\u09be\u09a6\u09c3\u09b6\u09cd\u09af \u2014 \u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
+      "label": "High contrast, dark",
+      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
       "polarity": "dark",
       "high_contrast": true,
       "text_target": 7.0,

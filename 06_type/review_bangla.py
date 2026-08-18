@@ -15,6 +15,17 @@ puts every Bangla string the system will ship onto a single page, at the exact
 size and in the exact face it will ship in, next to what it is for and what it
 says in English — and gets out of the way.
 
+"Every" is now true and checked. The sheet is built from 06_type/bangla-strings.json,
+the register of what actually ships, and guard_covers_register() below refuses to
+write a sheet that is missing one of its strings. It used to be a hand-typed list of
+24 entries under this same sentence, while the system shipped 88 distinct strings:
+3 of the 94 register keys were on it, and all 60 card names and subtitles, 13 of the
+14 chapter titles, both high-contrast theme labels and every ui.* and status.*
+string were not. A reviewer marked up 24 rows and had no way to tell.
+
+It needs no network either. It carries the three subset faces inlined, which is what
+makes "the exact face" true — see embedded_fonts().
+
 Mark it up. Anything you change here changes at the source, not in a patch.
 
 RUN
@@ -25,6 +36,7 @@ RUN
 
 from __future__ import annotations
 
+import base64
 import json
 import sys
 from pathlib import Path
@@ -35,7 +47,17 @@ TOKENS = ROOT / "07_tokens" / "build"
 OUT = HERE / "BANGLA-REVIEW.html"
 PDF = HERE / "BANGLA-REVIEW.pdf"
 
-# Every Bangla string the system currently intends to ship.
+# The hand-written rows: the strings the 2026 review put questions against, each
+# with the question. Every one is also in 06_type/bangla-strings.json; these carry
+# the reviewer's prompt, which no data file holds.
+#
+# THIS LIST IS NOT THE SHEET. It used to be — a hand-typed literal of 24 entries,
+# under a docstring promising "every Bangla string the system will ship", while the
+# system shipped 88 distinct strings. Three of the 94 keys were on it. A reviewer
+# handed the page marked up 24 strings and was given no signal that 91 keys had
+# never been shown, including every Bangla word a reader of the component library
+# actually sees. strings_for_review() below appends everything in the register that
+# is not already here, so a string added since cannot fall outside review again.
 #   (id, English, Bangla, where it appears, px size it ships at, what to check)
 STRINGS: list[tuple[str, str, str, str, int, str]] = [
     # --- identity -----------------------------------------------------------
@@ -140,6 +162,151 @@ STRINGS: list[tuple[str, str, str, str, int, str]] = [
      "This is the single measurement that set the floor."),
 ]
 
+REGISTER = ROOT / "06_type" / "bangla-strings.json"
+FONTS_DIR = ROOT / "08_components" / "fonts"
+
+# Where each family of keys appears, and the px size it ships at, so a generated
+# row says as much about itself as a hand-written one.
+KEY_CONTEXT = {
+    "card.": ("The component card library", 16),
+    "chapter.": ("A guidebook chapter title", 21),
+    "theme.": ("The theme switcher, on every surface", 16),
+    "ui.": ("Interface furniture — the site, the cards, the plugins", 16),
+    "status.": ("Status and validation messages", 16),
+}
+
+
+def strings_for_review() -> list[tuple[str, str, str, str, int, str]]:
+    """The hand-written rows, then every register string not already on one.
+
+    The register is the authority on WHAT ships; this script is the instrument for
+    reviewing it. So the sheet is the register, in full, with the hand-written
+    prompts attached to the rows that have them.
+    """
+    if not REGISTER.exists():
+        raise SystemExit(
+            f"{REGISTER} is missing. This sheet is built from the register, because "
+            f"a hand-typed list of what ships is a list that goes stale."
+        )
+    register = json.loads(REGISTER.read_text(encoding="utf-8"))
+    already = {bn for _, _, bn, *_ in STRINGS}
+    rows = list(STRINGS)
+    for key, entry in register.items():
+        bn = entry.get("bn", "")
+        if not bn or bn in already:
+            continue
+        already.add(bn)
+        where, px = next(((w, s) for prefix, (w, s) in KEY_CONTEXT.items()
+                          if key.startswith(prefix)),
+                         ("Shipped, from the register", 16))
+        rows.append((key, entry.get("en", ""), bn, where, px,
+                     entry.get("basis", "")))
+    return rows
+
+
+def embedded_fonts() -> str:
+    """The three subset faces, base64, so this page needs no network.
+
+    This was the ONE committed HTML artefact in the repository that fetched over
+    the network: three <link> tags to fonts.googleapis.com and no @font-face of its
+    own, while every other HTML file here embeds all three faces. Its stated
+    purpose is to show each string "at the exact size and in the exact face it will
+    ship in" — and with no network, or on any machine without Noto Serif Bengali
+    installed, the Bangla fell back to a generic serif, so the conjunct shapes the
+    reviewer was asked to judge were not the ones that ship. Neither of the
+    repository's two network guards reached 06_type at all.
+
+    These are the same subsets the cards and the site inline, which is what makes
+    "the exact face" true.
+    """
+    faces = [("Literata", "literata-subset.woff2", "400 700"),
+             ("Noto Serif Bengali", "notoserifbengali-subset.woff2", "400 700"),
+             ("Aninda Mono", "anindamono-subset.woff2", "400 500")]
+    out = []
+    for family, filename, weights in faces:
+        path = FONTS_DIR / filename
+        if not path.exists():
+            raise SystemExit(
+                f"{path} is missing. Run 08_components/build.py first — this sheet "
+                f"embeds the same subsets the component cards do."
+            )
+        blob = base64.b64encode(path.read_bytes()).decode("ascii")
+        out.append(
+            f"@font-face{{font-family:'{family}';font-style:normal;"
+            f"font-weight:{weights};font-display:block;"
+            f"src:url(data:font/woff2;base64,{blob}) format('woff2')}}"
+        )
+    return "\n".join(out)
+
+
+def guard_covers_register(rows) -> None:
+    """Every Bangla string the register holds must be on the sheet."""
+    register = json.loads(REGISTER.read_text(encoding="utf-8"))
+    shown = {bn for _, _, bn, *_ in rows}
+    missing = sorted(key for key, entry in register.items()
+                     if entry.get("bn") and entry["bn"] not in shown)
+    if missing:
+        raise SystemExit(
+            f"{len(missing)} register string(s) are not on this sheet: "
+            f"{', '.join(missing[:8])}"
+            f"{'…' if len(missing) > 8 else ''}. The docstring above promises every "
+            f"Bangla string the system will ship, and a reviewer handed the page "
+            f"has no way to know what was left off it."
+        )
+
+
+def guard_no_network(html: str) -> None:
+    """Refuse to write a sheet that fetches anything over the network.
+
+    11_site/build.py raises on a network fetch and 09_guidebook/build.py has its own
+    external-asset guard; nothing guarded 06_type, and this was the one committed
+    HTML artefact in the repository that needed a network — three <link> tags to
+    fonts.googleapis.com and no @font-face of its own.
+
+    It checks the attributes a browser actually FETCHES from, not the word
+    "googleapis" anywhere in the file, so the comment above the embedded faces
+    explaining what used to be here does not trip it.
+    """
+    import re
+
+    fetched = [
+        *re.findall(r'<script[^>]*\bsrc\s*=\s*"([^"]+)"', html),
+        *re.findall(r'<img[^>]*\bsrc\s*=\s*"([^"]+)"', html),
+        *re.findall(r"url\(\s*(?!data:)([^)\s]+)\s*\)", html),
+        *re.findall(r'<link\b[^>]*\bhref\s*=\s*"([^"]+)"', html),
+    ]
+    remote = [target for target in fetched
+              if target.startswith(("http://", "https://", "//"))]
+    if remote:
+        raise SystemExit(
+            "this sheet would fetch " + ", ".join(sorted(set(remote))) +
+            " over the network. Its whole purpose is to show each string in the "
+            "exact face that ships, and a fetched face is not that one — with no "
+            "network the Bangla falls back to a generic serif and the conjunct "
+            "shapes the reviewer is asked to judge are not the shipped shapes. "
+            "Embed it instead, as embedded_fonts() does."
+        )
+
+
+def guard_font_covers(rows, bangla_font: Path) -> None:
+    """Refuse to write a sheet whose own font cannot draw what it shows.
+
+    A reviewer judging a tofu box is worse than no reviewer. The charset union in
+    08_components/build.py is where a missing character is fixed.
+    """
+    from fontTools.ttLib import TTFont
+
+    covered = set(TTFont(str(bangla_font)).getBestCmap())
+    missing = sorted({ch for _, _, bn, *_ in rows for ch in bn
+                      if "\u0980" <= ch <= "\u09ff" and ord(ch) not in covered})
+    if missing:
+        raise SystemExit(
+            f"the embedded Noto Serif Bengali subset cannot draw "
+            f"{''.join(missing)}, which this sheet shows. Those would render as "
+            f"tofu boxes and the reviewer would be judging the wrong shapes. Add "
+            f"them to the charset union in 08_components/build.py and re-run it."
+        )
+
 
 def main() -> int:
     prim = json.loads((TOKENS / "primitive.tokens.json").read_text())
@@ -165,12 +332,15 @@ def main() -> int:
     # Row numbers are looked up, never typed. The first version of this sheet said
     # "Row 17 sets the register" while the voice sample was actually row 18 — an
     # off-by-one in a document whose whole purpose is to be precise about detail.
-    idx = {sid: i for i, (sid, *_) in enumerate(STRINGS, 1)}
+    rows_in = strings_for_review()
+    guard_covers_register(rows_in)
+    guard_font_covers(rows_in, FONTS_DIR / "notoserifbengali-subset.woff2")
+    idx = {sid: i for i, (sid, *_) in enumerate(rows_in, 1)}
     n_voice, n_conj, n_floor = idx["vc-1"], idx["cj-1"], idx["cj-2"]
 
     bscale = prim["number"]["scale"]["bangla"]
     rows = []
-    for i, (sid, en, bn, where, px, check) in enumerate(STRINGS, 1):
+    for i, (sid, en, bn, where, px, check) in enumerate(rows_in, 1):
         # Apply the measured multiplier, but never below the floor — the same rule
         # the stylesheet enforces, applied here so the sheet shows the real size.
         mult = (bscale["caption"]["$value"] if px <= 12 else
@@ -193,14 +363,16 @@ def main() -> int:
   </td>
 </tr>""")
 
-    ids_json = json.dumps([s[0] for s in STRINGS])
+    ids_json = json.dumps([s[0] for s in rows_in])
 
     html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Aninda Studio — Bangla review sheet</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,200..900&family=Noto+Serif+Bengali:wght@100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* The three faces, inlined. No network: this sheet is judged on the exact
+   subsets that ship, and it used to fetch them from fonts.googleapis.com. */
+{embedded_fonts()}
+</style>
 <style>
 *{{box-sizing:border-box;margin:0}}
 body{{background:{bg};color:{ink};font-family:Literata,Georgia,serif;font-size:16px;
@@ -214,15 +386,15 @@ h1{{font-size:38px;line-height:1.15;margin-bottom:14px;font-weight:600}}
 .rule ul{{margin:8px 0 0 20px;color:{muted};font-size:15px}}
 .rule li{{margin-bottom:5px}}
 table{{width:100%;border-collapse:collapse;margin-top:20px}}
-th{{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+th{{text-align:left;font-family:'Aninda Mono',monospace;font-size:10.5px;
   letter-spacing:.11em;text-transform:uppercase;font-weight:400;color:{accent};
   padding:0 12px 10px 0;border-bottom:2px solid {line};vertical-align:bottom}}
 td{{padding:18px 12px 18px 0;border-bottom:1px solid {line};vertical-align:top}}
-.n{{width:26px;color:{muted};font-family:'IBM Plex Mono',monospace;font-size:12px}}
+.n{{width:26px;color:{muted};font-family:'Aninda Mono',monospace;font-size:12px}}
 .meta{{width:15%}}
-.meta code{{font-family:'IBM Plex Mono',monospace;font-size:11px;color:{accent};display:block}}
+.meta code{{font-family:'Aninda Mono',monospace;font-size:11px;color:{accent};display:block}}
 .meta .where{{display:block;font-size:12.5px;color:{muted};margin-top:3px}}
-.meta .size{{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+.meta .size{{display:block;font-family:'Aninda Mono',monospace;font-size:10.5px;
   color:{muted};margin-top:5px;opacity:.8}}
 .en{{width:22%;font-size:14.5px;color:{muted}}}
 .bn{{width:26%}}
@@ -245,7 +417,7 @@ td{{padding:18px 12px 18px 0;border-bottom:1px solid {line};vertical-align:top}}
 #bar button.ghost{{background:transparent;color:{accent}}}
 #bar button:focus-visible{{outline:3px solid {ink};outline-offset:2px}}
 #count{{font-size:14px;color:{muted}}}
-#out{{width:100%;margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+#out{{width:100%;margin-top:12px;font-family:'Aninda Mono',monospace;font-size:12px;
   border:1px solid {line};border-radius:8px;padding:10px;min-height:90px;display:none;
   background:{bg};color:{ink}}}
 .foot{{margin-top:36px;padding-top:20px;border-top:1px solid {line};color:{muted};
@@ -359,8 +531,11 @@ way.</p>
 </script>
 </body></html>"""
 
+    guard_no_network(html)
     OUT.write_text(html)
-    print(f"Wrote {OUT.relative_to(ROOT)}  ({len(STRINGS)} strings)")
+    print(f"Wrote {OUT.relative_to(ROOT)}  ({len(rows_in)} rows: "
+          f"{len(STRINGS)} with a written question, "
+          f"{len(rows_in) - len(STRINGS)} more from the register)")
 
     try:
         from playwright.sync_api import sync_playwright

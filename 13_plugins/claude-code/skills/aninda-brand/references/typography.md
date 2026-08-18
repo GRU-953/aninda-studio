@@ -50,6 +50,15 @@ Bangla only. Do not invent one; use the platform's own default.
 
 ## Bangla sizing — the rule that matters most
 
+**Write `lang="bn"` and every figure in this section applies itself.** The
+`:lang(bn), [lang="bn"]` block in `assets/css/tokens.css` sets the family, the
+multiplier, the floor and the weight step in one declaration. The numbers below
+are here so you can check what a rendered page is doing and explain it — they are
+not a list of things to type. Applying them by hand to text that is tagged applies
+them twice; applying them by hand instead of tagging leaves the text announced as
+English, which fails WCAG 2.2 SC 3.1.2 (Level AA). Rule 5 in `SKILL.md` is the
+short version.
+
 Bangla's reading height is about 0.62 em against Latin's 0.72, so Bangla set at
 the same nominal size looks smaller. The multipliers below were measured on
 rendered specimens, not estimated.

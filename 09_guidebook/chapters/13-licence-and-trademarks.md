@@ -2,6 +2,7 @@
 
 Three licences and one thing that has no licence at all.
 
+{{table: Each part of the kit, its licence terms, and the SPDX identifier to write in a file header.}}
 | Part | Terms | SPDX identifier |
 |---|---|---|
 | The design system — tokens, stylesheets, build scripts, component cards | Apache License 2.0 | `Apache-2.0` |

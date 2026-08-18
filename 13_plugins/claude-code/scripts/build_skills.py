@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -40,6 +41,7 @@ DIST = PLUGIN_ROOT / "dist"
 PROJECT_ROOT = PLUGIN_ROOT.parent.parent
 TOKENS_DIR = SKILLS_DIR / "aninda-brand" / "assets" / "tokens"
 BANGLA_PATH = SKILLS_DIR / "aninda-brand" / "assets" / "bangla-verified.json"
+TOKENS_CSS = SKILLS_DIR / "aninda-brand" / "assets" / "css" / "tokens.css"
 
 # A fixed point in time for every entry in every archive. Not "now", and not the
 # file's own mtime: either would make the same content hash differently on a
@@ -126,6 +128,16 @@ def review_system_data() -> str:
             "nonText": float(studio.get("nonTextTarget", 3.0)),
         }
 
+    # The CSS property names, read out of the stylesheet the brand skill bundles.
+    # The checker used to derive a property from a role name by swapping dots for
+    # hyphens, which produced --as-accent-default and six other names that do not
+    # exist. A standalone bundle has no sibling skill to read, so the names travel
+    # with it.
+    properties: dict[str, str] = {}
+    for _name, _value in re.findall(r"(--as-[a-z0-9-]+)\s*:\s*([^;}]+)",
+                                    TOKENS_CSS.read_text("utf-8")):
+        properties.setdefault(_name, _value.strip())
+
     bangla = json.loads(BANGLA_PATH.read_text("utf-8"))
     data = {
         "$comment": (
@@ -137,6 +149,7 @@ def review_system_data() -> str:
         ),
         "themes": themes,
         "targets": targets,
+        "properties": properties,
         "bangla": [entry["bangla"] for entry in bangla["strings"]],
     }
     return json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n"

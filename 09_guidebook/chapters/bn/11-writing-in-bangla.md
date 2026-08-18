@@ -13,6 +13,7 @@ house rules, the punctuation rules and the full list of what is unverified.
 Each of these is quoted from the Bangla Academy's 2012 rules or from *আধুনিক
 বাংলা অভিধান*. None of them was written for this book.
 
+{{table: The spellings this book uses, the ones it does not, and the ruling behind each.}}
 | Use this | Not this | Why |
 |---|---|---|
 | এখনো | এখনও | এখনও is only a cross-reference to এখনো in the dictionary |

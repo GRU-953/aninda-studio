@@ -358,14 +358,97 @@ def banner(theme: str, icon: int, latin: int, bangla: int, tagline: int,
     }
 
 
+def stroke_rule() -> dict:
+    """The mark's stroke rule, read from 04_mark/manifest.json rather than typed.
+
+    The manifest carries `switch_px` and a per-file stroke measured off the
+    artwork, so this file can ask which artefact carries which weight instead of
+    naming one and hoping.
+    """
+    if not MARK_MANIFEST.exists():
+        raise BuildError(f"{MARK_MANIFEST} is missing. Run 04_mark/build.py first.")
+    strokes = json.loads(MARK_MANIFEST.read_text("utf-8"))["strokes"]
+    for key in ("regular", "heavy", "switch_px", "stroke_by_file"):
+        if key not in strokes:
+            raise BuildError(
+                f"04_mark/manifest.json's strokes block has no {key!r}. This build "
+                f"reads the stroke rule from there so it cannot be retyped here."
+            )
+    return strokes
+
+
+def icon_source(size: int, above: str) -> str:
+    """Which mark artefact a raster of this size must be rendered from.
+
+    THE ONE PLACE THE HEAVY WEIGHT IS ACTUALLY NEEDED WAS THE ONE PLACE IT WAS NOT
+    USED. Every favicon here was rendered from icon-192.svg, which carries the
+    regular stroke of 9 units. At 16 px that is 9/100 x 0.9208 x 16 = 1.33 px, and
+    measured in the shipped file only one of its three pixels reached near full
+    value. The manifest, chapter 03 of the guidebook and asset.py all state that
+    the regular weight may not be used below 24 px — asset.py refuses to make it,
+    with exit 2 — and 10_assets shipped it anyway, in favicon-16.png and in the
+    16 px plane of favicon.ico.
+
+    tile-web.svg is the same construction at the heavy weight: same rounded
+    rectangle, same rx, the mark scaled a little smaller to give the thicker
+    stroke its clearance. The plugin's icons.md has named it "the web tile and
+    favicon source" all along, while nothing in 10_assets referenced it.
+    """
+    strokes = stroke_rule()
+    if size >= strokes["switch_px"]:
+        return above
+    heavy = [name for name, width in strokes["stroke_by_file"].items()
+             if width == strokes["heavy"] and name.startswith(("tile", "icon"))]
+    if not heavy:
+        raise BuildError(
+            f"nothing in 04_mark/svg carries the heavy stroke "
+            f"({strokes['heavy']:g}) as a rounded icon, so a {size} px favicon "
+            f"cannot be rendered without breaking the stroke rule."
+        )
+    return sorted(heavy)[0]
+
+
+def guard_stroke_rule(items: list[dict]) -> None:
+    """Prove the stroke rule on every icon raster, from the artwork it came from.
+
+    guard_mark_size in asset.py applies the rule to the standalone mark only, so
+    make_icon and make_tile scaled the same artwork to any size above the 16 px
+    floor with no stroke check at all. This is the missing half: it reads the
+    stroke width out of the source SVG for every raster about to be rendered and
+    compares it against the size that raster is declared at.
+    """
+    strokes = stroke_rule()
+    problems = []
+    for item in items:
+        if item["render"][0] != "icon":
+            continue
+        source = item["render"][1]
+        actual = strokes["stroke_by_file"].get(source)
+        if actual is None:
+            problems.append(f"{item['name']}: 04_mark/manifest.json records no "
+                            f"stroke for {source}")
+            continue
+        wanted = (strokes["regular"] if min(item["w"], item["h"]) >= strokes["switch_px"]
+                  else strokes["heavy"])
+        if actual != wanted:
+            problems.append(
+                f"{item['name']} is {item['w']}x{item['h']} px and is rendered from "
+                f"{source}, whose stroke is {actual:g}. The rule is "
+                f"\"{strokes['rule']}\", so it needs {wanted:g}."
+            )
+    if problems:
+        raise BuildError("The stroke rule failed:\n  " + "\n  ".join(problems))
+
+
 def asset_list() -> list[dict]:
     ico_pngs = [16, 32, 48]
     items: list[dict] = []
 
     for size in (16, 32, 48, 96):
+        source = icon_source(size, "icon-192.svg")
         items.append({
             "name": f"favicon-{size}.png", "w": size, "h": size, "opaque": False,
-            "render": ("icon", "icon-192.svg", False, False),
+            "render": ("icon", source, False, False),
             "purpose": f"Browser tab and bookmark icon at {size} px.",
             "spec": "PNG favicon, 16/32/48/96 px",
             "verified": "stable", "note": STABLE_NOTE,
@@ -623,9 +706,20 @@ def pack_ico(pngs: dict[int, bytes]) -> bytes:
 
 
 def build_svg_icon() -> bytes:
-    """icon.svg — the scalable favicon. The everyday rounded icon with its fixed
-    width and height removed, so it scales to whatever the browser asks for."""
-    node = load_svg("icon-1024.svg")
+    """icon.svg — the scalable favicon, with its fixed width and height removed so
+    it scales to whatever the browser asks for.
+
+    It is rendered from the HEAVY artwork, for the same reason the 16 px PNG is.
+    This file is declared as `rel="icon"` with no `sizes`, and the surfaces a
+    browser draws that on — the tab strip, the bookmark bar, the history list —
+    are 16 to 20 px. Every size above the switch already has its own declared
+    file: favicon.ico at 32, apple-touch-icon at 180, the manifest icons at 192
+    and 512. So the size this one is actually drawn at is below the switch, and
+    the asymmetry decides it: the heavy weight at 48 px is a slightly bolder mark,
+    while the regular weight at 16 px thins away, which is the failure the rule
+    was written for.
+    """
+    node = load_svg(icon_source(16, "icon-1024.svg"))
     for attribute in ("width", "height"):
         if attribute in node.attrib:
             del node.attrib[attribute]
@@ -634,7 +728,8 @@ def build_svg_icon() -> bytes:
             child.text = "Aninda Studio"
     text = (
         f"<!-- {DO_NOT_EDIT} -->\n"
-        f"<!-- Source: 04_mark/svg/icon-1024.svg, written by 04_mark/build.py. -->\n"
+        f"<!-- Source: 04_mark/svg/{icon_source(16, 'icon-1024.svg')}, "
+        f"written by 04_mark/build.py. -->\n"
         + svg_to_text(node)
         + "\n"
     )
@@ -656,6 +751,7 @@ def run() -> int:
 
     guard_glyphs([TAGLINE, SITE_URL, STRAPLINE])
     items = asset_list()
+    guard_stroke_rule(items)
 
     out: dict[str, bytes] = {}
     try:
@@ -762,6 +858,13 @@ def build_manifest(items: list[dict], out: dict[str, bytes]) -> bytes:
             "spec": item["spec"],
             "verification": item["verified"],
         }
+        # Which artwork this raster came from, and at what stroke. Recorded because
+        # every favicon here was rendered from the regular-weight icon-192.svg
+        # while three documents said the regular weight may not be used below
+        # 24 px, and nothing in the shipped output said which file it came from.
+        if item["render"][0] == "icon":
+            entry["rendered_from"] = item["render"][1]
+            entry["stroke"] = stroke_rule()["stroke_by_file"].get(item["render"][1])
         if item["verified"] == "verified":
             source = item["source"]
             entry["verified_on"] = BUILT_ON

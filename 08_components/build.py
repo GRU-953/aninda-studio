@@ -66,6 +66,17 @@ CARDS_DIR = HERE / "cards"
 FONTS_DIR = HERE / "fonts"
 REGISTRY = HERE / "_cards.json"
 
+# The Claude Code plugin bundles these same subsets and renders its own approved
+# Bangla with them, so its Bangla is part of the character set. See the charset
+# union in build() for what went wrong when it was not.
+_SKILL = ROOT / "13_plugins" / "claude-code" / "skills" / "aninda-brand"
+PLUGIN_BANGLA_JSON = _SKILL / "assets" / "bangla-verified.json"
+PLUGIN_BANGLA_MD = _SKILL / "references" / "bangla.md"
+
+# The shaping test set from 06_type. 06_type/review_bangla.py shows it in the
+# shipped face, so it belongs in the charset the shipped face is subset to.
+MEASUREMENTS_JSON = ROOT / "06_type" / "_data" / "measurements.json"
+
 GENERATOR = "08_components/build.py"
 
 # The one line that separates the generated token stylesheet — the only place in a
@@ -511,13 +522,174 @@ def bn(text: str, large: bool = False) -> str:
     return f'<span lang="bn"{cls}>{e(text)}</span>'
 
 
+def walk_language_scopes(doc: str):
+    """Borrowed, not copied, from 09_guidebook/build.py.
+
+    That file holds the one implementation of "what language is this text run in",
+    with its own account of the three earlier versions that each got scope tracking
+    wrong. A third copy would be a third thing to keep right, so this imports it.
+
+    The import is by path rather than by package because these generators are
+    scripts in numbered folders, not a package. It costs about 0.1 s at module
+    load and reads no card data, so it does not invert the build order — the
+    guidebook still runs after this file and reads _cards.json.
+    """
+    import importlib.util
+
+    global _GUIDEBOOK
+    if _GUIDEBOOK is None:
+        source = ROOT / "09_guidebook" / "build.py"
+        if not source.exists():
+            raise BuildError(
+                f"{source} is missing. This build reads its language-scope walker "
+                f"from there rather than keeping a second copy of it."
+            )
+        spec = importlib.util.spec_from_file_location("_aninda_guidebook", source)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["_aninda_guidebook"] = module
+        spec.loader.exec_module(module)
+        _GUIDEBOOK = module
+    return _GUIDEBOOK.walk_language_scopes(doc)
+
+
+_GUIDEBOOK = None
+
+
+def guard_language_of_parts(pages: dict[str, str]) -> None:
+    """No Bangla may ship outside a lang="bn" element, and no English inside one.
+
+    WCAG 2.2 SC 3.1.2 Language of Parts, Level AA. The site has this guard
+    (11_site/build.py) and the guidebook has it (guard_inline_bangla), and the
+    largest surface — 30 cards — had none, so `grep -n lang 08_components/check.py`
+    returned nothing at all.
+
+    What it cost: two cards shipped a bare Bangla word inside an English paragraph,
+    five times each across the theme panels. Chromium reported the containing
+    paragraph as lang='en' with fontFamily 'Literata, Georgia, serif', and
+    CSS.getPlatformFontsForNode showed the Bangla glyphs drawn by macOS's Kohinoor
+    Bangla — a system face — rather than by the Noto Serif Bengali subset the card
+    inlines. So the card footer's "Fonts are subset and inlined; this card needs no
+    network" was untrue of that text, and on a machine with no Bengali font it is
+    tofu. On typography.html the run sat at 12.0032px and weight 400, which is
+    precisely the case the sentence containing it says must gain a weight step.
+
+    The scope walker skips script, style, title and textarea, which is why this can
+    run over a card that inlines components.css — that stylesheet has মাত্রা in two
+    comments. Running 11_site/check.py's expression verbatim over the cards counted
+    those two as faults on all thirty, and a guard that reports one false positive
+    per file is a guard somebody switches off.
+    """
+    bangla = re.compile(r"[\u0980-\u09FF]")
+    problems: list[str] = []
+    for name, markup in pages.items():
+        for token, lang in walk_language_scopes(markup):
+            if lang == "skip" or not token.strip():
+                continue
+            if bangla.search(token) and lang != "bn":
+                problems.append(
+                    f'{name}: Bangla outside lang="bn" — {token.strip()[:44]}')
+            if lang == "bn" and not bangla.search(token) \
+                    and re.search(r"[A-Za-z]{4}", token):
+                problems.append(
+                    f'{name}: English inside lang="bn" — {token.strip()[:44]}')
+    if problems:
+        raise BuildError(
+            f"WCAG 2.2 SC 3.1.2 Language of Parts failed in {len(problems)} "
+            f"place(s):\n  " + "\n  ".join(problems[:10]) +
+            ("\n  …" if len(problems) > 10 else "") +
+            "\n  Bangla must sit inside lang=\"bn\". Nothing else applies the "
+            "Bengali family, the measured multiplier, the 12 px floor or the "
+            "weight step below 14 px, because all four are keyed to "
+            ":lang(bn), [lang=\"bn\"] in tokens.css."
+        )
+
+
+def guard_field_descriptions(pages: dict[str, str]) -> None:
+    """Every hint or error beside a control must be in that control's description.
+
+    WCAG 2.2 SC 1.3.1 Info and Relationships, Level A: text positioned as help for
+    a control states a relationship visually, and that relationship has to be
+    programmatically determinable too. `aria-describedby` is how.
+
+    Twenty-five of the fifty-five such spans were referenced and thirty were not,
+    which is why this is a generator guard rather than a rewrite: the technique was
+    already in the file, applied inconsistently. Chromium's
+    Accessibility.getPartialAXTree reported description=None on 'Account number',
+    'Language', 'Plan' and 'Group'. On 'Group' the entire success state reached
+    sighted users only — the words were unlinked and the green tick is
+    aria-hidden="true" like every icon() in this file, so nothing announced that
+    the field had validated.
+
+    A hint inside the <label> is exempt: it is already part of the accessible name.
+    That is the .as-choice pattern, where the label wraps the control.
+    """
+    import re as _re
+
+    problems: list[str] = []
+    for name, markup in pages.items():
+        # Only the primary stage is inspected. The quad panels repeat the same
+        # markup with the same ids per panel prefix, so a fault would be reported
+        # five times and fixed once.
+        for block in _re.findall(r'<div class="as-field">(.*?)</div>', markup, _re.S):
+            if "<label" in block and "</label>" not in block:
+                continue
+            described = set()
+            for value in _re.findall(r'aria-describedby="([^"]+)"', block):
+                described.update(value.split())
+            controls = _re.findall(r"<(input|select|textarea)\b[^>]*", block)
+            if not controls:
+                continue
+            for span in _re.findall(r'<span class="as-(?:hint|error)"[^>]*>', block):
+                ident = _re.search(r'id="([^"]+)"', span)
+                if ident is None:
+                    problems.append(f"{name}: a hint or error with no id at all — {span}")
+                elif ident.group(1) not in described:
+                    problems.append(
+                        f'{name}: {span} is not in any aria-describedby in its field')
+    if problems:
+        raise BuildError(
+            f"WCAG 2.2 SC 1.3.1 Info and Relationships failed in {len(problems)} "
+            f"place(s):\n  " + "\n  ".join(problems[:10]) +
+            ("\n  …" if len(problems) > 10 else "") +
+            "\n  Give the span an id and name it in the control's "
+            "aria-describedby. Text placed under a control is help for that "
+            "control, and a screen reader is told so only by that attribute."
+        )
+
+
+def e_mixed(text: str) -> str:
+    """Escape a sentence that has a Bangla word inside it, tagging the word.
+
+    Bangla inside an English sentence has to declare its own language. WCAG 2.2
+    SC 3.1.2 Language of Parts (Level AA) asks for it, and in this system it also
+    decides whether the text gets the Bengali family at all: the whole Bangla half
+    of tokens.css is keyed to `:lang(bn), [lang="bn"]`, so an untagged run gets
+    Literata, which has no Bengali glyphs, and falls back to whatever the reader's
+    machine has. Chromium drew the two runs that shipped this way in macOS's
+    Kohinoor Bangla, at 12.0032px and weight 400 — the exact case one of those very
+    sentences says must gain a weight step.
+
+    The card text is written as plain strings and escaped on the way out, so a
+    hand-written <span> in a string would be escaped into visible markup. This
+    escapes the sentence and then wraps each unbroken Bangla run in the span.
+    """
+    escaped = e(text)
+    return re.sub(r"[\u0980-\u09FF\u200c\u200d।॥]+",
+                  lambda m: f'<span lang="bn">{m.group(0)}</span>', escaped)
+
+
 def code_block(name: str, body: str, copy_label: str = "", copy_lang: str = "") -> str:
+    # e_mixed rather than e, because a sample that shows how to mark Bangla up
+    # contains Bangla. Untagged, that run is announced as English and set in
+    # Aninda Mono, which is subset from IBM Plex Mono and carries no Bengali glyph
+    # at all — so the sample teaching the lang attribute was itself unable to draw
+    # its own example. The span changes nothing a reader sees or copies.
     lines = []
     for line in body.strip("\n").split("\n"):
         if line.lstrip().startswith("<!--") or line.lstrip().startswith("/*"):
-            lines.append(f'<span class="as-code__comment">{e(line)}</span>')
+            lines.append(f'<span class="as-code__comment">{e_mixed(line)}</span>')
         else:
-            lines.append(e(line))
+            lines.append(e_mixed(line))
     label = copy_label or "Copy the code"
     lang_attr = f' lang="{copy_lang}"' if copy_lang else ""
     return (
@@ -530,10 +702,14 @@ def code_block(name: str, body: str, copy_label: str = "", copy_lang: str = "") 
 
 
 # =========================================================================
-# Verified Bangla. Every string here is taken verbatim from the final table of
-# 06_type/BANGLA-STANDARD.md. Nothing in this dictionary was written by me.
-# Where a card needs Bangla that is not in that table, it uses English and the
-# gap is reported. That is the rule, and it is why this dictionary is short.
+# Verified Bangla. Every string in this dictionary is taken verbatim from the
+# recommended-strings table of 06_type/BANGLA-STANDARD.md, which is the governing
+# document. Nothing in it was written by me.
+#
+# It is not the whole story: 06_type/bangla-strings.json is the register written
+# under those rules, and it supplies the card names, the card subtitles and the
+# theme labels further down this file. Where neither holds a string, the card uses
+# English and the gap is reported.
 # =========================================================================
 
 BN = {
@@ -571,10 +747,15 @@ BN = {
 }
 
 BANGLA_NOTE = (
-    "Bangla appears only where the final table of 06_type/BANGLA-STANDARD.md holds a "
-    "verified string. The fields listed here are empty because that table has no entry "
-    "for them. Writing new Bangla to fill them is not allowed, so they stay in English "
-    "and are named here instead, for review."
+    "Bangla appears only where an approved string exists. Two files, and they are "
+    "not interchangeable: 06_type/BANGLA-STANDARD.md governs — it holds the Bangla "
+    "Academy spelling rules with their primary sources, and the 31 strings reviewed "
+    "against them — while 06_type/bangla-strings.json is the register of 94 "
+    "approved keys written under those rules, each carrying the rule number or "
+    "dictionary page it rests on, and it is the file these cards actually read. "
+    "The fields listed here are empty because neither holds an entry for them. "
+    "Writing new Bangla to fill them is not allowed, so they stay in English and "
+    "are named here instead, for review."
 )
 
 
@@ -736,8 +917,8 @@ def d_input(p, th, T):
   </div>
   <div class="as-field">
     <label class="as-label" for="{p}-locked">Account number</label>
-    <input class="as-input" id="{p}-locked" type="text" value="6041 2288" disabled>
-    <span class="as-hint">Off because this cannot be changed after the account opens.</span>
+    <input class="as-input" id="{p}-locked" type="text" value="6041 2288" disabled aria-describedby="{p}-locked-hint">
+    <span class="as-hint" id="{p}-locked-hint">Off because this cannot be changed after the account opens.</span>
   </div>
 </div>"""
 
@@ -761,23 +942,23 @@ def d_select(p, th, T):
   <div class="as-field">
     <label class="as-label" for="{p}-lang">Language</label>
     <span class="as-select-wrap">
-      <select class="as-select" id="{p}-lang">
+      <select class="as-select" id="{p}-lang" aria-describedby="{p}-lang-hint">
         <option selected>English</option>
         <option lang="bn">{e(BN['wm-2'])}</option>
       </select>
       <span class="as-select-wrap__arrow">{icon('chevron')}</span>
     </span>
-    <span class="as-hint">The arrow is drawn, not a character, so it keeps the theme colour.</span>
+    <span class="as-hint" id="{p}-lang-hint">The arrow is drawn, not a character, so it keeps the theme colour.</span>
   </div>
   <div class="as-field">
     <label class="as-label" for="{p}-plan">Plan</label>
     <span class="as-select-wrap">
-      <select class="as-select" id="{p}-plan" disabled>
+      <select class="as-select" id="{p}-plan" disabled aria-describedby="{p}-plan-hint">
         <option>Studio</option>
       </select>
       <span class="as-select-wrap__arrow">{icon('chevron')}</span>
     </span>
-    <span class="as-hint">Off until the account is verified.</span>
+    <span class="as-hint" id="{p}-plan-hint">Off until the account is verified.</span>
   </div>
 </div>"""
 
@@ -1231,7 +1412,7 @@ def d_typography(p, th, T):
   <hr class="as-divider">
   <p class="as-lead as-bn-large" lang="bn">{e(BN['gb-5'])}</p>
   <p lang="bn">{e(BN['vc-1'])}</p>
-  <p class="as-hint">Bangla is set in Noto Serif Bengali, never uppercased, never letter-spaced, never synthetically emboldened. Below 14 px it gains one weight step, because its মাত্রা — the headline stroke along the top of the letters — goes pale before the letters do.</p>
+  <p class="as-hint">Bangla is set in Noto Serif Bengali, never uppercased, never letter-spaced, never synthetically emboldened. Below 14 px it gains one weight step, because its <span lang="bn">মাত্রা</span> — the headline stroke along the top of the letters — goes pale before the letters do.</p>
   <hr class="as-divider">
   <div class="as-scroll-x">
     <table class="as-table as-table--numeric">
@@ -1441,7 +1622,7 @@ def d_settings(p, th, T):
         <div class="as-field">
           <label class="as-label" for="{p}-set-theme">Theme</label>
           <span class="as-select-wrap">
-            <select class="as-select" id="{p}-set-theme">
+            <select class="as-select" id="{p}-set-theme" aria-describedby="{p}-set-theme-hint">
               <option selected>Follow the system</option>
               <option>Light</option>
               <option>Dark</option>
@@ -1450,7 +1631,7 @@ def d_settings(p, th, T):
             </select>
             <span class="as-select-wrap__arrow">{icon('chevron')}</span>
           </span>
-          <span class="as-hint">Following the system also follows a request for more contrast, without a second choice here.</span>
+          <span class="as-hint" id="{p}-set-theme-hint">Following the system also follows a request for more contrast, without a second choice here.</span>
         </div>
         <label class="as-choice" for="{p}-set-motion">
           <input class="as-choice__control" id="{p}-set-motion" type="checkbox" checked>
@@ -1571,7 +1752,8 @@ def d_landing(p, th, T):
     ]
     cards = "".join(
         f'<article class="as-card"><p class="as-card__meta">{icon(ic)}</p>'
-        f'<h3 class="as-card__title">{e(t)}</h3><p class="as-card__body">{e(b)}</p></article>'
+        f'<h3 class="as-card__title">{e(t)}</h3>'
+        f'<p class="as-card__body">{e_mixed(b)}</p></article>'
         for t, b, ic in features
     )
     return f"""
@@ -1672,21 +1854,21 @@ def d_validation(p, th, T):
   </div>
   <div class="as-field">
     <label class="as-label" for="{p}-v2">Attachment</label>
-    <input class="as-input" id="{p}-v2" type="text" value="specimen-18mb.pdf" aria-invalid="true" aria-describedby="{p}-v2-err">
+    <input class="as-input" id="{p}-v2" type="text" value="specimen-18mb.pdf" aria-invalid="true" aria-describedby="{p}-v2-err {p}-v2-bn">
     <span class="as-error" id="{p}-v2-err">{icon('warn')}<span>That file is too large. The maximum is 10 MB, so choose a smaller one.</span></span>
-    <span class="as-hint" lang="bn">{e(BN['ms-2'])}</span>
+    <span class="as-hint" lang="bn" id="{p}-v2-bn">{e(BN['ms-2'])}</span>
   </div>
   <div class="as-field">
     <label class="as-label" for="{p}-v3">Group</label>
     <span class="as-select-wrap">
-      <select class="as-select" id="{p}-v3">
+      <select class="as-select" id="{p}-v3" aria-describedby="{p}-v3-hint">
         <option>Foundations</option>
         <option selected>Components</option>
         <option>Patterns</option>
       </select>
       <span class="as-select-wrap__arrow">{icon('chevron')}</span>
     </span>
-    <span class="as-hint">{icon('check')} This one is fine.</span>
+    <span class="as-hint" id="{p}-v3-hint">{icon('check')} This one is fine.</span>
   </div>
   <div class="as-row">
     <button type="submit" class="as-btn as-btn--primary">Save the entry</button>
@@ -1757,11 +1939,11 @@ CARDS = [
     dict(slug="input", group="Components", name="Input", name_bn="",
          subtitle="A label, an optional hint, and an error that says what happened and then what to do next.",
          subtitle_bn="", demo=d_input, height=1500,
-         usage=("markup", '<div class="as-field">\n  <label class="as-label" for="size">File size</label>\n  <input class="as-input" id="size" aria-invalid="true" aria-describedby="size-err">\n  <span class="as-error" id="size-err">…</span>\n</div>')),
+         usage=("markup", '<div class="as-field">\n  <label class="as-label" for="size">File size</label>\n  <input class="as-input" id="size" aria-invalid="true"\n         aria-describedby="size-hint size-err">\n  <span class="as-hint" id="size-hint">…</span>\n  <span class="as-error" id="size-err">…</span>\n</div>\n<!-- A hint is described-by too, not only an error. Without it the words are\n     next to the field for a sighted reader and absent for a screen reader. -->')),
     dict(slug="select", group="Components", name="Select", name_bn="",
          subtitle="A native select with a drawn arrow, so the arrow follows the theme instead of the operating system.",
          subtitle_bn="", demo=d_select, height=1300,
-         usage=("markup", '<span class="as-select-wrap">\n  <select class="as-select">…</select>\n  <span class="as-select-wrap__arrow"><svg class="as-icon">…</svg></span>\n</span>')),
+         usage=("markup", '<div class="as-field">\n  <label class="as-label" for="plan">Plan</label>\n  <span class="as-select-wrap">\n    <select class="as-select" id="plan" aria-describedby="plan-hint">…</select>\n    <span class="as-select-wrap__arrow"><svg class="as-icon">…</svg></span>\n  </span>\n  <span class="as-hint" id="plan-hint">…</span>\n</div>')),
     dict(slug="checkbox-radio", group="Components", name="Checkbox and radio", name_bn="",
          subtitle="Native controls at 24 px, wrapped in a label so the words are part of the target.",
          subtitle_bn="", demo=d_choice, height=1500,
@@ -1869,6 +2051,24 @@ if _BN_STRINGS.exists():
             _entry = _bn.get(f"card.{_card['slug']}.{_field}")
             if _entry and _entry.get("bn"):
                 _card[f"{_field}_bn"] = _entry["bn"]
+
+    # The theme labels, for the same reason. THEMES above carried "" for the two
+    # high-contrast labels, so 60 of the 120 theme buttons across the 30 cards were
+    # monolingual next to 60 that were bilingual — and the gap was declared nowhere,
+    # because _bangla_gaps covers card names and subtitles only. The register holds
+    # both compounds with a cited basis: verified th-3 joined to verified th-1 or
+    # th-2 with the same comma the English label uses.
+    for _index, (_key, _label, _label_bn) in enumerate(THEMES):
+        _entry = _bn.get(f"theme.{_key}")
+        if _entry and _entry.get("bn"):
+            if _entry.get("en") and _entry["en"] != _label:
+                raise BuildError(
+                    f"theme.{_key} in 06_type/bangla-strings.json is keyed to the "
+                    f"English label {_entry['en']!r} and this file writes "
+                    f"{_label!r}. The approved Bangla was joined to match that "
+                    f"exact wording, so the two must not differ."
+                )
+            THEMES[_index] = (_key, _label, _entry["bn"])
 
 GROUP_DIR = {"Foundations": "foundations", "Components": "components", "Patterns": "patterns"}
 
@@ -2108,6 +2308,37 @@ def build() -> dict[str, bytes]:
     charset = set()
     for text in pages.values():
         charset |= set(text)
+
+    # Plus the Bangla the Claude Code plugin ships, because the plugin bundles
+    # these same three subsets as assets/fonts/*.woff2 and renders its approved
+    # strings with them. Subsetting to the cards alone left the plugin unable to
+    # draw ঠ in কণ্ঠস্বর — one of its own approved strings — and ২ and ৫ in the
+    # Bangla Academy edition years it cites as its authority, so those came out as
+    # tofu boxes from the skill's own font. The union is the honest boundary: every
+    # character any consumer of these files is told it may use.
+    for extra in (PLUGIN_BANGLA_JSON, PLUGIN_BANGLA_MD):
+        if not extra.exists():
+            raise BuildError(
+                f"{extra} is missing. The subset fonts are built to cover the "
+                f"Bangla the Claude Code plugin ships, so that file has to be here."
+            )
+        charset |= set(extra.read_text(encoding="utf-8"))
+
+    # Plus the shaping test set from the type research. 06_type/review_bangla.py
+    # shows those conjuncts and words in the shipped face, so the shipped face has
+    # to contain them — ঞ, in জ্ঞ, was absent, so the one row of the review sheet
+    # whose job is to prove the conjuncts shape could not draw one of them.
+    if not MEASUREMENTS_JSON.exists():
+        raise BuildError(
+            f"{MEASUREMENTS_JSON} is missing. The subsets cover the shaping test "
+            f"set, and that is where it is recorded."
+        )
+    _shaping = json.loads(MEASUREMENTS_JSON.read_text(encoding="utf-8"))["shaping"]
+    for _face in _shaping.values():
+        charset |= set("".join(_face.get("conjuncts", {})))
+        charset |= set("".join(w.get("text", "")
+                               for w in _face.get("words", {}).values()))
+
     chars = "".join(sorted(charset))
 
     fonts: dict[str, bytes] = {}
@@ -2145,6 +2376,14 @@ def build() -> dict[str, bytes]:
             )
         guard_markup(rest, rel)
         out[rel] = text.encode("utf-8")
+
+    # WCAG 2.2 SC 3.1.2, over every card. Run on the whole page rather than on
+    # `rest`, because the language of a run depends on the lang attributes of its
+    # ancestors and <html lang="en"> is in the head.
+    guard_language_of_parts({rel: data.decode("utf-8")
+                             for rel, data in out.items() if rel.endswith(".html")})
+    guard_field_descriptions({rel: data.decode("utf-8")
+                             for rel, data in out.items() if rel.endswith(".html")})
 
     for key in ("latin", "bangla", "mono"):
         spec = FONT_SOURCES[key]
@@ -2246,7 +2485,8 @@ def main(argv: list[str]) -> int:
         size = len(artefacts[f"fonts/{spec['out']}"])
         print(f"  {spec['family']:<20} {size / 1024:6.1f} KB subset")
     gaps = bangla_gaps()
-    print(f"Bangla left in English because the verified table has no entry: "
+    print(f"Bangla left in English because neither 06_type/BANGLA-STANDARD.md nor "
+          f"06_type/bangla-strings.json holds an approved string: "
           f"{len(gaps['name_bn'])} card names, {len(gaps['subtitle_bn'])} subtitles. "
           "The slugs are listed under _bangla_gaps in _cards.json.")
     return 0

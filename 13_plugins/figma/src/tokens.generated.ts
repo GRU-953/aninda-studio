@@ -9,14 +9,14 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "2cdfc50d825f42ade2c5000560f40e688e7e6f62aae119d5837afa0d487ff68d";
+export const BUNDLE_SHA256 = "d626af6df16c93f74995a295ed43a9e1cee49d8e3485774e98b45969151668aa";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
   "07_tokens/build/primitive.tokens.json": "359b6b214801145054bd3154b51247b2cc3fbf1983f54664b959b30802aaf43f",
   "07_tokens/build/semantic.light.tokens.json": "534accf8100efb3ff853cfe026a4d00646e5e493f3ca38fdbf3ab8f8dfafc610",
   "07_tokens/build/semantic.dark.tokens.json": "fe0cc6711edb27002371282611b59da5bf801a503a424cf7af77394f4f885f78",
-  "07_tokens/build/semantic.hc-light.tokens.json": "b07f11f482d055cded17f089668a1afccb09046756c7746e50c850c796e7828c",
-  "07_tokens/build/semantic.hc-dark.tokens.json": "a54f1325076dbd613c6a41de8f4f8775fbbf5732531cfec4a95c647b6d1a36c6",
+  "07_tokens/build/semantic.hc-light.tokens.json": "3062503096667a1467c692d32fe435510683d518e85cb2758efcc2a43350bc72",
+  "07_tokens/build/semantic.hc-dark.tokens.json": "669c73a84614148a4de4171426746882a309160ad571e3d4ec0dd08ecc90257e",
   "07_tokens/build/forced-colors.map.json": "f4a01647597461616b592257d968bc948d9c0f2af0516406c05f8a8453962852",
   "04_mark/svg/icon-1024.svg": "9ff31c7bfa022fdd1cfbcf6782320b84d83422ddd617f97a8ab41248409407bd",
   "04_mark/svg/icon-1088-watch.svg": "f0dd4c249a78419af2855f90344cb05d1335444194c1ac9059e1b81c5b6bd6cb",
@@ -28,8 +28,8 @@ export const SOURCE_HASHES: { [file: string]: string } = {
   "04_mark/svg/tile-web.svg": "b631c922ebb4287e9d227fd4303864e7373dbf38467ca086fbde9cbee573600b",
   "04_mark/svg/wordmark-bangla.svg": "6b42edde179882a29c3147a78e333ef3e341fbd16913ec8fd70519599d8b464d",
   "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
-  "04_mark/manifest.json": "e0feb94e418c4379ba026c07026e68692dbb67e67108f89f59ff1b4087f997cd",
-  "08_components/_cards.json": "470f1858caae9dc091799048ea9222387f2c0e73ca1d53e9b38912967e403768"
+  "04_mark/manifest.json": "c92cc5750503bb8d3a232f732d85a7ef6d5fe9d285530bc9e5ff19b38c29851c",
+  "08_components/_cards.json": "121438f08dfdd372016501e2f5f6dced331410f6c20850bfdbd23196ee927061"
 };
 
 export const BUNDLED: RawInput = {
@@ -2555,7 +2555,7 @@ export const BUNDLED: RawInput = {
 },
     'hc-light': {
   "$schema": "https://tr.designtokens.org/format/",
-  "$description": "Aninda Studio semantic tokens — High contrast light theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 7.0:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
+  "$description": "Aninda Studio semantic tokens — High contrast, light theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 7.0:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
   "$extensions": {
     "studio.aninda": {
       "direction": "estuary",
@@ -2581,7 +2581,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#FCFDFC"
         },
-        "$description": "Tonal surface 'lowest' for the High contrast light theme",
+        "$description": "Tonal surface 'lowest' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.979743,
@@ -2599,7 +2599,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#FAFAFA"
         },
-        "$description": "Tonal surface 'low' for the High contrast light theme",
+        "$description": "Tonal surface 'low' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.955973,
@@ -2617,7 +2617,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#F7F8F7"
         },
-        "$description": "Tonal surface 'base' for the High contrast light theme",
+        "$description": "Tonal surface 'base' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.936243,
@@ -2635,7 +2635,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#F5F5F5"
         },
-        "$description": "Tonal surface 'high' for the High contrast light theme",
+        "$description": "Tonal surface 'high' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.913099,
@@ -2653,7 +2653,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#F2F3F2"
         },
-        "$description": "Tonal surface 'highest' for the High contrast light theme",
+        "$description": "Tonal surface 'highest' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.893892,
@@ -2671,7 +2671,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#F1F1F1"
         },
-        "$description": "Tonal surface 'dim' for the High contrast light theme",
+        "$description": "Tonal surface 'dim' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.879622,
@@ -2689,7 +2689,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#FFFFFF"
         },
-        "$description": "Tonal surface 'bright' for the High contrast light theme",
+        "$description": "Tonal surface 'bright' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 1.0,
@@ -2992,7 +2992,7 @@ export const BUNDLED: RawInput = {
 },
     'hc-dark': {
   "$schema": "https://tr.designtokens.org/format/",
-  "$description": "Aninda Studio semantic tokens — High contrast dark theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 7.0:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
+  "$description": "Aninda Studio semantic tokens — High contrast, dark theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 7.0:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
   "$extensions": {
     "studio.aninda": {
       "direction": "estuary",
@@ -3018,7 +3018,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#070807"
         },
-        "$description": "Tonal surface 'lowest' for the High contrast dark theme",
+        "$description": "Tonal surface 'lowest' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.002342,
@@ -3036,7 +3036,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#0C0C0C"
         },
-        "$description": "Tonal surface 'low' for the High contrast dark theme",
+        "$description": "Tonal surface 'low' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.003677,
@@ -3054,7 +3054,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#0E0F0E"
         },
-        "$description": "Tonal surface 'base' for the High contrast dark theme",
+        "$description": "Tonal surface 'base' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.004667,
@@ -3072,7 +3072,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#111111"
         },
-        "$description": "Tonal surface 'high' for the High contrast dark theme",
+        "$description": "Tonal surface 'high' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.005605,
@@ -3090,7 +3090,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#111211"
         },
-        "$description": "Tonal surface 'highest' for the High contrast dark theme",
+        "$description": "Tonal surface 'highest' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.005923,
@@ -3108,7 +3108,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#030303"
         },
-        "$description": "Tonal surface 'dim' for the High contrast dark theme",
+        "$description": "Tonal surface 'dim' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.000911,
@@ -3126,7 +3126,7 @@ export const BUNDLED: RawInput = {
           ],
           "hex": "#121212"
         },
-        "$description": "Tonal surface 'bright' for the High contrast dark theme",
+        "$description": "Tonal surface 'bright' for the High contrast, dark theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.006049,
@@ -3526,7 +3526,18 @@ export const BUNDLED: RawInput = {
   "strokes": {
     "regular": 9.0,
     "heavy": 15.0,
-    "rule": "stroke 9 at 24px and above; stroke 15 below"
+    "switch_px": 24,
+    "rule": "stroke 9 at 24 px and above; stroke 15 below",
+    "stroke_by_file": {
+      "mark-regular.svg": 9.0,
+      "mark-heavy.svg": 15.0,
+      "tile-web.svg": 15.0,
+      "icon-1024.svg": 9.0,
+      "icon-1088-watch.svg": 9.0,
+      "icon-512.svg": 9.0,
+      "icon-192.svg": 9.0,
+      "icon-appstore-square-1024.svg": 9.0
+    }
   },
   "clear_space": "half the mark's own height on all four sides",
   "safe_field": 90.0,
@@ -3583,7 +3594,7 @@ export const BUNDLED: RawInput = {
   "_warning": "GENERATED FILE. Do not hand-edit — the next build overwrites it.",
   "_note": "width and height are the declared design canvas for a card, not a measured render height. The cards are fluid; check.py measures them at 360, 768 and 1280 CSS px.",
   "_bangla_gaps": {
-    "note": "Bangla appears only where the final table of 06_type/BANGLA-STANDARD.md holds a verified string. The fields listed here are empty because that table has no entry for them. Writing new Bangla to fill them is not allowed, so they stay in English and are named here instead, for review.",
+    "note": "Bangla appears only where an approved string exists. Two files, and they are not interchangeable: 06_type/BANGLA-STANDARD.md governs — it holds the Bangla Academy spelling rules with their primary sources, and the 31 strings reviewed against them — while 06_type/bangla-strings.json is the register of 94 approved keys written under those rules, each carrying the rule number or dictionary page it rests on, and it is the file these cards actually read. The fields listed here are empty because neither holds an entry for them. Writing new Bangla to fill them is not allowed, so they stay in English and are named here instead, for review.",
     "name_bn": [],
     "subtitle_bn": []
   },
@@ -3603,7 +3614,7 @@ export const BUNDLED: RawInput = {
       "source": "06_type/candidates/bangla/notoserifbengali/NotoSerifBengali[wdth,wght].ttf",
       "licence": "SIL OFL 1.1",
       "licence_file": "fonts/notoserifbengali-OFL.txt",
-      "bytes": 103716,
+      "bytes": 110712,
       "renamed": false
     },
     {
@@ -3612,7 +3623,7 @@ export const BUNDLED: RawInput = {
       "source": "06_type/candidates/mono/ibmplexmono/IBMPlexMono-Regular.ttf",
       "licence": "SIL OFL 1.1",
       "licence_file": "fonts/anindamono-OFL.txt",
-      "bytes": 10288,
+      "bytes": 10464,
       "renamed": true
     }
   ],

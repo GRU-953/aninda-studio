@@ -1,6 +1,6 @@
 {
   "$schema": "https://tr.designtokens.org/format/",
-  "$description": "Aninda Studio semantic tokens — High contrast light theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 7.0:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
+  "$description": "Aninda Studio semantic tokens — High contrast, light theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 7.0:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
   "$extensions": {
     "studio.aninda": {
       "direction": "estuary",
@@ -26,7 +26,7 @@
           ],
           "hex": "#FCFDFC"
         },
-        "$description": "Tonal surface 'lowest' for the High contrast light theme",
+        "$description": "Tonal surface 'lowest' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.979743,
@@ -44,7 +44,7 @@
           ],
           "hex": "#FAFAFA"
         },
-        "$description": "Tonal surface 'low' for the High contrast light theme",
+        "$description": "Tonal surface 'low' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.955973,
@@ -62,7 +62,7 @@
           ],
           "hex": "#F7F8F7"
         },
-        "$description": "Tonal surface 'base' for the High contrast light theme",
+        "$description": "Tonal surface 'base' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.936243,
@@ -80,7 +80,7 @@
           ],
           "hex": "#F5F5F5"
         },
-        "$description": "Tonal surface 'high' for the High contrast light theme",
+        "$description": "Tonal surface 'high' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.913099,
@@ -98,7 +98,7 @@
           ],
           "hex": "#F2F3F2"
         },
-        "$description": "Tonal surface 'highest' for the High contrast light theme",
+        "$description": "Tonal surface 'highest' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.893892,
@@ -116,7 +116,7 @@
           ],
           "hex": "#F1F1F1"
         },
-        "$description": "Tonal surface 'dim' for the High contrast light theme",
+        "$description": "Tonal surface 'dim' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 0.879622,
@@ -134,7 +134,7 @@
           ],
           "hex": "#FFFFFF"
         },
-        "$description": "Tonal surface 'bright' for the High contrast light theme",
+        "$description": "Tonal surface 'bright' for the High contrast, light theme",
         "$extensions": {
           "studio.aninda": {
             "luminance": 1.0,

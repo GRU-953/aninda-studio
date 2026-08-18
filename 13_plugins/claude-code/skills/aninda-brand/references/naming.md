@@ -106,12 +106,19 @@ Numbered folders keep the pipeline in reading order: `04_mark`, `07_tokens`,
 | Plugin name | lowercase, hyphens | `aninda-studio` |
 | Skill name | plugin prefix, then the unit of work | `aninda-brand`, `aninda-repo`, `aninda-review` |
 | Command | `/plugin:verb-or-noun` | `/aninda-studio:asset` |
-| npm package | lowercase, hyphens | `aninda-studio` |
-| PyPI package | lowercase, hyphens | `aninda-studio` |
+| npm package | lowercase, hyphens, and it says what it holds | `aninda-studio-tokens` |
+| PyPI package | the same name as the npm one | `aninda-studio-tokens` |
 | GitHub repository | lowercase, hyphens | `GRU-953/aninda-studio` |
 
 The GitHub username `anindastudio` is taken, which is why the repository is the
 hyphenated `aninda-studio`. Checked 14 August 2026.
+
+The packages carry `-tokens` on the end because they hold the tokens and nothing
+else — not the mark, not the guidebook, not the components. This table used to
+give both of them as `aninda-studio`, which is the repository's name, so a reader
+following it typed an install command for a package that does not exist. The rule
+at the top of this file cuts both ways: one name for one thing means the packages
+may not borrow the repository's name either.
 
 ---
 

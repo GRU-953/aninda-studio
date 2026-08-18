@@ -117,6 +117,7 @@ PROOF_JSON = ROOT / "05_colour" / "generated" / "estuary.proof.json"
 MEASUREMENTS_JSON = ROOT / "06_type" / "_data" / "measurements.json"
 FONT_FACTS_JSON = ROOT / "06_type" / "_data" / "font_facts.json"
 NPM_DIST = ROOT / "12_packages" / "npm" / "dist"
+BANGLA_STANDARD = ROOT / "06_type" / "BANGLA-STANDARD.md"
 
 THEMES = ["light", "dark", "hc-light", "hc-dark"]
 
@@ -124,7 +125,7 @@ THEMES = ["light", "dark", "hc-light", "hc-dark"]
 # a primary-source review (BANGLA-STANDARD.md) or a generated artefact whose
 # Bangla was taken from it. Nothing else may contribute Bangla to this book.
 VERIFIED_BN_SOURCES = [
-    ROOT / "06_type" / "BANGLA-STANDARD.md",
+    BANGLA_STANDARD,
     ROOT / "06_type" / "RECOMMENDATION.md",
     ROOT / "06_type" / "MEASUREMENTS.md",
     CARDS_JSON,
@@ -138,10 +139,21 @@ VERIFIED_BN_SOURCES = [
 # ---------------------------------------------------------------------------
 # The verified Bangla strings, and only these
 #
+class BuildError(Exception):
+    pass
+
+
 # Source: the "Recommended final strings" table of 06_type/BANGLA-STANDARD.md,
-# 14 August 2026 — 27 strings reviewed, 6 changed, 21 unchanged. The values
-# below are the RECOMMENDED column, so the six corrections are already applied.
-# Nothing is added to this table by hand. Where a string is missing, the English
+# 14 August 2026. The values below are the RECOMMENDED column, so the six
+# corrections are already applied. Nothing is added to this table by hand.
+#
+# No counts in this comment. It used to say "27 strings reviewed, 6 changed, 21
+# unchanged", which was wrong about a table of 31 rows in the same repository.
+# bangla_standard_counts() counts that table, and the build refuses to write the
+# book if the document's own summary line disagrees with the count.
+#
+# This is HALF the Bangla. 06_type/bangla-strings.json is merged over it below and
+# supplies most of what actually ships. Where neither holds a string, the English
 # is used and the gap is named in the book itself.
 # ---------------------------------------------------------------------------
 
@@ -194,14 +206,6 @@ BN_ENGLISH = {
     "ms-4": "Saved",
 }
 
-# Composed from two verified strings each. Neither compound was itself put in
-# front of the reviewer, so both are named in the gap list rather than presented
-# as verified.
-BN_COMPOSED = {
-    "hc-light": BN.get("theme.hc-light", f"{BN['th-3']} — {BN['th-1']}"),
-    "hc-dark": BN.get("theme.hc-dark", f"{BN['th-3']} — {BN['th-2']}"),
-}
-
 # ---------------------------------------------------------------------------
 # Chapters
 # ---------------------------------------------------------------------------
@@ -216,6 +220,50 @@ if _STRINGS.exists():
     for _k, _v in json.loads(_STRINGS.read_text(encoding="utf-8")).items():
         if _v.get("bn"):
             BN[_k] = _v["bn"]
+
+
+# The two high-contrast theme labels.
+#
+# THIS BLOCK USED TO SIT FOURTEEN LINES ABOVE THE MERGE ABOVE IT. It read
+# `BN.get("theme.hc-light", f"{BN['th-3']} — {BN['th-1']}")`, and at that point in
+# the file the merge had not run, so the key was never there and the em-dash
+# fallback always won. 06_type/bangla-strings.json holds both compounds with a
+# cited basis — verified th-3 joined to verified th-1 with the same comma the
+# English label uses, comma being ordinary Western punctuation in Bangla — and
+# neither reached any shipped surface. The book then printed "The compound was not
+# itself reviewed" underneath an em-dash form nobody had reviewed, which is a false
+# statement about the standing of a string that is in fact approved.
+#
+# The fallback is kept, and it now raises instead of inventing: a missing key is a
+# gap to declare, not one to paper over with punctuation of this file's choosing.
+def _composed(key: str) -> str:
+    value = BN.get(key)
+    if not value:
+        raise BuildError(
+            f"06_type/bangla-strings.json has no approved string for {key!r}. "
+            f"This book will not compose one: an unreviewed compound presented as "
+            f"a label is exactly what the Bangla policy forbids. Add the key with "
+            f"its basis, or remove the label."
+        )
+    return value
+
+
+BN_COMPOSED = {
+    "hc-light": _composed("theme.hc-light"),
+    "hc-dark": _composed("theme.hc-dark"),
+}
+
+# The basis each one rests on, read from the register rather than described here.
+BN_COMPOSED_BASIS = {}
+if _STRINGS.exists():
+    _register = json.loads(_STRINGS.read_text(encoding="utf-8"))
+    for _key, _short in (("theme.hc-light", "hc-light"), ("theme.hc-dark", "hc-dark")):
+        BN_COMPOSED_BASIS[_short] = _register.get(_key, {}).get("basis", "")
+
+# The English labels the approved Bangla is keyed to. The book used to write
+# "High contrast light" while the Bangla was joined with the comma the label
+# carries, so the two halves of the same row disagreed about the wording.
+COMPOSED_EN = {"hc-light": "High contrast, light", "hc-dark": "High contrast, dark"}
 
 
 CHAPTERS = [
@@ -252,10 +300,6 @@ CHAPTER_STANDFIRST = {
     "13": "Three licences, one thing with no licence at all, and where the boundary falls.",
     "14": "The honest list. Not a disclaimer — every item changes how much weight to put on something earlier.",
 }
-
-
-class BuildError(Exception):
-    pass
 
 
 # ---------------------------------------------------------------------------
@@ -295,13 +339,48 @@ def fmt_bytes(n: int) -> str:
 
 
 def table(headers: list[str], rows: list[list[str]], cls: str = "gb-table",
-          caption: str = "") -> str:
+          caption: str = "", row_header: bool = True) -> str:
+    """A data table with a caption, column headers and a row header on every row.
+
+    THE BOOK PRINTS THIS RULE AND ITS OWN TABLES BROKE IT. The Table component's
+    card says "Row headers, a caption saying what the numbers are, and a sideways
+    scroll when the table is wider than the space", and both other surfaces that
+    ship that component obey it. In this book none of the 68 tables had a row
+    header and 54 had no caption, because this function emitted every body cell as
+    a <td> and ignored the caption argument on 29 of its 39 call sites.
+
+    What that costs is WCAG 2.2 SC 1.3.1 Info and Relationships, Level A. In table
+    mode a screen reader announces a cell with its headers, so on the ten-column
+    colour tables it could say "Worst case ±1 bit, 15.61:1" and never which role
+    that belonged to — the role name was a presentational <b> inside a <td>. Ten
+    and eight columns is exactly where reading order cannot recover the
+    relationship.
+
+    The caption is now REQUIRED. A table of numbers with no statement of what they
+    are is the failure this book exists to argue against, and an optional argument
+    that 29 call sites skipped is how it stayed that way.
+
+    row_header is there for the rare table whose first column is not the row's
+    identity. Nothing passes False today; the argument exists so that a table which
+    genuinely has no row identity does not force a wrong <th> on it.
+    """
+    if not caption.strip():
+        raise BuildError(
+            f"a table with headers {headers} was built with no caption. Every table "
+            f"in this book states what its rows are, because a table of figures "
+            f"with no statement of what they are is the thing this book argues "
+            f"against. Pass caption=."
+        )
     head = "".join(f"<th scope=\"col\">{h}</th>" for h in headers)
     body = []
     for row in rows:
-        cells = "".join(f"<td>{c}</td>" for c in row)
+        if row_header and row:
+            first = f'<th scope="row">{row[0]}</th>'
+            cells = first + "".join(f"<td>{c}</td>" for c in row[1:])
+        else:
+            cells = "".join(f"<td>{c}</td>" for c in row)
         body.append(f"<tr>{cells}</tr>")
-    cap = f"<caption>{caption}</caption>" if caption else ""
+    cap = f"<caption>{caption}</caption>"
     return (
         f'<div class="gb-scroll-x"><table class="{cls}">{cap}'
         f"<thead><tr>{head}</tr></thead><tbody>{''.join(body)}</tbody></table></div>"
@@ -620,7 +699,8 @@ def block_mark_files() -> str:
         rows.append([f"<code>{e(name)}</code>", fmt_bytes(path.stat().st_size)])
     checks = "".join(f"<li>{e(c)}</li>" for c in m["checks"])
     return (
-        table(["File", "Size"], rows)
+        table(["File", "Size"], rows,
+                caption="Every mark file this build wrote, with its size read off the file.")
         + details("Every check the mark build ran, and passed",
                   f'<ul class="gb-list">{checks}</ul>')
     )
@@ -635,7 +715,8 @@ def block_icon_files() -> str:
     rows.append([f"<code>{e(pol['app_store_only'])}</code>",
                  "App Store submission only. Square, unmasked, fully opaque"])
     return (
-        table(["File", "Where it is used"], rows)
+        table(["File", "Where it is used"], rows,
+                caption="Every icon artefact, and the one surface each is for.")
         + note(f"<p><strong>The decision.</strong> {e(pol['decision'])} "
                f"Verified against the {e(pol['verified_against'])}.</p>")
     )
@@ -694,7 +775,8 @@ def block_voice_strings() -> str:
         rows.append([e(BN_ENGLISH[key]), bn_span(key)])
     for key in ("ms-1", "ms-2", "ms-3", "ms-4"):
         rows.append([e(BN_ENGLISH[key]), bn_span(key)])
-    return table(["English", "Bangla"], rows)
+    return table(["English", "Bangla"], rows,
+                 caption="The verified button and message strings, English first.")
 
 
 def block_bn_strings_buttons() -> str:
@@ -707,13 +789,79 @@ def block_bn_strings_messages() -> str:
     return table(["Bangla", "English"], rows, caption="Messages.")
 
 
+def bangla_standard_counts() -> dict[str, int]:
+    """Count the recommended-strings table of 06_type/BANGLA-STANDARD.md.
+
+    The document's own summary line said "Strings reviewed: 27 · changed: 6 ·
+    unchanged: 21" four rows above a table of 31 rows, of which 6 are marked changed
+    and 25 unchanged. 6 + 21 = 27 makes the line look internally consistent, which
+    is why nobody rechecked it against the rows. This book then reprinted all three
+    figures under a caption naming that file as their source.
+
+    So they are counted here, from the table, and guard_bangla_standard_summary()
+    below checks the document's own summary line against the same count — because
+    the figures in a hand-written document cannot be generated, but they can be
+    verified.
+    """
+    lines = BANGLA_STANDARD.read_text(encoding="utf-8").splitlines()
+    try:
+        start = next(i for i, line in enumerate(lines)
+                     if line.strip() == "## Recommended final strings")
+    except StopIteration:
+        raise BuildError(
+            f"{BANGLA_STANDARD.name} has no '## Recommended final strings' heading, "
+            f"so its review counts cannot be counted."
+        )
+    changed = unchanged = 0
+    for line in lines[start + 1:]:
+        if line.startswith("## "):
+            break
+        if not line.startswith("| ") or line.startswith("| id") or line.startswith("|---"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 4:
+            continue
+        if cells[3] == "yes":
+            changed += 1
+        elif cells[3] == "no":
+            unchanged += 1
+    if not changed and not unchanged:
+        raise BuildError(f"{BANGLA_STANDARD.name}: no rows found under "
+                         f"'## Recommended final strings'")
+    return {"reviewed": changed + unchanged, "changed": changed,
+            "unchanged": unchanged}
+
+
+def guard_bangla_standard_summary() -> None:
+    """The summary line in BANGLA-STANDARD.md must match the table under it."""
+    counts = bangla_standard_counts()
+    text = BANGLA_STANDARD.read_text(encoding="utf-8")
+    match = re.search(r"\*\*Strings reviewed:\s*(\d+)\s*·\s*changed:\s*(\d+)"
+                      r"\s*·\s*unchanged:\s*(\d+)\*\*", text)
+    if not match:
+        raise BuildError(
+            f"{BANGLA_STANDARD.name} has no '**Strings reviewed: N · changed: N · "
+            f"unchanged: N**' line. This book reprints those three figures, so the "
+            f"line has to be there to be checked."
+        )
+    claimed = tuple(int(g) for g in match.groups())
+    counted = (counts["reviewed"], counts["changed"], counts["unchanged"])
+    if claimed != counted:
+        raise BuildError(
+            f"{BANGLA_STANDARD.name} claims reviewed/changed/unchanged = {claimed} "
+            f"and its own table counts {counted}. This book reprints those figures, "
+            f"so it will not print a number the document it names cannot support."
+        )
+
+
 def block_bangla_provenance() -> str:
     cards = read_json(CARDS_JSON)
     gaps = cards["_bangla_gaps"]
+    counts = bangla_standard_counts()
     rows = [
-        ["Reviewed strings", "27"],
-        ["Changed by the review", "6"],
-        ["Unchanged", "21"],
+        ["Reviewed strings", str(counts["reviewed"])],
+        ["Changed by the review", str(counts["changed"])],
+        ["Unchanged", str(counts["unchanged"])],
         ["Verified strings available to this book", str(len(BN))],
         ["Component cards with no verified Bangla name",
          str(len(gaps["name_bn"])) + " of 30"],
@@ -721,7 +869,31 @@ def block_bangla_provenance() -> str:
          str(len(gaps["subtitle_bn"])) + " of 30"],
     ]
     return table(["Measure", "Count"], rows,
-                 caption="From the final table of 06_type/BANGLA-STANDARD.md.")
+                 caption="The Bangla this book rests on. The first three rows are "
+                         "counted from the recommended-strings table of "
+                         "06_type/BANGLA-STANDARD.md; the fourth is the register "
+                         "in 06_type/bangla-strings.json merged over it, which is "
+                         "where most of what you can see comes from.")
+
+
+def _gap_caption(rows: list[list[str]]) -> str:
+    """Count the rows and describe them, rather than asserting a figure above them.
+
+    This caption used to read "Four of the fourteen chapters have no verified
+    Bangla title" — hardcoded, directly above generated rows, and refuted by every
+    one of them: all fourteen chapters now carry a Bangla title from
+    06_type/bangla-strings.json, and not one "What is missing" cell mentions a
+    missing title. It understated what the system holds, which is the safe
+    direction, and it was still a false counted claim in the chapter the book
+    offers as the calibration for everything else.
+    """
+    total = len(rows)
+    without = sum(1 for row in rows if "<em>none</em>" in row[1])
+    if without:
+        return (f"{without} of the {total} chapters have no verified Bangla title. "
+                f"All {total} lack verified Bangla body prose.")
+    return (f"All {total} chapters have a verified Bangla title. All {total} lack "
+            f"verified Bangla body prose — only the approved strings appear.")
 
 
 def block_bangla_gaps() -> str:
@@ -733,21 +905,26 @@ def block_bangla_gaps() -> str:
         else:
             rows.append([f"{num} — {e(title)}", "<em>none</em>",
                          "Title <strong>and</strong> body. Both stay in English."])
+    # The standing is read from the register, not typed. Both compounds ARE
+    # approved, with a cited basis, and the previous wording here said the opposite
+    # about them — under an em-dash form that nobody had reviewed, because the
+    # fallback that produced it ran before the register was merged.
     extra = [
-        ["High contrast light", bn_raw(BN_COMPOSED["hc-light"]),
-         "Composed from two verified strings. The compound was not itself reviewed."],
-        ["High contrast dark", bn_raw(BN_COMPOSED["hc-dark"]),
-         "Composed from two verified strings. The compound was not itself reviewed."],
+        [e(COMPOSED_EN[key]), bn_raw(BN_COMPOSED[key]), e(BN_COMPOSED_BASIS[key])]
+        for key in ("hc-light", "hc-dark")
     ]
+
     cards = read_json(CARDS_JSON)
     gaps = cards["_bangla_gaps"]
     card_names = ", ".join(gaps["name_bn"])
     return (
         table(["Chapter", "Verified Bangla title", "What is missing"], rows,
-              caption="Four of the fourteen chapters have no verified Bangla "
-                      "title. All fourteen lack verified Bangla body prose.")
+              caption=_gap_caption(rows))
         + table(["Label", "String used", "Standing"], extra,
-                caption="Two composed strings, named rather than presented as verified.")
+                caption="The two composed theme labels, with the basis each rests "
+                        "on read from 06_type/bangla-strings.json. Both are "
+                        "approved; an earlier version of this book said they were "
+                        "not, over a form nobody had reviewed.")
         + details(
             f"The {len(gaps['name_bn'])} component cards with no verified Bangla name",
             f'<p class="gb-caption">{e(card_names)}</p>'
@@ -768,7 +945,9 @@ def block_font_licences() -> str:
             f"<code>{e(spec['licence_file'])}</code>",
         ])
     return table(["Family", "Licence", "Reserved Font Name", "Subset size",
-                  "Licence text"], rows)
+                  "Licence text"], rows,
+                 caption="The three typefaces, their licences, and the size of "
+                         "each subset as written to disk.")
 
 
 def block_output_files(print_mode: bool) -> str:
@@ -810,7 +989,8 @@ def block_output_files(print_mode: bool) -> str:
         "Bangla prints in a fallback face, which is the one thing this book must "
         "not do.</p>"
     )
-    return table(["File", "What it is"], rows) + note(reason)
+    return table(["File", "What it is"], rows,
+                 caption="What this build writes, and what each file is for.") + note(reason)
 
 
 def block_kit_index() -> str:
@@ -824,7 +1004,9 @@ def block_kit_index() -> str:
         ["Identity files", "10"],
         ["Typefaces", "3, each SIL OFL 1.1"],
     ]
-    return table(["Measure", "Value"], rows) + (
+    return table(["Measure", "Value"], rows,
+                 caption="What the kit contains, counted from the repository "
+                         "each time this book is built.") + (
         '<p>The full list, with a download link for each, is at the end of this '
         "book.</p>"
     )
@@ -949,11 +1131,16 @@ def chapter_colour_en(tok: Tokens) -> str:
                 f'<div class="gb-swatch__meta"><b>{step}</b>'
                 f'<code>{e(hexv)}</code></div></div>'
             )
+        # row_header=False: this is a single row of five different measures, so
+        # the first cell is a hue rather than the row's identity. The row's
+        # identity is the family, and that is in the caption and the heading above.
         meta = table(
             ["Hue (OKLCH)", "Chroma ceiling", "Anchor", "Anchor step", "Kind"],
             [[f"{ext['hueOklch']}°", f"{ext['chromaCeiling']}",
               f"<code>{e(ext['anchor'])}</code>", str(ext["anchorStep"]),
               e(fam["kind"])]],
+            caption=f"How the {e(fam['label'])} ramp is generated.",
+            row_header=False,
         )
         note_text = fam["note"] or ramp["$description"]
         out.append(
@@ -984,7 +1171,9 @@ def chapter_colour_en(tok: Tokens) -> str:
     forced = tok.forced
     rows = [[f"<code>{e(k)}</code>", f"<code>{e(v)}</code>"]
             for k, v in forced["map"].items()]
-    out.append(table(["Token", "System colour it becomes"], rows))
+    out.append(table(["Token", "System colour it becomes"], rows,
+                     caption="Forced-colors mode: which system keyword each "
+                             "token yields to, from forced-colors.map.json."))
     out.append(
         '<ul class="gb-list">'
         + "".join(f"<li>{e(r)}</li>" for r in forced["rules"])
@@ -995,6 +1184,8 @@ def chapter_colour_en(tok: Tokens) -> str:
     m = proof["measurement"]
     out.append(table(
         ["Step", "How"],
+        caption="How every colour figure in this chapter was produced.",
+        rows=
         [["Library", e(m["library"])],
          ["Contrast method", e(m["contrast_method"])],
          ["Perceptual difference", f"ΔE{e(m['delta_e_method'])}"],
@@ -1064,7 +1255,8 @@ def theme_section(tok: Tokens, theme: str) -> str:
         f'<section class="gb-theme" data-theme="{e(theme)}">'
         f"<h3>{e(label)} — {bn_label}</h3>"
         + table(["Setting", "Value"],
-                [["Polarity", e(ext["polarity"])],
+                caption=f"What the {e(label)} theme is measured against.",
+                rows=[["Polarity", e(ext["polarity"])],
                  ["High contrast", "yes" if ext["highContrast"] else "no"],
                  ["Text target", fmt_ratio(ext["textTarget"])],
                  ["Non-text target", fmt_ratio(ext["nonTextTarget"])]])
@@ -1072,10 +1264,15 @@ def theme_section(tok: Tokens, theme: str) -> str:
         + f'<div class="gb-swatches gb-swatches--surfaces">{"".join(chips)}</div>'
         + "<h4>Roles</h4>"
         + table(["Role", "Value", "Ramp step", "Kind", "Required", "Measured",
-                 "Worst case ±1 bit", "Hardest surface", "Level", "Criterion"], rows)
+                 "Worst case ±1 bit", "Hardest surface", "Level", "Criterion"], rows,
+                caption=f"Every role in the {e(label)} theme, with the contrast "
+                        f"ratio it was measured at and the criterion it was "
+                        f"measured against.")
         + details(
             "Every role against every one of the seven surfaces",
-            table(["Role"] + surface_names, matrix_rows))
+            table(["Role"] + surface_names, matrix_rows,
+                  caption=f"Every role against every surface in the {e(label)} "
+                          f"theme. Each cell is a measured contrast ratio."))
         + "</section>"
     )
 
@@ -1103,7 +1300,9 @@ def chapter_colour_bn(tok: Tokens) -> str:
             f"<code>{e(anchor)}</code>",
             e(family),
         ])
-    out.append(table(["Bangla", "English", "Anchor", "Role"], rows))
+    out.append(table(["Bangla", "English", "Anchor", "Role"], rows,
+                     caption="The six colour family names in Bangla, each with "
+                             "the ramp it anchors."))
 
     out.append("<h2>The four themes</h2>")
     rows = []
@@ -1115,9 +1314,11 @@ def chapter_colour_bn(tok: Tokens) -> str:
             bnv, standing = bn_span("th-2", large=True), "Verified"
         else:
             bnv, standing = (bn_raw(BN_COMPOSED[theme], large=True),
-                             "Composed from two verified strings, not itself reviewed")
+                             e(BN_COMPOSED_BASIS[theme]))
         rows.append([bnv, e(label), standing])
-    out.append(table(["Bangla", "English", "Standing"], rows))
+    out.append(table(["Bangla", "English", "Standing"], rows,
+                     caption="The four theme names in Bangla, and how each "
+                             "string stands."))
     out.append(note(
         "<p>The draft Bangla for high contrast was উচ্চ বৈসাদৃশ্য, and the review "
         "rejected it on two grounds. বৈসাদৃশ্য means dissimilarity — an abstract "
@@ -1165,7 +1366,9 @@ def chapter_type_en(tok: Tokens) -> str:
             fmt_bytes(spec["bytes"]),
         ])
     out.append(table(["Family", "Version", "Licence", "Variable axes",
-                      "Reserved Font Name", "Subset"], rows))
+                      "Reserved Font Name", "Subset"], rows,
+                     caption="The three families, read from the font files "
+                             "themselves."))
     out.append(
         "<p>The mono face is IBM Plex Mono, subset and <strong>renamed</strong>. "
         "IBM Plex carries a Reserved Font Name, and subsetting counts as "
@@ -1203,7 +1406,9 @@ def chapter_type_en(tok: Tokens) -> str:
             bn_cell,
         ])
     out.append(table(["Token", "Size", "At 16 px root", "Bangla multiplier",
-                      "Bangla size"], rows))
+                      "Bangla size"], rows,
+                     caption="The type scale in rem and at a 16 px root, with the "
+                             "measured Bangla multiplier for each step."))
 
     out.append("<h2>Why Bangla needs a multiplier at all</h2>")
     out.append(
@@ -1225,7 +1430,9 @@ def chapter_type_en(tok: Tokens) -> str:
         ])
     out.append(table(["Nominal size", "Literata x-height",
                       "Noto Serif Bengali baseline to মাত্রা",
-                      "Bangla appears larger by", "Multiplier"], rows))
+                      "Bangla appears larger by", "Multiplier"], rows,
+                     caption="Where the Bangla multiplier comes from: two "
+                             "measured heights at each nominal size."))
     out.append(
         f"<p>The headline figure is <strong>×{pairing['bangla_size_multiplier_at_16']}"
         "</strong> at body size. It barely moves across the scale, because "
@@ -1257,6 +1464,8 @@ def chapter_type_en(tok: Tokens) -> str:
     nsb = meas["matra"]["notoserifbengali"]
     out.append(table(
         ["Measure", "Noto Serif Bengali"],
+        caption="The মাত্রা stroke, measured, and why it sets a weight step.",
+        rows=
         [["মাত্রা thickness", f"{nsb['matra_thickness_em']} em"],
          ["At 16 px", f"{nsb['matra_thickness_px_at_16']} device px"],
          ["At 11 px", f"{nsb['matra_thickness_px_at_11']} device px"],
@@ -1354,7 +1563,9 @@ def chapter_type_bn(tok: Tokens) -> str:
     rows = [[bn_raw(w["text"], large=True), str(w["in_chars"]), str(w["out_glyphs"])]
             for w in shaping.values()]
     out.append("<h2>The shaping test strings</h2>")
-    out.append(table(["String", "Code points", "Glyphs"], rows))
+    out.append(table(["String", "Code points", "Glyphs"], rows,
+                     caption="The shaping test strings, with code points in and "
+                             "glyphs out."))
     out.append(
         "<p>These five strings and sixteen conjuncts were shaped with HarfBuzz "
         "and produced no dotted circles, no missing glyphs and no stray hasantas. "
@@ -1389,7 +1600,8 @@ def chapter_space_en(tok: Tokens) -> str:
             f'<div class="gb-bar"><div class="gb-bar__fill" style="width:{v}px"></div>'
             f'<span class="gb-bar__label"><code>{key}</code> {v:g} px</span></div>')
     out.append(f'<div class="gb-bars">{"".join(bars)}</div>')
-    out.append(table(["Token", "Value", "At 16 px root"], rows))
+    out.append(table(["Token", "Value", "At 16 px root"], rows,
+                     caption="The ten steps of the space scale."))
 
     out.append("<h2>Four radii</h2>")
     radius = tok.prim("dimension.radius")
@@ -1407,7 +1619,8 @@ def chapter_space_en(tok: Tokens) -> str:
             f'style="border-radius:{v}px"></div>'
             f'<span class="gb-caption"><code>{key}</code><br>{v:g} px</span></div>')
     out.append(f'<div class="gb-radii">{"".join(chips)}</div>')
-    out.append(table(["Token", "Value", "Where"], rows))
+    out.append(table(["Token", "Value", "Where"], rows,
+                     caption="The four radii, and what each is used on."))
     manifest = read_json(MARK_DIR / "manifest.json")
     out.append(note(
         f"<p>The hero radius is also the icon's corner rounding, at "
@@ -1433,7 +1646,9 @@ def chapter_space_en(tok: Tokens) -> str:
     for key in ("min", "apple-min", "comfortable", "android-min"):
         v = target[key]["$value"]["value"]
         rows.append([f"<code>--as-target-{key}</code>", f"{v:g}", sources[key]])
-    out.append(table(["Token", "Size", "Where the figure comes from"], rows))
+    out.append(table(["Token", "Size", "Where the figure comes from"], rows,
+                     caption="The four target sizes, each with the guidance it "
+                             "comes from."))
     out.append(note(
         "<p>A CSS pixel is the web's device-independent unit of length. It is "
         "not the same as a physical screen pixel, an Apple point or an Android "
@@ -1445,6 +1660,8 @@ def chapter_space_en(tok: Tokens) -> str:
     fo = tok.prim("dimension.focus.ring-offset")["$value"]["value"]
     out.append(table(
         ["Token", "Value", "Why"],
+        caption="The focus ring, and the criterion behind each figure.",
+        rows=
         [[f"<code>--as-focus-ring-width</code>", f"{fw:g} px",
           "WCAG 2.2 criterion 2.4.13 asks for a perimeter at least 2 CSS pixels "
           "thick. 3 px clears it with room for a rounded corner."],
@@ -1481,11 +1698,12 @@ def chapter_space_bn(tok: Tokens) -> str:
     fo = tok.prim("dimension.focus.ring-offset")["$value"]["value"]
     out.append(table(
         ["Scale", "Steps"],
-        [["Space", ", ".join(values)],
-         ["Radii", ", ".join(radii)],
-         ["Targets", ", ".join(targets)],
-         ["Focus ring", f"{fw:g} wide, {fo:g} offset"]],
-        caption="All values in px, read from the token file."))
+        caption="Every step of every scale in this chapter, in one place. All "
+                "values in px, read from the token file.",
+        rows=[["Space", ", ".join(values)],
+              ["Radii", ", ".join(radii)],
+              ["Targets", ", ".join(targets)],
+              ["Focus ring", f"{fw:g} wide, {fo:g} offset"]]))
     return "".join(out)
 
 
@@ -1560,7 +1778,8 @@ def chapter_components_en(tok: Tokens) -> str:
                 f"{card['width']} × {card['height']}",
             ])
         out.append(f"<h2>{group} — {counts[group]}</h2>")
-        out.append(table(["Card", "Bangla", "What it shows", "Design canvas"], rows))
+        out.append(table(["Card", "Bangla", "What it shows", "Design canvas"], rows,
+                         caption=f"The {group.lower()} cards, read from 08_components/_cards.json."))
 
     out.append("<h2>The fonts each card carries</h2>")
     out.append(block_font_licences())
@@ -1596,7 +1815,8 @@ def chapter_components_bn(tok: Tokens) -> str:
     out.append("<h2>The cards that do have a verified Bangla name</h2>")
     rows = [[bn_raw(c["name_bn"], large=True), e(c["name"]), e(c["group"])]
             for c in cards["cards"] if c["name_bn"]]
-    out.append(table(["Bangla", "English", "Group"], rows))
+    out.append(table(["Bangla", "English", "Group"], rows,
+                     caption="The cards that do have a verified Bangla name."))
     out.append(
         f"<p>Five of the thirty cards carry a verified Bangla name, because five "
         f"of them share a name with a chapter of this book. The other "
@@ -1624,6 +1844,8 @@ def chapter_motion_en(tok: Tokens) -> str:
         "300 ms.</p>")
     out.append(table(
         ["Token", "Value", "What it is for"],
+        caption="The two durations, and what each is for.",
+        rows=
         [[f"<code>--as-duration-colour</code>", f"{colour_ms:g} ms",
           "Anything that changes in place: a hover tint, a border, a background, "
           "a text colour."],
@@ -1652,7 +1874,8 @@ def chapter_motion_en(tok: Tokens) -> str:
             f'{v[2]*100:.1f} {100-v[3]*100:.1f} 100 0"/></svg>',
             why,
         ])
-    out.append(table(["Token", "Curve", "Shape", "Where"], rows))
+    out.append(table(["Token", "Curve", "Shape", "Where"], rows,
+                     caption="The three easing curves, drawn from their own control points."))
 
     out.append("<h2>Material's spring system was read, and not adopted</h2>")
     out.append(
@@ -1723,7 +1946,8 @@ def chapter_motion_bn(tok: Tokens) -> str:
 
     out.append(table(
         ["Token", "Value"],
-        [["<code>--as-duration-colour</code>", f"{colour_ms:g} ms"],
+        caption="The motion tokens.",
+        rows=[["<code>--as-duration-colour</code>", f"{colour_ms:g} ms"],
          ["<code>--as-duration-move</code>", f"{move_ms:g} ms"],
          ["<code>--as-ease-standard</code>", curve("standard")],
          ["<code>--as-ease-enter</code>", curve("enter")],
@@ -1800,13 +2024,78 @@ def render_markdown(path: Path, bn_key: str | None, print_mode: bool) -> str:
     text = re.sub(r"\{\{(gap-notice)\}\}", block_sub, text)
     text = re.sub(r"\{\{(figure|data|bn-block):([a-z0-9\-]+)\}\}", block_sub, text)
 
+    # Pulled out before Markdown runs, in document order, so each caption stays
+    # with the table it was written above.
+    captions = [c.strip() for c in re.findall(r"^\{\{table:\s*(.+?)\}\}\s*$",
+                                              text, re.M)]
+    text = re.sub(r"^\{\{table:\s*.+?\}\}\s*$\n?", "", text, flags=re.M)
+
     md = markdown_mod.Markdown(extensions=["tables", "fenced_code", "sane_lists"])
     body = md.convert(text)
+    body = fix_markdown_tables(body, path.name, captions)
 
     for key, fragment in markers.items():
         body = body.replace(f"<p>{key}</p>", fragment)
         body = body.replace(key, fragment)
     return body
+
+
+def fix_markdown_tables(body: str, source: str, captions: list[str]) -> str:
+    """Give a markdown table the headers and caption the generator's tables have.
+
+    Python-Markdown's tables extension emits a bare <th> with no scope, a <tbody>
+    whose first cell is a <td>, and no caption at all — so seventeen of the book's
+    column headers declared no scope and seven of its tables had no row header even
+    after table() above was fixed. A screen reader in table mode needs both.
+
+    Three changes, all mechanical:
+      * scope="col" on every <th> in the <thead>;
+      * the first cell of every body row becomes <th scope="row">;
+      * a <caption>, taken from the `{{table:…}}` marker the chapter puts
+        immediately above the table. The caption is AUTHORED, not lifted from the
+        nearest sentence: the first version of this took the preceding paragraph
+        and captioned the name table "Both forms are correct", which is true of
+        the paragraph and says nothing about the rows. A guessed caption is worse
+        than none, because it looks deliberate. A table with no marker fails the
+        build.
+
+    Every markdown table in this book has a first column that is the row's
+    identity — Part, Stage, Situation, Use, "Use this" — which is why the promotion
+    is unconditional here. A table whose first column is a measure belongs in
+    table(row_header=False) in this file, not in chapter markdown.
+    """
+    out: list[str] = []
+    position = 0
+    pending = list(captions)
+    for match in re.finditer(r"<table>(.*?)</table>", body, re.S):
+        inner = match.group(1)
+        before = body[position:match.start()]
+        if not pending:
+            raise BuildError(
+                f"{source}: a table has no caption. Put a line reading "
+                f"{{{{table: what these rows are}}}} immediately above it. Every "
+                f"table in this book states what its rows are."
+            )
+        sentence = pending.pop(0)
+
+        head, sep, rest = inner.partition("</thead>")
+        if not sep:
+            raise BuildError(f"{source}: a markdown table has no <thead>")
+        head = head.replace("<th>", '<th scope="col">')
+        rest = re.sub(r"<tr>\s*<td>", '<tr>\n<th scope="row">', rest)
+        rest = re.sub(r'(<th scope="row">(?:(?!</td>).)*?)</td>', r"\1</th>", rest,
+                      flags=re.S)
+        out.append(before)
+        out.append(f"<table><caption>{e(sentence)}</caption>{head}</thead>{rest}</table>")
+        position = match.end()
+    out.append(body[position:])
+    if pending:
+        raise BuildError(
+            f"{source}: {len(pending)} {{{{table:…}}}} caption(s) with no table "
+            f"under them — {pending}. A caption that captions nothing is a caption "
+            f"that has drifted off its table."
+        )
+    return "".join(out)
 
 
 # ---------------------------------------------------------------------------
@@ -2526,6 +2815,75 @@ def guard_bn_sections(documents: dict[str, str]) -> None:
 # ---------------------------------------------------------------------------
 
 
+def guard_tables(documents: dict[str, str]) -> None:
+    """Every table: a caption, scope on every header, and a row header per row.
+
+    WCAG 2.2 SC 1.3.1 Info and Relationships, Level A. In table mode a screen
+    reader announces a cell together with its headers, so a data cell with only a
+    column header cannot be tied back to the row it belongs to. On the ten-column
+    colour tables that means "Worst case ±1 bit, 15.61:1" with no way to know which
+    role it is about.
+
+    This book PRINTS the rule — the Table component's card says "Row headers, a
+    caption saying what the numbers are, and a sideways scroll when the table is
+    wider than the space" — and none of its 68 tables had a row header, 54 had no
+    caption, and 17 header cells had no scope at all. Both other surfaces that ship
+    that component get it right, so the book contradicted a rule on its own pages.
+
+    A SINGLE-ROW TABLE IS EXEMPT from the row-header rule, and that is not a
+    loophole. Six tables here are one row of five different measures each — a hue,
+    a chroma ceiling, an anchor — where the first cell is a measure, not the row's
+    identity. There is no second row to tell it apart from, and forcing a <th>
+    there would assert a relationship that is not the one the table has. The
+    identity of those rows is in the caption and the heading above.
+
+    Measured with lxml over the documents that ship, not asserted about the
+    generator.
+    """
+    try:
+        from lxml import etree
+    except ImportError:
+        raise BuildError("lxml is not importable, so the tables cannot be checked")
+
+    problems: list[str] = []
+    for name, doc in documents.items():
+        tree = etree.fromstring(doc.encode("utf-8"), etree.HTMLParser())
+        tables = tree.xpath("//table")
+        for index, table in enumerate(tables):
+            where = f"{name}: table {index}"
+            caption = table.xpath("./caption")
+            # The text content, not .text. The language tagger runs before this and
+            # wraps every run in a <span lang="…">, so .text is empty on a caption
+            # that reads perfectly well.
+            caption_text = (etree.tostring(caption[0], method="text",
+                                           encoding="unicode").strip()
+                            if caption else "")
+            if not caption_text:
+                problems.append(f"{where} has no caption")
+            body_rows = table.xpath("./tbody/tr")
+            if len(body_rows) > 1:
+                for row_index, row in enumerate(body_rows):
+                    cells = row.xpath("./*")
+                    if not cells:
+                        continue
+                    if cells[0].tag != "th" or cells[0].get("scope") != "row":
+                        problems.append(
+                            f'{where} row {row_index} starts with a '
+                            f'<{cells[0].tag}>, not <th scope="row">')
+                        break
+        for header in tree.xpath("//th"):
+            if header.get("scope") not in ("col", "row"):
+                text = etree.tostring(header, method="text",
+                                      encoding="unicode").strip()[:30]
+                problems.append(f'{name}: a <th> has scope={header.get("scope")!r} '
+                                f'— "{text}"')
+    if problems:
+        raise BuildError(
+            f"WCAG 2.2 SC 1.3.1, tables, failed in {len(problems)} place(s):\n  "
+            + "\n  ".join(problems[:10]) + ("\n  …" if len(problems) > 10 else "")
+        )
+
+
 def guard_inline_bangla(documents: dict[str, str]) -> None:
     """Every run must sit in a scope declaring its own language.
 
@@ -2572,6 +2930,8 @@ def build_all() -> dict[str, str]:
     guard_english(docs)
     guard_bangla(docs)
     guard_no_external(docs)
+    guard_tables(docs)
+    guard_bangla_standard_summary()
     guard_kit(docs)
     guard_bn_sections(docs)
     guard_inline_bangla(docs)

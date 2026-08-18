@@ -79,8 +79,9 @@ OUT = HERE / "svg"
 RASTER = HERE / "png"
 
 GRID = 100.0
-STROKE_REGULAR = 9.0     # at 24px and above
-STROKE_HEAVY = 15.0      # below 24px
+STROKE_REGULAR = 9.0     # at STROKE_SWITCH_PX and above
+STROKE_HEAVY = 15.0      # below it
+STROKE_SWITCH_PX = 24    # the size the weight changes at
 SAFE = 90.0              # essential shapes live inside 90 of the 100 units
 TILE_RADIUS_PCT = 24.0   # from the system's own radius-hero token, not from folklore
 
@@ -755,14 +756,41 @@ def main() -> int:
     sheet, sheet_note = proof_sheet(docs, ink, paper)
     notes.append(sheet_note)
 
+    # Read the stroke out of each artefact that was written, so the manifest
+    # cannot claim a weight the file does not carry.
+    stroke_by_file: dict[str, float] = {}
+    for _name, _text in docs.items():
+        _widths = {float(w) for w in re.findall(r'stroke-width="([0-9.]+)"', _text)}
+        if len(_widths) > 1:
+            print(f"FAILED — nothing written:\n  {_name} mixes stroke widths "
+                  f"{sorted(_widths)}. One artefact carries one weight.",
+                  file=sys.stderr)
+            return 1
+        if _widths:
+            stroke_by_file[_name] = _widths.pop()
+
     manifest = {
         "generated_by": "04_mark/build.py",
         "warning": "Generated. Do not hand-edit — change the script and re-run.",
         "grid": GRID,
         "geometry": {"circle": CIRCLE, "stem_x": STEM_X, "stem_top": STEM_TOP,
                      "stem_bottom": STEM_BOTTOM},
-        "strokes": {"regular": STROKE_REGULAR, "heavy": STROKE_HEAVY,
-                    "rule": "stroke 9 at 24px and above; stroke 15 below"},
+        # switch_px and stroke_by_file are machine-readable on purpose. The rule
+        # used to exist here only as the prose sentence below, so every consumer
+        # retyped the switch point or ignored it — and 10_assets/build.py rendered
+        # every favicon, including the 16 px one and the 16 px plane of
+        # favicon.ico, from icon-192.svg at the regular weight, which is the one
+        # place in the whole system that the heavy weight exists for. A consumer
+        # can now ask this file which artwork carries which stroke instead of
+        # hard-coding a filename.
+        "strokes": {
+            "regular": STROKE_REGULAR,
+            "heavy": STROKE_HEAVY,
+            "switch_px": STROKE_SWITCH_PX,
+            "rule": (f"stroke {STROKE_REGULAR:g} at {STROKE_SWITCH_PX} px and "
+                     f"above; stroke {STROKE_HEAVY:g} below"),
+            "stroke_by_file": stroke_by_file,
+        },
         "clear_space": "half the mark's own height on all four sides",
         "safe_field": SAFE,
         "tile_radius_percent": TILE_RADIUS_PCT,

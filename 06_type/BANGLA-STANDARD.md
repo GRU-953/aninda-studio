@@ -410,7 +410,14 @@ Everything else here is right and should be protected in review:
 
 ## Recommended final strings
 
-**Strings reviewed: 27 · changed: 6 · unchanged: 21**
+**Strings reviewed: 31 · changed: 6 · unchanged: 25**
+
+<!-- These three figures are counted from the table below by
+     bangla_standard_counts() in 09_guidebook/build.py, and that build
+     refuses to write the book if they disagree with it. They read
+     27 / 6 / 21 until 18 August 2026, four rows above a table of 31.
+     6 + 21 = 27 is internally consistent, which is why nobody rechecked
+     it against the rows. -->
 
 | id | current | recommended | changed | reason |
 |---|---|---|---|---|

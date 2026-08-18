@@ -191,6 +191,7 @@ window.__as = (function () {
     var skip = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEMPLATE: 1, TITLE: 1 };
     var failures = [];
     var problems = [];
+    var shouted = [];
     var counted = 0;
     var worst = { ratio: Infinity, where: '' };
     var node;
@@ -201,6 +202,16 @@ window.__as = (function () {
       if (!el || skip[el.tagName]) continue;
       if (!visible(el)) continue;
       var cs = getComputedStyle(el);
+      // Sentence case, measured from the computed style rather than from the
+      // string. The rule is stated in three shipped documents and was broken on
+      // all thirty cards by one stylesheet declaration, which no reading of the
+      // copy could have found: the source string is "Foundations" and the page
+      // rendered FOUNDATIONS. Reading it here catches it whichever stylesheet
+      // does it, including one added later.
+      if (cs.textTransform === 'uppercase' || cs.textTransform === 'capitalize') {
+        shouted.push({ path: path(el), transform: cs.textTransform,
+                       text: text.trim().slice(0, 40) });
+      }
       var fg = parseColour(cs.color);
       if (!fg) { problems.push('unparsed colour ' + cs.color + ' at ' + path(el)); continue; }
       var bg = effectiveBackground(el);
@@ -223,7 +234,8 @@ window.__as = (function () {
         });
       }
     }
-    return { counted: counted, failures: failures, problems: problems, worst: worst };
+    return { counted: counted, failures: failures, problems: problems,
+             shouted: shouted, worst: worst };
   }
 
   function measureOverflow() {
@@ -691,6 +703,15 @@ def run(argv: list[str]) -> int:
                         )
                     for problem in text["problems"]:
                         found.fail(f"{label}: could not measure a background — {problem}")
+                    for shout in text["shouted"]:
+                        found.fail(
+                            f"{label}: text-transform: {shout['transform']} on "
+                            f"{shout['path']} renders \"{shout['text']}\" in other "
+                            f"than sentence case. The rule is sentence case for "
+                            f"everything — headings, buttons, labels — and the "
+                            f"reason is in 02_strategy/ENGLISH-STANDARD.md: "
+                            f"capitals are harder to read and Bangla has none."
+                        )
 
                     targets = page.evaluate(
                         "a => window.__as.measureTargets(a[0], a[1])", [INTERACTIVE, TARGET_MIN]
