@@ -77,6 +77,7 @@
   --as-line: #578076;
   --as-accent: #126974;
   --as-accent-edge: #278492;
+  --as-accent-hover: #054D56;
   --as-focus-ring: #278492;
   --as-success: #2D6C42;
   --as-warning: #7C5414;
@@ -104,6 +105,7 @@
       --as-line: #578076;
       --as-accent: #42A0AE;
       --as-accent-edge: #278492;
+      --as-accent-hover: #65BAC7;
       --as-focus-ring: #278492;
       --as-success: #59A46F;
       --as-warning: #B8863E;
@@ -129,6 +131,7 @@
       --as-line: #41655C;
       --as-accent: #054D56;
       --as-accent-edge: #126974;
+      --as-accent-hover: #013137;
       --as-focus-ring: #126974;
       --as-success: #1D502E;
       --as-warning: #5D3C07;
@@ -152,6 +155,7 @@
       --as-line: #6F9B90;
       --as-accent: #65BAC7;
       --as-accent-edge: #42A0AE;
+      --as-accent-hover: #8ED2DD;
       --as-focus-ring: #42A0AE;
       --as-success: #77BE8B;
       --as-warning: #D2A15F;
@@ -177,6 +181,7 @@
   --as-line: #578076;
   --as-accent: #126974;
   --as-accent-edge: #278492;
+  --as-accent-hover: #054D56;
   --as-focus-ring: #278492;
   --as-success: #2D6C42;
   --as-warning: #7C5414;
@@ -198,6 +203,7 @@
   --as-line: #578076;
   --as-accent: #42A0AE;
   --as-accent-edge: #278492;
+  --as-accent-hover: #65BAC7;
   --as-focus-ring: #278492;
   --as-success: #59A46F;
   --as-warning: #B8863E;
@@ -219,6 +225,7 @@
   --as-line: #41655C;
   --as-accent: #054D56;
   --as-accent-edge: #126974;
+  --as-accent-hover: #013137;
   --as-focus-ring: #126974;
   --as-success: #1D502E;
   --as-warning: #5D3C07;
@@ -240,6 +247,7 @@
   --as-line: #6F9B90;
   --as-accent: #65BAC7;
   --as-accent-edge: #42A0AE;
+  --as-accent-hover: #8ED2DD;
   --as-focus-ring: #42A0AE;
   --as-success: #77BE8B;
   --as-warning: #D2A15F;
@@ -267,6 +275,7 @@
       --as-line: CanvasText;
       --as-accent: LinkText;
       --as-accent-edge: CanvasText;
+      --as-accent-hover: ButtonFace;
       --as-focus-ring: Highlight;
       --as-success: CanvasText;
       --as-warning: CanvasText;
@@ -554,9 +563,14 @@
   color: var(--as-surface-lowest);
 }
 
+/* --as-accent-hover, not --as-accent-edge. accent-edge is proven at 3:1 as a
+   LINE; behind this button's 16px label it measured 4.3549:1 in light and
+   4.4808:1 in dark, because in both themes it moves the fill TOWARDS the
+   label's own lightness. accent-hover is proven against the label itself, one
+   step further away, and measures 9.4953:1 and 8.7727:1. */
 .as-btn--primary:hover {
-  background-color: var(--as-accent-edge);
-  border-color: var(--as-accent-edge);
+  background-color: var(--as-accent-hover);
+  border-color: var(--as-accent-hover);
 }
 
 .as-btn--primary:active {

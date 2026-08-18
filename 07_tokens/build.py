@@ -431,7 +431,8 @@ def semantic(proof: dict, theme_key: str) -> dict:
             "surface": surfaces,
             "ink": {"default": role("ink"), "muted": role("ink-muted")},
             "line": {"default": role("line")},
-            "accent": {"default": role("accent"), "edge": role("accent-edge")},
+            "accent": {"default": role("accent"), "edge": role("accent-edge"),
+                       "hover": role("accent-hover")},
             "focus": {"ring": role("focus")},
             "status": {k: role(k) for k in ("success", "warning", "danger", "info")
                        if k in t["roles"]},
@@ -462,6 +463,11 @@ FORCED_COLORS = {
         "color.line.default": "CanvasText",
         "color.accent.default": "LinkText",
         "color.accent.edge": "CanvasText",
+        # A button fill, so it takes the system's own button colour rather than a
+        # generic one. ButtonFace is paired with ButtonText by the OS, which is
+        # what makes the hovered label readable without this file choosing a
+        # contrast for it.
+        "color.accent.hover": "ButtonFace",
         "color.focus.ring": "Highlight",
         "color.status.success": "CanvasText",
         "color.status.warning": "CanvasText",

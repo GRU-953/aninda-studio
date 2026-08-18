@@ -131,12 +131,18 @@ def theme_vars(doc: dict, prim: dict) -> dict[str, str]:
     out: dict[str, str] = {}
     for name, tok in c["surface"].items():
         out[prop_for(f"color.surface.{name}")] = fmt(resolve(tok["$value"], prim))
-    for group, keys in (("ink", ("default", "muted")), ("line", ("default",)),
-                        ("accent", ("default", "edge")), ("focus", ("ring",))):
-        for k in keys:
-            out[prop_for(f"color.{group}.{k}")] = fmt(resolve(c[group][k]["$value"], prim))
-    for k, tok in c["status"].items():
-        out[prop_for(f"color.status.{k}")] = fmt(resolve(tok["$value"], prim))
+    # Walked, not listed. This used to be a hand-typed tuple of (group, keys),
+    # and adding color.accent.hover to the token source emitted the forced-colors
+    # override for it — that block iterates the map — while the four theme blocks
+    # emitted nothing, because `hover` was not in the tuple. A property overridden
+    # in forced-colors mode and defined in no theme is the same defect prop_for was
+    # written to end, one level up: two derivations of the same list disagreeing.
+    # The token document is now the only list.
+    for group in ("ink", "line", "accent", "focus", "status"):
+        for k, tok in c.get(group, {}).items():
+            if k.startswith("$"):
+                continue
+            out[prop_for(f"color.{group}.{k}")] = fmt(resolve(tok["$value"], prim))
     # A shadow on a dark ground reads as dirt, so in the dark and high-contrast
     # themes the elevation shadow resolves to none and a lighter surface carries
     # the lift instead. Stated here rather than left for a component to discover.
@@ -308,6 +314,19 @@ def verify(css: str, prim: dict, sem: dict[str, dict], forced: dict) -> list[str
         if not re.search(rf"{re.escape(prop)}\s*:", fblock):
             problems.append(f"forced-colors block does not override '{prop}' — its brand "
                             f"value would survive into forced-colors mode")
+    # And the converse, which is not the same check. A property overridden here
+    # and defined in no theme is an override of nothing: the name is dead, any
+    # component using it falls back to the initial value, and the check above
+    # reads clean because it only walks the other direction. This happened while
+    # color.accent.hover was being added — the forced-colors emitter iterates the
+    # map and picked it up, while theme_vars was iterating a hand-typed list of
+    # group keys and did not. The `unexpected` loop above cannot see it either,
+    # because it deliberately excuses any property whose values are all system
+    # keywords, which is exactly what a dead forced-colors override looks like.
+    for prop in sorted(set(re.findall(r"(--as-[a-z0-9-]+)\s*:", fblock))):
+        if prop not in theme_vars(sem["light"], prim) and prop not in static_vars(prim):
+            problems.append(f"forced-colors block overrides '{prop}', which no theme "
+                            f"defines — the override applies to nothing")
     return problems
 
 

@@ -1202,6 +1202,14 @@ def chapter_colour_en(tok: Tokens) -> str:
     return "".join(out)
 
 
+def fmt_list(names: list[str]) -> str:
+    """`a`, `b` and `c` — the Oxford-comma-free form the English standard uses."""
+    codes = [f"<code>{e(n)}</code>" for n in names]
+    if len(codes) == 1:
+        return codes[0]
+    return ", ".join(codes[:-1]) + " and " + codes[-1]
+
+
 def theme_section(tok: Tokens, theme: str) -> str:
     proof_theme = tok.proof["themes"][theme]
     ext = tok.semantic[theme]["$extensions"]["studio.aninda"]
@@ -1229,6 +1237,7 @@ def theme_section(tok: Tokens, theme: str) -> str:
 
     rows = []
     matrix_rows = []
+    fills: list[str] = []
     surface_names = [n for n in surfaces if not n.startswith("$")]
     for role, leaf in tok.roles(theme):
         p = tok.proof_of(leaf)
@@ -1246,6 +1255,21 @@ def theme_section(tok: Tokens, theme: str) -> str:
             e(p["level"]),
             e(p["criterion"]),
         ])
+        # A role of kind "fill" is a GROUND that carries text, so it is measured
+        # against the label it carries and not against the seven surfaces. Putting
+        # it in this matrix would mean inventing seven ratios that were never
+        # taken. Any other role missing a surface is a real fault and must stop the
+        # build rather than be quietly dropped from the table.
+        if x["kind"] == "fill":
+            fills.append(role)
+            continue
+        missing = [n for n in surface_names if n not in p["againstEverySurface"]]
+        if missing:
+            raise BuildError(
+                f"{theme}/{role} is kind '{x['kind']}' but was not measured against "
+                f"{missing}. Only a 'fill' role is legitimately absent from the "
+                f"against-every-surface matrix."
+            )
         matrix_rows.append(
             [f"<b>{e(role)}</b>"]
             + [fmt_ratio(p["againstEverySurface"][s]) for s in surface_names]
@@ -1269,10 +1293,20 @@ def theme_section(tok: Tokens, theme: str) -> str:
                         f"ratio it was measured at and the criterion it was "
                         f"measured against.")
         + details(
-            "Every role against every one of the seven surfaces",
+            "Every ink and line role against every one of the seven surfaces",
             table(["Role"] + surface_names, matrix_rows,
-                  caption=f"Every role against every surface in the {e(label)} "
-                          f"theme. Each cell is a measured contrast ratio."))
+                  caption=(
+                      f"Every role that sits ON a surface, against every surface in "
+                      f"the {e(label)} theme. Each cell is a measured contrast ratio. "
+                      + (f"{fmt_list(fills)} " + ("is" if len(fills) == 1 else "are")
+                         + " absent because "
+                         + ("it is a ground that carries text, so it is measured "
+                            "against the label on it — see the Hardest surface "
+                            "column above." if len(fills) == 1 else
+                            "they are grounds that carry text, so they are measured "
+                            "against the labels on them — see the Hardest surface "
+                            "column above.")
+                         if fills else ""))))
         + "</section>"
     )
 

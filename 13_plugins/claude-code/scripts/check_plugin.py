@@ -216,6 +216,52 @@ BUNDLED_FROM_REPO = {
 }
 
 
+def bundled_pairs() -> dict[str, str]:
+    """The single list of (copy in the skill, source in the repository).
+
+    Split out of check_bundled_copies so `--sync` copies exactly what the check
+    compares. Before this existed the check reported drift and a person fixed it
+    by hand, which is how the bundled Bangla subset lost ten codepoints: the
+    report was right, and the hand that acted on it missed a file.
+    """
+    pairs = dict(BUNDLED_FROM_REPO)
+    for source in sorted((REPO_ROOT / "07_tokens" / "build").glob("*.json")):
+        pairs[f"aninda-brand/assets/tokens/{source.name}"] = f"07_tokens/build/{source.name}"
+    for source in sorted((REPO_ROOT / "04_mark" / "svg").glob("*.svg")):
+        copy = SKILLS / "aninda-brand" / "assets" / "marks" / source.name
+        if copy.exists():
+            pairs[f"aninda-brand/assets/marks/{source.name}"] = f"04_mark/svg/{source.name}"
+    # Every subset font, from the source side, so a MISSING copy is a failure and
+    # not merely an absence. This is the direction the hand-typed entry got wrong.
+    for source in sorted((REPO_ROOT / "08_components" / "fonts").glob("*.woff2")):
+        pairs[f"aninda-brand/assets/fonts/{source.name}"] = \
+            f"08_components/fonts/{source.name}"
+    return pairs
+
+
+def sync_bundled_copies() -> int:
+    """Copy every source over its bundled copy. Prints what it changed."""
+    changed = []
+    for relative, origin in sorted(bundled_pairs().items()):
+        copy, source = SKILLS / relative, REPO_ROOT / origin
+        if not source.exists():
+            print(f"  ! {origin} is missing — cannot sync skills/{relative}",
+                  file=sys.stderr)
+            return 1
+        data = source.read_bytes()
+        if not copy.exists() or copy.read_bytes() != data:
+            copy.parent.mkdir(parents=True, exist_ok=True)
+            copy.write_bytes(data)
+            changed.append(f"skills/{relative}  <-  {origin}")
+    if changed:
+        print(f"Synced {len(changed)} bundled file(s):")
+        for line in changed:
+            print(f"  {line}")
+    else:
+        print("Every bundled file already matched its source. Nothing copied.")
+    return 0
+
+
 def check_bundled_copies(problems: Problems) -> None:
     """Nothing copied into the skill may have drifted from the file it came from.
 
@@ -241,18 +287,7 @@ def check_bundled_copies(problems: Problems) -> None:
     pattern that only looks at what the copy holds could be satisfied by deleting
     the copy — every subset the repository ships must also be present.
     """
-    pairs = dict(BUNDLED_FROM_REPO)
-    for source in sorted((REPO_ROOT / "07_tokens" / "build").glob("*.json")):
-        pairs[f"aninda-brand/assets/tokens/{source.name}"] = f"07_tokens/build/{source.name}"
-    for source in sorted((REPO_ROOT / "04_mark" / "svg").glob("*.svg")):
-        copy = SKILLS / "aninda-brand" / "assets" / "marks" / source.name
-        if copy.exists():
-            pairs[f"aninda-brand/assets/marks/{source.name}"] = f"04_mark/svg/{source.name}"
-    # Every subset font, from the source side, so a MISSING copy is a failure and
-    # not merely an absence. This is the direction the hand-typed entry got wrong.
-    for source in sorted((REPO_ROOT / "08_components" / "fonts").glob("*.woff2")):
-        pairs[f"aninda-brand/assets/fonts/{source.name}"] = \
-            f"08_components/fonts/{source.name}"
+    pairs = bundled_pairs()
 
     stale = []
     for relative, origin in sorted(pairs.items()):
@@ -516,6 +551,9 @@ def check_bundles(problems: Problems) -> None:
 
 
 def main() -> int:
+    if "--sync" in sys.argv[1:]:
+        return sync_bundled_copies()
+
     problems = Problems()
     check_manifest(problems)
     check_commands(problems)

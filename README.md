@@ -28,7 +28,7 @@ written down rather than left for you to find.
 
 **Every colour pairing in this system was measured, not chosen.**
 
-There are **40 colour role and theme pairings** across
+There are **44 colour role and theme pairings** across
 **4 themes** — light, dark, and a high-contrast pair. Each one was
 measured against every surface it can land on, on the rounded 8-bit hex a browser
 actually produces, and then measured again with every channel of both colours
@@ -52,7 +52,7 @@ number a person types is a number that can be wrong and stay wrong.
 | Folder | What it holds |
 |---|---|
 | `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (14.7 MB) that needs no network, plus a 1.8 MB PDF |
-| `07_tokens/` | The design tokens: DTCG source, and 63 CSS custom properties generated from it |
+| `07_tokens/` | The design tokens: DTCG source, and 64 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
 | `04_mark/` | 10 mark, wordmark and icon files |
 | `10_assets/` | 20 ready-made images at exact platform sizes |

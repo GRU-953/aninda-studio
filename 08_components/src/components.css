@@ -228,9 +228,14 @@
   color: var(--as-surface-lowest);
 }
 
+/* --as-accent-hover, not --as-accent-edge. accent-edge is proven at 3:1 as a
+   LINE; behind this button's 16px label it measured 4.3549:1 in light and
+   4.4808:1 in dark, because in both themes it moves the fill TOWARDS the
+   label's own lightness. accent-hover is proven against the label itself, one
+   step further away, and measures 9.4953:1 and 8.7727:1. */
 .as-btn--primary:hover {
-  background-color: var(--as-accent-edge);
-  border-color: var(--as-accent-edge);
+  background-color: var(--as-accent-hover);
+  border-color: var(--as-accent-hover);
 }
 
 .as-btn--primary:active {

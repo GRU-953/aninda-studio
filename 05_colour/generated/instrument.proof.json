@@ -404,6 +404,25 @@
           "criterion": "WCAG 2.2 1.4.11",
           "rationale": "lightest accent step clearing 3.0:1 against all 7 surfaces, hardest being dim"
         },
+        "accent-hover": {
+          "value": "#174182",
+          "family": "accent",
+          "step": 800,
+          "target": 4.5,
+          "measured": {
+            "label (surface.lowest)": 9.6019
+          },
+          "hardest_ground": "label (surface.lowest)",
+          "ratio": 9.6019,
+          "worst_case_lsb": 9.3821,
+          "kind": "fill",
+          "level": "AAA",
+          "criterion": "WCAG 2.2 1.4.3",
+          "carries": "surface.lowest",
+          "rest_step": 700,
+          "de_from_rest": 9.141,
+          "rationale": "nearest accent step beyond 700, away from the label #FBFBFC, clearing 4.5:1 as a ground under that label and staying \u0394E 9.14 from the resting fill"
+        },
         "success": {
           "value": "#276C4B",
           "family": "success",
@@ -652,6 +671,25 @@
           "level": "meets 1.4.11",
           "criterion": "WCAG 2.2 1.4.11",
           "rationale": "darkest accent step clearing 3.0:1 against all 7 surfaces, hardest being bright"
+        },
+        "accent-hover": {
+          "value": "#6DAAFF",
+          "family": "accent",
+          "step": 400,
+          "target": 4.5,
+          "measured": {
+            "label (surface.lowest)": 8.2342
+          },
+          "hardest_ground": "label (surface.lowest)",
+          "ratio": 8.2342,
+          "worst_case_lsb": 8.0883,
+          "kind": "fill",
+          "level": "AAA",
+          "criterion": "WCAG 2.2 1.4.3",
+          "carries": "surface.lowest",
+          "rest_step": 500,
+          "de_from_rest": 7.937,
+          "rationale": "nearest accent step beyond 500, away from the label #0C0C0D, clearing 4.5:1 as a ground under that label and staying \u0394E 7.94 from the resting fill"
         },
         "success": {
           "value": "#52A47B",
@@ -902,6 +940,25 @@
           "criterion": "policy, above WCAG 2.2 1.4.11 \u2014 WCAG defines no AAA level for non-text contrast",
           "rationale": "lightest accent step clearing 4.5:1 against all 7 surfaces, hardest being dim"
         },
+        "accent-hover": {
+          "value": "#0B2855",
+          "family": "accent",
+          "step": 900,
+          "target": 7.0,
+          "measured": {
+            "label (surface.lowest)": 13.8947
+          },
+          "hardest_ground": "label (surface.lowest)",
+          "ratio": 13.8947,
+          "worst_case_lsb": 13.6036,
+          "kind": "fill",
+          "level": "AAA",
+          "criterion": "WCAG 2.2 1.4.6",
+          "carries": "surface.lowest",
+          "rest_step": 800,
+          "de_from_rest": 9.21,
+          "rationale": "nearest accent step beyond 800, away from the label #FAFAFB, clearing 7.0:1 as a ground under that label and staying \u0394E 9.21 from the resting fill"
+        },
         "success": {
           "value": "#185036",
           "family": "success",
@@ -1150,6 +1207,25 @@
           "level": "meets policy",
           "criterion": "policy, above WCAG 2.2 1.4.11 \u2014 WCAG defines no AAA level for non-text contrast",
           "rationale": "darkest accent step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+        },
+        "accent-hover": {
+          "value": "#99C6FF",
+          "family": "accent",
+          "step": 300,
+          "target": 7.0,
+          "measured": {
+            "label (surface.lowest)": 11.3211
+          },
+          "hardest_ground": "label (surface.lowest)",
+          "ratio": 11.3211,
+          "worst_case_lsb": 11.139,
+          "kind": "fill",
+          "level": "AAA",
+          "criterion": "WCAG 2.2 1.4.6",
+          "carries": "surface.lowest",
+          "rest_step": 400,
+          "de_from_rest": 7.906,
+          "rationale": "nearest accent step beyond 400, away from the label #080809, clearing 7.0:1 as a ground under that label and staying \u0394E 7.91 from the resting fill"
         },
         "success": {
           "value": "#72BE96",

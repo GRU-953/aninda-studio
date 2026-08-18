@@ -287,6 +287,28 @@
           }
         },
         "$value": "{color.ramp.accent.600}"
+      },
+      "hover": {
+        "$description": "nearest accent step beyond 500, away from the label #0B0C0B, clearing 4.5:1 as a ground under that label and staying ΔE 7.97 from the resting fill",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "accent",
+            "step": 400,
+            "kind": "fill",
+            "proof": {
+              "required": 4.5,
+              "measured": 8.7727,
+              "worstCaseLsb": 8.6199,
+              "hardestGround": "label (surface.lowest)",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.3",
+              "againstEverySurface": {
+                "label (surface.lowest)": 8.7727
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.accent.400}"
       }
     },
     "focus": {

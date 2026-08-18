@@ -786,7 +786,9 @@ ROLE_ORDER = [
     ("ink", "muted", "--as-ink-muted", "Secondary text, hints, captions"),
     ("line", "default", "--as-line", "Borders, rules, dividers"),
     ("accent", "default", "--as-accent", "Links, the primary action"),
-    ("accent", "edge", "--as-accent-edge", "The hovered primary action"),
+    ("accent", "edge", "--as-accent-edge", "The line around an accent surface"),
+    ("accent", "hover", "--as-accent-hover", "The hovered primary action, "
+     "measured against the label it carries"),
     ("focus", "ring", "--as-focus-ring", "The focus indicator"),
     ("status", "success", "--as-success", "Something finished"),
     ("status", "warning", "--as-warning", "Something needs attention"),
@@ -1301,7 +1303,7 @@ def d_code(p, th, T):
   border-color: var(--as-accent);
   color: var(--as-surface-lowest);
 }
-.as-btn--primary:hover  { background-color: var(--as-accent-edge); }
+.as-btn--primary:hover  { background-color: var(--as-accent-hover); }
 .as-btn--primary:active { box-shadow: inset 0 0 0 1px var(--as-surface-lowest); }""",
     )
     second = code_block(

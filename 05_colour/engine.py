@@ -450,6 +450,89 @@ def pick(fam: Family, grounds: dict[str, str], target: float, polarity: str,
     )
 
 
+def pick_fill(fam: Family, label: str, target: float, polarity: str,
+              what: str, rest_step: int) -> dict:
+    """A ramp step to paint BEHIND text, measured against that text.
+
+    `pick` answers a different question: which step of this family is legible
+    when it is the ink sitting ON the seven surfaces. A button fill inverts the
+    relationship — the role is the ground and one specific colour is the ink —
+    so the seven surfaces are irrelevant to it and `surface.lowest`, the label,
+    is the only thing it must clear.
+
+    Round 3 of the review found the consequence of not having this function.
+    `.as-btn--primary:hover` was painted with `accent-edge`, a role proven at
+    3:1 as a LINE, and the white label on it measured 4.3549:1 in light and
+    4.4808:1 in dark. Both harnesses read resting states only, so nothing saw
+    it. The role was legitimately proven; it was proven for the wrong job.
+
+    The step is taken one rung FURTHER FROM THE LABEL than the resting fill, so
+    hovering always deepens the contrast rather than eroding it — the specific
+    error being fixed was a hover that moved the fill towards the label's own
+    lightness. It must also stay visibly different from the resting fill, or the
+    state change is invisible; ΔE2000 against `rest_step` is checked, not assumed.
+    """
+    # Away from the label. `surface.lowest` is near-white on a light theme, so
+    # further means darker: scan up the steps. On a dark theme it is near-black,
+    # so further means lighter: scan down. Getting this backwards is exactly the
+    # fault under repair, so it is derived from the label's own luminance rather
+    # than from `polarity` — one fewer thing that can be passed in wrongly.
+    away = STEPS if luminance(label) > 0.5 else tuple(reversed(STEPS))
+    if polarity != ("light" if luminance(label) > 0.5 else "dark"):
+        raise Fail(
+            f"{what}: the label colour {label} is not the polarity's extreme. "
+            f"A fill role is measured against the label it carries, and this "
+            f"label does not look like one this theme would use."
+        )
+
+    rest = fam.ramp[rest_step]
+    started = False
+    best_step, best_worst, best_de = None, -1.0, 0.0
+    for s in away:
+        if s == rest_step:
+            started = True
+            continue
+        if not started:
+            continue
+        w = worst_case_ratio(label, fam.ramp[s])
+        d = de2000(fam.ramp[s], rest)
+        if w > best_worst:
+            best_step, best_worst, best_de = s, w, d
+        if w >= target and d >= MIN_RAMP_DE:
+            return {
+                "value": fam.ramp[s],
+                "family": fam.key,
+                "step": s,
+                "target": target,
+                "measured": {"label (surface.lowest)": ratio(label, fam.ramp[s])},
+                "hardest_ground": "label (surface.lowest)",
+                "ratio": ratio(label, fam.ramp[s]),
+                "worst_case_lsb": w,
+                "kind": "fill",
+                "level": level(w, "text", target),
+                "criterion": (
+                    "WCAG 2.2 1.4.6" if target == AAA_TEXT else "WCAG 2.2 1.4.3"
+                ),
+                "carries": "surface.lowest",
+                "rest_step": rest_step,
+                "de_from_rest": d,
+                "rationale": (
+                    f"nearest {fam.key} step beyond {rest_step}, away from the "
+                    f"label {label}, clearing {target}:1 as a ground under that "
+                    f"label and staying ΔE {d:.2f} from the resting fill"
+                ),
+            }
+
+    raise Fail(
+        f"{what}: no step of '{fam.key}' beyond {rest_step} both clears "
+        f"{target}:1 under the label {label} and stays ΔE {MIN_RAMP_DE} from "
+        f"the resting fill. Best was step {best_step} at {best_worst}:1, "
+        f"ΔE {best_de:.2f}. A hovered fill that fails this must not ship: the "
+        f"label on it becomes unreadable in the one state a pointer user sees "
+        f"most. Widen the accent ramp or drop the hover fill change."
+    )
+
+
 def build_theme(theme: Theme, fams: dict[str, Family]) -> dict:
     ground = fams["ground"]
     surfaces = build_surfaces(theme, ground)
@@ -470,6 +553,14 @@ def build_theme(theme: Theme, fams: dict[str, Family]) -> dict:
     add("accent", "accent", theme.text_target)
     add("accent-edge", "accent", theme.nontext_target, kind="nontext")
     add("focus", "accent", theme.nontext_target, kind="nontext")
+
+    # A ground that carries text, so it is measured against the text and not
+    # against the surfaces. See pick_fill for why this is a separate function
+    # and which shipped defect it repairs.
+    roles["accent-hover"] = pick_fill(
+        fams["accent"], surfaces["lowest"], theme.text_target, theme.polarity,
+        f"{theme.key}/accent-hover", roles["accent"]["step"],
+    )
     for sem in ("success", "warning", "danger", "info"):
         if sem in fams:
             add(sem, sem, theme.text_target)

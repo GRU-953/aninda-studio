@@ -168,6 +168,66 @@ MEASURE_JS = r"""
 }
 """
 
+# Measures one element's own text against its composited effective background,
+# right now — so it can be called while a real pointer is held over a control.
+# MEASURE_JS above can only ever see the resting page. Round 3 found the primary
+# button's hover fill taking its white label to 4.3549:1 with every resting
+# measurement in this file passing, which is what an unmeasured state costs.
+HOVER_JS = r"""
+(el) => {
+  const px = v => parseFloat(v) || 0;
+  const parse = c => {
+    const m = c.match(/[\d.]+/g);
+    if (!m) return null;
+    return [ +m[0], +m[1], +m[2], m.length > 3 ? +m[3] : 1 ];
+  };
+  const over = (top, under) => {
+    const a = top[3];
+    return [ top[0]*a + under[0]*(1-a), top[1]*a + under[1]*(1-a),
+             top[2]*a + under[2]*(1-a), 1 ];
+  };
+  const effectiveBg = e => {
+    const layers = []; let opacity = 1;
+    for (let n = e; n && n.nodeType === 1; n = n.parentElement) {
+      const cs = getComputedStyle(n);
+      const own = parseFloat(cs.opacity);
+      if (!isNaN(own)) opacity *= own;
+      const c = parse(cs.backgroundColor);
+      if (!c) continue;
+      const layer = [c[0], c[1], c[2], c[3] * opacity];
+      if (layer[3] > 0) layers.push(layer);
+      if (layer[3] >= 0.999) break;
+    }
+    if (!layers.length || layers[layers.length-1][3] < 0.999) layers.push([255,255,255,1]);
+    let r = layers[layers.length-1];
+    for (let i = layers.length-2; i >= 0; i--) r = over(layers[i], r);
+    return r;
+  };
+  const lum = ([r,g,b]) => {
+    const f = v => { v /= 255; return v <= 0.04045 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); };
+    return 0.2126*f(r) + 0.7152*f(g) + 0.0722*f(b);
+  };
+  const ratio = (a, b) => {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+    return (x + 0.05) / (y + 0.05);
+  };
+  const cs = getComputedStyle(el);
+  const own = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+  if (!own) return { skipped: 'no text node of its own' };
+  const fg = parse(cs.color);
+  if (!fg || fg[3] === 0) return { skipped: 'no opaque text colour' };
+  const bg = effectiveBg(el);
+  const size = px(cs.fontSize), weight = parseInt(cs.fontWeight) || 400;
+  return {
+    ratio: +ratio(over(fg, bg), bg).toFixed(4),
+    size, weight,
+    large: size >= 24 || (size >= 18.66 && weight >= 700),
+    text: el.textContent.trim().slice(0, 40),
+    tag: el.tagName.toLowerCase(),
+  };
+}
+"""
+
 
 def main() -> int:
     try:
@@ -183,7 +243,7 @@ def main() -> int:
 
     problems: list[str] = []
     notes: list[str] = []
-    counts = {"text": 0, "targets": 0}
+    counts = {"text": 0, "targets": 0, "hovered": 0}
 
     with sync_playwright() as p:
         try:
@@ -236,12 +296,57 @@ def main() -> int:
                         problems.append(f"{where}: <{c['tag']} class={c['cls']!r}> has {c['by']}px "
                                         f"outside an ancestor that clips it — invisible and "
                                         f"unreachable")
+                    # ---- the same text, hovered ----
+                    # A :hover that repaints the ground under a label can move
+                    # that label below its floor while every resting reading
+                    # passes. Nothing above this line can see that, so a real
+                    # pointer is moved over each control and the label is read
+                    # again in place.
+                    INT = ('a[href],button,input[type="submit"],input[type="button"],'
+                           'summary,[role="button"]')
+                    for handle in pg.query_selector_all(INT):
+                        try:
+                            if not handle.is_visible():
+                                continue
+                            handle.scroll_into_view_if_needed(timeout=1500)
+                            handle.hover(timeout=1500)
+                        except Exception:
+                            notes.append(f"{where}: a control could not be hovered, so its "
+                                         f"hovered label contrast was not measured.")
+                            continue
+                        pg.wait_for_timeout(20)
+                        h = handle.evaluate(HOVER_JS)
+                        counts["hovered"] += 1
+                        if "ratio" not in h:
+                            continue
+                        need = TARGET[theme]
+                        if h["large"]:
+                            need = 4.5 if theme.startswith("hc") else 3.0
+                        if h["ratio"] < need:
+                            problems.append(
+                                f"{where}: <{h['tag']}> label measures {h['ratio']}:1 while "
+                                f"hovered, needs {need}:1 — {h['text']!r} at "
+                                f"{h['size']}/{h['weight']}. The resting state passes; the "
+                                f"state a pointer is actually in does not."
+                            )
+                    pg.mouse.move(0, 0)
+
                     for e in errs:
                         problems.append(f"{where}: {e}")
                     ctx.close()
 
         notes.append(f"{counts['text']} text nodes measured against composited backgrounds")
         notes.append(f"{counts['targets']} interactive targets sized")
+        # Counted and floored, not merely attempted. A hover sweep that silently
+        # measured nothing would print the same clean report as one that measured
+        # everything — the shape this repository has now been caught in twice.
+        notes.append(f"{counts['hovered']} controls measured while a pointer was over them")
+        if counts["hovered"] < len(PAGES) * len(WIDTHS) * len(THEMES):
+            problems.append(
+                f"the hovered-label sweep measured only {counts['hovered']} controls across "
+                f"{len(PAGES) * len(WIDTHS) * len(THEMES)} page/width/theme combinations. "
+                f"It is meant to reach at least one per combination, so it did not really run."
+            )
         notes.append(f"{len(PAGES)} pages × {len(WIDTHS)} widths × {len(THEMES)} themes")
 
         # --- forced colours, with a liveness probe FIRST --------------------
@@ -260,7 +365,16 @@ def main() -> int:
             problems.append("forced-colors emulation is INERT — a #ff00ff element came back "
                             "unchanged, so this check proves nothing and must not pass")
         else:
-            survivors = pg.evaluate("""() => {
+            # r""" — NOT """. This block was widened to catch 3, 4 and 8-digit
+            # hex and the colour functions, the fix was reported as proved, and
+            # it was not: in a non-raw Python string `\b` is a BACKSPACE
+            # character, so the regex that reached the browser demanded a literal
+            # \x08 after the hex digits and could never match anything. `\s`
+            # only survived because it is an *invalid* escape, which Python keeps
+            # verbatim while emitting a SyntaxWarning — the warning that gave this
+            # away. The pattern was validated in isolation instead of through the
+            # code that runs it, which is why it read as fixed for a day.
+            survivors = pg.evaluate(r"""() => {
                 const cs = getComputedStyle(document.documentElement);
                 const out = [];
                 for (const n of cs) {

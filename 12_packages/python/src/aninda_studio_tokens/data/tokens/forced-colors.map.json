@@ -15,6 +15,7 @@
     "color.line.default": "CanvasText",
     "color.accent.default": "LinkText",
     "color.accent.edge": "CanvasText",
+    "color.accent.hover": "ButtonFace",
     "color.focus.ring": "Highlight",
     "color.status.success": "CanvasText",
     "color.status.warning": "CanvasText",

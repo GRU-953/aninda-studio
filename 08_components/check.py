@@ -416,7 +416,40 @@ window.__as = (function () {
     document.head.appendChild(style);
   }
 
+  /* The contrast of ONE element's own text against its composited background,
+     right now. measureText sweeps the whole page, but it can only ever see the
+     resting state — the pointer is nowhere and nothing is pressed. This exists
+     to be called while a real pointer is held over a control, which is the only
+     way a :hover fill gets measured at all.
+
+     Round 3 found why that matters: .as-btn--primary:hover was painted with a
+     role proven at 3:1 as a line, and the label on it measured 4.3549:1. Every
+     resting state passed, in four themes, at three widths, for months. */
+  function contrastNow(el) {
+    var cs = getComputedStyle(el);
+    var own = Array.prototype.some.call(el.childNodes, function (nd) {
+      return nd.nodeType === 3 && nd.textContent.trim();
+    });
+    if (!own) return { skipped: 'no text node of its own' };
+    var fg = parseColour(cs.color);
+    if (!fg) return { error: 'unparsed color ' + cs.color };
+    if (fg.a === 0) return { skipped: 'transparent text' };
+    var bg = effectiveBackground(el);
+    if (bg.error) return { error: bg.error };
+    var size = parseFloat(cs.fontSize) || 0;
+    var weight = parseInt(cs.fontWeight, 10) || 400;
+    return {
+      ratio: Math.round(contrast(over(fg, bg.colour), bg.colour) * 10000) / 10000,
+      fontSize: size,
+      fontWeight: weight,
+      large: size >= 24 || (size >= 18.66 && weight >= 700),
+      text: el.textContent.trim().slice(0, 40),
+      path: path(el)
+    };
+  }
+
   return {
+    contrastNow: contrastNow,
     measureText: measureText,
     measureOverflow: measureOverflow,
     measureTargets: measureTargets,
@@ -463,8 +496,13 @@ CANNOT_CHECK = [
     "The press test compares a fixed list of computed properties. A :active rule "
     "that changed only some property outside that list would read as dead here.",
     "Mid-transition states. Transitions are frozen for the whole run, so every "
-    "reading is of a resting state. A colour that dips below its floor for 60 ms "
-    "on its way somewhere would not be seen here.",
+    "reading is of a settled state. A colour that dips below its floor for 60 ms "
+    "on its way somewhere would not be seen here. This entry used to say 'every "
+    "reading is of a resting state', which invited the reader to believe the "
+    "hovered and pressed states had been read as well. They had not, and a "
+    "hovered button label was sitting at 4.3549:1 behind that sentence. Text "
+    "contrast is now measured in three states — at rest by the page sweep, and "
+    "hovered and pressed by the pointer pass.",
     "The four themes inside the quad panels are not driven by a pointer. "
     "Interaction and focus are measured on the primary stage, where every "
     "distinct control appears once, in all four page themes.",
@@ -729,7 +767,9 @@ def run(argv: list[str]) -> int:
                         page.evaluate("t => window.__as.setTheme(t)", theme)
                         page.wait_for_timeout(30)
                         label = f"{slug} @{width} [{theme}]"
-                        did, rings = check_interaction(page, label, found)
+                        did, rings = check_interaction(
+                            page, label, found,
+                            TEXT_MIN_HC if theme in HC_THEMES else TEXT_MIN)
                         elements_interacted += did
                         rings_measured += rings
 
@@ -911,7 +951,7 @@ def place(page, handle, viewport, pad: int, tries: int = 3):
     return None
 
 
-def check_interaction(page, label: str, found: Findings) -> tuple[int, int]:
+def check_interaction(page, label: str, found: Findings, text_min: float) -> tuple[int, int]:
     """Drive a real pointer over every control on the stage, then measure the
     focus ring from pixels."""
     handles = page.query_selector_all(f".as-doc-stage :is({INTERACTIVE})")
@@ -962,9 +1002,11 @@ def check_interaction(page, label: str, found: Findings) -> tuple[int, int]:
         page.mouse.move(cx, cy)
         page.wait_for_timeout(25)
         hover = handle.evaluate("(el, p) => window.__as.styleOf(el, p)", COMPARED_PROPS)
+        hover_text = handle.evaluate("el => window.__as.contrastNow(el)")
         page.mouse.down()
         page.wait_for_timeout(25)
         active = handle.evaluate("(el, p) => window.__as.styleOf(el, p)", COMPARED_PROPS)
+        active_text = handle.evaluate("el => window.__as.contrastNow(el)")
         page.mouse.up()
         if tag == "select":
             page.keyboard.press("Escape")
@@ -977,6 +1019,27 @@ def check_interaction(page, label: str, found: Findings) -> tuple[int, int]:
                 f"{label}: {described} looks identical while pressed and while hovered. "
                 "That is what a dead :active rule looks like from outside the browser."
             )
+
+        # The label has to stay readable in the states a pointer user spends the
+        # most time in, not only in the one a static scan can reach.
+        for state, m in (("hovered", hover_text), ("pressed", active_text)):
+            if not m or "ratio" not in m:
+                if m and "error" in m:
+                    found.fail(f"{label}: {described} — could not measure its {state} "
+                               f"label contrast: {m['error']}")
+                continue
+            # Large text has its own floors: 3:1 at AA (1.4.3) and 4.5:1 at
+            # AAA (1.4.6). Holding a 24px heading to 4.5 would be inventing a
+            # rule; holding a 16px button label to 3 would be excusing one.
+            large_floor = {TEXT_MIN: NON_TEXT_MIN, TEXT_MIN_HC: TEXT_MIN}[text_min]
+            need = large_floor if m["large"] else text_min
+            if m["ratio"] < need:
+                found.fail(
+                    f"{label}: {described} label measures {m['ratio']}:1 while {state}, "
+                    f"needs {need}:1 — \"{m['text']}\" at "
+                    f"{m['fontSize']}/{m['fontWeight']}. A resting state that passes "
+                    f"proves nothing about the state a pointer is actually in."
+                )
 
         # ---- focus ring, measured from pixels ----
         page.evaluate("() => { if (document.activeElement) document.activeElement.blur(); }")
