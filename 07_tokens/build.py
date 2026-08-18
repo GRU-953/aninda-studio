@@ -459,7 +459,15 @@ FORCED_COLORS = {
         "color.surface.dim": "Canvas",
         "color.surface.bright": "Canvas",
         "color.ink.default": "CanvasText",
-        "color.ink.muted": "GrayText",
+        # CanvasText, not GrayText. CSS Color 4 defines GrayText normatively as
+        # DISABLED text, and this role paints toast bodies, empty-state messages,
+        # page subtitles, the Bangla document title and a badge background — live
+        # content, in 33 places in the component layer. In high contrast a reader
+        # has learned that colour means "inactive". It also put the measured 5.64:1
+        # floor outside this system's control, because WCAG exempts inactive
+        # components from contrast requirements, so the guarantee would have been
+        # given away for a role that never needed to.
+        "color.ink.muted": "CanvasText",
         "color.line.default": "CanvasText",
         "color.accent.default": "LinkText",
         "color.accent.edge": "CanvasText",
@@ -481,6 +489,12 @@ FORCED_COLORS = {
         "with a stated reason.",
         "Because status colours all resolve to CanvasText, nothing may rely on colour "
         "alone — every state carries a glyph and a word regardless.",
+        "GrayText is reserved for roles that are genuinely disabled, and this map "
+        "assigns it to none. CSS Color 4 defines it normatively as disabled text, so "
+        "using it for a live role teaches a high-contrast reader that live content is "
+        "inactive — and WCAG exempts inactive components from contrast requirements, "
+        "which would hand away a measured guarantee for nothing. color.ink.muted was "
+        "mapped to it and paints subtitles, toast bodies and empty-state messages.",
     ],
 }
 

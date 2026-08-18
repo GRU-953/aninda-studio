@@ -9,15 +9,15 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "d626af6df16c93f74995a295ed43a9e1cee49d8e3485774e98b45969151668aa";
+export const BUNDLE_SHA256 = "1f3b60f2ba8d7c3be634742794eb850b16f966dd74a73fe3169d2c3cd4c65671";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
   "07_tokens/build/primitive.tokens.json": "359b6b214801145054bd3154b51247b2cc3fbf1983f54664b959b30802aaf43f",
-  "07_tokens/build/semantic.light.tokens.json": "534accf8100efb3ff853cfe026a4d00646e5e493f3ca38fdbf3ab8f8dfafc610",
-  "07_tokens/build/semantic.dark.tokens.json": "fe0cc6711edb27002371282611b59da5bf801a503a424cf7af77394f4f885f78",
-  "07_tokens/build/semantic.hc-light.tokens.json": "3062503096667a1467c692d32fe435510683d518e85cb2758efcc2a43350bc72",
-  "07_tokens/build/semantic.hc-dark.tokens.json": "669c73a84614148a4de4171426746882a309160ad571e3d4ec0dd08ecc90257e",
-  "07_tokens/build/forced-colors.map.json": "f4a01647597461616b592257d968bc948d9c0f2af0516406c05f8a8453962852",
+  "07_tokens/build/semantic.light.tokens.json": "bcf15346d37fa2566444a2e104355b8d63193219083be5e248e42c62ecddd3f7",
+  "07_tokens/build/semantic.dark.tokens.json": "2e76f39e6583772b465e4e346a4fc4682d60f91014bfd22e5bc88179e383159f",
+  "07_tokens/build/semantic.hc-light.tokens.json": "46ccb577f108f8d2e4d50e05325ae669ea0fdd2da8304ae11c1b11a1ab6022a2",
+  "07_tokens/build/semantic.hc-dark.tokens.json": "92c7347bb61a429b47786e652d0b3e4582fa56ad26dc740d2cd6c00042037ad2",
+  "07_tokens/build/forced-colors.map.json": "58560c18bc09567071160cfea947402ab7f1ad44a9eb128c0ce6d6ae0e10f641",
   "04_mark/svg/icon-1024.svg": "9ff31c7bfa022fdd1cfbcf6782320b84d83422ddd617f97a8ab41248409407bd",
   "04_mark/svg/icon-1088-watch.svg": "f0dd4c249a78419af2855f90344cb05d1335444194c1ac9059e1b81c5b6bd6cb",
   "04_mark/svg/icon-192.svg": "58b7f359ff0841f399214b16ec5790932106dc66854b6c87c7dee88dc20eadb7",
@@ -28,8 +28,8 @@ export const SOURCE_HASHES: { [file: string]: string } = {
   "04_mark/svg/tile-web.svg": "b631c922ebb4287e9d227fd4303864e7373dbf38467ca086fbde9cbee573600b",
   "04_mark/svg/wordmark-bangla.svg": "6b42edde179882a29c3147a78e333ef3e341fbd16913ec8fd70519599d8b464d",
   "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
-  "04_mark/manifest.json": "c92cc5750503bb8d3a232f732d85a7ef6d5fe9d285530bc9e5ff19b38c29851c",
-  "08_components/_cards.json": "121438f08dfdd372016501e2f5f6dced331410f6c20850bfdbd23196ee927061"
+  "04_mark/manifest.json": "440d2eafd5c5ebb6d66d3a5aae0a5e170dc2b9a88ebacc697ced0bc8a877f4ad",
+  "08_components/_cards.json": "ad9cdce30242383ec2d9eeb7603576b04c32d19bd584b565faf096ea11657b34"
 };
 
 export const BUNDLED: RawInput = {
@@ -1968,6 +1968,28 @@ export const BUNDLED: RawInput = {
           }
         },
         "$value": "{color.ramp.accent.600}"
+      },
+      "hover": {
+        "$description": "nearest accent step beyond 700, away from the label #FDFFFE, clearing 4.5:1 as a ground under that label and staying ΔE 9.28 from the resting fill",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "accent",
+            "step": 800,
+            "kind": "fill",
+            "proof": {
+              "required": 4.5,
+              "measured": 9.4953,
+              "worstCaseLsb": 9.2768,
+              "hardestGround": "label (surface.lowest)",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.3",
+              "againstEverySurface": {
+                "label (surface.lowest)": 9.4953
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.accent.800}"
       }
     },
     "focus": {
@@ -2405,6 +2427,28 @@ export const BUNDLED: RawInput = {
           }
         },
         "$value": "{color.ramp.accent.600}"
+      },
+      "hover": {
+        "$description": "nearest accent step beyond 500, away from the label #0B0C0B, clearing 4.5:1 as a ground under that label and staying ΔE 7.97 from the resting fill",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "accent",
+            "step": 400,
+            "kind": "fill",
+            "proof": {
+              "required": 4.5,
+              "measured": 8.7727,
+              "worstCaseLsb": 8.6199,
+              "hardestGround": "label (surface.lowest)",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.3",
+              "againstEverySurface": {
+                "label (surface.lowest)": 8.7727
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.accent.400}"
       }
     },
     "focus": {
@@ -2842,6 +2886,28 @@ export const BUNDLED: RawInput = {
           }
         },
         "$value": "{color.ramp.accent.700}"
+      },
+      "hover": {
+        "$description": "nearest accent step beyond 800, away from the label #FCFDFC, clearing 7.0:1 as a ground under that label and staying ΔE 8.90 from the resting fill",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "accent",
+            "step": 900,
+            "kind": "fill",
+            "proof": {
+              "required": 7.0,
+              "measured": 13.7688,
+              "worstCaseLsb": 13.4699,
+              "hardestGround": "label (surface.lowest)",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "label (surface.lowest)": 13.7688
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.accent.900}"
       }
     },
     "focus": {
@@ -3279,6 +3345,28 @@ export const BUNDLED: RawInput = {
           }
         },
         "$value": "{color.ramp.accent.500}"
+      },
+      "hover": {
+        "$description": "nearest accent step beyond 400, away from the label #070807, clearing 7.0:1 as a ground under that label and staying ΔE 7.11 from the resting fill",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "accent",
+            "step": 300,
+            "kind": "fill",
+            "proof": {
+              "required": 7.0,
+              "measured": 11.8572,
+              "worstCaseLsb": 11.6686,
+              "hardestGround": "label (surface.lowest)",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "label (surface.lowest)": 11.8572
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.accent.300}"
       }
     },
     "focus": {
@@ -3441,10 +3529,11 @@ export const BUNDLED: RawInput = {
     "color.surface.dim": "Canvas",
     "color.surface.bright": "Canvas",
     "color.ink.default": "CanvasText",
-    "color.ink.muted": "GrayText",
+    "color.ink.muted": "CanvasText",
     "color.line.default": "CanvasText",
     "color.accent.default": "LinkText",
     "color.accent.edge": "CanvasText",
+    "color.accent.hover": "ButtonFace",
     "color.focus.ring": "Highlight",
     "color.status.success": "CanvasText",
     "color.status.warning": "CanvasText",
@@ -3454,7 +3543,8 @@ export const BUNDLED: RawInput = {
   "rules": [
     "Every brand colour must be overridden. A hex that survives forced-colors mode defeats the whole point of it.",
     "forced-color-adjust: none is forbidden except where explicitly allow-listed with a stated reason.",
-    "Because status colours all resolve to CanvasText, nothing may rely on colour alone — every state carries a glyph and a word regardless."
+    "Because status colours all resolve to CanvasText, nothing may rely on colour alone — every state carries a glyph and a word regardless.",
+    "GrayText is reserved for roles that are genuinely disabled, and this map assigns it to none. CSS Color 4 defines it normatively as disabled text, so using it for a live role teaches a high-contrast reader that live content is inactive — and WCAG exempts inactive components from contrast requirements, which would hand away a measured guarantee for nothing. color.ink.muted was mapped to it and paints subtitles, toast bodies and empty-state messages."
   ]
 },
   marks: [
@@ -3542,7 +3632,9 @@ export const BUNDLED: RawInput = {
   "clear_space": "half the mark's own height on all four sides",
   "safe_field": 90.0,
   "tile_radius_percent": 24.0,
-  "tile_radius_source": "the system's own radius-hero token. Apple publishes no corner radius; this number is ours and is not claimed to be theirs.",
+  "tile_radius_grid_units_per_100": 24.0,
+  "tile_radius_px_at_1024": 245.8,
+  "tile_radius_source": "read at build time from dimension.radius.hero. That token is 24 px; this is 24 units per 100 on the icon grid, which is 245.8 px of rounding on the 1024 px icon. The numeral is reused deliberately, so the icon corner belongs to the same family as every other rounded corner in the kit \u2014 it is an echo, not a unit conversion. Apple publishes no corner radius; this number is ours and is not claimed to be theirs.",
   "icon_policy": {
     "decision": "One rounded icon is used on every surface, Apple included. Owner's decision, 14 August 2026.",
     "everyday": [
@@ -3625,6 +3717,16 @@ export const BUNDLED: RawInput = {
       "licence_file": "fonts/anindamono-OFL.txt",
       "bytes": 10464,
       "renamed": true
+    },
+    {
+      "file": "fonts/AnindaMono-Regular.ttf",
+      "family": "Aninda Mono (desktop)",
+      "source": "06_type/candidates/mono/ibmplexmono/IBMPlexMono-Regular.ttf",
+      "licence": "SIL OFL 1.1",
+      "licence_file": "fonts/anindamono-OFL.txt",
+      "bytes": 136228,
+      "renamed": true,
+      "subset": false
     }
   ],
   "counts": {
@@ -3638,8 +3740,8 @@ export const BUNDLED: RawInput = {
       "name": "Colour",
       "name_bn": "রং",
       "group": "Foundations",
-      "subtitle": "Seventeen roles across four themes, each with the contrast ratio it was measured at and the criterion it was measured against.",
-      "subtitle_bn": "চার থিমে ১৭টি ভূমিকা — প্রতিটির মাপা কনট্রাস্ট অনুপাত আর কোন মানদণ্ডে মাপা হয়েছে",
+      "subtitle": "Every colour role across four themes, each with the contrast ratio it was measured at and the criterion it was measured against, over the seven surfaces they are measured against.",
+      "subtitle_bn": "চার থিমে প্রতিটি রঙের ভূমিকা — প্রতিটির মাপা কনট্রাস্ট অনুপাত আর কোন মানদণ্ডে মাপা হয়েছে",
       "width": 1280,
       "height": 2400
     },

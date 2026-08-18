@@ -330,3 +330,83 @@ The site is a named deliverable and the kit's public front door. A reader who ar
 
 This is the one requested artefact with no local work left, so it should not be mistaken for a build gap. It is worth doing before the 30 cards move again, because nothing will report that the remote copy has fallen behind. The second half is a real completeness gap in its own right: a named deliverable recorded only in a carried-forward findings file is invisible to anyone reading the kit's own inventory, so a future rebuild has no reason to know the push is owed.
 
+
+---
+
+## Round 3 — open after the fix pass of 19 August 2026
+
+Round 3 raised 53 findings across three lenses: one blocker, five majors and
+thirty-two minors, with eight refuted. The blocker, all five majors and
+twenty-eight minors are fixed. What follows is what is knowingly left.
+
+### R3-1. About forty tracked files carry no SPDX header, against the licence matrix this system publishes
+
+`13_plugins/claude-code/skills/aninda-repo/scripts/spdx.py`
+
+Both READMEs, `TRADEMARKS.md`, `ci.yml`, the guidebook chapter sources, nine
+reference documents and several stylesheets. The checker ships here and no CI
+step runs it.
+
+Left deliberately, on the reviewer's own recommendation and on the evidence. No
+file is ambiguously licensed: `NOTICE`, both READMEs and guidebook chapter 13 all
+state the four-licence split and what each covers, so no reader is misled. Seven
+of the flagged files are the enforcer over-reaching its own published matrix,
+demanding headers for `.html` and `.gitignore`, which the matrix does not cover.
+And the remedy is not "turn the checker on": most of the flagged files are
+generated, so `spdx.py --write README.md` immediately fails `scripts/readme.py
+--check`. Closing this means either a generator change per artefact or scoping
+the matrix down to hand-written files. It is a decision about the matrix, not a
+sweep, and it is the owner's to make.
+
+The window was widened from 40 lines to 120 in this pass, which is a separate
+fault: the checker was calling seven files missing a header they carry, because
+the house docstring style puts the essay above the identifier. The deepest real
+identifier in the tree sits at line 69.
+
+### R3-2. The plugin and the review sheet use the same `gb-*` ids for different things
+
+`13_plugins/claude-code/skills/aninda-brand/assets/bangla-verified.json`,
+`06_type/review_bangla.py`
+
+`gb-1` is a single chapter title, "Welcome", in the plugin. In the review sheet it
+is a display row carrying three at once, "Welcome · The name · The mark". One id
+namespace, two meanings, so the guard that now compares the plugin's verified
+strings against the document they cite has to exclude the whole `gb-*` range.
+
+The guidebook was moved onto `chapter.<slug>` keys from the register in this
+pass, which is the shape the plugin should follow. Until it does, those ids are
+outside the comparison. Nothing wrong ships: the Bangla itself agrees everywhere.
+
+### R3-3. Three English glosses in the plugin differ from the document they cite
+
+`13_plugins/claude-code/skills/aninda-brand/assets/bangla-verified.json`
+
+`th-3` is glossed "High contrast" and the source says "More contrast"; `wm-1` is
+"Aninda Studio" against a source reading "aninda studio", the wordmark as drawn;
+`wm-2` is "Aninda" against "Aninda Studio (short form)". Each is a judgement about
+what a gloss is for — the name, or the string as it renders — rather than a
+mistake, so they are reported by `check_plugin.py` and do not fail it. They are
+the Bangla reviewer's call.
+
+`ms-2` was in this group and was not ambiguous: it read "That file is too big"
+against a source saying "too large", and it is corrected.
+
+### R3-4. Two approved Bangla strings were revised without the reviewer
+
+`06_type/bangla-strings.json`
+
+`card.colour.subtitle` lost the numeral ১৭, and `card.the-marks.subtitle` lost
+মোহনা. Both were changed because what they said had become false — seventeen
+counted ten measured roles plus seven surfaces that carry no ratio at all, and
+"Estuary" names the ground colour ramp, not the mark. Every approved word is
+kept; only the false part is gone. Both entries carry `pending_review: true` and
+the reason, and both need the reviewer's confirmation.
+
+### R3-5. The interactive guidebook's PDF size is a recorded one-off, not a measurement
+
+`09_guidebook/build.py`
+
+The print build's PDF size is now read from the file. The interactive build's is
+not: that PDF is not shipped, and 14.2 MB was measured once while deciding to
+ship two HTML builds. It is labelled as exactly that. Producing it on every build
+to keep the figure current would cost more than the sentence is worth.

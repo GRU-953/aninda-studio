@@ -72,7 +72,7 @@ that is honestly labelled as the only version available.
 | bt-4 | আবার চেষ্টা করুন | Try again |
 | bt-5 | কোডটি কপি করুন | Copy the code |
 | ms-1 | সংরক্ষণ করা যায়নি। আপনার লেখা এখনো আছে — একটু পরে আবার চেষ্টা করুন। | Couldn't save. Your work is still here — try again in a moment. |
-| ms-2 | ফাইলটি অনেক বড়ো। সর্বোচ্চ ১০ মেগাবাইট। | That file is too big. The limit is 10 MB. |
+| ms-2 | ফাইলটি অনেক বড়ো। সর্বোচ্চ ১০ মেগাবাইট। | That file is too large. The limit is 10 MB. |
 | ms-3 | এখনো কিছু নেই। শুরু করতে প্রথম লেখাটি যোগ করুন। | Nothing here yet. Add your first entry to begin. |
 | ms-4 | সংরক্ষিত হয়েছে | Saved |
 | vc-1 | আমি ছোটো, যত্নে গড়া সফটওয়্যার বানাই। কোনো কিছুর সীমা থাকলে সেটা এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না। | I make small, carefully built software. Where something has a limit, that limit is written down here rather than hidden. |

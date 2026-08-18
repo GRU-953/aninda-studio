@@ -193,7 +193,17 @@ def check_skills(problems: Problems) -> None:
 
 
 def check_bangla_agreement(problems: Problems) -> None:
-    """The table a person reads and the JSON a script reads must say the same thing."""
+    """The table a person reads and the JSON a script reads must say the same thing —
+    and BOTH must match the document they cite as their source.
+
+    Comparing only the plugin's two copies to each other left four copies of these
+    31 pairs with one comparison between two of them. ms-2's English gloss read
+    "That file is too big. The limit is 10 MB." while 06_type/review_bangla.py,
+    which BANGLA-STANDARD.md quotes, says "That file is too large. The limit is
+    10 MB." The Bangla was identical in all four; only the gloss diverged — and the
+    gloss is the only way an agent finds the right string, with the plugin's rule
+    being to use a listed string or leave the English alone.
+    """
     json_path = SKILLS / "aninda-brand" / "assets" / "bangla-verified.json"
     markdown_path = SKILLS / "aninda-brand" / "references" / "bangla.md"
     if not json_path.exists() or not markdown_path.exists():
@@ -205,10 +215,64 @@ def check_bangla_agreement(problems: Problems) -> None:
         row = re.match(r"^\|\s*([a-z]+-\d+)\s*\|\s*([^|]+?)\s*\|", line)
         if row:
             from_markdown[row.group(1)] = row.group(2).strip()
-    if from_json == from_markdown:
+    # The source: the review sheet's STRINGS table, which BANGLA-STANDARD.md
+    # quotes string by string. Read by parsing rather than importing, so this
+    # check does not depend on that script running.
+    source_path = REPO_ROOT / "06_type" / "review_bangla.py"
+    source: dict[str, tuple[str, str]] = {}
+    if source_path.exists():
+        text = source_path.read_text("utf-8")
+        for match in re.finditer(
+                r'\(\s*"([a-z]+-\d+)"\s*,\s*"((?:[^"\\]|\\.)*)"\s*,\s*\n?\s*"((?:[^"\\]|\\.)*)"',
+                text):
+            source[match.group(1)] = (match.group(2), match.group(3))
+    else:
+        problems.wrong("06_type/review_bangla.py is missing, so the plugin's verified "
+                       "strings cannot be checked against the document they cite")
+
+    glosses = {entry["id"]: entry["english"]
+               for entry in json.loads(json_path.read_text("utf-8"))["strings"]}
+
+    # The gb-* namespace is EXCLUDED, and this is a real defect rather than a
+    # convenience: the review sheet uses gb-1 for a display row carrying three
+    # chapter titles at once ("Welcome · The name · The mark"), and the plugin uses
+    # gb-1 for the single title "Welcome". Two documents, one id namespace, two
+    # meanings. The guidebook now keys its chapters to chapter.<slug> in the
+    # register; the plugin still uses gb-*, and until it does the same these ids
+    # cannot be compared. Recorded in 01_research/OPEN-FINDINGS.md.
+    GROUPED = {key for key in source if key.startswith("gb-")}
+
+    drifted = []
+    for key, (english, bangla) in sorted(source.items()):
+        if key in GROUPED:
+            continue
+        if key in from_json and from_json[key] != bangla:
+            drifted.append(f"{key} Bangla: the plugin has {from_json[key]!r}, "
+                           f"06_type/review_bangla.py has {bangla!r}")
+    for item in drifted:
+        problems.wrong(item)
+
+    # The English glosses are compared and REPORTED, not failed on. Three differ
+    # in ways that are a judgement about wording rather than a fault: th-3 is
+    # "High contrast" in the plugin and "More contrast" in the sheet, and wm-1 and
+    # wm-2 differ over whether the gloss is the name or the wordmark as drawn.
+    # Those are the Bangla reviewer's call, not this script's. ms-2 was not one of
+    # them — "too big" against a source saying "too large" — and is now corrected.
+    gloss_notes = [
+        f"{key}: plugin gloss {glosses[key]!r}, source {english!r}"
+        for key, (english, _) in sorted(source.items())
+        if key not in GROUPED and key in glosses and glosses[key] != english
+    ]
+    if gloss_notes:
+        problems.ok(f"{len(gloss_notes)} English gloss(es) differ from "
+                    f"06_type/review_bangla.py, awaiting the Bangla reviewer: "
+                    + "; ".join(gloss_notes))
+
+    if from_json == from_markdown and not drifted:  # gloss notes do not fail
         problems.ok(
-            f"the {len(from_json)} verified Bangla strings agree between bangla.md and "
-            "bangla-verified.json"
+            f"the {len(from_json)} verified Bangla strings agree between bangla.md, "
+            f"bangla-verified.json and the {len(source)} in 06_type/review_bangla.py, "
+            f"in Bangla and in English"
         )
         return
     for key in sorted(set(from_json) | set(from_markdown)):
@@ -639,6 +703,51 @@ def check_colour_reference(problems: Problems) -> None:
                     f"{len(expected)} colour values across {len(themes)} themes")
 
 
+def check_bangla_document(problems: Problems) -> None:
+    """06_type/BANGLA-STRINGS.md must agree with 06_type/bangla-strings.json.
+
+    The document is a hand-written table of the same 94 approved strings the
+    register holds, and nothing compared them. Two rows had already drifted —
+    both of them rows whose English was corrected for a false claim, where the
+    document kept the wrong version, which is the worst direction for a drift to
+    run in a file a reviewer reads to approve wording.
+
+    Basis notes are compared too. The basis is the citation behind each string,
+    and a citation that no longer matches its string is worse than none.
+    """
+    doc = REPO_ROOT / "06_type" / "BANGLA-STRINGS.md"
+    reg = REPO_ROOT / "06_type" / "bangla-strings.json"
+    if not doc.exists() or not reg.exists():
+        problems.wrong(f"{doc.name} or {reg.name} is missing, so the register "
+                       f"cannot be checked against the document that publishes it")
+        return
+    register = json.loads(reg.read_text(encoding="utf-8"))
+    rows = {}
+    for line in doc.read_text(encoding="utf-8").splitlines():
+        match = re.match(r"^\|\s*`([a-z0-9.\-]+)`\s*\|(.*?)\|(.*?)\|(.*)\|\s*$", line)
+        if match:
+            rows[match.group(1)] = tuple(g.strip() for g in match.groups()[1:])
+
+    bad = []
+    for key in sorted(set(register) | set(rows)):
+        if key not in rows:
+            bad.append(f"BANGLA-STRINGS.md has no row for {key}")
+        elif key not in register:
+            bad.append(f"BANGLA-STRINGS.md has a row for {key}, which is not in the register")
+        else:
+            entry = register[key]
+            want = (entry["en"], entry["bn"], entry["basis"])
+            for field, got, expected in zip(("English", "Bangla", "basis"), rows[key], want):
+                if got != expected:
+                    bad.append(f"{key} {field}: document has {got[:48]!r}, "
+                               f"register has {expected[:48]!r}")
+    for item in bad:
+        problems.wrong(item)
+    if not bad:
+        problems.ok(f"BANGLA-STRINGS.md matches the register for all "
+                    f"{len(register)} approved strings, English, Bangla and basis")
+
+
 def main() -> int:
     if "--sync" in sys.argv[1:]:
         return sync_bundled_copies()
@@ -654,6 +763,7 @@ def main() -> int:
     check_rule_count(problems)
     check_token_names(problems)
     check_colour_reference(problems)
+    check_bangla_document(problems)
     check_bundles(problems)
 
     lines = ["", f"PASSED ({len(problems.passed)})", "-" * 72]

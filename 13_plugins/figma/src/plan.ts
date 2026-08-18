@@ -346,7 +346,7 @@ export function buildPlan(input: RawInput): Plan {
       resolvedType: 'COLOR',
       description:
         description ||
-        'One of the seventeen semantic colour roles. Each mode holds the value measured for that theme.',
+        'One of the semantic colour roles. Each mode holds the value measured for that theme.',
       values,
     });
   }
@@ -615,7 +615,7 @@ export function buildPlan(input: RawInput): Plan {
   decisions.push({
     what: 'Buttons are outlined, not filled.',
     why:
-      'The seventeen semantic roles include no "on accent" or "on danger" text colour, so the label colour on a ' +
+      'The semantic roles include no "on accent" or "on danger" text colour, so the label colour on a ' +
       'filled button is not defined anywhere in the system. An outlined button uses only roles that were measured: ' +
       'the label sits on a surface, which is exactly the pairing the colour engine checked.',
   });

@@ -274,7 +274,7 @@
       --as-surface-dim: Canvas;
       --as-surface-bright: Canvas;
       --as-ink: CanvasText;
-      --as-ink-muted: GrayText;
+      --as-ink-muted: CanvasText;
       --as-line: CanvasText;
       --as-accent: LinkText;
       --as-accent-edge: CanvasText;
@@ -1448,8 +1448,8 @@
 <p class="as-doc-eyebrow">Foundations</p>
 <h1 class="as-doc-title">The marks</h1>
 <p class="as-doc-title-bn as-bn-large" lang="bn">চিহ্ন</p>
-<p class="as-doc-sub">The Estuary mark in two weights, drawn in currentColor so it takes whatever theme it lands in.</p>
-<p class="as-doc-sub-bn" lang="bn">মোহনা চিহ্ন দুই ওজনে — currentColor দিয়ে আঁকা, তাই যে থিমে বসে সেই থিমের রং নিয়ে নেয়</p>
+<p class="as-doc-sub">The mark in two weights, drawn in currentColor so it takes whatever theme it lands in.</p>
+<p class="as-doc-sub-bn" lang="bn">চিহ্ন দুই ওজনে — currentColor দিয়ে আঁকা, তাই যে থিমে বসে সেই থিমের রং নিয়ে নেয়</p>
 <div class="as-doc-themes" role="group" aria-label="Choose a theme for this page"><button type="button" class="as-doc-theme" data-set-theme="" aria-pressed="true">Follow the system</button><button type="button" class="as-doc-theme" data-set-theme="light" aria-pressed="false">Light <span lang="bn">আলো</span></button><button type="button" class="as-doc-theme" data-set-theme="dark" aria-pressed="false">Dark <span lang="bn">অন্ধকার</span></button><button type="button" class="as-doc-theme" data-set-theme="hc-light" aria-pressed="false">High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></button><button type="button" class="as-doc-theme" data-set-theme="hc-dark" aria-pressed="false">High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></button></div>
 </header>
 <main class="as-stack as-stack--loose">
@@ -1462,11 +1462,11 @@
   <div class="as-grid as-grid--wide">
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="9"/><path d="M72 30V94" stroke="currentColor" stroke-width="9" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, regular weight</p>
+      <p class="as-doc-swatch__meta">The mark, regular weight</p>
     </div>
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark as-doc-mark--accent" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="15"/><path d="M72 30V94" stroke="currentColor" stroke-width="15" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, heavy weight, drawn in the accent</p>
+      <p class="as-doc-swatch__meta">The mark, heavy weight, drawn in the accent</p>
     </div>
   </div>
   <hr class="as-divider">
@@ -1494,16 +1494,16 @@
 <h2 class="as-doc-section__title">All four themes at once</h2>
 <p class="as-doc-section__note">Each panel pins its own theme with a data-theme attribute. That is why a dark panel can sit inside a light page: the themes are scoped to an element, not to the document root.</p>
 <div class="as-doc-quad as-doc-quad--wide">
-<div class="as-doc-panel" data-theme="light"><p class="as-doc-panel__label"><span>Light <span lang="bn">আলো</span></span><code>data-theme="light"</code></p>
+<div class="as-doc-panel" data-theme="light" role="group" aria-labelledby="the-marks-light-label"><p class="as-doc-panel__label" id="the-marks-light-label"><span>Light <span lang="bn">আলো</span></span><code>data-theme="light"</code></p>
 <div class="as-stack">
   <div class="as-grid as-grid--wide">
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="9"/><path d="M72 30V94" stroke="currentColor" stroke-width="9" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, regular weight</p>
+      <p class="as-doc-swatch__meta">The mark, regular weight</p>
     </div>
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark as-doc-mark--accent" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="15"/><path d="M72 30V94" stroke="currentColor" stroke-width="15" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, heavy weight, drawn in the accent</p>
+      <p class="as-doc-swatch__meta">The mark, heavy weight, drawn in the accent</p>
     </div>
   </div>
   <hr class="as-divider">
@@ -1524,16 +1524,16 @@
   04_mark/manifest.json when this card is built, so it cannot drift from the rule the
   mark builder and asset.py both follow.</p>
   <p class="as-lead"><span lang="bn" class="as-bn-large">অনিন্দ্য স্টুডিও</span></p>
-</div></div><div class="as-doc-panel" data-theme="dark"><p class="as-doc-panel__label"><span>Dark <span lang="bn">অন্ধকার</span></span><code>data-theme="dark"</code></p>
+</div></div><div class="as-doc-panel" data-theme="dark" role="group" aria-labelledby="the-marks-dark-label"><p class="as-doc-panel__label" id="the-marks-dark-label"><span>Dark <span lang="bn">অন্ধকার</span></span><code>data-theme="dark"</code></p>
 <div class="as-stack">
   <div class="as-grid as-grid--wide">
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="9"/><path d="M72 30V94" stroke="currentColor" stroke-width="9" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, regular weight</p>
+      <p class="as-doc-swatch__meta">The mark, regular weight</p>
     </div>
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark as-doc-mark--accent" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="15"/><path d="M72 30V94" stroke="currentColor" stroke-width="15" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, heavy weight, drawn in the accent</p>
+      <p class="as-doc-swatch__meta">The mark, heavy weight, drawn in the accent</p>
     </div>
   </div>
   <hr class="as-divider">
@@ -1554,16 +1554,16 @@
   04_mark/manifest.json when this card is built, so it cannot drift from the rule the
   mark builder and asset.py both follow.</p>
   <p class="as-lead"><span lang="bn" class="as-bn-large">অনিন্দ্য স্টুডিও</span></p>
-</div></div><div class="as-doc-panel" data-theme="hc-light"><p class="as-doc-panel__label"><span>High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></span><code>data-theme="hc-light"</code></p>
+</div></div><div class="as-doc-panel" data-theme="hc-light" role="group" aria-labelledby="the-marks-hc-light-label"><p class="as-doc-panel__label" id="the-marks-hc-light-label"><span>High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></span><code>data-theme="hc-light"</code></p>
 <div class="as-stack">
   <div class="as-grid as-grid--wide">
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="9"/><path d="M72 30V94" stroke="currentColor" stroke-width="9" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, regular weight</p>
+      <p class="as-doc-swatch__meta">The mark, regular weight</p>
     </div>
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark as-doc-mark--accent" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="15"/><path d="M72 30V94" stroke="currentColor" stroke-width="15" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, heavy weight, drawn in the accent</p>
+      <p class="as-doc-swatch__meta">The mark, heavy weight, drawn in the accent</p>
     </div>
   </div>
   <hr class="as-divider">
@@ -1584,16 +1584,16 @@
   04_mark/manifest.json when this card is built, so it cannot drift from the rule the
   mark builder and asset.py both follow.</p>
   <p class="as-lead"><span lang="bn" class="as-bn-large">অনিন্দ্য স্টুডিও</span></p>
-</div></div><div class="as-doc-panel" data-theme="hc-dark"><p class="as-doc-panel__label"><span>High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></span><code>data-theme="hc-dark"</code></p>
+</div></div><div class="as-doc-panel" data-theme="hc-dark" role="group" aria-labelledby="the-marks-hc-dark-label"><p class="as-doc-panel__label" id="the-marks-hc-dark-label"><span>High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></span><code>data-theme="hc-dark"</code></p>
 <div class="as-stack">
   <div class="as-grid as-grid--wide">
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="9"/><path d="M72 30V94" stroke="currentColor" stroke-width="9" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, regular weight</p>
+      <p class="as-doc-swatch__meta">The mark, regular weight</p>
     </div>
     <div class="as-stack as-stack--tight">
       <svg class="as-doc-mark as-doc-mark--accent" width="120" height="120" role="img" aria-label="The Aninda Studio mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"  fill="none"><!-- Recolourable: drawn in currentColor, with no colour on the root. Set `color` on this element or an ancestor. --><circle cx="44" cy="58" r="28" fill="none" stroke="currentColor" stroke-width="15"/><path d="M72 30V94" stroke="currentColor" stroke-width="15" stroke-linecap="round"/></svg>
-      <p class="as-doc-swatch__meta">Estuary, heavy weight, drawn in the accent</p>
+      <p class="as-doc-swatch__meta">The mark, heavy weight, drawn in the accent</p>
     </div>
   </div>
   <hr class="as-divider">
@@ -1619,7 +1619,7 @@
 </section>
 
 <section class="as-doc-section"><h2 class="as-doc-section__title">How to write it</h2><p class="as-doc-section__note">The classes carry the design decisions. The markup carries the meaning, and no class can supply that for you.</p><div class="as-code"><div class="as-code__head"><span class="as-code__name">markup</span><button type="button" class="as-btn as-btn--small">Copy the code</button></div><pre class="as-code__pre"><code>&lt;svg class=&quot;as-doc-mark&quot; viewBox=&quot;0 0 100 100&quot;&gt;…&lt;/svg&gt;
-<span class="as-code__comment">&lt;!-- currentColor throughout. The mark carries no colour of its own. --&gt;</span></code></pre></div></section>
+<span class="as-code__comment">&lt;!-- currentColor throughout. The mark carries no colour of its own. --&gt;</span></code></pre><p class="as-code__said as-visually-hidden" role="status" aria-live="polite"></p></div></section>
 </main>
 <footer class="as-doc-foot">
 <p>Generated by 08_components/build.py from 07_tokens/css/tokens.css and 08_components/src/components.css. Do not hand-edit this file. Fonts are subset and inlined; this card needs no network.</p>
@@ -1647,6 +1647,50 @@
     if (anchor) { event.preventDefault(); }
   });
   document.addEventListener('submit', function (event) { event.preventDefault(); });
+
+  // The copy button. It had no listener at all: a control whose name is a promise
+  // and whose behaviour is nothing, announced identically to one that works, and
+  // it matters most to the keyboard-only reader for whom it is the only offered
+  // route to the code. Confirmed dead with a clipboard sentinel — the sentinel
+  // survived the click.
+  //
+  // Both outcomes are announced through a live region, because a copy that
+  // silently fails is the same defect one step along. navigator.clipboard is not
+  // available on a file:// page in Chromium, so the execCommand path is the one
+  // that actually runs for a reader who opened the card from disk; it is tried
+  // second so a served page gets the modern API.
+  var copies = document.querySelectorAll('.as-code__head .as-btn');
+  for (var c = 0; c < copies.length; c++) {
+    copies[c].addEventListener('click', function (event) {
+      var head = event.currentTarget.parentNode;
+      var block = head.parentNode;
+      var pre = block.querySelector('.as-code__pre');
+      var say = block.querySelector('.as-code__said');
+      var code = pre ? pre.textContent : '';
+      function said(message) { if (say) { say.textContent = message; } }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(
+          function () { said('Copied.'); },
+          function () { legacy(); }
+        );
+        return;
+      }
+      legacy();
+      function legacy() {
+        var area = document.createElement('textarea');
+        area.value = code;
+        area.setAttribute('readonly', 'readonly');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+        document.body.removeChild(area);
+        said(ok ? 'Copied.' : 'Copying did not work. Select the code and copy it.');
+      }
+    });
+  }
 
   // The other half of the ARIA tabs pattern. A roving tabindex takes every
   // unselected tab out of the tab sequence, so without this the tabs card shipped

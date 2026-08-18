@@ -221,53 +221,6 @@ Source: [Academy rules, মুখবন্ধ, §২.১১, §৫](https://arch
 
 ---
 
-## PART 3 — punctuation and typography
-
-*(Presented before Part 2 because the string table depends on it.)*
-
-The Academy's 2012 rules contain **no punctuation section**. Sourced from W3C's Bengali script documentation and Bengali Wikipedia's যতিচিহ্ন article.
-
-### The daṛi ।
-
-**Correct as your full stop.** W3C: *"The danda, U+0964, is used for sentence final punctuation."* Bengali Wikipedia: *"বাক্যের পরিসমাপ্তি বোঝাতে দাঁড়ি বা পূর্ণচ্ছেদ ব্যবহার করতে হয়।"*
-
-### Question mark and exclamation mark
-
-**Both are the ordinary Western characters — ? (U+003F) and ! (U+0021).** There is no Bengali-specific question or exclamation mark. W3C's *Bengali/Bangla orthography notes* lists the sentence-final punctuation set as exactly `. । ? !`, and adds: *"Western punctuation, such as commas, semicolons, colons, quotation marks and hyphens are also used quite commonly."* Phrase-level punctuation is likewise Western: `, ; :`.
-
-So: statement → `।` · question → `?` · exclamation → `!`
-
-### Space before ।
-
-**You are right — no space before.** W3C's *Bengali Layout Requirements* records two approaches and states the primary one:
-
-> "No space character appears between the end of the phrase and the danda glyph, but the advance width of the danda in a font should open a small gap before it. The danda is then typically followed by a single space."
-
-> "A space is allowed before and after the danda in order to balance the space before and after it. In this case, the danda must still be kept from wrapping to a new line on its own."
-
-**Use the first: no space before, one space after.** Let the font open the gap. Also honour the line-breaking constraint — *"Line breaking should not move a danda or double danda to the beginning of a new line"* — so never allow `।` to start a line.
-
-### Em dash —
-
-**Acceptable and standard in Bangla prose.** ড্যাশ (—) is listed as a regular Bangla যতিচিহ্ন: *"যৌগিক ও মিশ্র বাক্যে পৃথক ভাবাপন্ন দুই বা তার বেশি বাক্যের সমন্বয় বা সংযোগ বোঝাতে ড্যাশ বসে।"* It is a genuine Bengali punctuation mark, not an English import. Keep it in ms-1 and vc-1 — it is doing exactly the job it is meant for.
-
-Distinguish it from the hyphen: *"হাইফেন (-)। হাইফেন দৈর্ঘ্যে ড্যাশের অর্ধেক পরিমাণ।"*
-
-### Latin words inside Bangla sentences
-
-**Normal and Academy-sanctioned by practice.** The Academy's own dictionary embeds Latin script inside Bangla entries constantly, as glosses and as technical terms — *software*, *soft copy*, *X-ray*, *iodine*, *quotation*, *induction*, *altocumulus cloud*, *colour-blind*, *white lead*, *soft drink* — and even chemical formulae (*KI*). No transliteration is forced.
-
-**House guidance for this system:**
-
-1. Where the Academy dictionary has a Bangla form, prefer it in prose — write **মেগাবাইট**, not "MB", in a sentence a user reads.
-2. Keep Latin for proper product names that must stay recognisable and searchable — **GitHub**, **Figma**, **CSS**.
-3. Keep Latin for anything copied literally — code, version strings, file extensions.
-4. Do not mix within one word: write `GitHub-এ` (Latin name + Bangla case-ending, hyphenated), which is the established Bangladeshi convention. **Marked as convention, UNVERIFIED against a formal style-guide citation.**
-
-Sources: [W3C Bengali Layout Requirements](https://w3c.github.io/iip/bengali/) · [W3C Bengali orthography notes](https://r12a.github.io/scripts/beng/bn.html) · [যতিচিহ্ন](https://bn.wikipedia.org/wiki/যতিচিহ্ন)
-
----
-
 ## PART 2 — string-by-string review
 
 Ratings: **(a)** spelling correct? **(b)** tone natural/plain, or stiff? **(c)** recommendation **(d)** reason.
@@ -490,3 +443,50 @@ Everything else here is right and should be protected in review:
 - Any Academy or published style-guide rule on Bengali vs Western numerals — none found; the recommendation above rests on the Academy's own printing practice plus my editorial judgement for code contexts.
 - The `GitHub-এ` hyphenation convention for Latin words taking Bangla case-endings — widespread practice, no formal citation found.
 - তখনো as a dictionary headword — neither তখনো nor তখনও has an entry; the recommendation is inferred from এখনো and কখনো.
+
+## PART 3 — punctuation and typography
+
+*(Presented before Part 2 because the string table depends on it.)*
+
+The Academy's 2012 rules contain **no punctuation section**. Sourced from W3C's Bengali script documentation and Bengali Wikipedia's যতিচিহ্ন article.
+
+### The daṛi ।
+
+**Correct as your full stop.** W3C: *"The danda, U+0964, is used for sentence final punctuation."* Bengali Wikipedia: *"বাক্যের পরিসমাপ্তি বোঝাতে দাঁড়ি বা পূর্ণচ্ছেদ ব্যবহার করতে হয়।"*
+
+### Question mark and exclamation mark
+
+**Both are the ordinary Western characters — ? (U+003F) and ! (U+0021).** There is no Bengali-specific question or exclamation mark. W3C's *Bengali/Bangla orthography notes* lists the sentence-final punctuation set as exactly `. । ? !`, and adds: *"Western punctuation, such as commas, semicolons, colons, quotation marks and hyphens are also used quite commonly."* Phrase-level punctuation is likewise Western: `, ; :`.
+
+So: statement → `।` · question → `?` · exclamation → `!`
+
+### Space before ।
+
+**You are right — no space before.** W3C's *Bengali Layout Requirements* records two approaches and states the primary one:
+
+> "No space character appears between the end of the phrase and the danda glyph, but the advance width of the danda in a font should open a small gap before it. The danda is then typically followed by a single space."
+
+> "A space is allowed before and after the danda in order to balance the space before and after it. In this case, the danda must still be kept from wrapping to a new line on its own."
+
+**Use the first: no space before, one space after.** Let the font open the gap. Also honour the line-breaking constraint — *"Line breaking should not move a danda or double danda to the beginning of a new line"* — so never allow `।` to start a line.
+
+### Em dash —
+
+**Acceptable and standard in Bangla prose.** ড্যাশ (—) is listed as a regular Bangla যতিচিহ্ন: *"যৌগিক ও মিশ্র বাক্যে পৃথক ভাবাপন্ন দুই বা তার বেশি বাক্যের সমন্বয় বা সংযোগ বোঝাতে ড্যাশ বসে।"* It is a genuine Bengali punctuation mark, not an English import. Keep it in ms-1 and vc-1 — it is doing exactly the job it is meant for.
+
+Distinguish it from the hyphen: *"হাইফেন (-)। হাইফেন দৈর্ঘ্যে ড্যাশের অর্ধেক পরিমাণ।"*
+
+### Latin words inside Bangla sentences
+
+**Normal and Academy-sanctioned by practice.** The Academy's own dictionary embeds Latin script inside Bangla entries constantly, as glosses and as technical terms — *software*, *soft copy*, *X-ray*, *iodine*, *quotation*, *induction*, *altocumulus cloud*, *colour-blind*, *white lead*, *soft drink* — and even chemical formulae (*KI*). No transliteration is forced.
+
+**House guidance for this system:**
+
+1. Where the Academy dictionary has a Bangla form, prefer it in prose — write **মেগাবাইট**, not "MB", in a sentence a user reads.
+2. Keep Latin for proper product names that must stay recognisable and searchable — **GitHub**, **Figma**, **CSS**.
+3. Keep Latin for anything copied literally — code, version strings, file extensions.
+4. Do not mix within one word: write `GitHub-এ` (Latin name + Bangla case-ending, hyphenated), which is the established Bangladeshi convention. **Marked as convention, UNVERIFIED against a formal style-guide citation.**
+
+Sources: [W3C Bengali Layout Requirements](https://w3c.github.io/iip/bengali/) · [W3C Bengali orthography notes](https://r12a.github.io/scripts/beng/bn.html) · [যতিচিহ্ন](https://bn.wikipedia.org/wiki/যতিচিহ্ন)
+
+---

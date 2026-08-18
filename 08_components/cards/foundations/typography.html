@@ -274,7 +274,7 @@
       --as-surface-dim: Canvas;
       --as-surface-bright: Canvas;
       --as-ink: CanvasText;
-      --as-ink-muted: GrayText;
+      --as-ink-muted: CanvasText;
       --as-line: CanvasText;
       --as-accent: LinkText;
       --as-accent-edge: CanvasText;
@@ -1485,7 +1485,7 @@
 <h2 class="as-doc-section__title">All four themes at once</h2>
 <p class="as-doc-section__note">Each panel pins its own theme with a data-theme attribute. That is why a dark panel can sit inside a light page: the themes are scoped to an element, not to the document root.</p>
 <div class="as-doc-quad as-doc-quad--wide">
-<div class="as-doc-panel" data-theme="light"><p class="as-doc-panel__label"><span>Light <span lang="bn">আলো</span></span><code>data-theme="light"</code></p>
+<div class="as-doc-panel" data-theme="light" role="group" aria-labelledby="typography-light-label"><p class="as-doc-panel__label" id="typography-light-label"><span>Light <span lang="bn">আলো</span></span><code>data-theme="light"</code></p>
 <div class="as-stack">
   <p class="as-display">Ag</p>
   <p class="as-h1">Estuary</p>
@@ -1506,7 +1506,7 @@
       <tbody><tr><th scope="row">caption</th><td><code>--as-text-caption</code></td><td class="as-num">0.7502 rem</td><td class="as-num">12.00 px</td><td>caption</td><td class="as-num">0.815</td><td class="as-num">12.00 px</td></tr><tr><th scope="row">body</th><td><code>--as-text-body</code></td><td class="as-num">1.0000 rem</td><td class="as-num">16.00 px</td><td>body</td><td class="as-num">0.816</td><td class="as-num">13.06 px</td></tr><tr><th scope="row">lead</th><td><code>--as-text-lead</code></td><td class="as-num">1.3330 rem</td><td class="as-num">21.33 px</td><td>heading</td><td class="as-num">0.817</td><td class="as-num">17.42 px</td></tr><tr><th scope="row">h3</th><td><code>--as-text-h3</code></td><td class="as-num">1.7769 rem</td><td class="as-num">28.43 px</td><td>heading</td><td class="as-num">0.817</td><td class="as-num">23.23 px</td></tr><tr><th scope="row">h2</th><td><code>--as-text-h2</code></td><td class="as-num">2.3686 rem</td><td class="as-num">37.90 px</td><td>title</td><td class="as-num">0.822</td><td class="as-num">31.15 px</td></tr><tr><th scope="row">h1</th><td><code>--as-text-h1</code></td><td class="as-num">3.1573 rem</td><td class="as-num">50.52 px</td><td>title</td><td class="as-num">0.822</td><td class="as-num">41.52 px</td></tr><tr><th scope="row">display</th><td><code>--as-text-display</code></td><td class="as-num">4.2087 rem</td><td class="as-num">67.34 px</td><td>display</td><td class="as-num">0.825</td><td class="as-num">55.55 px</td></tr></tbody>
     </table>
   </div>
-</div></div><div class="as-doc-panel" data-theme="dark"><p class="as-doc-panel__label"><span>Dark <span lang="bn">অন্ধকার</span></span><code>data-theme="dark"</code></p>
+</div></div><div class="as-doc-panel" data-theme="dark" role="group" aria-labelledby="typography-dark-label"><p class="as-doc-panel__label" id="typography-dark-label"><span>Dark <span lang="bn">অন্ধকার</span></span><code>data-theme="dark"</code></p>
 <div class="as-stack">
   <p class="as-display">Ag</p>
   <p class="as-h1">Estuary</p>
@@ -1527,7 +1527,7 @@
       <tbody><tr><th scope="row">caption</th><td><code>--as-text-caption</code></td><td class="as-num">0.7502 rem</td><td class="as-num">12.00 px</td><td>caption</td><td class="as-num">0.815</td><td class="as-num">12.00 px</td></tr><tr><th scope="row">body</th><td><code>--as-text-body</code></td><td class="as-num">1.0000 rem</td><td class="as-num">16.00 px</td><td>body</td><td class="as-num">0.816</td><td class="as-num">13.06 px</td></tr><tr><th scope="row">lead</th><td><code>--as-text-lead</code></td><td class="as-num">1.3330 rem</td><td class="as-num">21.33 px</td><td>heading</td><td class="as-num">0.817</td><td class="as-num">17.42 px</td></tr><tr><th scope="row">h3</th><td><code>--as-text-h3</code></td><td class="as-num">1.7769 rem</td><td class="as-num">28.43 px</td><td>heading</td><td class="as-num">0.817</td><td class="as-num">23.23 px</td></tr><tr><th scope="row">h2</th><td><code>--as-text-h2</code></td><td class="as-num">2.3686 rem</td><td class="as-num">37.90 px</td><td>title</td><td class="as-num">0.822</td><td class="as-num">31.15 px</td></tr><tr><th scope="row">h1</th><td><code>--as-text-h1</code></td><td class="as-num">3.1573 rem</td><td class="as-num">50.52 px</td><td>title</td><td class="as-num">0.822</td><td class="as-num">41.52 px</td></tr><tr><th scope="row">display</th><td><code>--as-text-display</code></td><td class="as-num">4.2087 rem</td><td class="as-num">67.34 px</td><td>display</td><td class="as-num">0.825</td><td class="as-num">55.55 px</td></tr></tbody>
     </table>
   </div>
-</div></div><div class="as-doc-panel" data-theme="hc-light"><p class="as-doc-panel__label"><span>High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></span><code>data-theme="hc-light"</code></p>
+</div></div><div class="as-doc-panel" data-theme="hc-light" role="group" aria-labelledby="typography-hc-light-label"><p class="as-doc-panel__label" id="typography-hc-light-label"><span>High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></span><code>data-theme="hc-light"</code></p>
 <div class="as-stack">
   <p class="as-display">Ag</p>
   <p class="as-h1">Estuary</p>
@@ -1548,7 +1548,7 @@
       <tbody><tr><th scope="row">caption</th><td><code>--as-text-caption</code></td><td class="as-num">0.7502 rem</td><td class="as-num">12.00 px</td><td>caption</td><td class="as-num">0.815</td><td class="as-num">12.00 px</td></tr><tr><th scope="row">body</th><td><code>--as-text-body</code></td><td class="as-num">1.0000 rem</td><td class="as-num">16.00 px</td><td>body</td><td class="as-num">0.816</td><td class="as-num">13.06 px</td></tr><tr><th scope="row">lead</th><td><code>--as-text-lead</code></td><td class="as-num">1.3330 rem</td><td class="as-num">21.33 px</td><td>heading</td><td class="as-num">0.817</td><td class="as-num">17.42 px</td></tr><tr><th scope="row">h3</th><td><code>--as-text-h3</code></td><td class="as-num">1.7769 rem</td><td class="as-num">28.43 px</td><td>heading</td><td class="as-num">0.817</td><td class="as-num">23.23 px</td></tr><tr><th scope="row">h2</th><td><code>--as-text-h2</code></td><td class="as-num">2.3686 rem</td><td class="as-num">37.90 px</td><td>title</td><td class="as-num">0.822</td><td class="as-num">31.15 px</td></tr><tr><th scope="row">h1</th><td><code>--as-text-h1</code></td><td class="as-num">3.1573 rem</td><td class="as-num">50.52 px</td><td>title</td><td class="as-num">0.822</td><td class="as-num">41.52 px</td></tr><tr><th scope="row">display</th><td><code>--as-text-display</code></td><td class="as-num">4.2087 rem</td><td class="as-num">67.34 px</td><td>display</td><td class="as-num">0.825</td><td class="as-num">55.55 px</td></tr></tbody>
     </table>
   </div>
-</div></div><div class="as-doc-panel" data-theme="hc-dark"><p class="as-doc-panel__label"><span>High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></span><code>data-theme="hc-dark"</code></p>
+</div></div><div class="as-doc-panel" data-theme="hc-dark" role="group" aria-labelledby="typography-hc-dark-label"><p class="as-doc-panel__label" id="typography-hc-dark-label"><span>High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></span><code>data-theme="hc-dark"</code></p>
 <div class="as-stack">
   <p class="as-display">Ag</p>
   <p class="as-h1">Estuary</p>
@@ -1575,7 +1575,7 @@
 
 <section class="as-doc-section"><h2 class="as-doc-section__title">How to write it</h2><p class="as-doc-section__note">The classes carry the design decisions. The markup carries the meaning, and no class can supply that for you.</p><div class="as-code"><div class="as-code__head"><span class="as-code__name">markup</span><button type="button" class="as-btn as-btn--small">Copy the code</button></div><pre class="as-code__pre"><code>&lt;p lang=&quot;bn&quot;&gt;<span lang="bn">অনিন্দ্য</span> <span lang="bn">স্টুডিও</span>&lt;/p&gt;
 <span class="as-code__comment">&lt;!-- The lang attribute is enough. tokens.css switches the family,</span>
-     applies the multiplier and clamps it at 12px in one declaration. --&gt;</code></pre></div></section>
+     applies the multiplier and clamps it at 12px in one declaration. --&gt;</code></pre><p class="as-code__said as-visually-hidden" role="status" aria-live="polite"></p></div></section>
 </main>
 <footer class="as-doc-foot">
 <p>Generated by 08_components/build.py from 07_tokens/css/tokens.css and 08_components/src/components.css. Do not hand-edit this file. Fonts are subset and inlined; this card needs no network.</p>
@@ -1603,6 +1603,50 @@
     if (anchor) { event.preventDefault(); }
   });
   document.addEventListener('submit', function (event) { event.preventDefault(); });
+
+  // The copy button. It had no listener at all: a control whose name is a promise
+  // and whose behaviour is nothing, announced identically to one that works, and
+  // it matters most to the keyboard-only reader for whom it is the only offered
+  // route to the code. Confirmed dead with a clipboard sentinel — the sentinel
+  // survived the click.
+  //
+  // Both outcomes are announced through a live region, because a copy that
+  // silently fails is the same defect one step along. navigator.clipboard is not
+  // available on a file:// page in Chromium, so the execCommand path is the one
+  // that actually runs for a reader who opened the card from disk; it is tried
+  // second so a served page gets the modern API.
+  var copies = document.querySelectorAll('.as-code__head .as-btn');
+  for (var c = 0; c < copies.length; c++) {
+    copies[c].addEventListener('click', function (event) {
+      var head = event.currentTarget.parentNode;
+      var block = head.parentNode;
+      var pre = block.querySelector('.as-code__pre');
+      var say = block.querySelector('.as-code__said');
+      var code = pre ? pre.textContent : '';
+      function said(message) { if (say) { say.textContent = message; } }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(
+          function () { said('Copied.'); },
+          function () { legacy(); }
+        );
+        return;
+      }
+      legacy();
+      function legacy() {
+        var area = document.createElement('textarea');
+        area.value = code;
+        area.setAttribute('readonly', 'readonly');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+        document.body.removeChild(area);
+        said(ok ? 'Copied.' : 'Copying did not work. Select the code and copy it.');
+      }
+    });
+  }
 
   // The other half of the ARIA tabs pattern. A roving tabindex takes every
   // unselected tab out of the tab sequence, so without this the tabs card shipped

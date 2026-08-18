@@ -141,7 +141,11 @@ def hex_of(value, primitives: dict) -> str:
 
 
 def roles(semantic: dict) -> list[str]:
-    """The seventeen role names, without their `color.` prefix."""
+    """Every role name in the semantic set, without its `color.` prefix.
+
+    Read from the token document, so it is however many there are. The docstring
+    said "seventeen" and the count changed the moment a role was added.
+    """
     return [key[len("color.") :] for key in semantic["light"] if key.startswith("color.")]
 
 
@@ -357,6 +361,17 @@ def recoloured(svg: str, colour: str) -> str:
             "that file has no <svg> root element, so the colour could not be applied. "
             "Nothing was written."
         )
+    # The recolourable masters carry a comment reading "Recolourable: drawn in
+    # currentColor, with no colour on the root." Once a colour is on the root that
+    # sentence is false, and it is the sentence telling the recipient how to theme
+    # the file — so every asset this command handed out carried a false instruction
+    # about itself. Rewritten to say what the file now is.
+    updated = re.sub(
+        r"<!--\s*Recolourable:[^>]*?-->",
+        f"<!-- Recoloured to {colour} on the root by asset.py. The shapes are still "
+        f"drawn in currentColor, so overriding `color` on this element or an "
+        f"ancestor still works; the master with no root colour is in 04_mark/svg. -->",
+        updated, count=1)
     return updated
 
 

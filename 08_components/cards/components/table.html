@@ -274,7 +274,7 @@
       --as-surface-dim: Canvas;
       --as-surface-bright: Canvas;
       --as-ink: CanvasText;
-      --as-ink-muted: GrayText;
+      --as-ink-muted: CanvasText;
       --as-line: CanvasText;
       --as-accent: LinkText;
       --as-accent-edge: CanvasText;
@@ -1471,28 +1471,28 @@
 <h2 class="as-doc-section__title">All four themes at once</h2>
 <p class="as-doc-section__note">Each panel pins its own theme with a data-theme attribute. That is why a dark panel can sit inside a light page: the themes are scoped to an element, not to the document root.</p>
 <div class="as-doc-quad as-doc-quad--wide">
-<div class="as-doc-panel" data-theme="light"><p class="as-doc-panel__label"><span>Light <span lang="bn">আলো</span></span><code>data-theme="light"</code></p>
+<div class="as-doc-panel" data-theme="light" role="group" aria-labelledby="table-light-label"><p class="as-doc-panel__label" id="table-light-label"><span>Light <span lang="bn">আলো</span></span><code>data-theme="light"</code></p>
 <div class="as-scroll-x">
   <table class="as-table as-table--numeric">
     <caption>Smallest measured contrast ratio on each card, light theme.</caption>
     <thead><tr><th scope="col">Card</th><th scope="col">Group</th><th scope="col" class="as-num">Ratio</th><th scope="col">Result</th></tr></thead>
     <tbody><tr><th scope="row">Colour</th><td>Foundations</td><td class="as-num">15.90</td><td><span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span></td></tr><tr><th scope="row">Typography</th><td>Foundations</td><td class="as-num">8.44</td><td><span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span></td></tr><tr><th scope="row">Button</th><td>Components</td><td class="as-num">6.34</td><td><span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span></td></tr><tr><th scope="row">Badge</th><td>Components</td><td class="as-num">5.61</td><td><span class="as-badge as-badge--warning"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2 15 13.8H1Z"/><path d="M8 6.4v3.1"/><path d="M8 11.9h.01"/></svg><span>Check this</span></span></td></tr><tr><th scope="row">Dashboard</th><td>Patterns</td><td class="as-num">4.19</td><td><span class="as-badge as-badge--danger"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 12 12M12 4 4 12"/></svg><span>Failed</span></span></td></tr></tbody>
   </table>
-</div></div><div class="as-doc-panel" data-theme="dark"><p class="as-doc-panel__label"><span>Dark <span lang="bn">অন্ধকার</span></span><code>data-theme="dark"</code></p>
+</div></div><div class="as-doc-panel" data-theme="dark" role="group" aria-labelledby="table-dark-label"><p class="as-doc-panel__label" id="table-dark-label"><span>Dark <span lang="bn">অন্ধকার</span></span><code>data-theme="dark"</code></p>
 <div class="as-scroll-x">
   <table class="as-table as-table--numeric">
     <caption>Smallest measured contrast ratio on each card, light theme.</caption>
     <thead><tr><th scope="col">Card</th><th scope="col">Group</th><th scope="col" class="as-num">Ratio</th><th scope="col">Result</th></tr></thead>
     <tbody><tr><th scope="row">Colour</th><td>Foundations</td><td class="as-num">15.90</td><td><span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span></td></tr><tr><th scope="row">Typography</th><td>Foundations</td><td class="as-num">8.44</td><td><span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span></td></tr><tr><th scope="row">Button</th><td>Components</td><td class="as-num">6.34</td><td><span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span></td></tr><tr><th scope="row">Badge</th><td>Components</td><td class="as-num">5.61</td><td><span class="as-badge as-badge--warning"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2 15 13.8H1Z"/><path d="M8 6.4v3.1"/><path d="M8 11.9h.01"/></svg><span>Check this</span></span></td></tr><tr><th scope="row">Dashboard</th><td>Patterns</td><td class="as-num">4.19</td><td><span class="as-badge as-badge--danger"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 12 12M12 4 4 12"/></svg><span>Failed</span></span></td></tr></tbody>
   </table>
-</div></div><div class="as-doc-panel" data-theme="hc-light"><p class="as-doc-panel__label"><span>High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></span><code>data-theme="hc-light"</code></p>
+</div></div><div class="as-doc-panel" data-theme="hc-light" role="group" aria-labelledby="table-hc-light-label"><p class="as-doc-panel__label" id="table-hc-light-label"><span>High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></span><code>data-theme="hc-light"</code></p>
 <div class="as-scroll-x">
   <table class="as-table as-table--numeric">
     <caption>Smallest measured contrast ratio on each card, light theme.</caption>
     <thead><tr><th scope="col">Card</th><th scope="col">Group</th><th scope="col" class="as-num">Ratio</th><th scope="col">Result</th></tr></thead>
     <tbody><tr><th scope="row">Colour</th><td>Foundations</td><td class="as-num">15.90</td><td><span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span></td></tr><tr><th scope="row">Typography</th><td>Foundations</td><td class="as-num">8.44</td><td><span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span></td></tr><tr><th scope="row">Button</th><td>Components</td><td class="as-num">6.34</td><td><span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span></td></tr><tr><th scope="row">Badge</th><td>Components</td><td class="as-num">5.61</td><td><span class="as-badge as-badge--warning"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2 15 13.8H1Z"/><path d="M8 6.4v3.1"/><path d="M8 11.9h.01"/></svg><span>Check this</span></span></td></tr><tr><th scope="row">Dashboard</th><td>Patterns</td><td class="as-num">4.19</td><td><span class="as-badge as-badge--danger"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 12 12M12 4 4 12"/></svg><span>Failed</span></span></td></tr></tbody>
   </table>
-</div></div><div class="as-doc-panel" data-theme="hc-dark"><p class="as-doc-panel__label"><span>High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></span><code>data-theme="hc-dark"</code></p>
+</div></div><div class="as-doc-panel" data-theme="hc-dark" role="group" aria-labelledby="table-hc-dark-label"><p class="as-doc-panel__label" id="table-hc-dark-label"><span>High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></span><code>data-theme="hc-dark"</code></p>
 <div class="as-scroll-x">
   <table class="as-table as-table--numeric">
     <caption>Smallest measured contrast ratio on each card, light theme.</caption>
@@ -1508,7 +1508,7 @@
     &lt;caption&gt;…&lt;/caption&gt;
     &lt;thead&gt;&lt;tr&gt;&lt;th scope=&quot;col&quot;&gt;Card&lt;/th&gt;…&lt;/tr&gt;&lt;/thead&gt;
   &lt;/table&gt;
-&lt;/div&gt;</code></pre></div></section>
+&lt;/div&gt;</code></pre><p class="as-code__said as-visually-hidden" role="status" aria-live="polite"></p></div></section>
 </main>
 <footer class="as-doc-foot">
 <p>Generated by 08_components/build.py from 07_tokens/css/tokens.css and 08_components/src/components.css. Do not hand-edit this file. Fonts are subset and inlined; this card needs no network.</p>
@@ -1536,6 +1536,50 @@
     if (anchor) { event.preventDefault(); }
   });
   document.addEventListener('submit', function (event) { event.preventDefault(); });
+
+  // The copy button. It had no listener at all: a control whose name is a promise
+  // and whose behaviour is nothing, announced identically to one that works, and
+  // it matters most to the keyboard-only reader for whom it is the only offered
+  // route to the code. Confirmed dead with a clipboard sentinel — the sentinel
+  // survived the click.
+  //
+  // Both outcomes are announced through a live region, because a copy that
+  // silently fails is the same defect one step along. navigator.clipboard is not
+  // available on a file:// page in Chromium, so the execCommand path is the one
+  // that actually runs for a reader who opened the card from disk; it is tried
+  // second so a served page gets the modern API.
+  var copies = document.querySelectorAll('.as-code__head .as-btn');
+  for (var c = 0; c < copies.length; c++) {
+    copies[c].addEventListener('click', function (event) {
+      var head = event.currentTarget.parentNode;
+      var block = head.parentNode;
+      var pre = block.querySelector('.as-code__pre');
+      var say = block.querySelector('.as-code__said');
+      var code = pre ? pre.textContent : '';
+      function said(message) { if (say) { say.textContent = message; } }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(
+          function () { said('Copied.'); },
+          function () { legacy(); }
+        );
+        return;
+      }
+      legacy();
+      function legacy() {
+        var area = document.createElement('textarea');
+        area.value = code;
+        area.setAttribute('readonly', 'readonly');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+        document.body.removeChild(area);
+        said(ok ? 'Copied.' : 'Copying did not work. Select the code and copy it.');
+      }
+    });
+  }
 
   // The other half of the ARIA tabs pattern. A roving tabindex takes every
   // unselected tab out of the tab sequence, so without this the tabs card shipped

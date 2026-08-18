@@ -45,6 +45,28 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 TOKENS = ROOT / "07_tokens" / "build"
 OUT = HERE / "BANGLA-REVIEW.html"
+
+_GUIDEBOOK = None
+
+
+def _guidebook():
+    """The guidebook module, for its inline-language tagger and its guards."""
+    global _GUIDEBOOK
+    if _GUIDEBOOK is None:
+        import importlib.util
+        source = ROOT / "09_guidebook" / "build.py"
+        if not source.exists():
+            raise SystemExit(
+                f"could not run: {source} is missing. This sheet declares the "
+                f"language of every run using that file's tagger rather than "
+                f"keeping a second copy of it."
+            )
+        spec = importlib.util.spec_from_file_location("_aninda_guidebook", source)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["_aninda_guidebook"] = module
+        spec.loader.exec_module(module)
+        _GUIDEBOOK = module
+    return _GUIDEBOOK
 PDF = HERE / "BANGLA-REVIEW.pdf"
 
 # The hand-written rows: the strings the 2026 review put questions against, each
@@ -350,16 +372,22 @@ def main() -> int:
         bn_px = max(12, round(px * mult, 1))
         rows.append(f"""
 <tr id="{sid}">
-  <td class="n">{i}</td>
+  <th scope="row" class="n" id="lbl-{sid}">{i}. <span class="sr">{en}</span></th>
   <td class="meta"><code>{sid}</code><span class="where">{where}</span>
       <span class="size">Latin {px}px → Bangla {bn_px}px</span></td>
   <td class="en">{en}</td>
   <td class="bn"><span lang="bn" style="font-size:{bn_px}px">{bn}</span></td>
   <td class="ck">{check}</td>
   <td class="mark">
-    <label><input type="radio" name="{sid}" value="ok"><span>OK</span></label>
-    <label><input type="radio" name="{sid}" value="change"><span>Change</span></label>
-    <textarea data-for="{sid}" rows="2" placeholder="what it should say"></textarea>
+    <fieldset><legend class="sr">Row {i}: {en}</legend>
+    <label><input type="radio" name="{sid}" value="ok"
+                  aria-labelledby="lbl-{sid} ok-{sid}"><span id="ok-{sid}">OK</span></label>
+    <label><input type="radio" name="{sid}" value="change"
+                  aria-labelledby="lbl-{sid} ch-{sid}"><span id="ch-{sid}">Change</span></label>
+    </fieldset>
+    <textarea data-for="{sid}" rows="2" placeholder="what it should say"
+              aria-labelledby="lbl-{sid} ta-{sid}"></textarea>
+    <span class="sr" id="ta-{sid}">what it should say</span>
   </td>
 </tr>""")
 
@@ -408,6 +436,18 @@ td{{padding:18px 12px 18px 0;border-bottom:1px solid {line};vertical-align:top}}
   font-size:13px;border:1px solid {line};border-radius:6px;padding:5px 6px;
   background:{bg};color:{ink};resize:vertical}}
 .mark textarea:focus{{outline:3px solid {accent};outline-offset:2px}}
+.mark input:focus{{outline:3px solid {accent};outline-offset:2px}}
+.mark fieldset{{border:0;margin:0;padding:0}}
+/* Visible to a screen reader, not to the eye. This sheet shipped the class in
+   its stylesheet and used it in no markup; the row labels below are what it was
+   for. */
+.sr{{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0;
+  /* text-transform is inherited, and a screen reader reads the TRANSFORMED text.
+     Without this the row labels announce "ANINDA STUDIO" in capitals — invisible
+     on screen, and the exact thing 02_strategy/ENGLISH-STANDARD.md bans, for the
+     reason it gives: capitals are harder to read and Bangla has none. */
+  text-transform:none;letter-spacing:normal}}
 #bar{{position:sticky;bottom:0;background:{surf};border-top:2px solid {accent};
   padding:14px 18px;margin-top:28px;display:flex;gap:14px;align-items:center;
   flex-wrap:wrap;border-radius:10px 10px 0 0}}
@@ -415,7 +455,11 @@ td{{padding:18px 12px 18px 0;border-bottom:1px solid {line};vertical-align:top}}
   border:1px solid {accent};background:{accent};color:{bg};cursor:pointer;
   min-height:44px}}
 #bar button.ghost{{background:transparent;color:{accent}}}
-#bar button:focus-visible{{outline:3px solid {ink};outline-offset:2px}}
+/* :focus, not :focus-visible. 08_components/src/components.css:18 states why —
+   this system shows focus to anyone who focuses, not only to those the browser
+   guesses are using a keyboard — and this page used the form that stylesheet
+   rejects. */
+#bar button:focus{{outline:3px solid {ink};outline-offset:2px}}
 #count{{font-size:14px;color:{muted}}}
 #out{{width:100%;margin-top:12px;font-family:'Aninda Mono',monospace;font-size:12px;
   border:1px solid {line};border-radius:8px;padding:10px;min-height:90px;display:none;
@@ -452,14 +496,18 @@ screen, the floor is too low and I will raise it.</li>
 </ul></div>
 
 <table>
-<thead><tr><th></th><th>Where it appears</th><th>English</th><th>Bangla, at size</th>
-<th>What I am unsure about</th><th>OK / Change</th></tr></thead>
+<caption>Every string in the register, with the English it renders, the Bangla
+proposed for it at the size it is drawn, and the question I am unsure about.
+Choose OK or Change on each row.</caption>
+<thead><tr><th scope="col">Row</th><th scope="col">Where it appears</th>
+<th scope="col">English</th><th scope="col">Bangla, at size</th>
+<th scope="col">What I am unsure about</th><th scope="col">OK / Change</th></tr></thead>
 <tbody>{''.join(rows)}</tbody></table>
 
 <div id="bar">
   <button type="button" id="copy">Copy my answers</button>
   <button type="button" class="ghost" id="dl">Save as a file</button>
-  <span id="count">Nothing marked yet</span>
+  <span id="count" role="status" aria-live="polite">Nothing marked yet</span>
   <textarea id="out" readonly aria-label="Your answers, ready to paste"></textarea>
 </div>
 
@@ -530,6 +578,23 @@ way.</p>
 }})();
 </script>
 </body></html>"""
+
+    # WCAG 2.2 SC 3.1.2 Language of Parts, Level AA. 98 of this page's 207 Bangla
+    # runs sat outside lang="bn" — the question prose in every row and two lede
+    # paragraphs — so a screen reader announced them with an English voice. On the
+    # one page whose entire purpose is judging Bangla, sent to one reader who will
+    # be reading Bangla.
+    #
+    # The guidebook's tagger does this job already, in both directions, with an
+    # account of the three earlier attempts that each got it wrong. A fourth
+    # implementation on this page would be a fourth thing to keep right, so this
+    # borrows it — and then runs the guidebook's own guard over the result, which
+    # is the check that found the fault.
+    guidebook = _guidebook()
+    n_bn, n_en, html = guidebook.tag_inline_bangla(html)
+    guidebook.guard_split_entities({OUT.name: html})
+    guidebook.guard_inline_bangla({OUT.name: html})
+    print(f"  tagged {n_bn} Bangla and {n_en} English run(s) for SC 3.1.2")
 
     guard_no_network(html)
     OUT.write_text(html)

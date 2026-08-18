@@ -262,7 +262,7 @@
       --as-surface-dim: Canvas;
       --as-surface-bright: Canvas;
       --as-ink: CanvasText;
-      --as-ink-muted: GrayText;
+      --as-ink-muted: CanvasText;
       --as-line: CanvasText;
       --as-accent: LinkText;
       --as-accent-edge: CanvasText;

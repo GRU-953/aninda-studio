@@ -706,6 +706,7 @@ def code_block(name: str, body: str, copy_label: str = "", copy_lang: str = "") 
         f'<div class="as-code__head"><span class="as-code__name">{e(name)}</span>'
         f'<button type="button" class="as-btn as-btn--small"{lang_attr}>{e(label)}</button></div>'
         f'<pre class="as-code__pre"><code>{chr(10).join(lines)}</code></pre>'
+        '<p class="as-code__said as-visually-hidden" role="status" aria-live="polite"></p>'
         "</div>"
     )
 
@@ -1512,11 +1513,11 @@ def d_marks(p, th, T):
   <div class="as-grid as-grid--wide">
     <div class="as-stack as-stack--tight">
       {mark_at(regular, 120)}
-      <p class="as-doc-swatch__meta">Estuary, regular weight</p>
+      <p class="as-doc-swatch__meta">The mark, regular weight</p>
     </div>
     <div class="as-stack as-stack--tight">
       {mark_at(heavy, 120, accent=True)}
-      <p class="as-doc-swatch__meta">Estuary, heavy weight, drawn in the accent</p>
+      <p class="as-doc-swatch__meta">The mark, heavy weight, drawn in the accent</p>
     </div>
   </div>
   <hr class="as-divider">
@@ -1947,13 +1948,13 @@ CARDS = [
          subtitle_bn="", demo=d_motion, wide=True, height=1500,
          usage=("markup", 'transition: background-color var(--as-duration-colour) var(--as-ease-standard);')),
     dict(slug="the-marks", group="Foundations", name="The marks", name_bn=BN["gb-3"],
-         subtitle="The Estuary mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
+         subtitle="The mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
          subtitle_bn="", demo=d_marks, wide=True, height=1400,
          usage=("markup", '<svg class="as-doc-mark" viewBox="0 0 100 100">…</svg>\n<!-- currentColor throughout. The mark carries no colour of its own. -->')),
     dict(slug="accessibility", group="Foundations", name="Accessibility", name_bn="",
          subtitle="Target sizes with the guidance each one comes from, the anatomy of the focus ring, and what happens in forced colours &mdash; the mode where the operating system replaces every colour with its own.",
          subtitle_bn="", demo=d_a11y, wide=True, height=1700,
-         usage=("markup", '<button class="as-btn as-btn--small">Copy the code</button>\n<!-- The small button is exactly 24px tall: WCAG 2.2 SC 2.5.8, Level AA. -->')),
+         usage=("markup", '<button class="as-btn as-btn--small">Copy the code</button>\n<!-- The small button is never smaller than 24px tall: WCAG 2.2 SC 2.5.8, Level AA. -->')),
 
     # ---- Components ----
     dict(slug="button", group="Components", name="Button", name_bn="",
@@ -2140,6 +2141,50 @@ SWITCHER_JS = """
   });
   document.addEventListener('submit', function (event) { event.preventDefault(); });
 
+  // The copy button. It had no listener at all: a control whose name is a promise
+  // and whose behaviour is nothing, announced identically to one that works, and
+  // it matters most to the keyboard-only reader for whom it is the only offered
+  // route to the code. Confirmed dead with a clipboard sentinel — the sentinel
+  // survived the click.
+  //
+  // Both outcomes are announced through a live region, because a copy that
+  // silently fails is the same defect one step along. navigator.clipboard is not
+  // available on a file:// page in Chromium, so the execCommand path is the one
+  // that actually runs for a reader who opened the card from disk; it is tried
+  // second so a served page gets the modern API.
+  var copies = document.querySelectorAll('.as-code__head .as-btn');
+  for (var c = 0; c < copies.length; c++) {
+    copies[c].addEventListener('click', function (event) {
+      var head = event.currentTarget.parentNode;
+      var block = head.parentNode;
+      var pre = block.querySelector('.as-code__pre');
+      var say = block.querySelector('.as-code__said');
+      var code = pre ? pre.textContent : '';
+      function said(message) { if (say) { say.textContent = message; } }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(
+          function () { said('Copied.'); },
+          function () { legacy(); }
+        );
+        return;
+      }
+      legacy();
+      function legacy() {
+        var area = document.createElement('textarea');
+        area.value = code;
+        area.setAttribute('readonly', 'readonly');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+        document.body.removeChild(area);
+        said(ok ? 'Copied.' : 'Copying did not work. Select the code and copy it.');
+      }
+    });
+  }
+
   // The other half of the ARIA tabs pattern. A roving tabindex takes every
   // unselected tab out of the tab sequence, so without this the tabs card shipped
   // ten visible buttons no key could reach. Click, arrow keys, Home and End all
@@ -2199,9 +2244,18 @@ def build_page(card: dict, tokens_css: str, components_css: str, faces_css: str,
     for key, label, label_bn in THEMES:
         label_html = e(label) + ((" " + bn(label_bn)) if label_bn else "")
         body = demo(f"{slug}-{key}", key, T)
+        # role="group" with aria-labelledby, so the panel has a NAME. Without it
+        # every card put four or five copies of each control into one flat
+        # accessibility tree with nothing to tell them apart: sign-in.html offered
+        # five fields called "Email address", dialog.html five buttons called
+        # "Delete the file". Reading the page linearly recovers which theme each
+        # belongs to, because the label sits above it; tabbing does not, and the
+        # label was in an unnamed div. The name is the label already on the page.
         panels.append(
-            f'<div class="as-doc-panel" data-theme="{key}">'
-            f'<p class="as-doc-panel__label"><span>{label_html}</span>'
+            f'<div class="as-doc-panel" data-theme="{key}" role="group" '
+            f'aria-labelledby="{slug}-{key}-label">'
+            f'<p class="as-doc-panel__label" id="{slug}-{key}-label">'
+            f'<span>{label_html}</span>'
             f'<code>data-theme="{key}"</code></p>'
             f"{body}</div>"
         )

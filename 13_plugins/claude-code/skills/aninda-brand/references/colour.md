@@ -17,7 +17,7 @@ Apache-2.0.
 `warning`, `danger`, `info`. Steps run 50, 100, 200 … 900, 950. Never use a
 primitive directly in a design. It cannot follow a theme.
 
-**Semantic roles** are the seventeen names below. These are what you use. Each
+**Semantic roles** are the names below. These are what you use. Each
 one holds a different value in each of the four themes, so a design written in
 roles works in all four without being rewritten.
 

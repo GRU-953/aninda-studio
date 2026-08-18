@@ -97,8 +97,8 @@
       "name": "The marks",
       "name_bn": "চিহ্ন",
       "group": "Foundations",
-      "subtitle": "The Estuary mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
-      "subtitle_bn": "মোহনা চিহ্ন দুই ওজনে — currentColor দিয়ে আঁকা, তাই যে থিমে বসে সেই থিমের রং নিয়ে নেয়",
+      "subtitle": "The mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
+      "subtitle_bn": "চিহ্ন দুই ওজনে — currentColor দিয়ে আঁকা, তাই যে থিমে বসে সেই থিমের রং নিয়ে নেয়",
       "width": 1280,
       "height": 1400
     },

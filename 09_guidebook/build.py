@@ -270,20 +270,28 @@ COMPOSED_EN = {"hc-light": "High contrast, light", "hc-dark": "High contrast, da
 
 CHAPTERS = [
     # (number, slug, English title, Bangla title id or None, source)
-    ("01", "welcome", "Welcome", "gb-1", "file"),
-    ("02", "the-name", "The name", "gb-2", "file"),
-    ("03", "the-mark", "The mark", "gb-3", "file"),
+    # All fourteen keyed to chapter.* in 06_type/bangla-strings.json. Ten used to
+    # be served from the hand-typed BN table instead, and the register holds those
+    # same ten under chapter.* — so ten of the ninety-four approved keys were dead,
+    # and a correction made in the register, the file carrying the dictionary
+    # citation behind each string, would have changed nothing in the book. The
+    # comment at the head of the BN table names this exact consequence: "two copies
+    # of a translation drift, and the one that drifts is the one nobody is looking
+    # at." Verified all ten agreed at the moment of the change.
+    ("01", "welcome", "Welcome", "chapter.welcome", "file"),
+    ("02", "the-name", "The name", "chapter.the-name", "file"),
+    ("03", "the-mark", "The mark", "chapter.the-mark", "file"),
     ("04", "icons", "Icons", "chapter.icons", "file"),
-    ("05", "colour", "Colour", "gb-4", "generated"),
-    ("06", "type", "Type", "gb-5", "generated"),
-    ("07", "space-and-shape", "Space and shape", "gb-6", "generated"),
-    ("08", "components", "Components", "gb-7", "generated"),
-    ("09", "motion", "Motion", "gb-8", "generated"),
-    ("10", "voice", "Voice", "gb-9", "file"),
+    ("05", "colour", "Colour", "chapter.colour", "generated"),
+    ("06", "type", "Type", "chapter.type", "generated"),
+    ("07", "space-and-shape", "Space and shape", "chapter.space-and-shape", "generated"),
+    ("08", "components", "Components", "chapter.components", "generated"),
+    ("09", "motion", "Motion", "chapter.motion", "generated"),
+    ("10", "voice", "Voice", "chapter.voice", "file"),
     ("11", "writing-in-bangla", "Writing in Bangla", "chapter.writing-in-bangla", "file"),
     ("12", "applying-it", "Applying it", "chapter.applying-it", "file"),
     ("13", "licence-and-trademarks", "Licence and trademarks", "chapter.licence-and-trademarks", "file"),
-    ("14", "what-this-system-does-not-do", "What this system does not do", "gb-10", "file"),
+    ("14", "what-this-system-does-not-do", "What this system does not do", "chapter.what-this-system-does-not-do", "file"),
 ]
 
 CHAPTER_STANDFIRST = {

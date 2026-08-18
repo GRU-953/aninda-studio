@@ -4,7 +4,7 @@ description: >-
   Make ONE thing to the Aninda Studio brand and design system — a logo, mark,
   icon, app icon, favicon, wordmark, tile, colour swatch, button, card, page,
   component, email, slide, document or piece of copy. Holds every rule: the
-  Estuary colour ramps and the seventeen semantic roles across light, dark,
+  Estuary colour ramps and every semantic role across light, dark,
   hc-light and hc-dark; the Literata, Noto Serif Bengali and Aninda Mono type
   scale with the measured Bangla multiplier and its 12 px floor; the 4 px
   spacing scale and four radii; clear space and stroke weight on the mark; the

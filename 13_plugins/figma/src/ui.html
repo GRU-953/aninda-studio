@@ -3,7 +3,19 @@
   SPDX-License-Identifier: Apache-2.0
   Copyright 2026 Aninda Sundar Howlader
 -->
+<!--
+  A declared language and a title. This and its dist/ copy were the only two HTML
+  documents in the repository with neither, out of thirty-nine. Figma's own
+  document is what WCAG's page-level criteria attach to, which is why this is
+  minor rather than a failure — but a screen reader reading this frame has no
+  declared language for its contents, and the other thirty-seven documents here
+  all set one.
+-->
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8" />
+<title>Aninda Studio — build the Figma library</title>
 <style>
   /* Figma supplies its own chrome colours as --figma-color-* custom properties,
      and the plugin window belongs to Figma's interface rather than to a page of
@@ -128,6 +140,8 @@
     display: none !important;
   }
 </style>
+</head>
+<body>
 
 <h1>Aninda Studio — build the library</h1>
 <p class="lede">
@@ -178,6 +192,7 @@
     <p id="stopped" hidden></p>
     <div id="probe"></div>
     <table id="counts">
+      <caption>What this run is expected to make, and what it made.</caption>
       <thead>
         <tr>
           <th scope="col">What</th>
@@ -358,3 +373,5 @@
     };
   })();
 </script>
+</body>
+</html>

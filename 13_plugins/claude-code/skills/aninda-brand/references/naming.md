@@ -18,6 +18,16 @@ One name for one thing, everywhere. If it is the *mark*, it is never also the
 | **tile** | The mark on a rounded coloured square | badge, avatar |
 | **icon** | An app or platform icon file | logo, favicon |
 | **lockup** | Mark and wordmark placed together | combined logo |
+
+**One exception, and it is deliberate: platform-facing FILENAMES follow the
+platform's word, not this one.** A browser looks for `favicon.ico`; LinkedIn's
+own interface says "logo"; a profile picture is an avatar everywhere it is
+uploaded. So `10_assets/` ships `favicon.ico`, `favicon-16.png`, `avatar-512.png`
+and `linkedin-company-logo.png`, and that is right — the person downloading the
+file is served better by the name the destination uses than by this table's
+vocabulary. The rule above governs PROSE: what these things are called when
+written about, in this kit and anywhere else. Without this paragraph the rule was
+refuted seven times by the studio's own delivery.
 | **role** | A semantic colour name such as `ink.default` | variable, colour |
 | **ramp** | A primitive scale of eleven steps | palette, family |
 | **step** | One value in a ramp, such as `700` | shade, tone, weight |

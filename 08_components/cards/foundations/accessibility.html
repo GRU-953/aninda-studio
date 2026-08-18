@@ -274,7 +274,7 @@
       --as-surface-dim: Canvas;
       --as-surface-bright: Canvas;
       --as-ink: CanvasText;
-      --as-ink-muted: GrayText;
+      --as-ink-muted: CanvasText;
       --as-line: CanvasText;
       --as-accent: LinkText;
       --as-accent-edge: CanvasText;
@@ -1488,7 +1488,7 @@
 <h2 class="as-doc-section__title">All four themes at once</h2>
 <p class="as-doc-section__note">Each panel pins its own theme with a data-theme attribute. That is why a dark panel can sit inside a light page: the themes are scoped to an element, not to the document root.</p>
 <div class="as-doc-quad as-doc-quad--wide">
-<div class="as-doc-panel" data-theme="light"><p class="as-doc-panel__label"><span>Light <span lang="bn">আলো</span></span><code>data-theme="light"</code></p>
+<div class="as-doc-panel" data-theme="light" role="group" aria-labelledby="accessibility-light-label"><p class="as-doc-panel__label" id="accessibility-light-label"><span>Light <span lang="bn">আলো</span></span><code>data-theme="light"</code></p>
 <div class="as-stack">
   <p class="as-hint">Four target sizes, each with the guidance it comes from. Nothing in this system is smaller than the first.</p>
   <div class="as-row" style="align-items: flex-end"><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-min); block-size: var(--as-target-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">24 px</span><span class="as-hint">WCAG 2.2 SC 2.5.8, Level AA</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-apple-min); block-size: var(--as-target-apple-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">28 px</span><span class="as-hint">Apple HIG minimum, iOS and iPadOS</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-comfortable); block-size: var(--as-target-comfortable); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">44 px</span><span class="as-hint">Apple HIG default, iOS and iPadOS</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-android-min); block-size: var(--as-target-android-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">48 px</span><span class="as-hint">Android guidance, in dp</span></div></div>
@@ -1512,7 +1512,7 @@
     <span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span>
     <span class="as-badge as-badge--danger"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 12 12M12 4 4 12"/></svg><span>Failed</span></span>
   </div>
-</div></div><div class="as-doc-panel" data-theme="dark"><p class="as-doc-panel__label"><span>Dark <span lang="bn">অন্ধকার</span></span><code>data-theme="dark"</code></p>
+</div></div><div class="as-doc-panel" data-theme="dark" role="group" aria-labelledby="accessibility-dark-label"><p class="as-doc-panel__label" id="accessibility-dark-label"><span>Dark <span lang="bn">অন্ধকার</span></span><code>data-theme="dark"</code></p>
 <div class="as-stack">
   <p class="as-hint">Four target sizes, each with the guidance it comes from. Nothing in this system is smaller than the first.</p>
   <div class="as-row" style="align-items: flex-end"><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-min); block-size: var(--as-target-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">24 px</span><span class="as-hint">WCAG 2.2 SC 2.5.8, Level AA</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-apple-min); block-size: var(--as-target-apple-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">28 px</span><span class="as-hint">Apple HIG minimum, iOS and iPadOS</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-comfortable); block-size: var(--as-target-comfortable); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">44 px</span><span class="as-hint">Apple HIG default, iOS and iPadOS</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-android-min); block-size: var(--as-target-android-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">48 px</span><span class="as-hint">Android guidance, in dp</span></div></div>
@@ -1536,7 +1536,7 @@
     <span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span>
     <span class="as-badge as-badge--danger"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 12 12M12 4 4 12"/></svg><span>Failed</span></span>
   </div>
-</div></div><div class="as-doc-panel" data-theme="hc-light"><p class="as-doc-panel__label"><span>High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></span><code>data-theme="hc-light"</code></p>
+</div></div><div class="as-doc-panel" data-theme="hc-light" role="group" aria-labelledby="accessibility-hc-light-label"><p class="as-doc-panel__label" id="accessibility-hc-light-label"><span>High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></span><code>data-theme="hc-light"</code></p>
 <div class="as-stack">
   <p class="as-hint">Four target sizes, each with the guidance it comes from. Nothing in this system is smaller than the first.</p>
   <div class="as-row" style="align-items: flex-end"><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-min); block-size: var(--as-target-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">24 px</span><span class="as-hint">WCAG 2.2 SC 2.5.8, Level AA</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-apple-min); block-size: var(--as-target-apple-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">28 px</span><span class="as-hint">Apple HIG minimum, iOS and iPadOS</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-comfortable); block-size: var(--as-target-comfortable); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">44 px</span><span class="as-hint">Apple HIG default, iOS and iPadOS</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-android-min); block-size: var(--as-target-android-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">48 px</span><span class="as-hint">Android guidance, in dp</span></div></div>
@@ -1560,7 +1560,7 @@
     <span class="as-badge as-badge--success"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6 6.4 12 13 4.6"/></svg><span>Passed</span></span>
     <span class="as-badge as-badge--danger"><svg class="as-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 12 12M12 4 4 12"/></svg><span>Failed</span></span>
   </div>
-</div></div><div class="as-doc-panel" data-theme="hc-dark"><p class="as-doc-panel__label"><span>High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></span><code>data-theme="hc-dark"</code></p>
+</div></div><div class="as-doc-panel" data-theme="hc-dark" role="group" aria-labelledby="accessibility-hc-dark-label"><p class="as-doc-panel__label" id="accessibility-hc-dark-label"><span>High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></span><code>data-theme="hc-dark"</code></p>
 <div class="as-stack">
   <p class="as-hint">Four target sizes, each with the guidance it comes from. Nothing in this system is smaller than the first.</p>
   <div class="as-row" style="align-items: flex-end"><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-min); block-size: var(--as-target-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">24 px</span><span class="as-hint">WCAG 2.2 SC 2.5.8, Level AA</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-apple-min); block-size: var(--as-target-apple-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">28 px</span><span class="as-hint">Apple HIG minimum, iOS and iPadOS</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-comfortable); block-size: var(--as-target-comfortable); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">44 px</span><span class="as-hint">Apple HIG default, iOS and iPadOS</span></div><div class="as-stack as-stack--tight"><div style="inline-size: var(--as-target-android-min); block-size: var(--as-target-android-min); border: 1px solid var(--as-line); background-color: var(--as-surface-highest); border-radius: var(--as-radius-badge)"></div><span class="as-doc-swatch__meta">48 px</span><span class="as-hint">Android guidance, in dp</span></div></div>
@@ -1589,7 +1589,7 @@
 </section>
 
 <section class="as-doc-section"><h2 class="as-doc-section__title">How to write it</h2><p class="as-doc-section__note">The classes carry the design decisions. The markup carries the meaning, and no class can supply that for you.</p><div class="as-code"><div class="as-code__head"><span class="as-code__name">markup</span><button type="button" class="as-btn as-btn--small">Copy the code</button></div><pre class="as-code__pre"><code>&lt;button class=&quot;as-btn as-btn--small&quot;&gt;Copy the code&lt;/button&gt;
-<span class="as-code__comment">&lt;!-- The small button is exactly 24px tall: WCAG 2.2 SC 2.5.8, Level AA. --&gt;</span></code></pre></div></section>
+<span class="as-code__comment">&lt;!-- The small button is never smaller than 24px tall: WCAG 2.2 SC 2.5.8, Level AA. --&gt;</span></code></pre><p class="as-code__said as-visually-hidden" role="status" aria-live="polite"></p></div></section>
 </main>
 <footer class="as-doc-foot">
 <p>Generated by 08_components/build.py from 07_tokens/css/tokens.css and 08_components/src/components.css. Do not hand-edit this file. Fonts are subset and inlined; this card needs no network.</p>
@@ -1617,6 +1617,50 @@
     if (anchor) { event.preventDefault(); }
   });
   document.addEventListener('submit', function (event) { event.preventDefault(); });
+
+  // The copy button. It had no listener at all: a control whose name is a promise
+  // and whose behaviour is nothing, announced identically to one that works, and
+  // it matters most to the keyboard-only reader for whom it is the only offered
+  // route to the code. Confirmed dead with a clipboard sentinel — the sentinel
+  // survived the click.
+  //
+  // Both outcomes are announced through a live region, because a copy that
+  // silently fails is the same defect one step along. navigator.clipboard is not
+  // available on a file:// page in Chromium, so the execCommand path is the one
+  // that actually runs for a reader who opened the card from disk; it is tried
+  // second so a served page gets the modern API.
+  var copies = document.querySelectorAll('.as-code__head .as-btn');
+  for (var c = 0; c < copies.length; c++) {
+    copies[c].addEventListener('click', function (event) {
+      var head = event.currentTarget.parentNode;
+      var block = head.parentNode;
+      var pre = block.querySelector('.as-code__pre');
+      var say = block.querySelector('.as-code__said');
+      var code = pre ? pre.textContent : '';
+      function said(message) { if (say) { say.textContent = message; } }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(
+          function () { said('Copied.'); },
+          function () { legacy(); }
+        );
+        return;
+      }
+      legacy();
+      function legacy() {
+        var area = document.createElement('textarea');
+        area.value = code;
+        area.setAttribute('readonly', 'readonly');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+        document.body.removeChild(area);
+        said(ok ? 'Copied.' : 'Copying did not work. Select the code and copy it.');
+      }
+    });
+  }
 
   // The other half of the ARIA tabs pattern. A roving tabindex takes every
   // unselected tab out of the tab sequence, so without this the tabs card shipped
