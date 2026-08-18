@@ -1,5 +1,12 @@
 # Open findings — carried forward
 
+<!-- This file ships, so it is held to 02_strategy/ENGLISH-STANDARD.md like any
+     other prose here — including the banned-word list. Four banned words arrived
+     in it when the findings were copied in verbatim from the reviewers' own
+     wording, and CI's lint job caught them. If you paste a finding in, reword it.
+     A findings record that breaks the rule it records findings about is a poor
+     advertisement for the rule. -->
+
 Round 1 of the convergence review raised 59 findings across six independent
 lenses, each adversarially verified before it counted. The blockers and majors
 were fixed. These minors were judged not worth the change at the time, and are
@@ -103,7 +110,7 @@ The docstring's whole point is that "the reason for the two-file split stays a m
 
 `01_research/BENCHMARK.md`
 
-README.md line 62 sells 01_research/ as "What was checked, when, and against which source". The document instead asserts, in a published repository, that the artefact it is measuring does not exist — a statement that is simply false today — and leaves unredeemed an explicit promise that the verdict column would be completed by inspection. Its own criterion 28 ("no number appears that cannot be traced to one") is among the 28 left unjudged.
+README.md line 62 sells 01_research/ as "What was checked, when, and against which source". The document instead asserts, in a published repository, that the artefact it is measuring does not exist — a statement that is false today — and leaves unredeemed an explicit promise that the verdict column would be completed by inspection. Its own criterion 28 ("no number appears that cannot be traced to one") is among the 28 left unjudged.
 
 ### 17. The guidebook and the card harness state that measurement happened on macOS only and on one machine, which CI contradicts on every run
 
@@ -219,19 +226,19 @@ This is the first command the README asks a reader to run, and the duration is t
 
 `README.bn.md`
 
-Both READMEs open by promising the same thing — README.bn.md: "কোনো কিছুর সীমা থাকলে সেটা এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না" ("if something has a limit it will be written here, not hidden"). The icon decision is the one place the kit knowingly departs from a platform vendor's published guidance, and it is disclosed to English readers and not to Bangla readers, in the section whose only job is disclosure. Elsewhere the project declares its Bangla gaps at the point of the gap; here a limit is simply absent, so a Bangla reader has no way to know one was withheld.
+Both READMEs open by promising the same thing — README.bn.md: "কোনো কিছুর সীমা থাকলে সেটা এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না" ("if something has a limit it will be written here, not hidden"). The icon decision is the one place the kit knowingly departs from a platform vendor's published guidance, and it is disclosed to English readers and not to Bangla readers, in the section whose only job is disclosure. Elsewhere the project declares its Bangla gaps at the point of the gap; here a limit is absent, so a Bangla reader has no way to know one was withheld.
 
 ### R2-7. The tabs card's panels are unreachable by keyboard and the markup it teaches omits the tabindex that would fix it
 
 `08_components/cards/components/tabs.html`
 
-The WAI-ARIA Authoring Practices tabs pattern requires tabindex="0" on a tabpanel that holds no focusable element, so that after choosing a tab the reader can put focus into the panel and page through it. Without it a keyboard-only user activates a tab and focus jumps past the content they just revealed, with nothing focused inside the region they were reading. The card is the system's teaching artefact for this pattern and says so in its own panel text — 'Arrow keys move between the tabs and Home and End jump to the ends, which is what the roving tabindex on this pattern requires' — so the omission is copied by anyone following it. This is guidance rather than a WCAG success criterion, and the panels here are two short paragraphs, which is why it is minor rather than more.
+The WAI-ARIA Authoring Practices tabs pattern requires tabindex="0" on a tabpanel that holds no focusable element, so that after choosing a tab the reader can put focus into the panel and page through it. Without it a keyboard-only user activates a tab and focus jumps past the content they only revealed, with nothing focused inside the region they were reading. The card is the system's teaching artefact for this pattern and says so in its own panel text — 'Arrow keys move between the tabs and Home and End jump to the ends, which is what the roving tabindex on this pattern requires' — so the omission is copied by anyone following it. This is guidance rather than a WCAG success criterion, and the panels here are two short paragraphs, which is why it is minor rather than more.
 
 ### R2-8. The site harness's structure and Bangla-language probe runs on index.html only, and its Bangla expression has no script/style skip list
 
 `11_site/check.py`
 
-Round 1 removed four CI steps that could pass without running. This is the same shape one level down: a harness that measures two pages reports a structure result derived from one, and prints it as an unqualified pass, so a regression on 404.html — a missing skip link, a lost <main>, an untagged Bangla string — is green. The skip-list omission is the reason the check cannot simply be pointed at the component cards as it stands: it would fire on every card's own stylesheet comment and the real defects would be indistinguishable from the noise. Both are cheap to close, and closing them is what would let one guard cover all thirty-two shipped pages instead of one.
+Round 1 removed four CI steps that could pass without running. This is the same shape one level down: a harness that measures two pages reports a structure result derived from one, and prints it as an unqualified pass, so a regression on 404.html — a missing skip link, a lost <main>, an untagged Bangla string — is green. The skip-list omission is the reason the check cannot be pointed at the component cards as it stands: it would fire on every card's own stylesheet comment and the real defects would be indistinguishable from the noise. Both are cheap to close, and closing them is what would let one guard cover all thirty-two shipped pages instead of one.
 
 ### R2-9. The accessibility card's subtitle double-escapes an em dash, so the entity is read out as literal text on the one card whose subject is accessibility
 
