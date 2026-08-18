@@ -9,7 +9,7 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "1f3b60f2ba8d7c3be634742794eb850b16f966dd74a73fe3169d2c3cd4c65671";
+export const BUNDLE_SHA256 = "f210bd649b4e2af31378d8f61ed403907469b6e286e896566e32e7500415417b";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
   "07_tokens/build/primitive.tokens.json": "359b6b214801145054bd3154b51247b2cc3fbf1983f54664b959b30802aaf43f",
@@ -29,7 +29,7 @@ export const SOURCE_HASHES: { [file: string]: string } = {
   "04_mark/svg/wordmark-bangla.svg": "6b42edde179882a29c3147a78e333ef3e341fbd16913ec8fd70519599d8b464d",
   "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
   "04_mark/manifest.json": "440d2eafd5c5ebb6d66d3a5aae0a5e170dc2b9a88ebacc697ced0bc8a877f4ad",
-  "08_components/_cards.json": "ad9cdce30242383ec2d9eeb7603576b04c32d19bd584b565faf096ea11657b34"
+  "08_components/_cards.json": "bd177c1e4882eaa9df2c6a6bc1d3807563914b0c7c463c9fdd3fd8915ee08421"
 };
 
 export const BUNDLED: RawInput = {
@@ -3780,8 +3780,8 @@ export const BUNDLED: RawInput = {
       "name": "The marks",
       "name_bn": "চিহ্ন",
       "group": "Foundations",
-      "subtitle": "The Estuary mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
-      "subtitle_bn": "মোহনা চিহ্ন দুই ওজনে — currentColor দিয়ে আঁকা, তাই যে থিমে বসে সেই থিমের রং নিয়ে নেয়",
+      "subtitle": "The mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
+      "subtitle_bn": "চিহ্ন দুই ওজনে — currentColor দিয়ে আঁকা, তাই যে থিমে বসে সেই থিমের রং নিয়ে নেয়",
       "width": 1280,
       "height": 1400
     },
