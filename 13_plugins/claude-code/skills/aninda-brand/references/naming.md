@@ -49,18 +49,44 @@ it on every leaf.
 
 ## CSS custom properties
 
-Prefix `--as-`, then the role with dots replaced by hyphens, and the `color.` and
-`dimension.` prefixes dropped.
+The CSS name is not the token path with hyphens. Applied mechanically, that rule
+produces a name that does not exist for about half the token set — and it is the
+rule that produced `--as-accent-default`, a property no stylesheet defines, which
+resolves to nothing and drops the text back to inherited black. The four places
+that used the wrong names were corrected; this sentence, which generates them,
+was left standing for a round.
 
-| Token | CSS |
-| --- | --- |
-| `color.surface.base` | `--as-surface-base` |
-| `color.ink.muted` | `--as-ink-muted` |
-| `dimension.space.4` | `--as-space-4` |
-| `dimension.type.body` | `--as-text-body` |
-| `dimension.radius.card` | `--as-radius-card` |
-| `duration.motion.move` | `--as-duration-move` |
-| `cubicBezier.motion.enter` | `--as-ease-enter` |
+`07_tokens/emit_css.py` is the only authority. It does two things to a colour
+path and nothing at all to the rest:
+
+- drop a leading `color.` or `status.` segment
+- drop a trailing `default` segment
+
+So `color.ink.default` is `--as-ink`, `color.status.danger` is `--as-danger`, and
+`color.accent.default` is `--as-accent`. Role names keep both parts, which is why
+`asset.py contrast --fg accent-default` is right while `--as-accent-default` is not
+a property.
+
+Everything that is not a colour has a fixed family name, not a derived one:
+
+| Token | CSS | Why it is not derivable |
+| --- | --- | --- |
+| `color.surface.base` | `--as-surface-base` | colour, `color.` dropped |
+| `color.ink.default` | `--as-ink` | colour, trailing `default` dropped |
+| `color.status.danger` | `--as-danger` | colour, leading `status.` dropped |
+| `color.accent.hover` | `--as-accent-hover` | colour, nothing to drop |
+| `dimension.space.4` | `--as-space-4` | family `space` |
+| `dimension.type.body` | `--as-text-body` | family renamed `type` to `text` |
+| `dimension.radius.card` | `--as-radius-card` | family `radius` |
+| `fontFamily.bangla` | `--as-font-bangla` | family renamed to `font` |
+| `duration.motion.move` | `--as-duration-move` | `motion` dropped, family `duration` |
+| `cubicBezier.motion.enter` | `--as-ease-enter` | `motion` dropped, family renamed `ease` |
+| `number.scale.ratio` | `--as-scale-ratio` | family `scale` |
+
+When in doubt, read the property out of `assets/css/tokens.css` rather than
+deriving it. `check_plugin.py` compares every `var(--as-…)` in all three skills
+against that file, so a name invented here fails the plugin check — but it cannot
+read prose, which is why this section had to be corrected by hand.
 
 `--as-` and nothing else. A second prefix means two systems.
 

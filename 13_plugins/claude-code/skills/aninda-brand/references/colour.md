@@ -27,7 +27,7 @@ rules: মোহনা (ground, "estuary"), জোয়ার (accent, "tidewat
 
 ---
 
-## The seventeen roles, in all four themes
+## Every colour value, in all four themes
 
 | Role | light | dark | hc-light | hc-dark |
 |---|---|---|---|---|
@@ -43,6 +43,7 @@ rules: মোহনা (ground, "estuary"), জোয়ার (accent, "tidewat
 | `color.line.default` | #578076 | #578076 | #41655C | #6F9B90 |
 | `color.accent.default` | #126974 | #42A0AE | #054D56 | #65BAC7 |
 | `color.accent.edge` | #278492 | #278492 | #126974 | #42A0AE |
+| `color.accent.hover` | #054D56 | #65BAC7 | #013137 | #8ED2DD |
 | `color.focus.ring` | #278492 | #278492 | #126974 | #42A0AE |
 | `color.status.success` | #2D6C42 | #59A46F | #1D502E | #77BE8B |
 | `color.status.warning` | #7C5414 | #B8863E | #5D3C07 | #D2A15F |

@@ -1050,7 +1050,7 @@ def d_card(p, th, T):
   <article class="as-card">
     <p class="as-card__meta">Foundation</p>
     <h3 class="as-card__title">Colour</h3>
-    <p class="as-card__body">Seventeen roles, four themes, and a measured contrast ratio behind every one of them.</p>
+    <p class="as-card__body">Every colour role, four themes, and a measured contrast ratio behind every one of them.</p>
     <div class="as-card__foot">
       <a class="as-btn as-btn--small as-btn--primary" href="#">Open the card</a>
       <span class="as-badge as-badge--success">{icon('check')}<span>Measured</span></span>
@@ -1906,7 +1906,7 @@ def mark_at(svg: str, size: int, accent: bool = False) -> str:
 CARDS = [
     # ---- Foundations ----
     dict(slug="colour", group="Foundations", name="Colour", name_bn=BN["gb-4"],
-         subtitle="Seventeen roles across four themes, each with the contrast ratio it was measured at and the criterion it was measured against.",
+         subtitle="Every colour role across four themes, each with the contrast ratio it was measured at and the criterion it was measured against, over the seven surfaces they are measured against.",
          subtitle_bn="", demo=d_colour, wide=True, height=2400,
          extra=lambda T: [("Every role, measured",
                            "Nothing in these tables was typed. Every figure is read from the token files at build time, so the prose cannot drift away from the palette.",

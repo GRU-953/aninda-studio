@@ -547,12 +547,19 @@ Source:  {REPO}
         "var(--as-space-4);}\n"
     )
 
+    # `export { primitive as tokens }`, not `export { tokens }`. `tokens` was
+    # never declared in this module, so the ESM entry point threw
+    # "SyntaxError: Export 'tokens' is not defined in module" — and it threw at
+    # LINK time, not at run time, so no bundler and no Node version rescued it.
+    # index.d.ts told TypeScript users the import worked. The CI step named "The
+    # npm package must actually resolve" stat-ed this file and then imported the
+    # CommonJS twin instead, so it passed. That step now imports this file.
     index_body = (
         "// Aninda Studio design tokens. GENERATED — do not hand-edit.\n"
         "import primitive from './tokens/primitive.tokens.json' with { type: 'json' };\n"
         "export const themes = %s;\n"
-        "export { tokens };\n"
-        "export default tokens;\n" % json.dumps(list(THEMES))
+        "export { primitive as tokens };\n"
+        "export default primitive;\n" % json.dumps(list(THEMES))
     )
     files[npm / "dist" / "index.mjs"] = index_body
     files[npm / "dist" / "index.cjs"] = (

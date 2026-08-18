@@ -916,7 +916,25 @@ def block_bangla_gaps() -> str:
 
     cards = read_json(CARDS_JSON)
     gaps = cards["_bangla_gaps"]
-    card_names = ", ".join(gaps["name_bn"])
+    total_cards = len(cards["cards"])
+    no_name = gaps["name_bn"]
+    no_subtitle = gaps["subtitle_bn"]
+
+    # Derived, all four numbers. What stood here was a hand-typed paragraph under
+    # generated rows, and it made four false statements at once: a summary reading
+    # "The 0 component cards with no verified Bangla name", an empty body where
+    # names were promised, "all 30 cards lack a verified Bangla subtitle" when the
+    # register supplies all 30, and "five foundations" where there are six. Nothing
+    # was named above. The identical fault — a typed count over generated rows —
+    # had been diagnosed and repaired in _gap_caption sixteen lines earlier in this
+    # same function, and the repair landed in one of two adjacent copies.
+    def _standing(missing: list[str], what: str) -> str:
+        if not missing:
+            return (f'<p class="gb-caption">All {total_cards} component cards carry a '
+                    f'verified Bangla {what}, so there is no gap to list here.</p>')
+        return (f'<p class="gb-caption">{len(missing)} of {total_cards} component '
+                f'cards have no verified Bangla {what}: {e(", ".join(missing))}.</p>')
+
     return (
         table(["Chapter", "Verified Bangla title", "What is missing"], rows,
               caption=_gap_caption(rows))
@@ -925,11 +943,8 @@ def block_bangla_gaps() -> str:
                         "on read from 06_type/bangla-strings.json. Both are "
                         "approved; an earlier version of this book said they were "
                         "not, over a form nobody had reviewed.")
-        + details(
-            f"The {len(gaps['name_bn'])} component cards with no verified Bangla name",
-            f'<p class="gb-caption">{e(card_names)}</p>'
-            f'<p class="gb-caption">All 30 cards lack a verified Bangla subtitle '
-            f'except the five foundations named above, which have none either.</p>')
+        + _standing(no_name, "name")
+        + _standing(no_subtitle, "subtitle")
     )
 
 
@@ -1851,12 +1866,24 @@ def chapter_components_bn(tok: Tokens) -> str:
             for c in cards["cards"] if c["name_bn"]]
     out.append(table(["Bangla", "English", "Group"], rows,
                      caption="The cards that do have a verified Bangla name."))
+    # Every number here is counted. This paragraph used to read "Five of the
+    # thirty cards carry a verified Bangla name" and "none of the thirty has a
+    # verified Bangla subtitle" beside a generated "The other {n} do not" — so it
+    # said five, zero and thirty about the same set of cards in one sentence, and
+    # by then the register supplied all thirty of both. Third copy of one fault.
+    total = len(cards["cards"])
+    named = sum(1 for c in cards["cards"] if c["name_bn"])
+    subtitled = sum(1 for c in cards["cards"] if c.get("subtitle_bn"))
     out.append(
-        f"<p>Five of the thirty cards carry a verified Bangla name, because five "
-        f"of them share a name with a chapter of this book. The other "
-        f"{len(gaps['name_bn'])} do not, and <strong>none of the thirty has a "
-        f"verified Bangla subtitle</strong>. Those cards keep their English, and "
-        "the gap is recorded in the card registry itself rather than filled.</p>")
+        f"<p>{named} of the {total} cards carry a verified Bangla name and "
+        f"{subtitled} carry a verified Bangla subtitle. "
+        + ("Every string here comes from the approved register; nothing on a card "
+           "was translated for the card."
+           if named == total and subtitled == total else
+           f"{total - named} card(s) keep their English name and "
+           f"{total - subtitled} keep their English subtitle, and the gap is "
+           f"recorded in the card registry itself rather than filled.")
+        + "</p>")
     return "".join(out)
 
 
@@ -2620,7 +2647,34 @@ _BANGLA_RUN = re.compile(r"[\u0980-\u09FF][\u0980-\u09FF\s\u200c\u200d।,;:!?()
 _ENGLISH_RUN = re.compile(
     r"[A-Za-z][A-Za-z0-9\s.,;:!?()\u2019'\u2014/&%-]*[A-Za-z0-9.)]|[A-Za-z]{2,}"
 )
+# An HTML character reference is ONE character to a reader and a unit the parser
+# will not let a tag divide. _ENGLISH_RUN's character class contains both & and ;,
+# so a run could start inside `&quot;` and end inside the next one — which is what
+# happened. The Bangla chapter's copy of the one CSS rule the Bangla half depends
+# on shipped as `:lang(bn), [lang=&quot;bn";] {` and Chromium parsed it to ZERO
+# rules: a selector list is unforgiving, so the valid `:lang(bn)` half went with
+# it. A reader who copied the sample got nothing.
+#
+# Masking these out before tagging makes the split structurally impossible rather
+# than merely unlikely, and it keeps & and ; usable inside a run — a literal
+# ampersand in prose and a semicolon inside a CSS declaration both still tag as
+# one piece. guard_split_entities re-checks the output; the pattern is general and
+# the next Bangla chapter that quotes markup would break the same way.
+_ENTITY = re.compile(r"&(?:[a-zA-Z][a-zA-Z0-9]{1,31}|#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6});")
+
 _SKIP_ELEMENTS = ("script", "style", "title", "textarea")
+
+
+def _sub_outside_entities(pattern: re.Pattern, repl, text: str) -> str:
+    """Apply `pattern.sub` to every part of `text` that is not a character
+    reference, leaving the references themselves untouched and intact."""
+    out, last = [], 0
+    for m in _ENTITY.finditer(text):
+        out.append(pattern.sub(repl, text[last:m.start()]))
+        out.append(m.group(0))
+        last = m.end()
+    out.append(pattern.sub(repl, text[last:]))
+    return "".join(out)
 
 
 def walk_language_scopes(doc: str):
@@ -2704,13 +2758,13 @@ def tag_inline_bangla(doc: str) -> tuple[int, int, str]:
                 nonlocal n_en
                 n_en += 1
                 return f'<span lang="en">{m.group(0)}</span>'
-            out.append(_ENGLISH_RUN.sub(wrap_en, token))
+            out.append(_sub_outside_entities(_ENGLISH_RUN, wrap_en, token))
         else:
             def wrap_bn(m):
                 nonlocal n_bn
                 n_bn += 1
                 return f'<span lang="bn">{m.group(0)}</span>'
-            out.append(_BANGLA_RUN.sub(wrap_bn, token))
+            out.append(_sub_outside_entities(_BANGLA_RUN, wrap_bn, token))
 
     return n_bn, n_en, "".join(out)
 
@@ -2918,6 +2972,32 @@ def guard_tables(documents: dict[str, str]) -> None:
         )
 
 
+def guard_split_entities(documents: dict[str, str]) -> None:
+    """No inserted tag may sit inside an HTML character reference.
+
+    This is the structural form of the fault, not the instance of it. The
+    instance was `[lang=&quot;bn&quot;]` in the Bangla chapter arriving as
+    `[lang=&<span lang="en">quot;bn&quot</span>;]`, which a browser renders as
+    `[lang=&quot;bn";]` and parses to zero CSS rules — dropping the valid
+    `:lang(bn)` half of the selector list with it. build.py --check reported
+    "byte for byte" throughout, because it compared the build against a re-run
+    of the same corrupting build.
+
+    Checked on the shipped document, so it covers any future pass that inserts
+    markup, not only the tagger that caused it.
+    """
+    broken = re.compile(r"&(?:[a-zA-Z][a-zA-Z0-9]{0,31}|#[0-9xX]{1,8})?<|>(?:[a-zA-Z][a-zA-Z0-9]{1,31}|#[0-9]{1,7});")
+    for name, doc in documents.items():
+        hits = [m.group(0) for m in broken.finditer(doc)]
+        if hits:
+            raise SystemExit(
+                f"{name}: {len(hits)} HTML character reference(s) divided by an "
+                f"inserted tag, e.g. {hits[:3]}. The browser renders the pieces "
+                f"as literal text, which silently corrupts whatever the reference "
+                f"was part of — a CSS selector list, an attribute, a code sample."
+            )
+
+
 def guard_inline_bangla(documents: dict[str, str]) -> None:
     """Every run must sit in a scope declaring its own language.
 
@@ -2934,7 +3014,15 @@ def guard_inline_bangla(documents: dict[str, str]) -> None:
                 continue
             if bn.search(token) and lang != "bn":
                 bad_bn.append(token.strip()[:44])
-            if lang == "bn" and not bn.search(token) and re.search(r"[A-Za-z]{4}", token):
+            # Character references are masked out before looking for English,
+            # exactly as the tagger masks them before inserting a span. `&quot;`
+            # is one double-quote to a reader, not the four English letters
+            # q-u-o-t; without this the guard demands a lang="en" span around
+            # punctuation the tagger is now — correctly — refusing to enter.
+            # The tagger and its guard have disagreed about this document twice
+            # before, so they read the same way by construction.
+            if (lang == "bn" and not bn.search(token)
+                    and re.search(r"[A-Za-z]{4}", _ENTITY.sub(" ", token))):
                 bad_en.append(token.strip()[:44])
         if bad_bn or bad_en:
             raise SystemExit(
@@ -2958,6 +3046,7 @@ def build_all() -> dict[str, str]:
         n_bn, n_en, docs[name] = tag_inline_bangla(docs[name])
         if n_bn or n_en:
             print(f"  tagged {n_bn} Bangla and {n_en} English run(s) in {name}")
+    guard_split_entities(docs)
 
     guard_own_css()
     guard_placeholders(docs)

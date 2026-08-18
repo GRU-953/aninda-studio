@@ -145,6 +145,13 @@ jobs:
       - run: python 11_site/build.py --check
       - run: python 09_guidebook/build.py --check
       - name: The npm package must actually resolve
+        # This step used to check that each export target EXISTS and then load
+        # the CommonJS half. index.mjs was a link-time SyntaxError — `tokens` was
+        # never declared in it — and this step passed on every commit, because
+        # the file it stat-ed and the file it loaded were not the same file.
+        # Both halves are now imported for real, and the values they return are
+        # compared, so an entry point that parses but exports the wrong thing
+        # also fails here.
         run: |
           cd 12_packages/npm
           node -e "
@@ -153,7 +160,18 @@ jobs:
               const f = typeof v === 'string' ? v : (v.import || v.types);
               if (!fs.existsSync(f)) { console.error('missing export target', k, f); process.exit(1); }
             }
-            require('./dist/index.cjs');
+          "
+          node --input-type=module -e "
+            import a from 'node:assert';
+            import { createRequire } from 'node:module';
+            import esm, { tokens, themes } from './dist/index.mjs';
+            const cjs = createRequire(import.meta.url)('./dist/index.cjs');
+            a.ok(esm && typeof esm === 'object', 'the ESM default export is not an object');
+            a.strictEqual(tokens, esm, 'the ESM named and default exports disagree');
+            a.ok(Array.isArray(themes) && themes.length === 4, 'themes is not the four themes');
+            a.deepStrictEqual(Object.keys(cjs.tokens), Object.keys(esm),
+              'the CommonJS and ESM entry points return different tokens');
+            console.log('both entry points import, and agree on', Object.keys(esm).length, 'top-level keys');
           "
 
   # 5 ── under two minutes. The two plugins, and the two drift guards on them.

@@ -550,6 +550,73 @@ def check_bundles(problems: Problems) -> None:
             problems.ok(f"dist/{name}.skill: SKILL.md at the root, {len(names)} entries, one timestamp")
 
 
+def check_colour_reference(problems: Problems) -> None:
+    """references/colour.md's hex table must match the token documents.
+
+    It is hand-maintained markdown, and nothing compared it to anything. It was
+    headed "The seventeen roles" over eighteen rows of which seven are surfaces,
+    it was missing color.accent.hover entirely, and this is the document the
+    skill routes every colour question to. A reference table nobody checks is a
+    second source of truth, which is the failure mode the whole token pipeline
+    exists to prevent.
+
+    Every value is compared in both directions: no row may disagree with the
+    tokens, and no token may be absent from the table.
+    """
+    doc = SKILLS / "aninda-brand" / "references" / "colour.md"
+    if not doc.exists():
+        problems.wrong(f"{doc.name} is missing")
+        return
+    themes = ["light", "dark", "hc-light", "hc-dark"]
+    prim_path = REPO_ROOT / "07_tokens" / "build" / "primitive.tokens.json"
+    if not prim_path.exists():
+        problems.wrong("07_tokens/build is missing, so colour.md cannot be checked")
+        return
+    prim = json.loads(prim_path.read_text())
+
+    def resolve(value):
+        if isinstance(value, str) and value.startswith("{"):
+            node = prim
+            for part in value.strip("{}").split("."):
+                node = node[part]
+            return node["$value"]["hex"]
+        return value["hex"]
+
+    expected: dict[str, dict[str, str]] = {}
+    for theme in themes:
+        colour = json.loads(
+            (REPO_ROOT / "07_tokens" / "build" / f"semantic.{theme}.tokens.json").read_text()
+        )["color"]
+        for group in ("surface", "ink", "line", "accent", "focus", "status"):
+            for key, token in colour.get(group, {}).items():
+                if key.startswith("$"):
+                    continue
+                expected.setdefault(f"color.{group}.{key}", {})[theme] = resolve(token["$value"])
+
+    found: dict[str, list[str]] = {}
+    for line in doc.read_text(encoding="utf-8").splitlines():
+        match = re.match(r"\|\s*`(color\.[a-z.]+)`\s*\|(.+)\|\s*$", line)
+        if match:
+            found[match.group(1)] = [cell.strip() for cell in match.group(2).split("|")]
+
+    bad = []
+    for role in sorted(set(expected) | set(found)):
+        if role not in found:
+            bad.append(f"colour.md has no row for {role}")
+            continue
+        if role not in expected:
+            bad.append(f"colour.md has a row for {role}, which the tokens do not define")
+            continue
+        want = [expected[role][t] for t in themes]
+        if [c.upper() for c in found[role]] != [w.upper() for w in want]:
+            bad.append(f"colour.md {role} reads {found[role]}, tokens say {want}")
+    for item in bad:
+        problems.wrong(item)
+    if not bad:
+        problems.ok(f"references/colour.md's table matches the tokens for all "
+                    f"{len(expected)} colour values across {len(themes)} themes")
+
+
 def main() -> int:
     if "--sync" in sys.argv[1:]:
         return sync_bundled_copies()
@@ -564,6 +631,7 @@ def main() -> int:
     check_bangla_font_coverage(problems)
     check_rule_count(problems)
     check_token_names(problems)
+    check_colour_reference(problems)
     check_bundles(problems)
 
     lines = ["", f"PASSED ({len(problems.passed)})", "-" * 72]

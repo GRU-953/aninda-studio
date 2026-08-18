@@ -5,9 +5,10 @@
     "basis": "Verified string gb-4, BANGLA-STANDARD.md. Rule ২.৪ names রং in its own example list; রং is the dictionary headword (p. 1156), রঙ has no entry."
   },
   "card.colour.subtitle": {
-    "en": "Seventeen roles across four themes, each with the contrast ratio it was measured at and the criterion it was measured against.",
-    "bn": "চার থিমে ১৭টি ভূমিকা — প্রতিটির মাপা কনট্রাস্ট অনুপাত আর কোন মানদণ্ডে মাপা হয়েছে",
-    "basis": "কনট্রাস্ট reused from verified th-3; loanword licensed by rule ২.৬. কোন = which (interrogative), correct per the dictionary entry at p. 337. থিম is a ২.৬ loanword, not a dictionary headword. Bengali numeral ১৭ per house rule 9."
+    "en": "Every colour role across four themes, each with the contrast ratio it was measured at and the criterion it was measured against, over the seven surfaces they are measured against.",
+    "bn": "চার থিমে প্রতিটি রঙের ভূমিকা — প্রতিটির মাপা কনট্রাস্ট অনুপাত আর কোন মানদণ্ডে মাপা হয়েছে",
+    "basis": "কনট্রাস্ট reused from verified th-3; loanword licensed by rule ২.৬. কোন = which (interrogative), correct per the dictionary entry at p. 337. থিম is a ২.৬ loanword, not a dictionary headword. Bengali numeral ১৭ per house rule 9. REVISED 19 Aug 2026: the numeral ১৭ removed, no word changed. It counted ten measured roles plus seven surfaces, but the seven surfaces carry no ratio and no criterion, so the sentence claimed a measurement for seven values that have none — and the count changed again when a proven fill role was added. A count that must stay true is derived or absent, never typed. Pending confirmation by the Bangla reviewer.",
+    "pending_review": true
   },
   "card.typography.name": {
     "en": "Typography",
