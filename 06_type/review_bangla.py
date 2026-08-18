@@ -40,10 +40,10 @@ PDF = HERE / "BANGLA-REVIEW.pdf"
 STRINGS: list[tuple[str, str, str, str, int, str]] = [
     # --- identity -----------------------------------------------------------
     ("wm-1", "aninda studio", "অনিন্দ্য স্টুডিও", "The wordmark, everywhere", 44,
-     "Is স্টুডিও right, or should the Bangla lockup be just অনিন্দ্য? Does "
+     "Is স্টুডিও right, or should the Bangla lockup be অনিন্দ্য on its own? Does "
      "the ন্দ্য conjunct look correct at this size?"),
     ("wm-2", "Aninda Studio (short form)", "অনিন্দ্য", "Favicon, avatar, tight lockups", 32,
-     "Does the name alone read as a studio name, or does it read as just a person?"),
+     "Does the name alone read as a studio name, or only as a person's name?"),
 
     # --- themes -------------------------------------------------------------
     ("th-1", "Light", "আলো", "Theme switcher", 16,

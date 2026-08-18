@@ -54,6 +54,7 @@ import base64
 import html
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -72,6 +73,16 @@ PY_PACKAGE = ROOT / "12_packages" / "python" / "pyproject.toml"
 
 GENERATOR = "11_site/build.py"
 BUILT_ON = "2026-08-14"
+
+# The site's only Python usage example. It is a constant because it is EXECUTED
+# against the built package before the page is written — see python_example_runs().
+PYTHON_EXAMPLE = (
+    "from aninda_studio_tokens import css, css_path, THEMES\n"
+    "\n"
+    "print(THEMES)              # ['light', 'dark', 'hc-light', 'hc-dark']\n"
+    "print(css('dark')[:40])    # the dark theme's stylesheet text\n"
+    "print(css_path())          # the path to the complete one\n"
+)
 DOMAIN = "anindastudio.com"
 ORIGIN = f"https://{DOMAIN}"
 
@@ -744,21 +755,27 @@ def section_system(cards: dict) -> str:
     )
 
 
-def section_install(npm: dict, py_name: str) -> str:
+def section_install(npm: dict, py_name: str, pub: dict) -> str:
+    # The publication record is read from 12_packages/PUBLICATION.json rather than
+    # written here. This page was the ONLY place that told a reader the packages are
+    # not published; the two READMEs and the guidebook all said "npm install" with
+    # no caveat. One shared record is what stops the four disagreeing again.
+    missing = [r for r in pub["registries"] if not r["published"]]
+    where = " and ".join(e(r["registry"]) for r in missing)
     return (
         '<section class="as-doc-section" aria-labelledby="install">'
         '<h2 class="as-h2" id="install">Installing the token packages</h2>'
-        '<div class="as-alert as-alert--warning">'
-        f'<span class="as-alert__glyph">{icon("warn")}</span>'
-        '<div class="as-alert__body">'
-        '<p class="as-alert__title">Not published yet</p>'
-        f'<p class="as-alert__text">On {BUILT_ON} I checked the npm registry, the '
-        "Python Package Index and GitHub, and none of the three holds these "
-        "packages. They are built and they work from a local checkout. The two "
-        "commands below are what will work once they are published, and I would "
-        "rather show you that plainly than let you find out at the terminal.</p>"
-        "</div></div>"
-        '<div class="as-grid as-grid--wide">'
+        + ('<div class="as-alert as-alert--warning">'
+           f'<span class="as-alert__glyph">{icon("warn")}</span>'
+           '<div class="as-alert__body">'
+           '<p class="as-alert__title">Not published yet</p>'
+           f'<p class="as-alert__text">On {e(pub["checked"])} I checked {where}, and '
+           "neither holds these packages. They are built and they work from a local "
+           "checkout. The two commands below are what will work once they are "
+           "published, and I would rather show you that plainly than let you find "
+           "out at the terminal.</p>"
+           "</div></div>" if missing else "")
+        + '<div class="as-grid as-grid--wide">'
         + "".join([
             '<div class="as-stack">'
             '<h3 class="as-h3">For a web project</h3>'
@@ -771,8 +788,12 @@ def section_install(npm: dict, py_name: str) -> str:
             '<div class="as-stack">'
             '<h3 class="as-h3">For a Python project</h3>'
             + code("terminal", f"pip install {py_name}")
-            + code("app.py", "from aninda_studio_tokens import tokens_css\n\n"
-                             "print(tokens_css())")
+            # This block used to import `tokens_css`, a name the package has never
+            # exported, so the site's only Python example raised ImportError
+            # whether or not the package was published. It is now the real API, and
+            # python_example_runs() below executes it against the built package
+            # before this page may be written.
+            + code("app.py", PYTHON_EXAMPLE)
             + '<p class="as-caption as-muted">The same values, the same four themes, '
               "read from the same source data.</p>"
             "</div>",
@@ -876,8 +897,34 @@ def document(title: str, description: str, body: str, tokens_css: str,
     )
 
 
+def python_example_runs() -> None:
+    """Run the site's Python example against the built package, or write nothing.
+
+    The page carried `from aninda_studio_tokens import tokens_css`, a name the
+    package has never exported, so the site's single Python example raised
+    ImportError on a page whose own thesis is that every claim on it was measured.
+    11_site/check.py drives a browser and measures contrast and layout; nothing
+    executed a code sample. This does, in a subprocess, against
+    12_packages/python/src so it is the shipped package that answers.
+    """
+    source = ROOT / "12_packages" / "python" / "src"
+    if not source.is_dir():
+        raise BuildError(f"{source} is missing. Run 12_packages/build.py first — the "
+                         "site's Python example is executed against it.")
+    proc = subprocess.run(
+        [sys.executable, "-c", PYTHON_EXAMPLE],
+        capture_output=True, text=True, cwd=source,
+    )
+    if proc.returncode != 0:
+        raise BuildError(
+            "the Python example on the site does not run. It was executed with "
+            f"{source} on the path and exited {proc.returncode}:\n"
+            + (proc.stderr.strip() or proc.stdout.strip())[:600]
+        )
+
+
 def index_page(tokens_css: str, cards: dict, npm: dict, py_name: str,
-               email: str, og: tuple[int, int]) -> str:
+               email: str, og: tuple[int, int], pub: dict) -> str:
     mark = read_mark("icon-192.svg", "48", "Aninda Studio")
     body = (
         '<div class="as-doc-page">'
@@ -887,7 +934,7 @@ def index_page(tokens_css: str, cards: dict, npm: dict, py_name: str,
         + section_studio()
         + section_work(cards, tokens_css)
         + section_system(cards)
-        + section_install(npm, py_name)
+        + section_install(npm, py_name, pub)
         + section_contact(email)
         + "</main>"
         + footer(cards)
@@ -1049,6 +1096,8 @@ def build() -> dict[str, bytes]:
         raise BuildError("Could not read the Python package name from pyproject.toml.")
     py_name = found.group(1)
     email = npm["author"]["email"]
+    pub = read_json(ROOT / "12_packages" / "PUBLICATION.json")
+    python_example_runs()
 
     og = next((f for f in assets["files"] if f["name"] == "og-image.png"), None)
     if og is None:
@@ -1056,7 +1105,7 @@ def build() -> dict[str, bytes]:
     og_size = (og["width"], og["height"])
 
     pages = {
-        "index.html": index_page(tokens_css, cards, npm, py_name, email, og_size),
+        "index.html": index_page(tokens_css, cards, npm, py_name, email, og_size, pub),
         "404.html": not_found_page(tokens_css, cards, og_size),
     }
 

@@ -20,6 +20,8 @@ Then write markup with the `.as-` classes, inside an element carrying `.as-root`
 
 ## Or install it
 
+{{data:publication}}
+
 ```bash
 npm install aninda-studio-tokens
 ```

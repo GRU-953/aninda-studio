@@ -12,6 +12,35 @@ See `NOTICE` for the full split, including the fonts and the identity.
 
 ---
 
+## Installing it
+
+A Claude Code plugin is installed from a marketplace, and a marketplace is a
+`.claude-plugin/marketplace.json` at the root of a git repository. This repository
+carries one, listing this plugin at `./13_plugins/claude-code`.
+
+Inside Claude Code, run these two:
+
+```
+/plugin marketplace add GRU-953/aninda-studio
+/plugin install aninda-studio@aninda-studio
+```
+
+The first adds the repository as a marketplace; the second installs the plugin from
+it. The two names are the same because the marketplace and the plugin share a name.
+
+To install from a checkout you already have, point the first command at the folder
+instead:
+
+```
+/plugin marketplace add /path/to/aninda-studio
+```
+
+Then restart Claude Code, type `/aninda-studio:` and the four commands appear. Until
+14 August 2026 there was no marketplace file and no document saying how to install
+this, so everything below it was finished and unreachable.
+
+---
+
 ## The three skills, split by unit of work
 
 They are split this way so that choosing between them is reliable. Each one names
@@ -154,18 +183,18 @@ one of the four commands.
 
 ## What needs the owner
 
-Two things in the system's own files disagree, and a script cannot settle a
-disagreement between two sources of truth:
-
-- **Clear space around the mark.** `04_mark/manifest.json` says half the mark's
-  own height on all four sides. The marks card in `08_components` says one stroke
-  width. `asset.py` follows the manifest and says so in its output every time,
-  but the losing statement still needs correcting at its source.
 - **Bangla beyond the verified list.** The 30 component cards contain Bangla
   prose that is not among the 31 verified strings. `check.py` reports each one as
   a note rather than a failure, because it cannot tell you whether the Bangla is
   wrong — only that it has not been checked against the Bangla Academy
   dictionary.
+
+**Settled, and recorded so it is not reopened.** Clear space around the mark used
+to be stated two incompatible ways: `04_mark/manifest.json` said half the mark's
+own height on all four sides, and the marks card in `08_components` said one stroke
+width, about four times smaller, under a green tick. The manifest wins, and the card
+now reads the rule out of the manifest at build time rather than carrying its own
+copy of it.
 
 ---
 

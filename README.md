@@ -51,7 +51,7 @@ number a person types is a number that can be wrong and stay wrong.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (14.1 MB) that needs no network, plus a 1.6 MB PDF |
+| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (14.2 MB) that needs no network, plus a 1.6 MB PDF |
 | `07_tokens/` | The design tokens: DTCG source, and 63 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
 | `04_mark/` | 10 mark, wordmark and icon files |
@@ -63,25 +63,31 @@ number a person types is a number that can be wrong and stay wrong.
 
 ## Try it in one minute
 
-```bash
-npm install aninda-studio-tokens
-```
+Start from a local checkout. **The two token packages are built but not
+published.** On 2026-08-18 I checked the npm registry and the Python Package Index, and neither
+holds `aninda-studio-tokens`, so `npm install` and `pip install` will not work yet. Everything
+below works from a checkout.
 
 ```bash
 ./.venv/bin/python 00_sandbox/measure.py
 ```
 
-That second command opens a real browser and re-measures every colour pairing
-against the pixels it actually produced. It takes about a minute and it either
-agrees with the token files or tells you exactly where it does not.
+That command opens a real browser and re-measures every colour pairing against the
+pixels it actually produced. It takes about a minute and it either agrees with the
+token files or tells you exactly where it does not.
 
 ```bash
-./.venv/bin/python 13_plugins/claude-code/skills/aninda-brand/scripts/asset.py --mark --size 12
+./.venv/bin/python 13_plugins/claude-code/skills/aninda-brand/scripts/asset.py mark --size 12
 ```
 
-**That last one fails on purpose.** Twelve pixels is below the mark's size floor,
-so the script refuses rather than producing something unreadable. A system that
-warns teaches nothing; one that refuses teaches the rule.
+**That one fails on purpose**, with exit 2. It asks for the mark
+at 12 px, and the rule it meets is this: The mark may not be made smaller than 16 px. The script refuses
+rather than producing something unreadable. A system that warns teaches nothing;
+one that refuses teaches the rule.
+
+That command is run by `scripts/readme.py` every time this file is generated, and
+the rule quoted above is the script's own words. If it stopped refusing, this
+README could not be written.
 
 ## Rebuild everything
 
@@ -102,6 +108,9 @@ Stated here rather than discovered later:
   Contrast is computed and proved. Lived accessibility is a different claim and
   this kit does not make it.
 - **No user research.** One person's judgement, and it says so.
+- **The npm and PyPI packages are built but not published.** Checked
+  2026-08-18: the npm registry and the Python Package Index hold nothing under `aninda-studio-tokens`. The
+  packages work from this checkout; the registry commands do not work yet.
 - **The Bangla has not been reviewed by a second Bangla reader.** Spelling follows
   the Bangla Academy standard and every ruling is sourced, but sourced is not the
   same as read well. 30 of 30 cards carry Bangla names.

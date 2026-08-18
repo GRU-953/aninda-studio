@@ -54,6 +54,22 @@ jobs:
           for f in 07_tokens/css/tokens.css; do
             grep -q "GENERATED" "$f" || { echo "::error::$f lost its header"; exit 1; }
           done
+      - name: The English standard's blocklist is enforced
+        # ENGLISH-STANDARD.md told the reader "every banned word and idiom above is
+        # in a blocklist the checker enforces". The checker existed and no job ran
+        # it, so nobody looked at the prose — and the standard itself used two
+        # banned words, with seven more in 06_type. The list below is the scope the
+        # standard now names: the authored English prose. It is a list rather than
+        # the whole tree because the checker skips a file over 1 MB, and a generated
+        # card is larger than that; those are held to the rule by their generators,
+        # which read this prose rather than writing their own.
+        run: |
+          fail=0
+          for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md                       00_sandbox/TOOLCHAIN.md 01_research 02_strategy                       09_guidebook/chapters 13_plugins/claude-code/README.md                       13_plugins/claude-code/skills 13_plugins/figma/README.md                       06_type/BANGLA-STANDARD.md 06_type/BANGLA-STRINGS.md                       06_type/SHORTLIST.md 06_type/RECOMMENDATION.md                       06_type/MEASUREMENTS.md 06_type/pairings.md ; do
+            python 13_plugins/claude-code/skills/aninda-review/scripts/check.py "$path"               || { echo "::error::$path fails the English standard"; fail=1; }
+          done
+          exit $fail
+
       - name: The PolyForm URL has no trailing slash
         # The trailing-slash form returns 404. It takes one keystroke to add and a
         # long time to notice.
@@ -99,7 +115,12 @@ jobs:
       - name: Rebuild the marks — the shaping gates run inside
         run: python 04_mark/build.py
       - name: The marks must not have changed
-        run: git diff --exit-code 04_mark/svg 04_mark/manifest.json
+        # proof.svg is in the diff because it did not used to be generated at all.
+        # 04_mark/proof.png was a hand-made image that captioned the Apple and
+        # watchOS panels as square, unmasked masters long after the owner decided
+        # on one rounded icon everywhere, and because no script wrote it this job
+        # could not see the contradiction.
+        run: git diff --exit-code 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
 
   # 4 ── a couple of minutes. Everything that has a --check mode.
   build:
@@ -118,8 +139,13 @@ jobs:
         run: python scripts/readme.py --check
       - run: python 12_packages/build.py --check
       - run: python 08_components/build.py --check
-      - run: test ! -f 11_site/build.py || python 11_site/build.py --check
-      - run: test ! -f 09_guidebook/build.py || python 09_guidebook/build.py --check
+      # These four steps used to read `test ! -f X || python X`, so deleting or
+      # renaming any one of them turned it into a green pass on six jobs while the
+      # artefact went unmeasured. All four scripts are committed, so the guard
+      # could only ever hide their disappearance — which is the thing most worth
+      # failing on. A check that did not run must never read as a pass.
+      - run: python 11_site/build.py --check
+      - run: python 09_guidebook/build.py --check
       - name: The npm package must actually resolve
         run: |
           cd 12_packages/npm
@@ -199,6 +225,6 @@ jobs:
       - name: Measure the tokens in a real browser
         run: python 00_sandbox/measure.py
       - name: Measure every component card
-        run: test ! -f 08_components/check.py || python 08_components/check.py
+        run: python 08_components/check.py
       - name: Measure the site
-        run: test ! -f 11_site/check.py || python 11_site/check.py
+        run: python 11_site/check.py

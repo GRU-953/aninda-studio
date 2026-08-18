@@ -48,7 +48,13 @@ EXIT CODES
 ----------
     0  everything drawn and checked
     1  a real failure — a check did not pass
-    2  could not run — a font or a library is missing
+    2  could not run — a font, a library or Chromium is missing
+
+Nothing is written on 1 or 2. Every artefact is buffered until the last gate has
+passed, because writing as it went left rewritten SVGs beside a stale manifest
+after a failing build. A missing Chromium is exit 2 rather than a note, because
+the render gate is the only check that sees what a renderer produces, and it used
+to disappear behind an "ok" line and a successful exit.
 
 RUN
 ---
@@ -61,6 +67,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -345,18 +352,32 @@ def icon_placement(stroke: float) -> tuple[float, float, float, str]:
             raise Fail(f"icon placement at stroke {stroke:g}: a corner lands at "
                        f"({sx:.2f},{sy:.2f}), outside the {SAFE:g}-unit safe field")
 
-    note = (f"icon at stroke {stroke:g}: mark {w:.1f}×{h:.1f} scaled ×{scale:.4f}, "
-            f"worst corner {worst:.2f} of {radius:g} units from centre — inside both "
-            f"the {SAFE:g}-unit field and the circle watchOS and visionOS mask to")
+    # The figure is worth stating and worth not overstating. The scale above is
+    # radius / half-diagonal, so the worst corner lands EXACTLY on the circle
+    # whenever the mark is scaled down at all — it is a tautology, not a finding,
+    # and the guidebook used to offer it as the evidence that the rounding costs
+    # nothing under a circular mask, which is a different question entirely. What
+    # the check does earn is the box constraint on the next line: the corners have
+    # to fall inside the 5-to-95 band, and that can fail.
+    fit = "exactly on" if abs(worst - radius) < 1e-6 else f"{worst:.2f} of {radius:g} from"
+    note = (f"icon at stroke {stroke:g}: mark {w:.1f}×{h:.1f} scaled ×{scale:.4f}, worst "
+            f"corner {fit} the {radius:g}-unit inscribed circle — the scale is derived "
+            f"from the mark's own diagonal, so this is a fit by construction; what is "
+            f"tested is that all four corners also land inside the {SAFE:g}-unit field")
     return scale, tx, ty, note
 
 
-def render_check() -> list[str]:
+def render_check(docs: dict[str, str]) -> list[str]:
     """Render each icon artefact over a garish background and measure what covers it.
 
     An Apple master must cover 100% of its frame: square, full-bleed, fully opaque.
     A web tile must NOT, because its rounded corners are the whole point of it —
     a browser will not round a favicon for you.
+
+    It is handed the documents rather than reading 04_mark/svg, because nothing is
+    on disk yet when this runs. Writing before the last gate had passed left
+    rewritten SVGs beside a stale manifest after a failing build, which broke the
+    one promise that makes the manifest worth reading.
     """
     try:
         from playwright.sync_api import sync_playwright
@@ -375,7 +396,7 @@ def render_check() -> list[str]:
     # perfectly fine.
     for name in ("mark-regular.svg", "mark-heavy.svg",
                  "wordmark-latin.svg", "wordmark-bangla.svg"):
-        head = (OUT / name).read_text()[:400]
+        head = docs[name][:400]
         if "style=\"color:" in head.split("<title>")[0]:
             raise Fail(
                 f"{name} sets a colour on its root element. It is meant to be "
@@ -404,7 +425,7 @@ def render_check() -> list[str]:
             raise NotEquipped(f"chromium unavailable: {e}") from e
         for name, (lo, hi, why) in expectations.items():
             page = browser.new_page(viewport={"width": 256, "height": 256})
-            doc = (OUT / name).read_text().replace(
+            doc = docs[name].replace(
                 "<svg ", '<svg style="width:256px;height:256px;display:block" ', 1)
             page.set_content(f'<body style="margin:0;background:rgb(255,0,255)">{doc}</body>')
             page.wait_for_timeout(250)
@@ -422,8 +443,153 @@ def render_check() -> list[str]:
                     f"the viewBox does not match the grid the artwork is drawn on."
                 )
             notes.append(f"{name}: {pct:.1f}% background showing — {why}")
+
+        # The one part of the icon decision that CAN be measured from here.
+        #
+        # watchOS and visionOS mask to a CIRCLE, and the decision to ship one
+        # rounded icon everywhere rests on the rounded file and the square master
+        # being the same image once that circle is applied. The guidebook asserted
+        # that as "Measured here" while nothing measured it, and offered the
+        # placement check's "worst corner 45.00 of 45" as the evidence — a different
+        # quantity, and one that equals 45.00 by construction. So the two documents
+        # are rendered under the same inscribed circle and differenced.
+        #
+        # What this can and cannot catch, stated so it is not mistaken for more than
+        # it is. The corner material a radius removes always lies outside a circle
+        # inscribed in the same square — for side 100 and radius r the nearest
+        # removed point sits sqrt(2)(50-r)+r from the centre, which stays above 50
+        # for every r up to a full circle — so the radius alone can never make these
+        # two differ. What the difference does catch is the two files drifting apart
+        # in anything else: the mark placed at a different scale, a different stroke
+        # weight, or a different ink or ground in one of them. That is a real risk,
+        # because they are two separate strings built from two separate bodies.
+        #
+        # The rounded-rectangle case is deliberately NOT measured. Apple publishes
+        # no corner radius, so there is no mask to composite against, and using our
+        # own radius as a stand-in for theirs would be circular.
+        clipped = {}
+        for name in ("icon-1024.svg", "icon-appstore-square-1024.svg"):
+            page = browser.new_page(viewport={"width": 256, "height": 256})
+            doc = docs[name].replace(
+                "<svg ",
+                '<svg style="width:256px;height:256px;display:block;'
+                'clip-path:circle(50%)" ', 1)
+            page.set_content(f'<body style="margin:0;background:rgb(255,0,255)">{doc}</body>')
+            page.wait_for_timeout(250)
+            clipped[name] = Image.open(io.BytesIO(page.screenshot())).convert("RGB")
+            page.close()
+        rounded, square = clipped["icon-1024.svg"], clipped["icon-appstore-square-1024.svg"]
+        if rounded.size != square.size:
+            browser.close()
+            raise Fail(f"the two icons rendered at different sizes, {rounded.size} "
+                       f"against {square.size}, so they cannot be differenced")
+        total = rounded.size[0] * rounded.size[1]
+        left, right = rounded.tobytes(), square.tobytes()
+        differing = sum(1 for i in range(0, len(left), 3) if left[i:i + 3] != right[i:i + 3])
+        if differing:
+            browser.close()
+            raise Fail(
+                f"under a circle inscribed in the frame the rounded icon and the square "
+                f"master differ in {differing} of {total} pixels. The decision to use one "
+                f"rounded icon everywhere rests on those two being the same image under a "
+                f"circular mask, which is what watchOS and visionOS apply."
+            )
+        notes.append(
+            f"under a circle inscribed in the frame, icon-1024.svg and "
+            f"icon-appstore-square-1024.svg are the same image in all {total} pixels — "
+            f"the corner rounding lies entirely outside the circle watchOS and visionOS "
+            f"mask to, and the artwork inside it has not drifted between the two files"
+        )
         browser.close()
     return notes
+
+
+# The contact sheet. Sizes are in the sheet's own user units.
+SHEET_CELL_W = 300.0
+SHEET_CELL_H = 340.0
+SHEET_ART = 200.0
+SHEET_PAD = 30.0
+SHEET_COLUMNS = 5
+
+
+def sheet_facts(name: str, doc: str) -> list[str]:
+    """What the artwork itself says about itself. Read, never typed.
+
+    Every fact on the contact sheet comes from here, which is the whole point:
+    04_mark/proof.png captioned two panels "Apple 1024 · square, unmasked" and
+    "watchOS 1088" and drew them with hard corners, while the shipped SVGs have
+    carried rx="24" since the owner's 14 August 2026 decision. A caption that is
+    measured out of the artwork cannot describe artwork that is not there.
+    """
+    facts: list[str] = []
+    width = re.search(r'\swidth="([0-9.]+)"', doc)
+    if width:
+        facts.append(f"{float(width.group(1)):g} px delivered")
+    radius = re.search(r'\srx="([0-9.]+)"', doc)
+    if radius:
+        facts.append(f"rounded, radius {float(radius.group(1)):g} of {GRID:g}")
+    elif "<rect" in doc:
+        facts.append("square, unmasked")
+    stroke = re.search(r'stroke-width="([0-9.]+)"', doc)
+    if stroke:
+        facts.append(f"stroke {float(stroke.group(1)):g}")
+    root = doc.split(">", 1)[0]
+    facts.append("fixed artwork" if 'style="color:' in root else "recolourable")
+    return facts
+
+
+def proof_sheet(docs: dict[str, str], ink: str, paper: str) -> tuple[str, str]:
+    """Assemble one contact sheet from the artwork that was just drawn.
+
+    04_mark/proof.png was a hand-made PNG that no script wrote and no document
+    linked, so the marks CI job — which diffs 04_mark/svg and 04_mark/manifest.json
+    — could not see that it contradicted the shipped icons. It is replaced by this,
+    which is generated from the same strings that become the SVG files, is plain
+    deterministic text, and is therefore diffable like everything else here.
+    """
+    rows = (len(docs) + SHEET_COLUMNS - 1) // SHEET_COLUMNS
+    width = SHEET_COLUMNS * SHEET_CELL_W + 2 * SHEET_PAD
+    height = rows * SHEET_CELL_H + 2 * SHEET_PAD
+    cells: list[str] = []
+    for index, (name, doc) in enumerate(docs.items()):
+        column, row = index % SHEET_COLUMNS, index // SHEET_COLUMNS
+        x = SHEET_PAD + column * SHEET_CELL_W
+        y = SHEET_PAD + row * SHEET_CELL_H
+        art_x = x + (SHEET_CELL_W - SHEET_ART) / 2
+        # The artefact is nested as-is, with only its box overridden, so what the
+        # sheet shows is the file itself and not a redrawing of it.
+        nested = re.sub(r'^<svg ', "<svg ", doc.strip(), count=1)
+        nested = re.sub(r'\swidth="[0-9.]+"', "", nested, count=1)
+        nested = re.sub(r'\sheight="[0-9.]+"', "", nested, count=1)
+        nested = nested.replace(
+            "<svg ",
+            f'<svg x="{art_x:g}" y="{y:g}" width="{SHEET_ART:g}" height="{SHEET_ART:g}" '
+            f'preserveAspectRatio="xMidYMid meet" ',
+            1,
+        )
+        captions = "".join(
+            f'<text x="{x + SHEET_CELL_W / 2:g}" y="{y + SHEET_ART + 30 + line * 22:g}" '
+            f'text-anchor="middle" font-size="{13 if line == 0 else 12:g}" '
+            f'fill="{ink}" opacity="{1 if line == 0 else 0.7:g}">{text}</text>'
+            for line, text in enumerate([name] + sheet_facts(name, doc))
+        )
+        cells.append(
+            f'<g><rect x="{x + 4:g}" y="{y - 8:g}" width="{SHEET_CELL_W - 8:g}" '
+            f'height="{SHEET_CELL_H - 8:g}" rx="14" fill="none" stroke="{ink}" '
+            f'stroke-width="0.5" opacity="0.25"/>{nested}{captions}</g>'
+        )
+    body = (
+        f'<rect width="{width:g}" height="{height:g}" fill="{paper}"/>'
+        f'<g style="color:{ink}" font-family="ui-monospace, monospace">'
+        + "".join(cells)
+        + "</g>"
+    )
+    sheet = svg_doc(
+        body, width, height, ink,
+        "Aninda Studio — contact sheet, generated from the artwork in 04_mark/svg",
+    )
+    return sheet, (f"contact sheet: {len(docs)} artefacts nested from the same strings "
+                   f"written to 04_mark/svg, every caption read out of the artwork")
 
 
 def main() -> int:
@@ -460,11 +626,18 @@ def main() -> int:
         print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
         return 1
 
-    OUT.mkdir(parents=True, exist_ok=True)
+    # Every artefact is buffered in memory and nothing touches the disk until the
+    # last gate has passed. The earlier version wrote each file as it was drawn, so
+    # a failure in check_apple_master or render_check left five rewritten SVGs on
+    # disk beside a manifest that still described the old ones — `git status` showed
+    # five modified files and the script had said "nothing further written". The
+    # manifest is what every downstream reader treats as the description of the
+    # SVGs next to it, so the two disagreeing is the worst state this can end in.
+    docs: dict[str, str] = {}
     written: list[tuple[str, str]] = []
 
     def write(name: str, content: str) -> None:
-        (OUT / name).write_text(content)
+        docs[name] = content
         written.append((name, f"{len(content)} bytes"))
 
     # --- the mark, two weights, one geometry -------------------------------
@@ -482,7 +655,7 @@ def main() -> int:
         try:
             body, adv, _ = shape_to_path(text, font, 100.0, var)
         except (Fail, NotEquipped) as e:
-            print(f"FAILED — nothing further written:\n  {e}", file=sys.stderr)
+            print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
             return 1
         write(f"{name}.svg",
               svg_doc(f'<g fill="currentColor">{body}</g>', adv, 140.0, ink,
@@ -551,7 +724,7 @@ def main() -> int:
     try:
         check_apple_master(doc)
     except Fail as e:
-        print(f"FAILED — nothing further written:\n  {e}", file=sys.stderr)
+        print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
         return 1
     write("icon-appstore-square-1024.svg", doc)
 
@@ -561,14 +734,26 @@ def main() -> int:
     # with a 1024-unit viewBox around 100-unit artwork, so it rendered as a tiny
     # mark in the corner of a white field. The file was valid SVG, the geometry
     # checks passed, and the artefact was useless.
+    # The render gate is the one that caught a bug no source read could see: the
+    # Apple master was written with a 1024-unit viewBox around 100-unit artwork.
+    # It also hosts the recolourable-root regression guard. A missing Chromium used
+    # to become an `ok    NOT CHECKED — ...` line and exit 0, so forgetting to
+    # export PLAYWRIGHT_BROWSERS_PATH silently skipped both and reported success.
+    # The docstring has always documented 2 as "could not run"; it now returns it.
     try:
-        notes += render_check()
+        notes += render_check(docs)
     except NotEquipped as e:
-        notes.append(f"NOT CHECKED — {e}")
+        print(f"could not run: {e}\n"
+              f"  The render gate is not optional: it is the only check that sees what a\n"
+              f"  renderer produces. Nothing was written. Did you export\n"
+              f"  PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers ?", file=sys.stderr)
+        return 2
     except Fail as e:
-        print(f"FAILED — artwork written but a render check did not pass:\n  {e}",
-              file=sys.stderr)
+        print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
         return 1
+
+    sheet, sheet_note = proof_sheet(docs, ink, paper)
+    notes.append(sheet_note)
 
     manifest = {
         "generated_by": "04_mark/build.py",
@@ -596,19 +781,33 @@ def main() -> int:
                 "highlights from the layer edges, so a pre-rounded edge sits inside "
                 "the mask and the highlight follows the wrong geometry. Apple's own "
                 "wording is that pre-masked artwork 'negatively impacts specular "
-                "highlight effects' and makes edges 'look jagged'. Measured here: in "
-                "a static render the difference is small, and on watchOS and "
-                "visionOS it is nil because the circular mask cuts well inside the "
-                "rounding. The dynamic cost could not be measured outside Apple's "
-                "own renderer."),
+                "highlight effects' and makes edges 'look jagged'. Measured here: "
+                "under the circle watchOS and visionOS mask to, the rounded icon and "
+                "the square master are the same image in every pixel — see the "
+                "difference recorded in 'checks' below. Judged rather than measured: "
+                "in a static render under Apple's rounded-rectangle mask the "
+                "difference looks slight. That one is not a measurement, because "
+                "Apple publishes no corner radius, so there is no mask to composite "
+                "against without substituting our own radius for theirs. The dynamic "
+                "cost — the moving specular highlight — could not be measured outside "
+                "Apple's own renderer and is not known."),
             "if_you_ever_submit_to_the_app_store": (
                 "Use icon-appstore-square-1024.svg, not the rounded icon. Icon "
                 "Composer expects unmasked layers."),
             "verified_against": "Apple Human Interface Guidelines, checked 14 August 2026",
         },
         "files": [n for n, _ in written],
+        "contact_sheet": ("proof.svg — generated from the same strings written to "
+                          "04_mark/svg, with every caption read out of the artwork"),
         "checks": notes,
     }
+
+    # Everything above only computed and checked. This is the only place that
+    # touches the disk, and it is reached only when every gate has passed.
+    OUT.mkdir(parents=True, exist_ok=True)
+    for name, content in docs.items():
+        (OUT / name).write_text(content)
+    (HERE / "proof.svg").write_text(sheet)
     (HERE / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
     for n in notes:
@@ -616,6 +815,7 @@ def main() -> int:
     print()
     for name, size in written:
         print(f"  wrote {name:<28} {size}")
+    print(f"  wrote {'proof.svg':<28} {len(sheet)} bytes")
     print(f"  wrote manifest.json")
     print("\nThis script CANNOT check: whether the mark is any good, whether the "
           "Bangla wordmark reads correctly to a Bangla reader, or how the icon looks "

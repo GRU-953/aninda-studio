@@ -62,7 +62,7 @@ use for that control:
 | আইকন | চিহ্ন is taken by the brand mark. |
 
 **Native word taken** — because a plain Bangla word exists, is genuinely used, and says the thing
-more clearly than the loanword would:
+more plainly than the loanword would:
 
 | | |
 |---|---|

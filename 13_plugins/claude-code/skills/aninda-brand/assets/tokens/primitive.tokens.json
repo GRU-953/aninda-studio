@@ -1585,7 +1585,7 @@
         "ui-monospace",
         "monospace"
       ],
-      "$description": "IBM Plex Mono, by Mike Abbink and Bold Monday. It carries the Reserved Font Name 'IBM Plex', and subsetting a font counts as modifying it under OFL 1.1 clause 3 — so the subset shipped here is renamed 'Aninda Mono'. The unmodified family name is kept as the next fallback, so anyone who already has IBM Plex Mono installed gets the real thing.",
+      "$description": "IBM Plex Mono, by Mike Abbink and Bold Monday. It carries the Reserved Font Name 'Plex', and subsetting a font counts as modifying it under OFL 1.1 clause 3 — so the subset shipped here is renamed 'Aninda Mono'. The unmodified family name is kept as the next fallback, so anyone who already has IBM Plex Mono installed gets the real thing.",
       "$extensions": {
         "studio.aninda": {
           "licence": "SIL OFL 1.1"

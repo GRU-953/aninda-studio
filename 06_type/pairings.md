@@ -250,7 +250,7 @@ Archivo and Anek Bangla have non-standard variable defaults (600 and 500) **[fil
 
 This pairing exists because the measurements rejected pairing 03, and an
 editorial direction is still needed. The diagnosis there was specific: Newsreader's
-x-height is simply too small (0.4403 em at body size) to carry Bangla beside it
+x-height is too small (0.4403 em at body size) to carry Bangla beside it
 without shrinking the Bangla to an unreadable 11.33px. Literata is the fix —
 same editorial register, same wide optical-size axis (7–72), but an x-height of
 0.5073 em at 16px **[rendered]**, a full pixel taller. That single substitution lifts

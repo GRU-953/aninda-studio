@@ -641,6 +641,53 @@ def block_icon_files() -> str:
     )
 
 
+def block_publication() -> str:
+    """Whether the registries hold these packages, read from one shared record.
+
+    Three of the four places that told a reader to install these packages omitted
+    that they are not published; only the website said so. All four now read
+    12_packages/PUBLICATION.json, so they cannot disagree about it.
+    """
+    pub = read_json(ROOT / "12_packages" / "PUBLICATION.json")
+    missing = [r for r in pub["registries"] if not r["published"]]
+    if not missing:
+        return note("<p><strong>Published.</strong> Both packages are on their "
+                    f"registries, checked {e(pub['checked'])}.</p>")
+    where = " and ".join(e(r["registry"]) for r in missing)
+    # Both registries carry the same package name, so the list is deduplicated
+    # while keeping its order — otherwise the sentence reads "neither holds X, X".
+    names = ", ".join(f"<code>{e(name)}</code>"
+                      for name in dict.fromkeys(r["package"] for r in missing))
+    return note(
+        f"<p><strong>Not published yet.</strong> On {e(pub['checked'])} I checked "
+        f"{where}, and neither holds {names}. The two commands below are what will "
+        f"work once they are published. Until then, use the checkout: the packages "
+        f"are built, and the files they carry are in <code>12_packages/</code>.</p>",
+        kind="gap",
+    )
+
+
+def block_icon_mask_measurement() -> str:
+    """The circular-mask difference, read out of the mark manifest.
+
+    This chapter used to assert "Measured here: the penalty is nil on watchOS and
+    visionOS" and offer the placement check's "worst corner 45.00 of 45" as the
+    evidence — a different quantity, and one that equals 45.00 by construction.
+    04_mark/build.py now renders the rounded icon and the square master under the
+    same inscribed circle and differences them, and this block prints what it
+    measured rather than restating a claim.
+    """
+    m = read_json(MARK_DIR / "manifest.json")
+    measured = [line for line in m["checks"] if line.startswith("under a circle")]
+    if len(measured) != 1:
+        raise BuildError(
+            "04_mark/manifest.json holds "
+            f"{len(measured)} circular-mask measurements, expected exactly one. The "
+            "chapter states this as measured, so it must not be assembled without it."
+        )
+    return note(f"<p><strong>Measured.</strong> {e(measured[0][0].upper() + measured[0][1:])}.</p>")
+
+
 def block_voice_strings() -> str:
     rows = []
     for key in ("bt-1", "bt-2", "bt-3", "bt-4", "bt-5"):
@@ -1732,6 +1779,8 @@ def render_markdown(path: Path, bn_key: str | None, print_mode: bool) -> str:
                 "mark-strokes": block_mark_strokes,
                 "mark-files": block_mark_files,
                 "icon-files": block_icon_files,
+                "icon-mask-measurement": block_icon_mask_measurement,
+                "publication": block_publication,
                 "voice-strings": block_voice_strings,
                 "bn-strings-buttons": block_bn_strings_buttons,
                 "bn-strings-messages": block_bn_strings_messages,

@@ -63,7 +63,7 @@ So the test is: **is the ও a live "…too / …as well" particle bolted onto a
 | **এখনো** | Full entry, p. 236: "এখনো /অ্যাখনো/ [বা.] ক্রি.বিণ. ১ আজও, বর্তমানকাল পর্যন্ত। ২ এরপরেও, তা সত্ত্বেও…" | ✅ **use this** |
 | এখনও | p. 236: "এখনও /অ্যাখনো/ [বা.] ক্রি.বিণ. **দ্র এখনো**।" — a cross-reference only ("দ্র" = দ্রষ্টব্য, *see*) | variant, not primary |
 | **কখনো** | Headword with its own entry | ✅ **use this** |
-| কখনও | No headword — site returns "প্রস্তাবিত শব্দ" (suggestions), i.e. not found | not a headword |
+| কখনও | No headword — site returns "প্রস্তাবিত শব্দ" (suggestions), which means not found | not a headword |
 | তখনো / তখনও | **Neither** is a separate headword | see note below |
 | **আরও** | p. 164: "আরও /আরো/ [বা.] … ক্রি.বিণ. অধিকন্তু; **আরো-র সংগততর বানান**।" — *the more consistent spelling of আরো* | ✅ **use this** |
 | আরো | p. 166: "আরো /আরো/ [বা.] … ক্রি.বিণ. অধিকন্তু; **আরও-এর প্রচলিত বানান**।" — *the common spelling of আরও* | acceptable but second-best |
@@ -150,7 +150,7 @@ Sources: [Academy rules §২.৭, §২.১০](https://archive.org/details/ban
 
 - **The Academy's own rulebook** numbers its sections ১.১ … ৫.১০, numbers its pages ১৮, ১৯, ২০, and states its print run as "২০০০০ কপি" — Bengali numerals throughout.
 - **The Academy's own dictionary** uses Bengali numerals for sense numbers, for quantities (কোটি = ১,০০,০০,০০০), for scientific values (iodine's atomic number "৫৩"; "প্রায় ৬৮০° সে."; "২০° থেকে ২৫° সেলসিয়াস") — **including in technical and measurement contexts.**
-- **W3C**, *Bengali/Bangla orthography notes*: "Bengali has a set of native digits, which are used regularly in text." The same document notes that "the modern Bangla orthography uses ASCII digit numbering, but also has a native numeric style" — i.e. both circulate.
+- **W3C**, *Bengali/Bangla orthography notes*: "Bengali has a set of native digits, which are used regularly in text." The same document notes that "the modern Bangla orthography uses ASCII digit numbering, but also has a native numeric style" — so both circulate.
 
 **Recommendation for this system:**
 
@@ -173,7 +173,7 @@ Rule ২.৬ (জ, য) states the governing principle:
 
 > "বাংলায় প্রচলিত বিদেশি শব্দ সাধারণভাবে বাংলা ভাষার ধ্বনিপদ্ধতি-অনুযায়ী লিখতে হবে। যেমন: কাগজ, জাদু, জাহাজ, জুলুম, বাজার, হাজার।"
 
-— that is, loanwords current in Bangla are simply **written the Bangla way**, not translated away.
+— that is, loanwords current in Bangla are **written the Bangla way**, not translated away.
 
 Rules ২.৮ and ২.৯ then give explicitly English examples as the standard:
 

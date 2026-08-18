@@ -1,0 +1,23 @@
+{
+  "warning": "HAND-MAINTAINED, and the only file in this repository that is allowed to be. Whether a registry holds a package is a fact about the outside world, so it cannot be measured from inside a checkout, and a build that reached for the network would fail on any machine without one. It carries a date instead. Four generated artefacts read this file, so they cannot disagree about it: scripts/readme.py (both READMEs), 11_site/build.py, 09_guidebook/build.py and 12_packages/build.py (both package READMEs).",
+  "why_this_file_exists": "The README's first instruction was `npm install aninda-studio-tokens`, which 404s, and only the website said so. Three of the four places that told a reader to install these packages omitted the fact, while the fourth stated it plainly. One record, read by all four, is what stops that recurring.",
+  "checked": "2026-08-18",
+  "how_it_was_checked": "curl -s -o /dev/null -w '%{http_code}' against each url below. Both returned 404 on the date above.",
+  "registries": [
+    {
+      "registry": "the npm registry",
+      "package": "aninda-studio-tokens",
+      "url": "https://registry.npmjs.org/aninda-studio-tokens",
+      "published": false,
+      "status": 404
+    },
+    {
+      "registry": "the Python Package Index",
+      "package": "aninda-studio-tokens",
+      "url": "https://pypi.org/pypi/aninda-studio-tokens/json",
+      "published": false,
+      "status": 404
+    }
+  ],
+  "when_you_publish": "Change published to true and status to 200, set checked to the day you did it, and re-run scripts/readme.py, 11_site/build.py, 09_guidebook/build.py and 12_packages/build.py. Every install instruction in the kit changes with it."
+}

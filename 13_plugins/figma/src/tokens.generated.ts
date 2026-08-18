@@ -9,7 +9,7 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "44005ba5204a1bbeff738d424cd6ad1d3d023aa9e56cc42f14ae678a363042bf";
+export const BUNDLE_SHA256 = "2cdfc50d825f42ade2c5000560f40e688e7e6f62aae119d5837afa0d487ff68d";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
   "07_tokens/build/primitive.tokens.json": "359b6b214801145054bd3154b51247b2cc3fbf1983f54664b959b30802aaf43f",
@@ -28,8 +28,8 @@ export const SOURCE_HASHES: { [file: string]: string } = {
   "04_mark/svg/tile-web.svg": "b631c922ebb4287e9d227fd4303864e7373dbf38467ca086fbde9cbee573600b",
   "04_mark/svg/wordmark-bangla.svg": "6b42edde179882a29c3147a78e333ef3e341fbd16913ec8fd70519599d8b464d",
   "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
-  "04_mark/manifest.json": "4c2b1c0cc6402bd9d068f7003a1045b9b1a9118eb6c475ee0ae660e025210c2f",
-  "08_components/_cards.json": "87ff3fa5cceecde135019674c4391a027f2afdf8b5e2e6f6937a094d38d70daa"
+  "04_mark/manifest.json": "e0feb94e418c4379ba026c07026e68692dbb67e67108f89f59ff1b4087f997cd",
+  "08_components/_cards.json": "470f1858caae9dc091799048ea9222387f2c0e73ca1d53e9b38912967e403768"
 };
 
 export const BUNDLED: RawInput = {
@@ -3542,7 +3542,7 @@ export const BUNDLED: RawInput = {
       "tile-web.svg"
     ],
     "app_store_only": "icon-appstore-square-1024.svg",
-    "trade_off": "Apple's current guidance asks for square, unmasked artwork: the system applies the mask and derives Liquid Glass specular highlights from the layer edges, so a pre-rounded edge sits inside the mask and the highlight follows the wrong geometry. Apple's own wording is that pre-masked artwork 'negatively impacts specular highlight effects' and makes edges 'look jagged'. Measured here: in a static render the difference is small, and on watchOS and visionOS it is nil because the circular mask cuts well inside the rounding. The dynamic cost could not be measured outside Apple's own renderer.",
+    "trade_off": "Apple's current guidance asks for square, unmasked artwork: the system applies the mask and derives Liquid Glass specular highlights from the layer edges, so a pre-rounded edge sits inside the mask and the highlight follows the wrong geometry. Apple's own wording is that pre-masked artwork 'negatively impacts specular highlight effects' and makes edges 'look jagged'. Measured here: under the circle watchOS and visionOS mask to, the rounded icon and the square master are the same image in every pixel \u2014 see the difference recorded in 'checks' below. Judged rather than measured: in a static render under Apple's rounded-rectangle mask the difference looks slight. That one is not a measurement, because Apple publishes no corner radius, so there is no mask to composite against without substituting our own radius for theirs. The dynamic cost \u2014 the moving specular highlight \u2014 could not be measured outside Apple's own renderer and is not known.",
     "if_you_ever_submit_to_the_app_store": "Use icon-appstore-square-1024.svg, not the rounded icon. Icon Composer expects unmasked layers.",
     "verified_against": "Apple Human Interface Guidelines, checked 14 August 2026"
   },
@@ -3558,21 +3558,24 @@ export const BUNDLED: RawInput = {
     "icon-192.svg",
     "icon-appstore-square-1024.svg"
   ],
+  "contact_sheet": "proof.svg \u2014 generated from the same strings written to 04_mark/svg, with every caption read out of the artwork",
   "checks": [
     "uharfbuzz present, HarfBuzz 14.3.0",
     "Bangla wordmark: 16 code points \u2192 11 glyphs, advance 520.1",
     "Latin wordmark: 13 code points \u2192 13 glyphs, advance 653.2",
     "conjuncts formed: 15 code points \u2192 11 glyphs",
     "negative control passed: naive 16 glyphs \u2260 shaped 11 glyphs",
-    "icon at stroke 9: mark 65.0\u00d773.0 scaled \u00d70.9208, worst corner 45.00 of 45 units from centre \u2014 inside both the 90-unit field and the circle watchOS and visionOS mask to",
-    "icon at stroke 15: mark 71.0\u00d779.0 scaled \u00d70.8473, worst corner 45.00 of 45 units from centre \u2014 inside both the 90-unit field and the circle watchOS and visionOS mask to",
+    "icon at stroke 9: mark 65.0\u00d773.0 scaled \u00d70.9208, worst corner exactly on the 45-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 90-unit field",
+    "icon at stroke 15: mark 71.0\u00d779.0 scaled \u00d70.8473, worst corner exactly on the 45-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 90-unit field",
     "4 recolourable files carry no root colour and draw in currentColor",
     "tile-web.svg: 4.7% background showing \u2014 rounded",
     "icon-1024.svg: 4.7% background showing \u2014 rounded \u2014 the everyday icon, all platforms",
     "icon-1088-watch.svg: 4.7% background showing \u2014 rounded",
     "icon-512.svg: 4.7% background showing \u2014 rounded",
     "icon-192.svg: 4.7% background showing \u2014 rounded",
-    "icon-appstore-square-1024.svg: 0.0% background showing \u2014 square and fully opaque \u2014 App Store only"
+    "icon-appstore-square-1024.svg: 0.0% background showing \u2014 square and fully opaque \u2014 App Store only",
+    "under a circle inscribed in the frame, icon-1024.svg and icon-appstore-square-1024.svg are the same image in all 65536 pixels \u2014 the corner rounding lies entirely outside the circle watchOS and visionOS mask to, and the artwork inside it has not drifted between the two files",
+    "contact sheet: 10 artefacts nested from the same strings written to 04_mark/svg, every caption read out of the artwork"
   ]
 },
   cards: {
@@ -3609,7 +3612,7 @@ export const BUNDLED: RawInput = {
       "source": "06_type/candidates/mono/ibmplexmono/IBMPlexMono-Regular.ttf",
       "licence": "SIL OFL 1.1",
       "licence_file": "fonts/anindamono-OFL.txt",
-      "bytes": 10344,
+      "bytes": 10288,
       "renamed": true
     }
   ],

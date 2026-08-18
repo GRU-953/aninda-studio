@@ -331,7 +331,7 @@ My assessment **[judgement]**, supported by the measurements above:
 - **Proportions:** baseline-to-মাত্রা 9.95px at 16px; tall letters (`ই`) reach
   14.59px; descenders 4.34px **[rendered]**. Its default line box is 22px at 16px —
   **the second-tightest of any Bangla face and tighter than every Latin candidate's
-  25px** **[rendered]**, which makes it unusually easy to fit into an existing grid.
+  25px** **[rendered]**, which makes it fit an existing grid with unusually little adjustment.
 - **Good at:** everything asked of a workhorse — body, interface, captions;
   sturdiest মাত্রা of any text face; no RFN so it may be subsetted freely.
 - **Bad at:** it is a system face and slightly anonymous; it will not give the
@@ -471,7 +471,7 @@ decides how much code fits on a line. **[rendered]**
   0.753)** **[rendered]**, and the tallest caps at 11.68px — drawn deliberately tall so
   code stays legible at small sizes.
 - **Good at:** code at 11–13px, which is where a studio actually reads it; `0` is
-  clearly dotted and `l`, `I`, `1` are unambiguous.
+  dotted and `l`, `I`, `1` are unambiguous.
 - **Bad at:** it has programming ligatures switched on by default, which turn
   `!==` into a single joined mark — pleasant in an editor, confusing in a brand
   specimen or a document a client reads. Turn them off with `font-variant-ligatures: none`.

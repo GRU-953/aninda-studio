@@ -37,14 +37,34 @@ You need three fonts installed on your computer:
 
 | Family | Style | Where it comes from |
 | --- | --- | --- |
-| Literata | Regular | The Latin text face. SIL Open Font License 1.1. |
-| Noto Serif Bengali | Regular and Medium | The Bangla text face. SIL Open Font License 1.1. |
-| Aninda Mono | Regular | The monospaced face. It is a renamed subset of IBM Plex Mono, because `IBM Plex` is a Reserved Font Name and a subset counts as a modification under the licence. |
+| Literata | Regular | The Latin text face. SIL Open Font License 1.1. Install it from Google Fonts under its own name. |
+| Noto Serif Bengali | Regular and Medium | The Bangla text face. SIL Open Font License 1.1. Install it from Google Fonts under its own name. |
+| Aninda Mono | Regular | The monospaced face. It exists only inside this project: it is IBM Plex Mono renamed, because `Plex` is a Reserved Font Name and renaming is what OFL 1.1 clause 3 requires of a modified font. **This project builds it for you** — see below. |
 
-Figma reads fonts your operating system has installed. The `.woff2` files in
-this project are for the web and will not install as system fonts, so you need
-an installable `.ttf` or `.otf` of each. If `Aninda Mono` is not installed under
+Figma reads fonts your operating system has installed. The `.woff2` files in this
+project are for the web and will not install as system fonts, so each family has to
+be on your system as a `.ttf` or `.otf`. If `Aninda Mono` is not installed under
 exactly that name, the plugin stops and says so.
+
+### Making and installing Aninda Mono
+
+Literata and Noto Serif Bengali can be installed from upstream under their own
+names. `Aninda Mono` cannot, because the name exists nowhere else. Until 18 August
+2026 this project shipped it only as a `.woff2`, so this step had no answer and
+step 1 below ended in a refusal.
+
+1. Open the Terminal app.
+2. Type `cd /Users/gru953/Claude/Cowork/Aninda_Studio` and press Return.
+3. Type `./.venv/bin/python 08_components/build.py` and press Return.
+4. That writes `08_components/fonts/AnindaMono-Regular.ttf`. It is the whole IBM
+   Plex Mono Regular with its family name changed, not a subset — a subset would
+   drop to a fallback the moment you typed a character it did not carry.
+5. Double-click that file and install it the way your system offers.
+6. Its licence is `08_components/fonts/anindamono-OFL.txt`, beside it. Keep the two
+   together if you pass the font on.
+
+Nothing about this is specific to Figma: install it once and any application on
+your computer can set type in it.
 
 ---
 

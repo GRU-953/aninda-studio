@@ -49,10 +49,19 @@ rules: মোহনা (ground, "estuary"), জোয়ার (accent, "tidewat
 | `color.status.danger` | #9B3728 | #E16551 | #752519 | #FB836F |
 | `color.status.info` | #316189 | #5C96C8 | #214767 | #7AB1E1 |
 
-In CSS the same roles are `--as-surface-base`, `--as-ink-default`,
-`--as-accent-default` and so on. Use those, not the hexes above. The hexes are
-here so you can answer a question without running anything; they are not for
-pasting into a design.
+In CSS the same roles are `--as-surface-base`, `--as-ink`, `--as-accent` and so
+on. Use those, not the hexes above. The hexes are here so you can answer a
+question without running anything; they are not for pasting into a design.
+
+The CSS name is not always the role name. `07_tokens/emit_css.py` drops a
+trailing `default` segment and a leading `status` one, so `color.ink.default`
+becomes `--as-ink` and `color.status.danger` becomes `--as-danger`. Role names
+keep both parts, which is why `asset.py contrast --fg accent-default` is right
+while a property called `--as-accent-default` does not exist and resolves to
+nothing.
+`check_plugin.py` now measures every `var(--as-...)` in this skill against the
+properties `07_tokens/css/tokens.css` defines, because this document and
+`SKILL.md` both named `--as-accent-default` and nothing caught it.
 
 ---
 

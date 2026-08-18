@@ -8,6 +8,8 @@ The Aninda Studio design tokens: colour, type, space, shape and motion, in four 
 npm install aninda-studio-tokens
 ```
 
+**Not published yet.** On 2026-08-18 I checked the npm registry and the Python Package Index, and neither holds this package. It is built and it works from a checkout of https://github.com/GRU-953/aninda-studio; the command above will work once it is published. I would rather tell you that here than let you find out at the terminal.
+
 ## Use the stylesheet
 
 ```js

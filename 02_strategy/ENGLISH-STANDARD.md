@@ -39,7 +39,7 @@ the ones this brand writes to. Stated in the standard's own terms, readers get
 what they need if the writing is:
 
 1. **Relevant** — they find what they need.
-2. **Findable** — they can locate it easily.
+2. **Findable** — they can locate what they need without hunting for it.
 3. **Understandable** — they understand it on the first read.
 4. **Usable** — they can act on it.
 
@@ -81,7 +81,7 @@ four adjectives, and adjectives do not guide writing, so here is what each one
 actually means at the keyboard.
 
 **Cooperative — write as if sitting beside the reader, not across a desk.**
-- Offer the next step, don't just state the position. *Here's what I'd suggest*,
+- Offer the next step rather than only stating the position. *Here's what I'd suggest*,
   not *this is the procedure*.
 - Use *you* and *I*, and use them in the same sentence when it's a joint problem.
   *If you send me the file, I can check it.*
@@ -165,10 +165,25 @@ A sentence is never made friendlier at the cost of being right.
 
 ## How this is checked
 
-- Sentence length and passive-voice constructions are counted mechanically across
-  every shipped English string.
-- Every banned word and idiom above is in a blocklist the checker enforces.
+The checker is `13_plugins/claude-code/skills/aninda-review/scripts/check.py`, and
+the `lint` job in `.github/workflows/ci.yml` runs it on every push.
+
+- **Every banned word and idiom above is in the checker's blocklist, and CI fails
+  on a hit.** A word inside backticks, emphasis or quotation marks is read as a
+  citation rather than a use, which is how a document can state the rule it sets.
+- Sentence length and passive-voice constructions are counted, and reported.
 - Anything the checker cannot judge — whether a sentence is *actually* clear — is
   named in its output as a gap rather than passed silently.
+
+**What CI covers, stated exactly, because the previous version of this section
+overstated it.** It said the blocklist was enforced when no job ran the checker at
+all, and this document was itself using two banned words while seven more sat in
+`06_type/`. The CI step names its paths: the two READMEs, `NOTICE`,
+`TRADEMARKS.md`, `LICENSE-DOCS.md`, `00_sandbox/TOOLCHAIN.md`, `01_research/`,
+`02_strategy/`, the guidebook chapters, both plugin READMEs, the plugin skills, and
+the six research documents in `06_type/`. That is the authored English prose. It is
+a list rather than the whole tree because the checker skips a file over 1 MB and a
+generated card is larger than that; those files are held to this standard by the
+generators that write them, and the generators read the prose above.
 
 *A reader should never have to be clever to understand this studio.*

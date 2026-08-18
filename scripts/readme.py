@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -41,6 +42,52 @@ EMAIL = "aninda.sh15@gmail.com"
 REPO = "https://github.com/GRU-953/aninda-studio"
 SITE = "https://anindastudio.com"
 PKG = "aninda-studio-tokens"
+
+# The one command in the README chosen to teach the system's governing idea:
+# refuse, do not warn. It is run below rather than quoted, because the README used
+# to print `asset.py --mark --size 12`, which argparse rejects as an invalid choice
+# and exits 2 — the same exit code as the refusal, so a reader checking only the
+# status concluded the demonstration had worked. It never reached the size floor.
+REFUSAL_SCRIPT = "13_plugins/claude-code/skills/aninda-brand/scripts/asset.py"
+REFUSAL_ARGS = ["mark", "--size", "12"]
+REFUSAL_EXIT = 2
+
+
+class BuildError(Exception):
+    pass
+
+
+def publication() -> dict:
+    """The registry record, read once and used by both READMEs."""
+    return json.loads((ROOT / "12_packages" / "PUBLICATION.json").read_text())
+
+
+def refusal() -> dict:
+    """Run the README's demonstration command and read the refusal off it.
+
+    A README that states WHY a command fails, without running it, is a sentence
+    nobody re-reads. This runs it and refuses to write a README that describes a
+    refusal the script does not actually give.
+    """
+    proc = subprocess.run(
+        [sys.executable, str(ROOT / REFUSAL_SCRIPT), *REFUSAL_ARGS],
+        capture_output=True, text=True, cwd=ROOT,
+    )
+    output = (proc.stdout + proc.stderr).strip()
+    if proc.returncode != REFUSAL_EXIT or not output.startswith("REFUSED"):
+        raise BuildError(
+            f"the README's demonstration command did not refuse. Ran\n"
+            f"  {REFUSAL_SCRIPT} {' '.join(REFUSAL_ARGS)}\n"
+            f"and got exit {proc.returncode} with:\n{output[:400]}\n"
+            f"The README says this command refuses because 12 px is below the mark's "
+            f"size floor. Either the command form is wrong or the floor has moved."
+        )
+    rule = next((line.split("Rule", 1)[1].strip()
+                 for line in output.splitlines() if line.strip().startswith("Rule")), "")
+    if not rule:
+        raise BuildError(f"the refusal printed no Rule line:\n{output[:400]}")
+    return {"command": f"./.venv/bin/python {REFUSAL_SCRIPT} {' '.join(REFUSAL_ARGS)}",
+            "exit": proc.returncode, "rule": rule}
 
 
 def count() -> dict:
@@ -88,6 +135,17 @@ def count() -> dict:
     f["files"] = sum(1 for p in ROOT.rglob("*") if p.is_file()
                      and not any(x in p.parts for x in
                                  (".venv", "node_modules", "browsers", ".git", "candidates")))
+
+    pub = publication()
+    unpublished = [r for r in pub["registries"] if not r["published"]]
+    f["pub_checked"] = pub["checked"]
+    f["pub_registries"] = " and ".join(r["registry"] for r in unpublished)
+    f["pub_unpublished"] = len(unpublished)
+
+    ref = refusal()
+    f["refusal_command"] = ref["command"]
+    f["refusal_exit"] = ref["exit"]
+    f["refusal_rule"] = ref["rule"]
     return f
 
 
@@ -157,25 +215,31 @@ number a person types is a number that can be wrong and stay wrong.
 
 ## Try it in one minute
 
-```bash
-npm install aninda-studio-tokens
-```
+Start from a local checkout. **The two token packages are built but not
+published.** On {f['pub_checked']} I checked {f['pub_registries']}, and neither
+holds `{PKG}`, so `npm install` and `pip install` will not work yet. Everything
+below works from a checkout.
 
 ```bash
 ./.venv/bin/python 00_sandbox/measure.py
 ```
 
-That second command opens a real browser and re-measures every colour pairing
-against the pixels it actually produced. It takes about a minute and it either
-agrees with the token files or tells you exactly where it does not.
+That command opens a real browser and re-measures every colour pairing against the
+pixels it actually produced. It takes about a minute and it either agrees with the
+token files or tells you exactly where it does not.
 
 ```bash
-./.venv/bin/python 13_plugins/claude-code/skills/aninda-brand/scripts/asset.py --mark --size 12
+{f['refusal_command']}
 ```
 
-**That last one fails on purpose.** Twelve pixels is below the mark's size floor,
-so the script refuses rather than producing something unreadable. A system that
-warns teaches nothing; one that refuses teaches the rule.
+**That one fails on purpose**, with exit {f['refusal_exit']}. It asks for the mark
+at 12 px, and the rule it meets is this: {f['refusal_rule']} The script refuses
+rather than producing something unreadable. A system that warns teaches nothing;
+one that refuses teaches the rule.
+
+That command is run by `scripts/readme.py` every time this file is generated, and
+the rule quoted above is the script's own words. If it stopped refusing, this
+README could not be written.
 
 ## Rebuild everything
 
@@ -196,6 +260,9 @@ Stated here rather than discovered later:
   Contrast is computed and proved. Lived accessibility is a different claim and
   this kit does not make it.
 - **No user research.** One person's judgement, and it says so.
+- **The npm and PyPI packages are built but not published.** Checked
+  {f['pub_checked']}: {f['pub_registries']} hold nothing under `{PKG}`. The
+  packages work from this checkout; the registry commands do not work yet.
 - **The Bangla has not been reviewed by a second Bangla reader.** Spelling follows
   the Bangla Academy standard and every ruling is sourced, but sourced is not the
   same as read well. {f['cards_bn']} of {f['cards']} cards carry Bangla names.
@@ -289,15 +356,17 @@ def bangla(f: dict) -> str:
 
 ## শুরু করতে
 
-```bash
-npm install aninda-studio-tokens
-```
+> **Not published yet.** *This paragraph is in English because no reviewed Bangla
+> exists for it, and the rule in this project is to leave the English rather than
+> invent the Bangla.* On {f['pub_checked']} I checked {f['pub_registries']}, and
+> neither holds `{PKG}`. So `npm install` and `pip install` will not work yet.
+> The command below works from a local checkout.
 
 ```bash
 ./.venv/bin/python 00_sandbox/measure.py
 ```
 
-এই দ্বিতীয় কমান্ডটি সত্যিকারের একটি ব্রাউজার খুলে প্রতিটি রঙের জোড়া আবার মেপে
+এই কমান্ডটি সত্যিকারের একটি ব্রাউজার খুলে প্রতিটি রঙের জোড়া আবার মেপে
 দেখে। এক মিনিট লাগে। হয় সে টোকেন ফাইলের সঙ্গে একমত হবে, নয়তো ঠিক কোথায় মেলে না
 তা বলে দেবে।
 
@@ -336,7 +405,20 @@ def main() -> int:
     ap.add_argument("--check", action="store_true")
     args = ap.parse_args()
 
-    f = count()
+    try:
+        f = count()
+    except BuildError as exc:
+        print(f"FAILED — nothing written:\n  {exc}", file=sys.stderr)
+        return 1
+    if f["pub_unpublished"] != 2:
+        # Both READMEs are written for the state recorded today: neither package is
+        # published. When that changes, the prose has to change with it rather than
+        # being quietly wrong in the other direction.
+        print("FAILED — nothing written:\n  12_packages/PUBLICATION.json now records "
+              f"{2 - f['pub_unpublished']} of 2 packages as published. The install "
+              "sections in both READMEs are written for neither being published; "
+              "rewrite them in scripts/readme.py before regenerating.", file=sys.stderr)
+        return 1
     files = {ROOT / "README.md": english(f), ROOT / "README.bn.md": bangla(f)}
 
     for k, v in f.items():

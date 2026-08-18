@@ -70,6 +70,114 @@ BLURB = (
 )
 
 
+# The Python usage examples. They are constants because check_python_examples()
+# EXECUTES them against the built package before the README that quotes them may be
+# written. The old README's two samples were JavaScript relabelled as Python and
+# neither one ran.
+PY_EXAMPLES = {
+    "basic": (
+        f"from {PY_MODULE} import css, css_path, THEMES\n"
+        "\n"
+        "print(THEMES)            # ['light', 'dark', 'hc-light', 'hc-dark']\n"
+        "print(css()[:40])        # every theme, as text\n"
+        "print(css('dark')[:40])  # one theme\n"
+        "print(css_path())        # a pathlib.Path, for copying\n"
+    ),
+    "tokens": (
+        f"from {PY_MODULE} import TOKENS, THEME_TOKENS\n"
+        "\n"
+        "ink = THEME_TOKENS['dark']['color']['ink']['default']\n"
+        "print(ink['$value'])                       # an alias into the ramps\n"
+        "print(TOKENS['color']['ramp']['ground']['950']['$value']['hex'])\n"
+    ),
+}
+
+
+PUBLICATION_FILE = HERE / "PUBLICATION.json"
+
+
+def publication() -> dict:
+    """The registry record. Hand-maintained, dated, and read by four generators."""
+    return json.loads(PUBLICATION_FILE.read_text())
+
+
+def publication_note() -> str:
+    """The registry record, as one paragraph, from the record all four artefacts read."""
+    pub = publication()
+    missing = [r for r in pub["registries"] if not r["published"]]
+    if not missing:
+        return (f"Published on {' and '.join(r['registry'] for r in missing)}, "
+                f"checked {pub['checked']}.")
+    where = " and ".join(r["registry"] for r in missing)
+    return (f"**Not published yet.** On {pub['checked']} I checked {where}, and neither "
+            f"holds this package. It is built and it works from a checkout of "
+            f"{REPO}; the command above will work once it is published. I would rather "
+            f"tell you that here than let you find out at the terminal.")
+
+
+def py_file_table(files: dict[Path, str], py_root: Path) -> str:
+    """The wheel's own file list, read out of what is about to be written.
+
+    The old README described the npm tree: it promised `typography.css` and
+    `layout.css`, which are only ever written into the npm package, and named the
+    token documents by their npm subpath rather than their filename. Reading the
+    table out of `files` means it cannot describe a file the wheel does not carry.
+    """
+    data = py_root / "src" / PY_MODULE / "data"
+    rows = ["| File | What it is |", "|---|---|"]
+    described = {
+        "tokens.css": "Every theme in one stylesheet",
+        "index.tokens.json": "An index of the token documents. **Not** a token document",
+    }
+    for path in sorted(p for p in files if data in p.parents or p.parent == data):
+        rel = path.relative_to(data).as_posix()
+        if rel in described:
+            what = described[rel]
+        elif rel.startswith("tokens.") and rel.endswith(".css"):
+            what = f"The {rel[len('tokens.'):-len('.css')]} theme alone"
+        elif rel == "tokens/primitive.tokens.json":
+            what = "The ramps, scales, families and durations. DTCG"
+        elif rel.startswith("tokens/semantic."):
+            theme = rel[len("tokens/semantic."):-len(".tokens.json")]
+            what = f"The {theme} theme's roles. DTCG, aliases into the primitives"
+        elif rel == "tokens/forced-colors.map.json":
+            what = "The forced-colours map. Deliberately **not** DTCG"
+        else:
+            raise SystemExit(
+                f"12_packages/build.py: the wheel now carries {rel}, and the Python "
+                "README has no description for it. Add one rather than shipping a "
+                "file table that does not match the package."
+            )
+        rows.append(f"| `{rel}` | {what} |")
+    rows.append(f"| `__init__.py`, `py.typed` | The module itself, typed |")
+    return "\n".join(rows)
+
+
+def check_python_examples(files: dict[Path, str], py_root: Path) -> list[str]:
+    """Run every Python example in the README against the package being built."""
+    import subprocess
+
+    source = py_root / "src"
+    written = {p: c for p, c in files.items() if source in p.parents}
+    problems = []
+    with __import__("tempfile").TemporaryDirectory() as tmp:
+        stage = Path(tmp)
+        for path, content in written.items():
+            target = stage / path.relative_to(source)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(content)
+        for name, code in PY_EXAMPLES.items():
+            proc = subprocess.run([sys.executable, "-c", code],
+                                  capture_output=True, text=True, cwd=stage)
+            if proc.returncode != 0:
+                problems.append(
+                    f"the README's '{name}' example does not run against the package "
+                    f"being built (exit {proc.returncode}): "
+                    + (proc.stderr.strip() or proc.stdout.strip()).splitlines()[-1]
+                )
+    return problems
+
+
 def read_version() -> str:
     if VERSION_FILE.exists():
         return VERSION_FILE.read_text().strip()
@@ -124,6 +232,8 @@ def build() -> tuple[dict[Path, str], list[str]]:
 ```
 npm install {NPM_NAME}
 ```
+
+{publication_note()}
 
 ## Use the stylesheet
 
@@ -375,9 +485,6 @@ Source = "{REPO}"
 [tool.hatch.build.targets.wheel]
 packages = ["src/{PY_MODULE}"]
 '''
-    files[py / "README.md"] = readme.replace(
-        f"npm install {NPM_NAME}", f"pip install {PY_NAME}"
-    ).replace("```js", "```python")
     files[py / "NOTICE"] = notice
     files[mod / "py.typed"] = ""
     files[mod / "__init__.py"] = f'''"""Aninda Studio design tokens.
@@ -438,6 +545,100 @@ __all__ = ["TOKENS", "THEME_TOKENS", "THEMES", "css", "css_path", "__version__"]
     for t, block in per_theme.items():
         files[mod / "data" / f"tokens.{t}.css"] = block
 
+    # The PyPI README is WRITTEN, not derived. It used to be the npm README with
+    # `npm install` swapped for `pip install` and every ```js fence relabelled
+    # ```python, which left two JavaScript ES module imports presented as Python —
+    # both syntax errors — and a file table listing npm subpath exports
+    # (`tokens/primitive`, `css/dark`, `typography.css`, `layout.css`) that have no
+    # Python equivalent at all. pyproject.toml sets readme = "README.md", so that
+    # file is the PyPI project page: every usage example on it failed. The four
+    # names that do work — TOKENS, THEME_TOKENS, css() and css_path() — were never
+    # mentioned. PY_EXAMPLES below is executed against the built package before
+    # anything is written.
+    files[py / "README.md"] = f"""# {PY_NAME}
+
+{BLURB}
+
+## Install
+
+```
+pip install {PY_NAME}
+```
+
+{publication_note()}
+
+## Use it
+
+```python
+{PY_EXAMPLES["basic"]}```
+
+`css()` returns the stylesheet text; `css_path()` returns a `pathlib.Path`, which is
+what you want when copying the file into a build rather than reading it.
+
+```python
+{PY_EXAMPLES["tokens"]}```
+
+`TOKENS` is the primitive document — the ramps, scales, families and durations.
+`THEME_TOKENS` holds one document per theme, with identical token paths in each.
+
+Each is [Design Tokens Format Module 2025.10](https://www.designtokens.org/tr/2025.10/format/),
+a Final Community Group Report of the W3C Design Tokens Community Group. It is a
+Community Group specification and **not** a W3C Standard.
+
+**There is no single combined token document, and that is deliberate.** DTCG has no
+theming concept, so each theme is its own file with identical token paths. One
+consequence worth knowing: a semantic theme document resolves only when it is merged
+with the primitive one, because its role colours are aliases into the ramps.
+
+Each colour carries its proof under `$extensions["studio.aninda"].proof` — the
+ratio required, the ratio measured, the worst case under a one-bit perturbation of
+both colours, which surface it was hardest against, and the WCAG criterion it
+meets. You can check the claim rather than trust it.
+
+## Applying a theme
+
+The stylesheet defines light values on `:root`, follows the reader's system setting
+where nobody has chosen, and lets an explicit choice anywhere in the tree win:
+
+```html
+<html>                          <!-- follows the system -->
+<div data-theme="dark">         <!-- an island, anywhere in the page -->
+<div data-theme="hc-light">     <!-- high contrast -->
+```
+
+`[data-theme]` is scoped to the attribute and never to `:root`, so a dark panel can
+sit inside a light page.
+
+## What the wheel contains
+
+{py_file_table(files, py)}
+
+There are no `typography.css` or `layout.css` files here. Those two are npm subpath
+exports and there is no Python equivalent of a subpath export; the families and the
+container widths they set are in the token documents, under `fontFamily` and
+`dimension`.
+
+## Fonts are not included
+
+The system uses Literata, Noto Serif Bengali and IBM Plex Mono, all under the SIL
+Open Font Licence 1.1. They are not bundled: it would triple the size of this
+package, and an OFL font inside an Apache-2.0 package muddies the licence
+declaration. The families are named in the token documents; loading them is yours.
+
+One thing to know if you subset IBM Plex Mono yourself: it carries the Reserved
+Font Name **"Plex"** — that is the exact string, from the first line of its own
+licence file — and subsetting counts as modifying it under OFL 1.1 clause 3, so a
+subset may not use that name. The design system's own subset is called
+"Aninda Mono" for exactly that reason.
+
+## Licence
+
+Apache-2.0. The name, the mark and the wordmark are **not** licensed — use the
+system, put your own identity on it.
+
+Questions: {EMAIL}
+"""
+
     notes.append(f"version {version}")
     notes.append(f"npm '{NPM_NAME}' — {sum(1 for p in files if 'npm' in p.parts)} files")
     notes.append(f"PyPI '{PY_NAME}' — {sum(1 for p in files if 'python' in p.parts)} files")
@@ -471,29 +672,77 @@ def verify(files: dict[Path, str]) -> list[str]:
         if not shipped_doc(name):
             problems.append(f"{name} was not packaged")
 
-    # Every hex in every semantic theme file must appear in the stylesheet.
+    # Every colour in every semantic theme file must appear in the stylesheet —
+    # AFTER its alias is resolved.
+    #
+    # The earlier form of this walk only looked at a $value that was a dict
+    # carrying "hex". Every role colour in a semantic theme file is an alias
+    # STRING, `"{color.ramp.ground.950}"`, so it was skipped: the check covered
+    # the seven swept surfaces per theme and none of the ten roles. Round 1 of the
+    # convergence review changed --as-ink in the stylesheet from #0D1A17 to
+    # #ABCDEF, rebuilt, and got four green ok lines with the wrong colour in both
+    # packages. Text, line, accent, focus and every status colour — the ones
+    # carrying the contrast proofs — were the ten it could not see.
+    primitive = shipped_doc("primitive.tokens.json")
+
+    def resolve(value):
+        """A hex, whether the token holds one or points at one."""
+        if isinstance(value, dict) and "hex" in value:
+            return value["hex"], None
+        if isinstance(value, str) and value.startswith("{") and value.endswith("}"):
+            node = primitive
+            for part in value[1:-1].split("."):
+                node = node.get(part) if isinstance(node, dict) else None
+                if node is None:
+                    return None, f"alias {value} does not resolve in primitive.tokens.json"
+            inner = node.get("$value") if isinstance(node, dict) else None
+            if isinstance(inner, dict) and "hex" in inner:
+                return inner["hex"], None
+            return None, f"alias {value} resolves to something with no hex"
+        return None, None
+
     for t in THEMES:
         doc = shipped_doc(f"semantic.{t}.tokens.json")
-        missing = []
+        missing: list[str] = []
+        counted = 0
 
-        def walk(node):
-            if isinstance(node, dict):
-                v = node.get("$value")
-                if isinstance(v, dict) and "hex" in v and v["hex"] not in css_blob:
-                    missing.append(v["hex"])
-                for k, child in node.items():
-                    if not k.startswith("$"):
-                        walk(child)
+        def walk(node, path=""):
+            nonlocal counted
+            if not isinstance(node, dict):
+                return
+            if "$value" in node:
+                hexv, why = resolve(node["$value"])
+                if why:
+                    problems.append(f"{t}:{path}: {why}")
+                elif hexv is not None:
+                    counted += 1
+                    if hexv not in css_blob:
+                        missing.append(f"{path} = {hexv}")
+            for k, child in node.items():
+                if not k.startswith("$"):
+                    walk(child, f"{path}.{k}" if path else k)
 
-        walk(doc.get("color", {}))
+        walk(doc.get("color", {}), "color")
         if missing:
-            problems.append(f"{t}: {len(missing)} colours in the tokens never appear "
-                            f"in the CSS, e.g. {sorted(set(missing))[:3]}")
+            problems.append(f"{t}: {len(missing)} of {counted} colours in the tokens "
+                            f"never appear in the CSS: {sorted(missing)[:3]}")
+        elif counted < 17:
+            # 17 roles per theme. A walk that silently resolved fewer than that is
+            # the failure this whole block exists to prevent, so it is stated as a
+            # number rather than left to inspection.
+            problems.append(f"{t}: only {counted} colours were resolved and compared, "
+                            f"and there are 17 roles per theme. The walk is missing some.")
 
     for t in THEMES:
         blob = next((v for k, v in files.items() if k.name == f"tokens.{t}.css"), None)
         if blob is None or f'[data-theme="{t}"]' not in blob:
             problems.append(f"the per-theme file for '{t}' has no matching block")
+
+    # Both README code samples must actually run. The PyPI README used to carry
+    # JavaScript relabelled as Python, and --check passed because it compared the
+    # generated file against the generator rather than against the package it
+    # describes. This runs them against a staged copy of the wheel's own source.
+    problems += check_python_examples(files, HERE / "python")
     return problems
 
 

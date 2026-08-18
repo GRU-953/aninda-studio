@@ -1,7 +1,7 @@
 {
   "$comment": "What a clean run of the plugin should report. It is written by build.mjs from the same plan code the plugin runs, so comparing it against the receipt the plugin prints is a comparison of two numbers, not a reading of two documents. There is no date in this file on purpose: it is a pure function of the tokens, and the SHA-256 below changes only when they do.",
   "generatedBy": "13_plugins/figma/build.mjs",
-  "tokensSha256": "44005ba5204a1bbeff738d424cd6ad1d3d023aa9e56cc42f14ae678a363042bf",
+  "tokensSha256": "2cdfc50d825f42ade2c5000560f40e688e7e6f62aae119d5837afa0d487ff68d",
   "sources": {
     "07_tokens/build/primitive.tokens.json": "359b6b214801145054bd3154b51247b2cc3fbf1983f54664b959b30802aaf43f",
     "07_tokens/build/semantic.light.tokens.json": "534accf8100efb3ff853cfe026a4d00646e5e493f3ca38fdbf3ab8f8dfafc610",
@@ -19,8 +19,8 @@
     "04_mark/svg/tile-web.svg": "b631c922ebb4287e9d227fd4303864e7373dbf38467ca086fbde9cbee573600b",
     "04_mark/svg/wordmark-bangla.svg": "6b42edde179882a29c3147a78e333ef3e341fbd16913ec8fd70519599d8b464d",
     "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
-    "04_mark/manifest.json": "4c2b1c0cc6402bd9d068f7003a1045b9b1a9118eb6c475ee0ae660e025210c2f",
-    "08_components/_cards.json": "87ff3fa5cceecde135019674c4391a027f2afdf8b5e2e6f6937a094d38d70daa"
+    "04_mark/manifest.json": "e0feb94e418c4379ba026c07026e68692dbb67e67108f89f59ff1b4087f997cd",
+    "08_components/_cards.json": "470f1858caae9dc091799048ea9222387f2c0e73ca1d53e9b38912967e403768"
   },
   "fontsRequired": [
     {

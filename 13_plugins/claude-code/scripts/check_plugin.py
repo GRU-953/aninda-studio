@@ -26,6 +26,8 @@ MANIFEST = PLUGIN_ROOT / ".claude-plugin" / "plugin.json"
 COMMANDS = PLUGIN_ROOT / "commands"
 SKILLS = PLUGIN_ROOT / "skills"
 DIST = PLUGIN_ROOT / "dist"
+REPO_ROOT = PLUGIN_ROOT.parent.parent
+MARKETPLACE = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 
 EXPECTED_SKILLS = ("aninda-brand", "aninda-repo", "aninda-review")
 EXPECTED_COMMANDS = ("asset", "design", "check", "init")
@@ -204,6 +206,151 @@ def check_bangla_agreement(problems: Problems) -> None:
             )
 
 
+# Every file the skill bundles that also exists in the repository, and where it
+# comes from. The skill is meant to work standalone once installed, so it carries
+# copies — but while both live in one tree the copy must be the source, byte for
+# byte.
+BUNDLED_FROM_REPO = {
+    "aninda-brand/assets/css/tokens.css": "07_tokens/css/tokens.css",
+    "aninda-brand/assets/marks/manifest.json": "04_mark/manifest.json",
+    "aninda-brand/assets/fonts/anindamono-subset.woff2":
+        "08_components/fonts/anindamono-subset.woff2",
+}
+
+
+def check_bundled_copies(problems: Problems) -> None:
+    """Nothing copied into the skill may have drifted from the file it came from.
+
+    Nothing syncs these, and one of them had already gone stale in a way that
+    mattered: the bundled primitive.tokens.json still recorded IBM Plex Mono's
+    Reserved Font Name as "IBM Plex" after the source had been corrected to the
+    exact string "Plex", so the plugin shipped a licence-relevant statement that the
+    repository had already fixed. The token documents and the marks are added by
+    pattern below so a new one cannot be missed.
+    """
+    pairs = dict(BUNDLED_FROM_REPO)
+    for source in sorted((REPO_ROOT / "07_tokens" / "build").glob("*.json")):
+        pairs[f"aninda-brand/assets/tokens/{source.name}"] = f"07_tokens/build/{source.name}"
+    for source in sorted((REPO_ROOT / "04_mark" / "svg").glob("*.svg")):
+        copy = SKILLS / "aninda-brand" / "assets" / "marks" / source.name
+        if copy.exists():
+            pairs[f"aninda-brand/assets/marks/{source.name}"] = f"04_mark/svg/{source.name}"
+
+    stale = []
+    for relative, origin in sorted(pairs.items()):
+        copy, source = SKILLS / relative, REPO_ROOT / origin
+        if not source.exists():
+            problems.wrong(f"{origin} is missing, so skills/{relative} cannot be checked")
+            continue
+        if not copy.exists():
+            problems.wrong(f"skills/{relative} is missing, and {origin} is there to copy")
+            continue
+        if copy.read_bytes() != source.read_bytes():
+            stale.append(f"skills/{relative} has drifted from {origin}")
+    for item in stale:
+        problems.wrong(item)
+    if not stale:
+        problems.ok(f"{len(pairs)} bundled files are byte-identical to their sources "
+                    "in the repository")
+
+
+def check_marketplace(problems: Problems) -> None:
+    """A plugin nobody can install is not shipped.
+
+    Claude Code installs a plugin from a marketplace, which is a
+    `.claude-plugin/marketplace.json` at the root of a git repository. Until
+    18 August 2026 this repository had none, and no document anywhere said how to
+    get the plugin into Claude Code by any other route — while the plugin's own
+    README told the reader to type `/aninda-studio:` and pick a command. Everything
+    else about it was finished and machine-checked, so the one missing piece was the
+    only thing between all that work and anybody running it.
+    """
+    if not MARKETPLACE.exists():
+        problems.wrong(
+            f"{MARKETPLACE.relative_to(REPO_ROOT)} is missing, so there is no way to "
+            "install this plugin. Claude Code installs from a marketplace file at the "
+            "root of a git repository."
+        )
+        return
+    listing = json.loads(MARKETPLACE.read_text("utf-8"))
+    manifest = json.loads(MANIFEST.read_text("utf-8")) if MANIFEST.exists() else {}
+    entries = listing.get("plugins")
+    if not isinstance(entries, list) or not entries:
+        problems.wrong("marketplace.json lists no plugins")
+        return
+    mine = [entry for entry in entries if entry.get("name") == manifest.get("name")]
+    if not mine:
+        problems.wrong(
+            f"marketplace.json lists {[entry.get('name') for entry in entries]} and none "
+            f"of them is {manifest.get('name')!r}, the name in plugin.json. The install "
+            "command names the plugin, so the two have to agree."
+        )
+        return
+    entry = mine[0]
+    source = (MARKETPLACE.parent.parent / entry.get("source", "")).resolve()
+    if source != PLUGIN_ROOT:
+        problems.wrong(
+            f"marketplace.json points {entry['name']} at {entry.get('source')!r}, which "
+            f"resolves to {source}, not {PLUGIN_ROOT}"
+        )
+        return
+    if entry.get("version") != manifest.get("version"):
+        problems.wrong(
+            f"marketplace.json says version {entry.get('version')!r} and plugin.json "
+            f"says {manifest.get('version')!r}"
+        )
+        return
+    # The README has to say how to install it. A marketplace file nobody is told
+    # about is the same failure one step further along.
+    readme = (PLUGIN_ROOT / "README.md").read_text("utf-8")
+    for needed in ("/plugin marketplace add", "/plugin install"):
+        if needed not in readme:
+            problems.wrong(f"13_plugins/claude-code/README.md never shows `{needed}`, so "
+                           "a reader is not told how to install the plugin")
+            return
+    problems.ok(
+        f"marketplace.json lists {entry['name']} v{entry['version']} at "
+        f"{entry['source']}, and the README shows both install commands"
+    )
+
+
+def check_token_names(problems: Problems) -> None:
+    """Every `var(--as-...)` the plugin prints must be a property tokens.css defines.
+
+    Round 1 of the convergence review found `var(--as-accent-default)` in rule 1 of
+    SKILL.md's seven rules and again in references/colour.md. It is not a property:
+    07_tokens/emit_css.py drops a trailing `default` segment, so the property is
+    `--as-accent`. In Chromium the undefined name resolved to the empty string and
+    the text fell back to inherited black, which looks plausible and is wrong. The
+    DTCG role name does keep `.default`, which is how the two forms got confused.
+    Nothing measured the instructions against the stylesheet, so this does.
+    """
+    stylesheet = SKILLS / "aninda-brand" / "assets" / "css" / "tokens.css"
+    if not stylesheet.exists():
+        problems.wrong(f"{stylesheet} is missing, so no token name can be checked")
+        return
+    defined = set(re.findall(r"(--as-[a-z0-9-]+)\s*:", stylesheet.read_text("utf-8")))
+    if not defined:
+        problems.wrong(f"{stylesheet} defines no custom properties")
+        return
+    used = 0
+    undefined: list[str] = []
+    for path in sorted(SKILLS.rglob("*.md")):
+        text = path.read_text("utf-8")
+        for match in re.finditer(r"var\(\s*(--as-[a-z0-9-]+)", text):
+            used += 1
+            if match.group(1) not in defined:
+                line = text.count("\n", 0, match.start()) + 1
+                undefined.append(f"{path.relative_to(PLUGIN_ROOT)}:{line} names {match.group(1)}")
+    for item in undefined:
+        problems.wrong(f"a token that does not exist: {item}")
+    if not undefined:
+        problems.ok(
+            f"{used} var(--as-...) references across the skills all name one of the "
+            f"{len(defined)} properties tokens.css defines"
+        )
+
+
 def check_bundles(problems: Problems) -> None:
     import zipfile
 
@@ -237,6 +384,9 @@ def main() -> int:
     check_commands(problems)
     check_skills(problems)
     check_bangla_agreement(problems)
+    check_marketplace(problems)
+    check_bundled_copies(problems)
+    check_token_names(problems)
     check_bundles(problems)
 
     lines = ["", f"PASSED ({len(problems.passed)})", "-" * 72]

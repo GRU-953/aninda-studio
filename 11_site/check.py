@@ -56,26 +56,52 @@ MEASURE_JS = r"""
     if (!m) return null;
     return [ +m[0], +m[1], +m[2], m.length > 3 ? +m[3] : 1 ];
   };
-  // Walk ancestors, blending every partly transparent layer, until opaque.
+  // Source-over: `top` composited onto `under`, which is opaque by the time it
+  // gets here.
+  const over = (top, under) => {
+    const a = top[3];
+    return [
+      top[0] * a + under[0] * (1 - a),
+      top[1] * a + under[1] * (1 - a),
+      top[2] * a + under[2] * (1 - a),
+      1,
+    ];
+  };
+  // Walk ancestors collecting every painting layer, then composite from the
+  // bottom up. This is the form 08_components/check.py has always used, and this
+  // harness is the same job done the same way.
+  //
+  // The earlier version accumulated in place with
+  //   acc = acc === null ? c.slice() : acc;  if (acc !== c) { blend acc with c }
+  // and c.slice() makes a COPY, so on the first painting layer `acc !== c` was
+  // true and the layer was blended with itself: the colour came out unchanged but
+  // the alpha became a + a(1-a), which is 0.75 for a 0.5 layer, and every later
+  // blend used that inflated weight. Verified against a black 50% panel over a
+  // white body: this function returned rgb(63.75) where the correct composite is
+  // rgb(127.5), and reported 2.018:1 for black text that truly measures 5.3:1.
+  // It was latent only because nothing in styles.css paints a partly transparent
+  // background yet. The docstring calls this walk the one that catches real bugs.
   const effectiveBg = el => {
-    let acc = null;
-    for (let n = el; n; n = n.parentElement) {
-      const c = parse(getComputedStyle(n).backgroundColor);
-      if (!c || c[3] === 0) continue;
-      acc = acc === null ? c.slice() : acc;
-      if (acc[3] >= 1) break;
-      if (acc !== c) {
-        const a = acc[3];
-        for (let i = 0; i < 3; i++) acc[i] = acc[i] * a + c[i] * (1 - a);
-        acc[3] = a + c[3] * (1 - a);
-      }
-      if (acc[3] >= 0.999) break;
+    const layers = [];
+    let opacity = 1;
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+      const cs = getComputedStyle(n);
+      const own = parseFloat(cs.opacity);
+      if (!isNaN(own)) opacity *= own;
+      const c = parse(cs.backgroundColor);
+      if (!c) continue;
+      const layer = [c[0], c[1], c[2], c[3] * opacity];
+      if (layer[3] > 0) layers.push(layer);
+      if (layer[3] >= 0.999) break;
     }
-    if (!acc) {
-      const b = parse(getComputedStyle(document.body).backgroundColor);
-      acc = b && b[3] > 0 ? b : [255, 255, 255, 1];
+    if (!layers.length || layers[layers.length - 1][3] < 0.999) {
+      // No opaque layer anywhere up the tree. The canvas is what shows through,
+      // and a browser paints that white unless told otherwise.
+      layers.push([255, 255, 255, 1]);
     }
-    return acc;
+    let result = layers[layers.length - 1];
+    for (let i = layers.length - 2; i >= 0; i--) result = over(layers[i], result);
+    return result;
   };
   const lum = ([r, g, b]) => {
     const f = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };

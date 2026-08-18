@@ -61,9 +61,10 @@ short list for the job in front of you.
 
 These seven cover most of what goes wrong. Everything else is in the references.
 
-1. **Never write a raw value.** Use a token. `var(--as-accent-default)`, never
+1. **Never write a raw value.** Use a token. `var(--as-accent)`, never
    `#126974`. `var(--as-space-4)`, never `24px`. A raw value cannot follow a
-   theme, and there are four themes.
+   theme, and there are four themes. The CSS name drops a trailing `default`, so
+   the role `color.accent.default` is the property `--as-accent`.
 2. **Four themes, always.** Light, dark, high-contrast light, high-contrast
    dark. Plus `forced-colors`, where every brand colour must yield to the
    operating system's own palette. A colour that survives forced-colors mode

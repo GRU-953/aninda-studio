@@ -323,6 +323,75 @@ window.__as = (function () {
     else document.documentElement.removeAttribute('data-theme');
   }
 
+  // Every id an ARIA attribute names must be in the document, and no id may be
+  // used twice. The tabs card shipped ten aria-controls attributes naming panels
+  // that were never emitted: a screen reader was told about content that did not
+  // exist. Nothing in this harness resolved an id reference before, so nothing
+  // could see it.
+  var ID_REF_SINGLE = ['aria-activedescendant', 'aria-errormessage'];
+  var ID_REF_LIST = ['aria-controls', 'aria-labelledby', 'aria-describedby',
+                     'aria-details', 'aria-owns', 'aria-flowto'];
+
+  function measureReferences() {
+    var dangling = [];
+    var duplicates = [];
+    var counted = 0;
+    var seen = {};
+    var withId = document.querySelectorAll('[id]');
+    for (var i = 0; i < withId.length; i++) {
+      var id = withId[i].id;
+      if (seen[id]) { duplicates.push({ id: id, path: path(withId[i]) }); }
+      seen[id] = true;
+    }
+    var attrs = ID_REF_LIST.concat(ID_REF_SINGLE);
+    for (var a = 0; a < attrs.length; a++) {
+      var holders = document.querySelectorAll('[' + attrs[a] + ']');
+      for (var h = 0; h < holders.length; h++) {
+        var raw = (holders[h].getAttribute(attrs[a]) || '').trim();
+        if (!raw) continue;
+        var ids = ID_REF_SINGLE.indexOf(attrs[a]) >= 0 ? [raw] : raw.split(/\s+/);
+        for (var n = 0; n < ids.length; n++) {
+          if (!ids[n]) continue;
+          counted++;
+          if (!document.getElementById(ids[n])) {
+            dangling.push({ attr: attrs[a], id: ids[n], path: path(holders[h]) });
+          }
+        }
+      }
+    }
+    // A `for` on a label has to resolve too, for the same reason.
+    var labels = document.querySelectorAll('label[for]');
+    for (var m = 0; m < labels.length; m++) {
+      counted++;
+      var target = labels[m].getAttribute('for');
+      if (!document.getElementById(target)) {
+        dangling.push({ attr: 'for', id: target, path: path(labels[m]) });
+      }
+    }
+    return { counted: counted, dangling: dangling, duplicates: duplicates };
+  }
+
+  // Which tabs a tablist holds, and which one Tab can currently land on. The
+  // Python side then drives the real arrow keys, because whether a keydown
+  // handler exists cannot be read out of the DOM.
+  function tablists() {
+    var out = [];
+    var lists = document.querySelectorAll('[role="tablist"]');
+    for (var i = 0; i < lists.length; i++) {
+      var tabs = lists[i].querySelectorAll('[role="tab"]');
+      var ids = [];
+      var entry = 0;
+      for (var j = 0; j < tabs.length; j++) {
+        if (!tabs[j].id) { return [{ error: 'a tab with no id at ' + path(tabs[j]) }]; }
+        if (!visible(tabs[j])) continue;
+        ids.push(tabs[j].id);
+        if (tabs[j].getAttribute('tabindex') !== '-1') { entry = ids.length - 1; }
+      }
+      if (ids.length) { out.push({ tabs: ids, entry: ids[entry], path: path(lists[i]) }); }
+    }
+    return out;
+  }
+
   function freeze(on) {
     var id = '__as_freeze';
     var existing = document.getElementById(id);
@@ -339,6 +408,8 @@ window.__as = (function () {
     measureText: measureText,
     measureOverflow: measureOverflow,
     measureTargets: measureTargets,
+    measureReferences: measureReferences,
+    tablists: tablists,
     styleOf: styleOf,
     hitTest: hitTest,
     probeForcedColours: probeForcedColours,
@@ -364,8 +435,10 @@ CANNOT_CHECK = [
     "compositor does with a group and is exact only when the group paints one layer.",
     "Screen readers. Roles, names and the order things are announced in are "
     "asserted in the markup and were not measured by any assistive technology.",
-    "Keyboard order beyond the fact that focus can land. Tab order, focus "
-    "trapping in a dialog and Escape handling are not exercised.",
+    "Keyboard order. Tab order, focus trapping in a dialog and Escape handling "
+    "are not exercised. The one keyboard behaviour that is driven for real is the "
+    "arrow-key walk through a tablist, because a roving tabindex makes it the "
+    "only way to reach most of the tabs.",
     "Any browser other than the pinned Chromium, and any platform other than "
     "macOS. Safari, Firefox and Windows high contrast were not run.",
     "Real reading. Nobody in either script was asked whether these cards are "
@@ -530,6 +603,8 @@ def run(argv: list[str]) -> int:
         elements_interacted = 0
         rings_measured = 0
         forced_pages = 0
+        references_seen = 0
+        tabs_reached = 0
 
         for width in widths:
             context = browser.new_context(
@@ -570,6 +645,21 @@ def run(argv: list[str]) -> int:
                         "'CSS1Compat'. The comments before the doctype have dropped "
                         "the page into quirks mode."
                     )
+
+                # Id references and tab reachability do not change with the
+                # viewport or the theme, so they are measured once per card.
+                if width == widths[0]:
+                    refs = page.evaluate("() => window.__as.measureReferences()")
+                    references_seen += refs["counted"]
+                    for bad in refs["dangling"]:
+                        found.fail(
+                            f"{slug}: {bad['attr']}=\"{bad['id']}\" names an id that is not "
+                            f"in the document — {bad['path']}"
+                        )
+                    for bad in refs["duplicates"]:
+                        found.fail(f"{slug}: id \"{bad['id']}\" is used more than once — "
+                                   f"{bad['path']}")
+                    tabs_reached += check_tablists(page, slug, found)
 
                 for theme in THEMES:
                     page.evaluate("t => window.__as.setTheme(t)", theme)
@@ -703,6 +793,8 @@ def run(argv: list[str]) -> int:
         "elements_pointer_driven": elements_interacted,
         "focus_rings_measured": rings_measured,
         "forced_colours_pages": forced_pages,
+        "id_references_resolved": references_seen,
+        "tabs_reached_by_keyboard": tabs_reached,
         "seconds": round(elapsed, 1),
     }
 
@@ -712,7 +804,8 @@ def run(argv: list[str]) -> int:
     print(f"Cards {len(cards)} · widths {widths} · themes {THEMES}")
     print(f"Measured: {text_nodes_seen} text nodes, {targets_seen} targets, "
           f"{elements_interacted} pointer-driven controls, "
-          f"{rings_measured} focus rings, {forced_pages} forced-colour pages.")
+          f"{rings_measured} focus rings, {forced_pages} forced-colour pages, "
+          f"{references_seen} id references, {tabs_reached} tabs reached by keyboard.")
     print(f"Took {elapsed:.0f} s.")
     print()
 
@@ -740,6 +833,40 @@ def run(argv: list[str]) -> int:
         Path(args.json).write_text(json.dumps(report, indent=2, ensure_ascii=False), "utf-8")
 
     return code
+
+
+def check_tablists(page, slug: str, found: Findings) -> int:
+    """Drive the real arrow keys through every tablist and count the tabs reached.
+
+    A roving tabindex is half of the ARIA tabs pattern: it takes every unselected
+    tab out of the tab sequence, and the arrow-key handler is what puts them back
+    within reach. This card shipped the first half without the second, so ten
+    visible, enabled buttons could not be focused by any key — SC 2.1.1, Level A.
+    Whether that handler exists cannot be read out of the DOM, so it is pressed.
+    """
+    lists = page.evaluate("() => window.__as.tablists()")
+    reached_total = 0
+    for group in lists:
+        if group.get("error"):
+            found.fail(f"{slug}: a tablist cannot be measured — {group['error']}")
+            continue
+        wanted = group["tabs"]
+        if len(wanted) < 2:
+            continue
+        page.eval_on_selector(f"#{group['entry']}", "el => el.focus()")
+        reached = {page.evaluate("() => document.activeElement.id")}
+        for _ in range(len(wanted)):
+            page.keyboard.press("ArrowRight")
+            reached.add(page.evaluate("() => document.activeElement.id"))
+        missed = [tab for tab in wanted if tab not in reached]
+        if missed:
+            found.fail(
+                f"{slug}: {len(missed)} of {len(wanted)} tabs in {group['path']} cannot be "
+                f"focused by Tab or by the arrow keys — {', '.join(missed)}. A roving "
+                "tabindex without an arrow-key handler removes them from the keyboard."
+            )
+        reached_total += len(wanted) - len(missed)
+    return reached_total
 
 
 def place(page, handle, viewport, pad: int, tries: int = 3):

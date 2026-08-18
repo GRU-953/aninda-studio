@@ -72,6 +72,18 @@ DIRECTION = "estuary"
 SCHEMA = "https://tr.designtokens.org/format/"
 NS = "studio.aninda"
 
+# The thirteen types DTCG 2025.10 defines, and the units each measured type
+# permits. Written out rather than inferred, because a typed vocabulary is the
+# only thing that lets check() tell a dimension from a number and so notice a
+# missing unit. The docstring above has claimed "thirteen types" since the file
+# was written; this is the list, so the claim is now checkable.
+DTCG_TYPES = frozenset({
+    "color", "dimension", "fontFamily", "fontWeight", "duration", "cubicBezier",
+    "number", "strokeStyle", "border", "transition", "shadow", "gradient",
+    "typography",
+})
+DTCG_UNITS = {"dimension": frozenset({"px", "rem"}), "duration": frozenset({"ms", "s"})}
+
 THEMES = ("light", "dark", "hc-light", "hc-dark")
 
 # --- Specified constants. A person chose these. Everything else is measured. ---
@@ -480,20 +492,27 @@ def check(files: dict[str, dict], proof: dict) -> list[str]:
     problems: list[str] = []
     prim = files["primitive.tokens.json"]
 
-    def walk(node, path=""):
+    def walk(node, path="", inherited=None):
+        """Yield (path, token, resolved $type) for every token in the document.
+
+        The third element carries the type down from the nearest ancestor group,
+        which is how DTCG inheritance works. It exists because the type gates
+        below cannot ask "is this a dimension?" without it.
+        """
         if isinstance(node, dict):
+            declared = node.get("$type", inherited)
             if "$value" in node:
-                yield path, node
+                yield path, node, declared
             for k, v in node.items():
                 if not k.startswith("$"):
-                    yield from walk(v, f"{path}.{k}" if path else k)
+                    yield from walk(v, f"{path}.{k}" if path else k, declared)
 
     for name, doc in files.items():
         if name == "forced-colors.map.json":
             continue
         if doc.get("$schema") != SCHEMA:
             problems.append(f"{name}: wrong or missing $schema")
-        for path, tok in walk(doc):
+        for path, tok, type_ in walk(doc):
             v = tok["$value"]
             if isinstance(v, dict) and "colorSpace" in v:
                 h = v["hex"].lstrip("#")
@@ -502,8 +521,40 @@ def check(files: dict[str, dict], proof: dict) -> list[str]:
                 if want != got:
                     problems.append(f"{name}:{path}: components {got} do not re-derive "
                                     f"the hex bytes {want}")
-            if isinstance(v, dict) and "unit" in v and not v["unit"]:
-                problems.append(f"{name}:{path}: dimension or duration without a unit")
+
+            # Every token must resolve a $type, from itself or from an ancestor
+            # group, and it must be one of the thirteen the format defines.
+            # Nothing checked this before, so a typo in a group's $type or a
+            # token added outside any typed group would have shipped.
+            if type_ is None:
+                problems.append(f"{name}:{path}: no $type on the token or any ancestor group")
+            elif type_ not in DTCG_TYPES:
+                problems.append(f"{name}:{path}: $type {type_!r} is not one of the "
+                                f"{len(DTCG_TYPES)} types DTCG 2025.10 defines")
+
+            # A dimension or a duration is an object carrying BOTH a value and a
+            # unit, and the unit is mandatory even at zero. The earlier form of
+            # this gate read `if "unit" in v and not v["unit"]`, which could only
+            # fire when a unit key was present and empty — that is, never for the
+            # failure the specification actually forbids. Round 1 of the
+            # convergence review proved it by making dim() drop the unit key:
+            # --check reported 0 problems and `--as-space-3: {'value': 16};`
+            # reached the shipped stylesheet as a Python dict repr.
+            if type_ in ("dimension", "duration"):
+                if not isinstance(v, dict):
+                    problems.append(f"{name}:{path}: a {type_} $value must be an object "
+                                    f"carrying value and unit, not {type(v).__name__}")
+                else:
+                    missing = [key for key in ("value", "unit") if key not in v]
+                    if missing:
+                        problems.append(f"{name}:{path}: {type_} has no "
+                                        f"{' and no '.join(missing)} — the unit is required "
+                                        f"even when the value is zero")
+                    elif not v["unit"]:
+                        problems.append(f"{name}:{path}: {type_} carries an empty unit")
+                    elif v["unit"] not in DTCG_UNITS[type_]:
+                        problems.append(f"{name}:{path}: {type_} unit {v['unit']!r} is not one of "
+                                        f"{sorted(DTCG_UNITS[type_])}")
             if isinstance(v, str) and v.startswith("{"):
                 target = v.strip("{}").split(".")
                 node = prim
@@ -515,7 +566,7 @@ def check(files: dict[str, dict], proof: dict) -> list[str]:
 
     # Theme parity: identical token paths in every theme file, or a consumer that
     # switches theme loses tokens without being told.
-    sets = {th: {p for p, _ in walk(files[f"semantic.{th}.tokens.json"])} for th in THEMES}
+    sets = {th: {p for p, _, _ in walk(files[f"semantic.{th}.tokens.json"])} for th in THEMES}
     base = sets["light"]
     for th, s in sets.items():
         if s != base:
@@ -530,7 +581,7 @@ def check(files: dict[str, dict], proof: dict) -> list[str]:
     # Every claimed ratio must still hold against the proof it came from.
     for th in THEMES:
         doc = files[f"semantic.{th}.tokens.json"]
-        for path, tok in walk(doc):
+        for path, tok, _ in walk(doc):
             pr = tok.get("$extensions", {}).get(NS, {}).get("proof")
             if not pr:
                 continue

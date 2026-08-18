@@ -405,11 +405,13 @@ def make_mark(args, primitives, semantic) -> dict:
         "contrast": f"{measurement['measured']}:1 against a target of {measurement['target']}:1",
         "judged by": measurement["judged_by"],
         "stroke": "9 of 100 units" if args.weight == "regular" else "15 of 100 units",
+        # The NOTE that used to sit here said the marks card in 08_components stated
+        # one stroke width instead, and that the owner had to settle the two. It is
+        # settled: the manifest wins, and 08_components/build.py now reads the rule
+        # out of the manifest rather than carrying its own copy.
         "clear space": (
             f"{clear:g} px on all four sides — half the mark's own height, from "
-            "assets/marks/manifest.json. NOTE: the marks card in 08_components says one stroke "
-            "width instead. The two statements in the system disagree and the owner needs to "
-            "settle it; this script follows the manifest."
+            "assets/marks/manifest.json"
         ),
     }
 

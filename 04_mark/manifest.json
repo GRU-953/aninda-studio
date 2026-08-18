@@ -31,7 +31,7 @@
       "tile-web.svg"
     ],
     "app_store_only": "icon-appstore-square-1024.svg",
-    "trade_off": "Apple's current guidance asks for square, unmasked artwork: the system applies the mask and derives Liquid Glass specular highlights from the layer edges, so a pre-rounded edge sits inside the mask and the highlight follows the wrong geometry. Apple's own wording is that pre-masked artwork 'negatively impacts specular highlight effects' and makes edges 'look jagged'. Measured here: in a static render the difference is small, and on watchOS and visionOS it is nil because the circular mask cuts well inside the rounding. The dynamic cost could not be measured outside Apple's own renderer.",
+    "trade_off": "Apple's current guidance asks for square, unmasked artwork: the system applies the mask and derives Liquid Glass specular highlights from the layer edges, so a pre-rounded edge sits inside the mask and the highlight follows the wrong geometry. Apple's own wording is that pre-masked artwork 'negatively impacts specular highlight effects' and makes edges 'look jagged'. Measured here: under the circle watchOS and visionOS mask to, the rounded icon and the square master are the same image in every pixel \u2014 see the difference recorded in 'checks' below. Judged rather than measured: in a static render under Apple's rounded-rectangle mask the difference looks slight. That one is not a measurement, because Apple publishes no corner radius, so there is no mask to composite against without substituting our own radius for theirs. The dynamic cost \u2014 the moving specular highlight \u2014 could not be measured outside Apple's own renderer and is not known.",
     "if_you_ever_submit_to_the_app_store": "Use icon-appstore-square-1024.svg, not the rounded icon. Icon Composer expects unmasked layers.",
     "verified_against": "Apple Human Interface Guidelines, checked 14 August 2026"
   },
@@ -47,20 +47,23 @@
     "icon-192.svg",
     "icon-appstore-square-1024.svg"
   ],
+  "contact_sheet": "proof.svg \u2014 generated from the same strings written to 04_mark/svg, with every caption read out of the artwork",
   "checks": [
     "uharfbuzz present, HarfBuzz 14.3.0",
     "Bangla wordmark: 16 code points \u2192 11 glyphs, advance 520.1",
     "Latin wordmark: 13 code points \u2192 13 glyphs, advance 653.2",
     "conjuncts formed: 15 code points \u2192 11 glyphs",
     "negative control passed: naive 16 glyphs \u2260 shaped 11 glyphs",
-    "icon at stroke 9: mark 65.0\u00d773.0 scaled \u00d70.9208, worst corner 45.00 of 45 units from centre \u2014 inside both the 90-unit field and the circle watchOS and visionOS mask to",
-    "icon at stroke 15: mark 71.0\u00d779.0 scaled \u00d70.8473, worst corner 45.00 of 45 units from centre \u2014 inside both the 90-unit field and the circle watchOS and visionOS mask to",
+    "icon at stroke 9: mark 65.0\u00d773.0 scaled \u00d70.9208, worst corner exactly on the 45-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 90-unit field",
+    "icon at stroke 15: mark 71.0\u00d779.0 scaled \u00d70.8473, worst corner exactly on the 45-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 90-unit field",
     "4 recolourable files carry no root colour and draw in currentColor",
     "tile-web.svg: 4.7% background showing \u2014 rounded",
     "icon-1024.svg: 4.7% background showing \u2014 rounded \u2014 the everyday icon, all platforms",
     "icon-1088-watch.svg: 4.7% background showing \u2014 rounded",
     "icon-512.svg: 4.7% background showing \u2014 rounded",
     "icon-192.svg: 4.7% background showing \u2014 rounded",
-    "icon-appstore-square-1024.svg: 0.0% background showing \u2014 square and fully opaque \u2014 App Store only"
+    "icon-appstore-square-1024.svg: 0.0% background showing \u2014 square and fully opaque \u2014 App Store only",
+    "under a circle inscribed in the frame, icon-1024.svg and icon-appstore-square-1024.svg are the same image in all 65536 pixels \u2014 the corner rounding lies entirely outside the circle watchOS and visionOS mask to, and the artwork inside it has not drifted between the two files",
+    "contact sheet: 10 artefacts nested from the same strings written to 04_mark/svg, every caption read out of the artwork"
   ]
 }

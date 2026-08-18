@@ -55,12 +55,24 @@ TOKENS_CSS = ROOT / "07_tokens" / "css" / "tokens.css"
 COMPONENTS_CSS = HERE / "src" / "components.css"
 TOKENS_BUILD = ROOT / "07_tokens" / "build"
 MARKS_DIR = ROOT / "03_directions" / "marks"
+# The mark's own rules live with the mark. This card used to state "Clear space:
+# one stroke width", typed here by hand, against the manifest's "half the mark's
+# own height on all four sides" — a factor of about four, presented on the card
+# with the same green tick the system uses for a verified fact. Reading the rule
+# from the manifest is what stops the two drifting apart again.
+MARK_MANIFEST = ROOT / "04_mark" / "manifest.json"
 
 CARDS_DIR = HERE / "cards"
 FONTS_DIR = HERE / "fonts"
 REGISTRY = HERE / "_cards.json"
 
 GENERATOR = "08_components/build.py"
+
+# The one line that separates the generated token stylesheet — the only place in a
+# card a literal colour is allowed — from everything the markup guard inspects.
+# It is a constant rather than two copies of a string, because the copies drifting
+# apart silently disabled the guard.
+TOKENS_CSS_END = "/* <<< end 07_tokens/css/tokens.css */"
 
 THEMES = [
     ("light", "Light", "আলো"),
@@ -206,25 +218,67 @@ def guard_stylesheet(text: str, name: str) -> None:
         )
 
 
-# re.IGNORECASE as a flag, not an inline (?i): Python requires a global flag to
-# sit at position 0 of the pattern, and this one is built from several fragments.
-# Case matters here because RGB(255 0 0) and OKLCH(...) are valid CSS, and while
-# this guard was case-sensitive every uppercase form passed it while the build
-# reported a clean run.
-_MARKUP_COLOUR = re.compile(
-    r"(?:fill|stroke|stop-color|flood-color|lighting-color|color|background|"
-    r"background-color|border-color|outline-color)\s*[:=]\s*[\"']?\s*"
-    r"(#[0-9a-f]{3,8}|rgba?\(|hsla?\(|hwb\(|oklch\(|oklab\(|lab\(|lch\()",
+# The markup guard cannot look for a bare colour literal anywhere in the page,
+# because the colour card legitimately PRINTS every hex as running text — that is
+# the whole card. So it looks in the two places where a literal can actually paint
+# something: inside a style attribute, and in an SVG paint attribute.
+#
+# The earlier version matched a nine-item property whitelist instead
+# (fill|stroke|stop-color|flood-color|lighting-color|color|background|
+# background-color|border-color|outline-color). Round 1 of the convergence review
+# walked straight past it with style="box-shadow: 0 0 0 2px #ff0000" and the build
+# reported a clean run. Every declaration inside a style attribute is now checked,
+# whatever its property, so text-shadow, caret-color, accent-color,
+# text-decoration-color and a gradient in background-image are all covered.
+_STYLE_ATTR = re.compile(r"""\sstyle\s*=\s*(?:"([^"]*)"|'([^']*)')""", re.IGNORECASE)
+# The SVG presentation attributes that carry paint. This IS a closed set: SVG 2
+# defines no others, and a value here is a colour by definition rather than by
+# property name.
+_SVG_PAINT_ATTR = re.compile(
+    r"""\s(fill|stroke|stop-color|flood-color|lighting-color|color|solid-color)"""
+    r"""\s*=\s*(?:"([^"]*)"|'([^']*)')""",
     re.IGNORECASE,
 )
 
 
-def guard_markup(markup: str, name: str) -> None:
-    hit = _MARKUP_COLOUR.search(markup)
+def colour_literal_in(value: str) -> str | None:
+    """The literal colour in a CSS value, or None. Names what it found, so the
+    build error says which form slipped through."""
+    hit = _HEX.search(value)
     if hit:
-        start = max(0, hit.start() - 60)
+        return hit.group(0)
+    hit = _FUNC.search(value)
+    if hit:
+        return hit.group(0)
+    for word in re.findall(r"[A-Za-z][A-Za-z0-9-]*", value):
+        low = word.lower()
+        if low in NAMED_COLOURS and low not in ALLOWED_COLOUR_KEYWORDS:
+            return word
+    return None
+
+
+def guard_markup(markup: str, name: str) -> None:
+    """Refuse to build if generated markup paints with a literal instead of a token."""
+    problems: list[str] = []
+    for match in _STYLE_ATTR.finditer(markup):
+        declarations = match.group(1) or match.group(2) or ""
+        for part in declarations.split(";"):
+            if ":" not in part:
+                continue
+            prop, _, value = part.partition(":")
+            found = colour_literal_in(value)
+            if found:
+                problems.append(f"style attribute {prop.strip()}: {value.strip()} "
+                                f"(literal {found})")
+    for match in _SVG_PAINT_ATTR.finditer(markup):
+        value = match.group(2) or match.group(3) or ""
+        found = colour_literal_in(value)
+        if found:
+            problems.append(f'{match.group(1)}="{value}" (literal {found})')
+    if problems:
         raise BuildError(
-            f"{name}: literal colour in generated markup — …{markup[start:hit.end() + 20]}…"
+            f"{name}: literal colour in generated markup, {len(problems)} of them:\n  "
+            + "\n  ".join(problems)
         )
 
 
@@ -319,11 +373,18 @@ def build_font(key: str, chars: str) -> bytes:
     return buf.getvalue()
 
 
-def rename_family(font, family: str, style: str = "Regular") -> None:
-    """Rewrite the primary name records. Copyright, trademark and licence stay."""
+def rename_family(font, family: str, style: str = "Regular",
+                  what: str = "subset of a SIL OFL 1.1 font") -> None:
+    """Rewrite the primary name records. Copyright, trademark and licence stay.
+
+    `what` describes the modification, and it is a parameter because the desktop
+    face is renamed whole rather than subset. Name ID 3 said "subset of" on a font
+    that is not one, which is a small untrue statement inside a licence-relevant
+    record.
+    """
     full = family if style == "Regular" else f"{family} {style}"
     postscript = family.replace(" ", "") + "-" + style.replace(" ", "")
-    unique = f"{full}; subset of a SIL OFL 1.1 font, generated by {GENERATOR}"
+    unique = f"{full}; {what}, generated by {GENERATOR}"
     new = {1: family, 2: style, 3: unique, 4: full, 6: postscript, 16: family, 17: style}
     name = font["name"]
     for record in list(name.names):
@@ -344,6 +405,53 @@ def set_description(font, text: str) -> None:
             name.setName(text, 10, record.platformID, record.platEncID, record.langID)
     if name.getDebugName(10) is None:
         name.setName(text, 10, 3, 1, 0x409)
+
+
+DESKTOP_FONT_OUT = "AnindaMono-Regular.ttf"
+DESKTOP_FONT_DESCRIPTION = (
+    "IBM Plex Mono Regular, renamed 'Aninda Mono' by " + GENERATOR + " because "
+    "'Plex' is a Reserved Font Name under SIL OFL 1.1 clause 3. Unsubset, so it is "
+    "usable as an installed desktop font. Do not hand-edit; the next build "
+    "overwrites it. Licence: anindamono-OFL.txt beside this file."
+)
+
+
+def desktop_font() -> bytes:
+    """The renamed monospace face as an installable .ttf, whole rather than subset.
+
+    13_plugins/figma requires "Aninda Mono" as a font the operating system has
+    installed, and 13_plugins/figma/src/plan.ts stops the build if it is absent.
+    Until 18 August 2026 the only file this project produced under that name was a
+    woff2, which is a web format and does not install as a system font — so step 1
+    of the Figma instructions ended in a refusal with no documented way forward, on
+    the one required input that only this project can supply.
+
+    It is deliberately NOT subset. The card library subsets because it knows every
+    character it will ever draw; a designer typing into Figma does not, and a
+    subset desktop font drops to a fallback the moment they type a character it
+    does not carry.
+    """
+    from fontTools.ttLib import TTFont
+
+    spec = FONT_SOURCES["mono"]
+    if not spec["path"].exists():
+        raise BuildError(f"Font not found: {spec['path']}")
+    font = TTFont(str(spec["path"]), recalcTimestamp=False)
+    font.recalcTimestamp = False
+    rename_family(font, spec["rename"], what="renamed, unsubset SIL OFL 1.1 font")
+    set_description(font, DESKTOP_FONT_DESCRIPTION)
+
+    # OFL clause 3, asserted rather than trusted — the same gate build_font applies.
+    for nid in (1, 3, 4, 6, 16, 17):
+        record = font["name"].getDebugName(nid)
+        if record and "plex" in record.lower():
+            raise BuildError(
+                f"desktop font: name record {nid} still says '{record}'. The Reserved "
+                "Font Name survived the rename, which would breach OFL 1.1 clause 3."
+            )
+    buf = io.BytesIO()
+    font.save(buf, reorderTables=False)
+    return buf.getvalue()
 
 
 def font_face_css(faces: dict[str, bytes]) -> str:
@@ -488,7 +596,8 @@ def load_tokens() -> dict:
     semantic = {}
     for key, _, _ in THEMES:
         semantic[key] = json.loads((TOKENS_BUILD / f"semantic.{key}.tokens.json").read_text("utf-8"))
-    return {"primitive": primitive, "semantic": semantic}
+    mark = json.loads(MARK_MANIFEST.read_text("utf-8"))
+    return {"primitive": primitive, "semantic": semantic, "mark": mark}
 
 
 ROLE_ORDER = [
@@ -849,18 +958,58 @@ def d_table(p, th, T):
 </div>"""
 
 
+# Each tab and the panel it controls, so the two cannot be emitted out of step.
+# The card used to declare three tabs and emit ONE panel, which left ten
+# aria-controls attributes across the five theme stages naming ids that were not
+# in the document, and gave the two unselected tabs tabindex="-1" with no
+# arrow-key handler to reach them — ten visible, enabled buttons that no key
+# could focus, a WCAG 2.2 SC 2.1.1 failure. Round 1 of the convergence review
+# found it by exhausting Tab, ArrowRight, ArrowDown and End in Chromium.
+TAB_PANELS = [
+    ("Foundations",
+     "Six cards. Colour, typography, space and shape, motion, the marks, and accessibility.",
+     "The selected tab is bold, underlined and marked with aria-selected. Three signals, "
+     "and only one of them is a colour."),
+    ("Components",
+     "Sixteen cards. Buttons, fields, alerts, badges, tables, tabs and the rest of the set.",
+     "Arrow keys move between the tabs and Home and End jump to the ends, which is what "
+     "the roving tabindex on this pattern requires."),
+    ("Patterns",
+     "Eight cards. Whole layouts assembled from the components, each one measured.",
+     "Every panel is in the document. A tab that points at a panel which is not there "
+     "tells a screen reader about content it can never reach."),
+]
+
+
 def d_tabs(p, th, T):
+    tabs = []
+    panels = []
+    for index, (label, body, hint) in enumerate(TAB_PANELS, start=1):
+        selected = index == 1
+        # Roving tabindex: exactly one tab is in the tab sequence, and the arrow
+        # keys in SWITCHER_JS move both the focus and the selection.
+        roving = "" if selected else ' tabindex="-1"'
+        tabs.append(
+            f'<button type="button" class="as-tab" role="tab" id="{p}-t{index}" '
+            f'aria-selected="{str(selected).lower()}" aria-controls="{p}-p{index}"{roving}>'
+            f"{e(label)}</button>"
+        )
+        # The panels carry no tabindex. The ARIA Authoring Practices offer
+        # tabindex="0" on a panel with no focusable content, but that would add a
+        # tab stop to every card that check.py would then hold to the focus-ring
+        # floor, and a paragraph is not a control. Reachability of the tabs is
+        # the accessibility failure; a focusable paragraph is not.
+        panels.append(
+            f'<div class="as-tabpanel" role="tabpanel" id="{p}-p{index}" '
+            f'aria-labelledby="{p}-t{index}"{"" if selected else " hidden"}>'
+            f"<p>{e(body)}</p><p class=\"as-hint\">{e(hint)}</p></div>"
+        )
     return f"""
 <div class="as-stack">
   <div class="as-tabs" role="tablist" aria-label="Card groups">
-    <button type="button" class="as-tab" role="tab" id="{p}-t1" aria-selected="true" aria-controls="{p}-p1">Foundations</button>
-    <button type="button" class="as-tab" role="tab" id="{p}-t2" aria-selected="false" aria-controls="{p}-p2" tabindex="-1">Components</button>
-    <button type="button" class="as-tab" role="tab" id="{p}-t3" aria-selected="false" aria-controls="{p}-p3" tabindex="-1">Patterns</button>
+    {"".join(tabs)}
   </div>
-  <div class="as-tabpanel" role="tabpanel" id="{p}-p1" aria-labelledby="{p}-t1">
-    <p>Six cards. Colour, typography, space and shape, motion, the marks, and accessibility.</p>
-    <p class="as-hint">The selected tab is bold, underlined and marked with aria-selected. Three signals, and only one of them is a colour.</p>
-  </div>
+  {"".join(panels)}
 </div>"""
 
 
@@ -1186,8 +1335,15 @@ def d_marks(p, th, T):
     <span class="as-badge as-badge--danger">{icon('cross')}<span>Never recolour it</span></span>
     <span class="as-badge as-badge--danger">{icon('cross')}<span>Never add a shadow</span></span>
     <span class="as-badge as-badge--danger">{icon('cross')}<span>Never stretch it</span></span>
-    <span class="as-badge as-badge--success">{icon('check')}<span>Clear space: one stroke width</span></span>
+    <span class="as-badge as-badge--success">{icon('check')}<span>Clear space, always</span></span>
   </div>
+  <!-- The rule is a hint rather than the badge's own label because .as-badge is
+       white-space: nowrap, and a sentence long enough to state the rule without
+       ambiguity overflows a 360 px viewport. It used to read "Clear space: one
+       stroke width", which fitted and was about four times too small. -->
+  <p class="as-hint">Clear space is {e(T['mark']['clear_space'])} — read from
+  04_mark/manifest.json when this card is built, so it cannot drift from the rule the
+  mark builder and asset.py both follow.</p>
   <p class="as-lead">{bn(BN['wm-1'], large=True)}</p>
 </div>"""
 
@@ -1637,7 +1793,17 @@ CARDS = [
     dict(slug="tabs", group="Components", name="Tabs", name_bn="",
          subtitle="The selected tab is bold, underlined and marked with aria-selected. Three signals, one of which is a colour.",
          subtitle_bn="", demo=d_tabs, height=1200,
-         usage=("markup", '<div class="as-tabs" role="tablist">\n  <button class="as-tab" role="tab" aria-selected="true">Foundations</button>\n</div>')),
+         usage=("markup", '<div class="as-tabs" role="tablist" aria-label="Card groups">\n'
+                          '  <button class="as-tab" role="tab" id="t1" aria-selected="true"\n'
+                          '          aria-controls="p1">Foundations</button>\n'
+                          '  <button class="as-tab" role="tab" id="t2" aria-selected="false"\n'
+                          '          aria-controls="p2" tabindex="-1">Components</button>\n'
+                          '</div>\n'
+                          '<div class="as-tabpanel" role="tabpanel" id="p1" aria-labelledby="t1">…</div>\n'
+                          '<div class="as-tabpanel" role="tabpanel" id="p2" aria-labelledby="t2" hidden>…</div>\n'
+                          '<!-- Every panel has to be in the document, and the arrow keys have to\n'
+                          '     move the selection. tabindex="-1" without them takes the tab off\n'
+                          '     the keyboard entirely. -->')),
     dict(slug="nav", group="Components", name="Nav", name_bn="",
          subtitle="Vertical and horizontal. The current item carries a bar, a heavier weight and aria-current.",
          subtitle_bn="", demo=d_nav, wide=True, height=1200,
@@ -1749,6 +1915,52 @@ SWITCHER_JS = """
     if (anchor) { event.preventDefault(); }
   });
   document.addEventListener('submit', function (event) { event.preventDefault(); });
+
+  // The other half of the ARIA tabs pattern. A roving tabindex takes every
+  // unselected tab out of the tab sequence, so without this the tabs card shipped
+  // ten visible buttons no key could reach. Click, arrow keys, Home and End all
+  // move the selection, and the panels are shown and hidden to match.
+  var lists = document.querySelectorAll('[role="tablist"]');
+  for (var l = 0; l < lists.length; l++) {
+    (function (list) {
+      var tabs = [].slice.call(list.querySelectorAll('[role="tab"]'));
+      if (tabs.length < 2) { return; }
+      function select(index, moveFocus) {
+        for (var i = 0; i < tabs.length; i++) {
+          var on = i === index;
+          tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+          if (on) { tabs[i].removeAttribute('tabindex'); }
+          else { tabs[i].setAttribute('tabindex', '-1'); }
+          var panel = document.getElementById(tabs[i].getAttribute('aria-controls'));
+          if (panel) {
+            if (on) { panel.removeAttribute('hidden'); }
+            else { panel.setAttribute('hidden', ''); }
+          }
+        }
+        if (moveFocus) { tabs[index].focus(); }
+      }
+      for (var i = 0; i < tabs.length; i++) {
+        (function (index) {
+          tabs[index].addEventListener('click', function () { select(index, true); });
+        })(i);
+      }
+      list.addEventListener('keydown', function (event) {
+        var current = tabs.indexOf(document.activeElement);
+        if (current < 0) { return; }
+        var next = -1;
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          next = (current + 1) % tabs.length;
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+          next = (current - 1 + tabs.length) % tabs.length;
+        } else if (event.key === 'Home') {
+          next = 0;
+        } else if (event.key === 'End') {
+          next = tabs.length - 1;
+        }
+        if (next >= 0) { event.preventDefault(); select(next, true); }
+      });
+    })(lists[l]);
+  }
 })();
 """.strip()
 
@@ -1812,7 +2024,7 @@ def build_page(card: dict, tokens_css: str, components_css: str, faces_css: str,
         f"/* GENERATED FILE. Written by {GENERATOR}. Do not hand-edit — the next build overwrites it. */",
         "/* >>> begin 07_tokens/css/tokens.css (generated; the only place a literal colour is allowed) */",
         tokens_css.strip(),
-        "/* <<< end 07_tokens/css/tokens.css */",
+        TOKENS_CSS_END,
         "/* >>> begin 08_components/src/components.css */",
         components_css.strip(),
         "/* <<< end 08_components/src/components.css */",
@@ -1917,7 +2129,19 @@ def build() -> dict[str, bytes]:
         if lines[0] != expected:
             raise BuildError(f"{rel}: line 1 is {lines[0]!r}, not {expected!r}.")
 
-        head, _, rest = text.partition("/* <<< end 07_tokens/css/tokens.css */")
+        # partition returns ('whole', '', '') when the separator is absent, so a
+        # cosmetic edit to this comment used to turn the markup guard into a
+        # complete no-op with no error at all: `rest` became the empty string and
+        # guard_markup inspected nothing. Round 1 of the convergence review proved
+        # it by renaming the marker and shipping style="fill: #ff0000" past a
+        # clean --check. The separator is now asserted before it is trusted.
+        head, marker, rest = text.partition(TOKENS_CSS_END)
+        if marker != TOKENS_CSS_END:
+            raise BuildError(
+                f"{rel}: the marker {TOKENS_CSS_END!r} is not in the page, so the markup "
+                "guard would have nothing to inspect. It is emitted by build_page; if it "
+                "was renamed there, rename it here too."
+            )
         guard_markup(rest, rel)
         out[rel] = text.encode("utf-8")
 
@@ -1925,6 +2149,7 @@ def build() -> dict[str, bytes]:
         spec = FONT_SOURCES[key]
         out[f"fonts/{spec['out']}"] = fonts[key]
         out[f"fonts/{spec['ofl_out']}"] = spec["ofl"].read_bytes()
+    out[f"fonts/{DESKTOP_FONT_OUT}"] = desktop_font()
 
     out["_cards.json"] = registry_bytes(fonts)
     return out
