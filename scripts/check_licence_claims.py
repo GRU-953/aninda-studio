@@ -58,6 +58,10 @@ TEXT_SUFFIXES = {".py", ".md", ".txt", ".html", ".json", ".css", ".ts", ".js",
 
 # The exact string, read from the licence rather than typed here, so this checker
 # cannot itself drift from the thing it is checking.
+# The repository has around 260 text files. A run that sees a small fraction of
+# that has been filtered by accident, not by design.
+MIN_FILES = 120
+
 OFL = ROOT / "06_type" / "candidates" / "mono" / "ibmplexmono" / "OFL.txt"
 
 
@@ -143,7 +147,14 @@ def main() -> int:
     for path in ROOT.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
             continue
-        if any(p in SKIP_DIRS for p in path.parts):
+        # RELATIVE to the repository, not absolute. SKIP_DIRS holds repo-relative
+        # directory names — `browsers` is 00_sandbox/browsers, and candidates,
+        # specimens and _data exist only under 06_type. Matching them against the
+        # absolute path meant any checkout whose own path contained one of those
+        # words skipped EVERY file: in .claude/worktrees/<id>, which is exactly the
+        # layout used to review this project, the sweep scanned 0 files and printed
+        # an affirmative pass on all three licence claims.
+        if any(part in SKIP_DIRS for part in path.relative_to(ROOT).parts):
             continue
         if path.name == Path(__file__).name:
             continue          # this file must be able to name the wrong string
@@ -167,6 +178,17 @@ def main() -> int:
                 if named and named.casefold() != correct.casefold():
                     offenders.append((str(path.relative_to(ROOT)), n, m.group(0).strip()))
 
+    # A sweep that scanned nothing is not a sweep that found nothing. This is the
+    # same silent-green-pass shape as the four CI steps that read
+    # `test ! -f X || python X`: the check did not run, and said so in a line
+    # nobody reads, while its exit code said everything was fine.
+    if scanned < MIN_FILES:
+        print(f"  scanned only {scanned} text files, expected at least {MIN_FILES}",
+              file=sys.stderr)
+        print("  This check did not really run, so its pass means nothing. Most likely "
+              "the skip list matched a component of the checkout path itself.",
+              file=sys.stderr)
+        return 1
     print(f"  scanned {scanned} text files")
     print(f"  the Reserved Font Name, read from {OFL.name}: \"{correct}\"")
 

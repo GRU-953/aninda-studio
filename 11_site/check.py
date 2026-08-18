@@ -266,7 +266,14 @@ def main() -> int:
                 for (const n of cs) {
                   if (!n.startsWith('--as-')) continue;
                   const v = cs.getPropertyValue(n).trim();
-                  if (/^#[0-9a-f]{6}$/i.test(v)) out.push(n + ': ' + v);
+                  // 3, 4, 6 and 8 digits are all valid CSS hex, and so is every
+                  // colour function. This is the FOURTH copy of this rule. Three
+                  // were widened earlier — emit_css.py, the guidebook build and
+                  // the component build — and this one was missed, so #f00,
+                  // #0C3A31FF, rgb() and oklch() all survived forced-colors mode
+                  // here while the harness reported no brand hex surviving.
+                  if (/#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\s*\(/i.test(v))
+                    out.push(n + ': ' + v);
                 }
                 return out;
             }""")
