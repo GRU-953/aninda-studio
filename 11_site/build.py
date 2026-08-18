@@ -841,7 +841,7 @@ def footer(cards: dict) -> str:
         f'<ul class="as-doc-list">{fonts}</ul>'
         "<p>Literata and Noto Serif Bengali keep their own names. The monospace "
         "face is a subset of IBM Plex Mono renamed to Aninda Mono, because "
-        "IBM Plex is a Reserved Font Name and subsetting is a modification under "
+        "Plex is a Reserved Font Name and subsetting is a modification under "
         "clause 3 of the SIL Open Font Licence 1.1. Each licence file sits beside "
         "its font in 08_components/fonts/.</p>"
         "<p>The design tokens and this site are licensed Apache-2.0. "

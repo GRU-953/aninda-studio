@@ -70,6 +70,12 @@ jobs:
           done
           exit $fail
 
+      - name: Every Reserved Font Name claim matches the licence we ship
+        # This claim was corrected twice by hand and was wrong both times. The
+        # second review found it still wrong in 35 files, including the two NOTICE
+        # files a redistributor of the plugin must carry. Two hand-corrections were
+        # not enough because nothing checked.
+        run: python scripts/check_licence_claims.py
       - name: The PolyForm URL has no trailing slash
         # The trailing-slash form returns 404. It takes one keystroke to add and a
         # long time to notice.

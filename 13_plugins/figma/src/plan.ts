@@ -464,7 +464,7 @@ export function buildPlan(input: RawInput): Plan {
     needFont('Aninda Mono', 'Regular', 'the two monospaced text styles');
     textStyles.push({
       name: `Mono/${step.label}`,
-      description: `${px} px, from ${varName}. Aninda Mono is the renamed IBM Plex Mono subset; IBM Plex is a Reserved Font Name under the SIL Open Font License 1.1, so a subset has to be renamed.`,
+      description: `${px} px, from ${varName}. Aninda Mono is the renamed IBM Plex Mono subset; Plex is a Reserved Font Name under the SIL Open Font License 1.1, so a subset has to be renamed.`,
       family: 'Aninda Mono',
       style: 'Regular',
       fontSize: px,

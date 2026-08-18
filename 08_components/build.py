@@ -2067,7 +2067,8 @@ def build_page(card: dict, tokens_css: str, components_css: str, faces_css: str,
         "Fonts are subset and inlined; this card needs no network.</p>",
         "<p>Literata and Noto Serif Bengali are used under SIL OFL 1.1 under their own names. "
         "The monospace face is a subset of IBM Plex Mono, renamed to Aninda Mono because "
-        "&ldquo;IBM Plex&rdquo; is a Reserved Font Name and subsetting is a modification under "
+        "&ldquo;Plex&rdquo; is a Reserved Font Name — the single word, which is why the whole "
+        "IBM Plex superfamily is covered — and subsetting is a modification under "
         "clause 3 of that licence. Each OFL.txt sits beside the subset in 08_components/fonts/.</p>",
         "</footer>",
         f"<script>{SWITCHER_JS}</script>",
