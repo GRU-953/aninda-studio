@@ -377,21 +377,40 @@ The guidebook was moved onto `chapter.<slug>` keys from the register in this
 pass, which is the shape the plugin should follow. Until it does, those ids are
 outside the comparison. Nothing wrong ships: the Bangla itself agrees everywhere.
 
-### R3-3. Three English glosses in the plugin differ from the document they cite
+### R3-3. CLOSED 19 August 2026 — the three English glosses are settled
 
 `13_plugins/claude-code/skills/aninda-brand/assets/bangla-verified.json`
 
-`th-3` is glossed "High contrast" and the source says "More contrast"; `wm-1` is
-"Aninda Studio" against a source reading "aninda studio", the wordmark as drawn;
-`wm-2` is "Aninda" against "Aninda Studio (short form)". Each is a judgement about
-what a gloss is for — the name, or the string as it renders — rather than a
-mistake, so they are reported by `check_plugin.py` and do not fail it. They are
-the Bangla reviewer's call.
+Settled by the owner. One was a real inconsistency and two were not.
+
+**`th-3` was real, and worse than a gloss.** "High contrast" is what
+`BANGLA-STANDARD.md` reviews the string under, what the register composes
+`theme.hc-light` from as "High contrast, light", and what the guidebook and all
+thirty cards ship. "More contrast" survived in two places — the review sheet and
+`11_site/build.py`, where it was a **visible button on both published pages**. So
+this was not two documents glossing one string differently; it was the website
+labelling a control with a word the rest of the system does not use. Both are now
+"High contrast". The Bangla is untouched: `বেশি কনট্রাস্ট` is the approved string
+for it, and `BANGLA-STANDARD.md` records why `উচ্চ বৈসাদৃশ্য` was rejected.
+
+**`wm-1` and `wm-2` are deliberately different, and are now recorded as such.**
+The two files ask different questions. The review sheet's English column is "the
+string this row is about", shown to a reviewer beside its Bangla; the plugin's
+gloss is "what this Bangla means", used by an agent to find the right string. The
+wordmark is drawn lowercase, so the sheet shows `aninda studio` while the name it
+means is `Aninda Studio`; and the sheet labels the second row "Aninda Studio
+(short form)" to say which wordmark is under review, while `অনিন্দ্য` alone means
+"Aninda". Both answers are correct. The reconciliation is written into
+`check_plugin.py` beside the exemption, so a future reader finds the reason rather
+than an unexplained divergence to "fix".
 
 `ms-2` was in this group and was not ambiguous: it read "That file is too big"
 against a source saying "too large", and it is corrected.
 
-### R3-4. Two approved Bangla strings were revised without the reviewer
+With the ambiguous cases resolved, the gloss comparison now **fails** the plugin
+check on any drift rather than merely reporting it.
+
+### R3-4. CLOSED 19 August 2026 — the two revised Bangla strings are approved
 
 `06_type/bangla-strings.json`
 
@@ -399,8 +418,9 @@ against a source saying "too large", and it is corrected.
 মোহনা. Both were changed because what they said had become false — seventeen
 counted ten measured roles plus seven surfaces that carry no ratio at all, and
 "Estuary" names the ground colour ramp, not the mark. Every approved word is
-kept; only the false part is gone. Both entries carry `pending_review: true` and
-the reason, and both need the reviewer's confirmation.
+kept; only the false part is gone. The owner confirmed both on 19 August 2026;
+`pending_review` is cleared and each entry's basis records the confirmation
+alongside the reason for the change.
 
 ### R3-5. The interactive guidebook's PDF size is a recorded one-off, not a measurement
 

@@ -252,23 +252,40 @@ def check_bangla_agreement(problems: Problems) -> None:
     for item in drifted:
         problems.wrong(item)
 
-    # The English glosses are compared and REPORTED, not failed on. Three differ
-    # in ways that are a judgement about wording rather than a fault: th-3 is
-    # "High contrast" in the plugin and "More contrast" in the sheet, and wm-1 and
-    # wm-2 differ over whether the gloss is the name or the wordmark as drawn.
-    # Those are the Bangla reviewer's call, not this script's. ms-2 was not one of
-    # them — "too big" against a source saying "too large" — and is now corrected.
-    gloss_notes = [
-        f"{key}: plugin gloss {glosses[key]!r}, source {english!r}"
-        for key, (english, _) in sorted(source.items())
-        if key not in GROUPED and key in glosses and glosses[key] != english
-    ]
-    if gloss_notes:
-        problems.ok(f"{len(gloss_notes)} English gloss(es) differ from "
-                    f"06_type/review_bangla.py, awaiting the Bangla reviewer: "
-                    + "; ".join(gloss_notes))
+    # The two files ask different questions of the same string, and for two ids
+    # the right answers differ. The review sheet's English column is "the string
+    # this row is about", shown to a reviewer beside its Bangla; the plugin's
+    # gloss is "what this Bangla means", used by an agent to find the right
+    # string. For the wordmark those are not the same thing:
+    #
+    #   wm-1  the wordmark is DRAWN lowercase, so the sheet shows "aninda studio";
+    #         the name it means is "Aninda Studio", which is the useful gloss.
+    #   wm-2  the sheet labels the row "Aninda Studio (short form)" to say which
+    #         wordmark is under review; অনিন্দ্য on its own means "Aninda".
+    #
+    # Both are right, so both stay, and the reconciliation is written here rather
+    # than left as an unexplained divergence a future reader would try to "fix".
+    # Settled by the owner on 19 August 2026.
+    #
+    # The other two in this group were real and are gone: ms-2 read "too big"
+    # against a source saying "too large", and th-3 was "High contrast" here and
+    # "More contrast" in the sheet and on the website's own theme button — one
+    # English for one string, and BANGLA-STANDARD.md reviews it as "High contrast".
+    RECONCILED = {"wm-1", "wm-2"}
 
-    if from_json == from_markdown and not drifted:  # gloss notes do not fail
+    gloss_drift = [
+        f"{key}: plugin gloss {glosses[key]!r}, 06_type/review_bangla.py {english!r}"
+        for key, (english, _) in sorted(source.items())
+        if key not in GROUPED and key not in RECONCILED
+        and key in glosses and glosses[key] != english
+    ]
+    for item in gloss_drift:
+        problems.wrong(item)
+    if not gloss_drift:
+        problems.ok(f"every English gloss matches 06_type/review_bangla.py, except "
+                    f"{len(RECONCILED)} recorded as deliberately different and why")
+
+    if from_json == from_markdown and not drifted and not gloss_drift:
         problems.ok(
             f"the {len(from_json)} verified Bangla strings agree between bangla.md, "
             f"bangla-verified.json and the {len(source)} in 06_type/review_bangla.py, "
@@ -739,8 +756,16 @@ def check_bangla_document(problems: Problems) -> None:
             want = (entry["en"], entry["bn"], entry["basis"])
             for field, got, expected in zip(("English", "Bangla", "basis"), rows[key], want):
                 if got != expected:
-                    bad.append(f"{key} {field}: document has {got[:48]!r}, "
-                               f"register has {expected[:48]!r}")
+                    # Show the text AROUND the first difference, not the first 48
+                    # characters of each. A basis note runs to several hundred
+                    # characters and these two strings agreed for the first 200 of
+                    # them, so the report printed two identical-looking excerpts
+                    # and named no difference at all.
+                    at = next((i for i, (a, b) in enumerate(zip(got, expected)) if a != b),
+                              min(len(got), len(expected)))
+                    bad.append(f"{key} {field}: differs at character {at} — "
+                               f"document has ...{got[at:at + 44]!r}, "
+                               f"register has ...{expected[at:at + 44]!r}")
     for item in bad:
         problems.wrong(item)
     if not bad:

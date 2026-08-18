@@ -96,7 +96,7 @@ STRINGS: list[tuple[str, str, str, str, int, str]] = [
     ("th-2", "Dark", "অন্ধকার", "Theme switcher", 16,
      "অন্ধকার is literally 'darkness' and may be too heavy. Is গাঢ় (deep) or "
      "রাত (night) better?"),
-    ("th-3", "More contrast", "বেশি কনট্রাস্ট", "Theme switcher, accessibility settings", 16,
+    ("th-3", "High contrast", "বেশি কনট্রাস্ট", "Theme switcher, accessibility settings", 16,
      "CHANGED. বৈসাদৃশ্য was not merely heavy — it means 'dissimilarity', not "
      "display contrast, so it was the right word for the wrong sense. কনট্রাস্ট is "
      "licensed as a loanword by rule ২.৬, and বেশি avoids the তৎসম register clash "

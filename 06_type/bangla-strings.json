@@ -7,8 +7,7 @@
   "card.colour.subtitle": {
     "en": "Every colour role across four themes, each with the contrast ratio it was measured at and the criterion it was measured against, over the seven surfaces they are measured against.",
     "bn": "চার থিমে প্রতিটি রঙের ভূমিকা — প্রতিটির মাপা কনট্রাস্ট অনুপাত আর কোন মানদণ্ডে মাপা হয়েছে",
-    "basis": "কনট্রাস্ট reused from verified th-3; loanword licensed by rule ২.৬. কোন = which (interrogative), correct per the dictionary entry at p. 337. থিম is a ২.৬ loanword, not a dictionary headword. Bengali numeral ১৭ per house rule 9. REVISED 19 Aug 2026: the numeral ১৭ removed, no word changed. It counted ten measured roles plus seven surfaces, but the seven surfaces carry no ratio and no criterion, so the sentence claimed a measurement for seven values that have none — and the count changed again when a proven fill role was added. A count that must stay true is derived or absent, never typed. Pending confirmation by the Bangla reviewer.",
-    "pending_review": true
+    "basis": "কনট্রাস্ট reused from verified th-3; loanword licensed by rule ২.৬. কোন = which (interrogative), correct per the dictionary entry at p. 337. থিম is a ২.৬ loanword, not a dictionary headword. Bengali numeral ১৭ per house rule 9. REVISED 19 Aug 2026: the numeral ১৭ removed, no word changed. It counted ten measured roles plus seven surfaces, but the seven surfaces carry no ratio and no criterion, so the sentence claimed a measurement for seven values that have none — and the count changed again when a proven fill role was added. A count that must stay true is derived or absent, never typed. Confirmed by the owner on 19 August 2026."
   },
   "card.typography.name": {
     "en": "Typography",
@@ -48,8 +47,7 @@
   "card.the-marks.subtitle": {
     "en": "The mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
     "bn": "চিহ্ন দুই ওজনে — currentColor দিয়ে আঁকা, তাই যে থিমে বসে সেই থিমের রং নিয়ে নেয়",
-    "basis": "মোহনা reused from verified col-1 (Estuary). currentColor stays Latin: a code token copied literally, per BANGLA-STANDARD.md house guidance 3. REVISED 19 Aug 2026: 'Estuary'/মোহনা removed. That name belongs to the ground colour ramp — it is the ramp's description in primitive.tokens.json and what colour.md calls it — and it was also being used for the mark, whose own files and chapter call it only 'the mark'. naming.md opens 'One name for one thing, everywhere.' Pending confirmation by the Bangla reviewer.",
-    "pending_review": true
+    "basis": "মোহনা reused from verified col-1 (Estuary). currentColor stays Latin: a code token copied literally, per BANGLA-STANDARD.md house guidance 3. REVISED 19 Aug 2026: 'Estuary'/মোহনা removed. That name belongs to the ground colour ramp — it is the ramp's description in primitive.tokens.json and what colour.md calls it — and it was also being used for the mark, whose own files and chapter call it only 'the mark'. naming.md opens 'One name for one thing, everywhere.' Confirmed by the owner on 19 August 2026."
   },
   "card.accessibility.name": {
     "en": "Accessibility",

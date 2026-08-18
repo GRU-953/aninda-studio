@@ -741,7 +741,12 @@ THEME_CHOICES = [
     ("system", "Follow the system", None),
     ("light", "Light", "th-1"),
     ("dark", "Dark", "th-2"),
-    ("contrast", "More contrast", "th-3"),
+    # "High contrast", not "More contrast". BANGLA-STANDARD.md reviews this
+    # string under that heading, the register composes theme.hc-light from it
+    # as "High contrast, light", and the guidebook and all 30 cards ship it.
+    # This button and the review sheet were the only two places saying
+    # otherwise, and this one was a visible control on both published pages.
+    ("contrast", "High contrast", "th-3"),
 ]
 
 
