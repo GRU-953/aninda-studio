@@ -69,6 +69,21 @@ else
                   13_plugins/figma/RECEIPT-EXPECTED.json | sed 's/^/    /'
   fail=1
 fi
+printf '%-46s ' "claude-code skill bundles are current"
+$PY 13_plugins/claude-code/scripts/build_skills.py >/dev/null 2>&1 || true
+if git diff --quiet 13_plugins/claude-code/dist; then
+  echo "ok"
+else
+  echo "FAILED — the committed .skill bundles differ from a fresh build"
+  git diff --stat 13_plugins/claude-code/dist | sed 's/^/    /'
+  fail=1
+fi
+printf '%-46s ' "skill bundles are reproducible"
+if $PY 13_plugins/claude-code/scripts/build_skills.py --prove >/dev/null 2>&1; then
+  echo "ok"
+else
+  echo "FAILED"; fail=1
+fi
 printf '%-46s ' "npm entry points import and agree"
 if ( cd 12_packages/npm && node --input-type=module -e "
   import a from 'node:assert';
