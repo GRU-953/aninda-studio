@@ -9,10 +9,10 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "bd4fa5d72d208ab10590e5dc6508618fac6c2c737fd4d98a86ca09c5053d312d";
+export const BUNDLE_SHA256 = "44005ba5204a1bbeff738d424cd6ad1d3d023aa9e56cc42f14ae678a363042bf";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
-  "07_tokens/build/primitive.tokens.json": "376477e33402598222f77ac8778a698348ddaed3e1616f75717a370c7ae4ea68",
+  "07_tokens/build/primitive.tokens.json": "359b6b214801145054bd3154b51247b2cc3fbf1983f54664b959b30802aaf43f",
   "07_tokens/build/semantic.light.tokens.json": "534accf8100efb3ff853cfe026a4d00646e5e493f3ca38fdbf3ab8f8dfafc610",
   "07_tokens/build/semantic.dark.tokens.json": "fe0cc6711edb27002371282611b59da5bf801a503a424cf7af77394f4f885f78",
   "07_tokens/build/semantic.hc-light.tokens.json": "b07f11f482d055cded17f089668a1afccb09046756c7746e50c850c796e7828c",
@@ -1620,7 +1620,7 @@ export const BUNDLED: RawInput = {
         "ui-monospace",
         "monospace"
       ],
-      "$description": "IBM Plex Mono, by Mike Abbink and Bold Monday. It carries the Reserved Font Name 'IBM Plex', and subsetting a font counts as modifying it under OFL 1.1 clause 3 — so the subset shipped here is renamed 'Aninda Mono'. The unmodified family name is kept as the next fallback, so anyone who already has IBM Plex Mono installed gets the real thing.",
+      "$description": "IBM Plex Mono, by Mike Abbink and Bold Monday. It carries the Reserved Font Name 'Plex', and subsetting a font counts as modifying it under OFL 1.1 clause 3 — so the subset shipped here is renamed 'Aninda Mono'. The unmodified family name is kept as the next fallback, so anyone who already has IBM Plex Mono installed gets the real thing.",
       "$extensions": {
         "studio.aninda": {
           "licence": "SIL OFL 1.1"
