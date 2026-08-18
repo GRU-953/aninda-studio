@@ -205,6 +205,14 @@ jobs:
       - name: Install the project's own build tools
         run: npm ci
         working-directory: 00_sandbox
+      - name: Install the Python dependencies
+        # check_plugin.py reads the bundled Bangla subset's cmap with fontTools to
+        # prove the font can draw the Bangla the skill ships — the guard that once
+        # found ঠ and ২ missing, both of them in strings the skill cites as its own
+        # authority. Without fontTools that check reports WRONG rather than
+        # pretending, which is right, and this job never installed it. It was
+        # latent: the step before it was failing first, so this one never ran.
+        run: pip install -r requirements.txt
       - name: The Figma plugin must typecheck
         run: ../../00_sandbox/node_modules/.bin/tsc --noEmit -p tsconfig.json
         working-directory: 13_plugins/figma
