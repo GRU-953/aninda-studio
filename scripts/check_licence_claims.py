@@ -83,6 +83,7 @@ def package_names() -> set[str]:
 
 
 def reserved_name() -> str:
+    """The Reserved Font Name of the face this system actually ships."""
     if not OFL.exists():
         raise SystemExit(f"could not run: {OFL} is missing, so the correct "
                          f"Reserved Font Name cannot be read from source")
@@ -93,9 +94,47 @@ def reserved_name() -> str:
     return m.group(1)
 
 
+def declared_names() -> set[str]:
+    """Every Reserved Font Name declared by any licence in this repository.
+
+    The widened claim pattern below now recognises the markdown-backtick form,
+    which this repository's own prose uses. That prose also discusses the faces
+    that were CONSIDERED and rejected, and some of them carry a Reserved Font
+    Name of their own — 06_type/SHORTLIST.md correctly says Source Code Pro
+    carries `Source`. Comparing every claim against the one shipped name would
+    fail those true sentences, and a guard that cries wolf gets switched off.
+
+    So the test is membership: a claim must name a Reserved Font Name that some
+    licence in this tree actually declares. "IBM Plex" — the string this project
+    got wrong three times — is declared by nothing, so it is still caught, and
+    the check has become wider in both directions at once rather than trading
+    one kind of blindness for another.
+    """
+    names: set[str] = set()
+    for path in ROOT.rglob("*OFL*.txt"):
+        if any(part in SKIP_DIRS for part in path.relative_to(ROOT).parts
+               if part != "candidates"):
+            continue
+        try:
+            first = path.read_text(encoding="utf-8", errors="replace").splitlines()[0]
+        except (OSError, IndexError):
+            continue
+        for m in re.finditer(r"Reserved Font Name\s*[\"\'\u2018\u201c]?"
+                             r"([A-Za-z0-9][A-Za-z0-9 \-]{0,23}?)"
+                             r"[\"\'\u2019\u201d]?\s*(?:\.|$)", first):
+            names.add(m.group(1).strip())
+    return names
+
+
 def main() -> int:
     expect_failure = "--expect-failure" in sys.argv
     correct = reserved_name()
+    declared = {n.casefold() for n in declared_names()}
+    if correct.casefold() not in declared:
+        raise SystemExit(f"could not run: the shipped Reserved Font Name "
+                         f"{correct!r} is not among the names any licence in this "
+                         f"tree declares ({sorted(declared)}) — the two readers "
+                         f"disagree, so neither can be trusted")
 
     # Any claim that the reserved name is something other than the real string.
     # Matches the plain form, the HTML-entity form the cards use, and the
@@ -109,11 +148,20 @@ def main() -> int:
     # So the quoted part must look like a font name: letters, digits, spaces and
     # hyphens only, one to twenty-four characters, no punctuation.
     NAME = r"[A-Za-z0-9][A-Za-z0-9 \-]{0,23}"
+    # The quote may be a straight or curly double, a straight or curly single, a
+    # markdown BACKTICK, or the HTML entity form. The backtick form was missing
+    # and this repository's own prose uses it four times for this exact claim, so
+    # the guard built to end a claim being right in one place and wrong in another
+    # could not read four of the places. `RFN` is recognised too, because the
+    # glossary defines the abbreviation and prose then uses it.
+    Q1 = r"[\"'`\u2018\u201c]"
+    Q2 = r"[\"'`\u2019\u201d]"
+    RFN = r"(?:Reserved Font Name|RFN)"
     wrong = re.compile(
-        rf"(?:Reserved Font Name\s+(?:is\s+)?[\"'“]({NAME})[\"'”])"
-        rf"|(?:Reserved Font Name\s+&ldquo;({NAME})&rdquo;)"
-        rf"|(?:[\"'“]({NAME})[\"'”]\s+is a Reserved Font Name)"
-        rf"|(?:&ldquo;({NAME})&rdquo;\s+is a Reserved Font Name)",
+        rf"(?:{RFN}\s+(?:is\s+)?(?:the single word\s+)?{Q1}({NAME}){Q2})"
+        rf"|(?:{RFN}\s+&ldquo;({NAME})&rdquo;)"
+        rf"|(?:{Q1}({NAME}){Q2}\s+is a(?:n)? {RFN})"
+        rf"|(?:&ldquo;({NAME})&rdquo;\s+is a(?:n)? {RFN})",
         re.IGNORECASE,
     )
 
@@ -175,7 +223,7 @@ def main() -> int:
                                      m.group(0).strip()))
             for m in wrong.finditer(line):
                 named = next((g for g in m.groups() if g), "").strip()
-                if named and named.casefold() != correct.casefold():
+                if named and named.casefold() not in declared:
                     offenders.append((str(path.relative_to(ROOT)), n, m.group(0).strip()))
 
     # A sweep that scanned nothing is not a sweep that found nothing. This is the
@@ -223,9 +271,12 @@ def main() -> int:
             print(f"    {f} ({by_file[f]})", file=sys.stderr)
         if len(by_file) > 12:
             print(f"    … and {len(by_file) - 12} more", file=sys.stderr)
-        print(f'\n  Every one must name exactly "{correct}". The error is in the '
-              f'permissive direction: a reader who trusts it would think only the '
-              f'compound is reserved and that "Plex Sans" is available.',
+        print(f'\n  A Reserved Font Name claim must name one that a licence in '
+              f'this tree actually declares: {sorted(declared_names())}. The face '
+              f'this system ships reserves "{correct}" — the single word — and the '
+              f'error this guard exists for is in the permissive direction: a '
+              f'reader who trusts "IBM Plex" would think only the compound is '
+              f'reserved and that "Plex Sans" is available.',
               file=sys.stderr)
         return 0 if expect_failure else 1
 

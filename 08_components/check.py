@@ -39,6 +39,7 @@ from __future__ import annotations
 import argparse
 import io as _io
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -521,6 +522,36 @@ class Findings:
         self.notes.append(message)
 
 
+def forced_expectations() -> dict[str, str]:
+    """Every custom property the generated stylesheet overrides in forced-colors
+    mode, and the system keyword it overrides it to.
+
+    Read from 07_tokens/css/tokens.css, which is generated and drift-checked, so
+    this harness cannot hold a stale or partial list of its own.
+    """
+    css = (HERE.parent / "07_tokens" / "css" / "tokens.css").read_text()
+    start = css.find("@media (forced-colors: active)")
+    if start < 0:
+        return {}
+    depth, i = 0, css.find("{", start)
+    end = len(css)
+    for j in range(i, len(css)):
+        if css[j] == "{":
+            depth += 1
+        elif css[j] == "}":
+            depth -= 1
+            if depth == 0:
+                end = j
+                break
+    block = css[i:end]
+    return {m.group(1): m.group(2).strip()
+            for m in re.finditer(r"(--as-[a-z0-9-]+)\s*:\s*([^;]+);", block)
+            if m.group(2).strip()[:1].isupper()}
+
+
+FORCED_EXPECTED = forced_expectations()
+
+
 def srgb_luminance(rgb) -> float:
     def ch(v):
         c = v / 255.0
@@ -815,26 +846,40 @@ def run(argv: list[str]) -> int:
                 page.evaluate("t => window.__as.setTheme(t)", theme)
                 page.wait_for_timeout(20)
                 label = f"{slug} forced-colors [{theme}]"
-                tokens = page.evaluate(
-                    "n => window.__as.tokenValues(n)",
-                    ["--as-surface-base", "--as-ink", "--as-focus-ring"],
-                )
-                if tokens["--as-surface-base"].lower() != "canvas":
-                    found.fail(
-                        f"{label}: --as-surface-base is {tokens['--as-surface-base']!r}, "
-                        "not Canvas. A brand colour that survives forced colours defeats it."
-                    )
+                # EVERY property the stylesheet overrides here, not three of
+                # them. This block used to fetch --as-surface-base, --as-ink and
+                # --as-focus-ring and assert on the first only: the other two were
+                # read and thrown away, so either could carry a brand hex on a card
+                # and the run still passed. The expectations are read out of the
+                # generated tokens.css rather than typed here, so a role added to
+                # the forced-colors map is asserted the moment it exists.
+                tokens = page.evaluate("n => window.__as.tokenValues(n)",
+                                       sorted(FORCED_EXPECTED))
+                for prop, want in sorted(FORCED_EXPECTED.items()):
+                    got = (tokens.get(prop) or "").strip()
+                    if got.lower() != want.lower():
+                        found.fail(
+                            f"{label}: {prop} computes to {got!r}, and tokens.css "
+                            f"overrides it to {want!r}. A brand colour that survives "
+                            f"forced colours defeats the whole point of it."
+                        )
                 over = page.evaluate("() => window.__as.measureOverflow()")
                 if over["page"] > 1:
                     found.fail(f"{label}: the page scrolls sideways by {over['page']} px.")
+                # Text against the TEXT floors, and the high-contrast themes named
+                # so they are held to AAA. This call used to pass [[], 3.0, 3.0] —
+                # every text node in every theme measured against the NON-TEXT
+                # floor, with an empty high-contrast list. That is the exact inverse
+                # of the level() fault already fixed in the colour engine, and it
+                # meant forced-colours text could sit at 3.1:1 and pass.
                 text = page.evaluate(
                     "a => window.__as.measureText(a[0], a[1], a[2])",
-                    [[], NON_TEXT_MIN, NON_TEXT_MIN],
+                    [list(HC_THEMES), TEXT_MIN, TEXT_MIN_HC],
                 )
                 for fail in text["failures"]:
                     found.fail(
-                        f"{label}: contrast {fail['ratio']}:1 in the system palette — "
-                        f"{fail['path']} \"{fail['text']}\""
+                        f"{label}: contrast {fail['ratio']}:1 in the system palette, "
+                        f"needs {fail['need']}:1 — {fail['path']} \"{fail['text']}\""
                     )
         page.close()
         context.close()

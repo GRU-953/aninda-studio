@@ -218,13 +218,37 @@ BANGLA_GAPS = _bangla_gaps()
 # Guards
 # =========================================================================
 
-_HEX = re.compile(r"#[0-9a-fA-F]{3,8}\b")
-# re.IGNORECASE: CSS colour functions are case-insensitive, so RGB(255 0 0)
-# and OKLCH(...) are valid CSS. This guard was case-sensitive and let every
-# uppercase form through while reporting a clean build — the same fault was
-# fixed in 08_components/build.py first, and this second copy was missed.
-_FUNC = re.compile(r"\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\s*\(",
-                   re.IGNORECASE)
+_COMPONENTS = None
+
+
+def _components():
+    """08_components/build.py, loaded once, for the no-literal-colour rule.
+
+    This file used to hold its own _HEX and _FUNC and NOTHING ELSE of the rule:
+    no named-colour list, and no markup half at all. Both gaps were real. A CSS
+    named colour built cleanly here with --check reporting no drift, and the half
+    that was missing entirely — style attributes and SVG paint attributes — is the
+    one that would have caught the three literal colours the brand lockup ships in
+    its markup on both published pages.
+
+    Borrowed rather than copied, the same way 08_components borrows the language
+    walker from 09_guidebook. Measured at 0.04 s, no side effects at import.
+    """
+    global _COMPONENTS
+    if _COMPONENTS is None:
+        import importlib.util
+        source = ROOT / "08_components" / "build.py"
+        if not source.exists():
+            raise BuildError(
+                f"{source} is missing. This build reads the no-literal-colour rule "
+                f"from there rather than keeping a partial copy of it."
+            )
+        spec = importlib.util.spec_from_file_location("_aninda_components", source)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["_aninda_components"] = module
+        spec.loader.exec_module(module)
+        _COMPONENTS = module
+    return _COMPONENTS
 
 BANNED_WORDS = ["simply", "just", "easy", "obviously", "of course", "clearly"]
 BANNED_LATIN = ["e.g.", "i.e.", "etc."]
@@ -250,15 +274,84 @@ def strip_css_comments(text: str) -> str:
 
 def guard_site_css(text: str) -> None:
     """The site layer may not contain a literal colour. tokens.css may, and is
-    checked separately by being taken verbatim from its own generator."""
+    checked separately by being taken verbatim from its own generator.
+
+    All three forms now — hex, colour function AND named colour — because the
+    named half lived in one of the three copies of this rule and `rebeccapurple`
+    built here cleanly.
+    """
     problems = []
     for lineno, line in enumerate(strip_css_comments(text).splitlines(), 1):
-        if _HEX.search(line):
-            problems.append(f"site layer:{lineno}: hex colour — {line.strip()}")
-        if _FUNC.search(line):
-            problems.append(f"site layer:{lineno}: colour function — {line.strip()}")
+        found = _components().colour_literal_in(line)
+        if found:
+            problems.append(f"site layer:{lineno}: literal colour {found!r} — {line.strip()}")
     if problems:
         raise BuildError("The no-literal-colour rule failed:\n  " + "\n  ".join(problems))
+
+
+# The one place on this site where a literal colour is correct, and why.
+#
+# 04_mark/svg/icon-192.svg is a FIXED-COLOUR icon master: a tile with a baked
+# ground and a baked mark, which is what an app icon has to be — a platform draws
+# it with no stylesheet and no custom properties. It is not a recolourable mark,
+# and 04_mark/build.py already refuses to put a root colour on the ones that are.
+# So its three literals are declared here, tied to the file they come from, and
+# everything else in the markup is guarded.
+ICON_EXCEPTION = "icon-192.svg"
+
+
+def guard_site_markup(pages: dict[str, str]) -> None:
+    """No literal colour in generated markup — style attributes and SVG paint.
+
+    This half of the rule did not exist in this file at all. 08_components has
+    carried it since the component cards were built; the site had only the CSS
+    half, and the missing half is the one that would have seen the three literals
+    the brand lockup ships on both published pages. They turn out to be correct,
+    which is exactly why they had to be DECLARED rather than merely unnoticed:
+    the site build's own header claimed tokens.css was "the only place a literal
+    colour lives", and it was not.
+    """
+    components = _components()
+    icon = (MARK_DIR / ICON_EXCEPTION).read_text(encoding="utf-8")
+    allowed = set()
+    for match in components._SVG_PAINT_ATTR.finditer(icon):
+        value = (match.group(2) or match.group(3) or "").strip()
+        if components.colour_literal_in(value):
+            allowed.add(value.upper())
+    for match in components._STYLE_ATTR.finditer(icon):
+        for part in (match.group(1) or match.group(2) or "").split(";"):
+            _, _, value = part.partition(":")
+            if components.colour_literal_in(value):
+                allowed.add(value.strip().upper())
+    if not allowed:
+        raise BuildError(
+            f"{ICON_EXCEPTION} carries no literal colour, so the exception this "
+            f"guard grants it is stale. Either the icon stopped being a "
+            f"fixed-colour master or it moved; do not leave the exception standing."
+        )
+
+    problems: list[str] = []
+    for name, markup in pages.items():
+        for match in components._STYLE_ATTR.finditer(markup):
+            for part in (match.group(1) or match.group(2) or "").split(";"):
+                if ":" not in part:
+                    continue
+                prop, _, value = part.partition(":")
+                found = components.colour_literal_in(value)
+                if found and value.strip().upper() not in allowed:
+                    problems.append(f"{name}: style {prop.strip()}: {value.strip()} "
+                                    f"(literal {found})")
+        for match in components._SVG_PAINT_ATTR.finditer(markup):
+            value = match.group(2) or match.group(3) or ""
+            found = components.colour_literal_in(value)
+            if found and value.strip().upper() not in allowed:
+                problems.append(f'{name}: {match.group(1)}="{value}" (literal {found})')
+    if problems:
+        raise BuildError(
+            f"Literal colour in generated markup, {len(problems)} of them. Only the "
+            f"fixed-colour icon master {ICON_EXCEPTION} may carry one:\n  "
+            + "\n  ".join(problems)
+        )
 
 
 def guard_english(pages: dict[str, str]) -> None:
@@ -314,36 +407,63 @@ def guard_glyphs(pages: dict[str, str]) -> None:
         )
 
 
+_GUIDEBOOK = None
+
+
+def _guidebook():
+    """The guidebook module, loaded once, for its element-stack walker.
+
+    Borrowed rather than copied — 08_components/build.py does the same, and for
+    the same reason. What stood here was a fourth stack of its own; see
+    walk_scopes in 09_guidebook/build.py for what was wrong with it.
+    """
+    global _GUIDEBOOK
+    if _GUIDEBOOK is None:
+        import importlib.util
+        source = ROOT / "09_guidebook" / "build.py"
+        if not source.exists():
+            raise BuildError(
+                f"{source} is missing. This build reads its element-stack walker "
+                f"from there rather than keeping a second copy of it."
+            )
+        spec = importlib.util.spec_from_file_location("_aninda_guidebook", source)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["_aninda_guidebook"] = module
+        spec.loader.exec_module(module)
+        _GUIDEBOOK = module
+    return _GUIDEBOOK
+
+
+# The two class scopes that change which font must draw a run.
+_MONO_MARKERS = ("as-mono", "as-code__pre")
+
+
 def text_runs(markup: str):
-    """Split the markup into the text each face has to draw. Anything inside an
-    element carrying lang="bn" is Bangla; anything inside .as-mono or
-    .as-code__pre is the mono face; everything else is Latin."""
+    """Split the markup into the text each face has to draw.
+
+    Anything inside lang="bn" is Bangla; anything inside .as-mono or
+    .as-code__pre is the mono face; everything else is Latin. The scopes come
+    from the shared walker, so this file no longer decides for itself what an
+    element stack is.
+    """
+    # Measured equivalent to the stack this replaced, on the input the font guard
+    # actually passes: index.html 143 Latin, 38 Bangla, 8 mono; 404.html 24 Latin,
+    # 4 Bangla; both sets identical run for run. (Compared on raw markup the two
+    # differ by the theme script and the document title, because the shared walker
+    # skips <script> and <title> and the old stack did not — but the caller already
+    # strips those three elements before calling here, so through the guard the
+    # behaviour is the same. Worth writing down: the first comparison was run on
+    # the raw markup and reported a difference that the guard could never see.)
     runs: list[tuple[str, str]] = []
-    depth_bn = 0
-    depth_mono = 0
-    stack: list[tuple[str, bool, bool]] = []
-    for token in re.split(r"(<[^>]+>)", markup):
-        if token.startswith("<"):
-            if token.startswith("</"):
-                if stack:
-                    _, was_bn, was_mono = stack.pop()
-                    depth_bn -= 1 if was_bn else 0
-                    depth_mono -= 1 if was_mono else 0
-                continue
-            if token.endswith("/>") or re.match(r"<(meta|link|br|img|hr|input|source)\b", token):
-                continue
-            is_bn = 'lang="bn"' in token
-            is_mono = "as-mono" in token or "as-code__pre" in token
-            stack.append((token, is_bn, is_mono))
-            depth_bn += 1 if is_bn else 0
-            depth_mono += 1 if is_mono else 0
+    for token, lang, marks in _guidebook().walk_scopes(markup, _MONO_MARKERS):
+        if token.startswith("<") or lang == "skip":
             continue
         chunk = html.unescape(token)
         if not chunk.strip():
             continue
-        if depth_bn:
+        if lang == "bn":
             runs.append(("bn", chunk))
-        elif depth_mono:
+        elif marks:
             runs.append(("mono", chunk))
         else:
             runs.append(("latin", chunk))
@@ -1175,6 +1295,7 @@ def build() -> dict[str, bytes]:
     }
 
     guard_english(pages)
+    guard_site_markup(pages)
     guard_bangla(pages)
     guard_glyphs(pages)
 

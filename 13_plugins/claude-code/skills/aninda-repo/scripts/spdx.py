@@ -96,7 +96,19 @@ FRONT_MATTER = re.compile(r"\A---\n.*?\n---\n", re.S)
 # or an opening comment block, which can run a good few lines. Beyond this an SPDX
 # line is a code sample or a quotation, and a reference document about licensing is
 # full of both.
-HEADER_LINES = 40
+# 120, not 40. At 40 this script reported seven files as missing a header they
+# DO carry — the four largest generators, the component stylesheet and both
+# guidebook builds — because the house docstring style puts the "why this file
+# exists" essay above the identifier. Measured across the tree, the deepest real
+# identifier sits at line 69 (09_guidebook/build.py), so 40 was under the true
+# maximum by a factor of nearly two and 13% of the report was noise. A checker
+# that cries wolf gets switched off, and then it protects nothing.
+#
+# The window is a ceiling on where a HEADER may sit, so widening it could in
+# principle start counting a mention in prose. Verified it does not: the seven
+# files this change moves from missing to correct all carry a real identifier
+# line, and no file's count changes in the other direction.
+HEADER_LINES = 120
 
 
 def no_header_reason(path: Path) -> str | None:

@@ -2677,6 +2677,60 @@ def _sub_outside_entities(pattern: re.Pattern, repl, text: str) -> str:
     return "".join(out)
 
 
+def walk_scopes(doc: str, markers: tuple[str, ...] = ()):
+    """Yield (text, nearest_declared_lang, markers_in_scope) for every text run.
+
+    The one element stack in this project. `markers` are substrings — normally
+    class names — whose enclosing scope the caller also needs; each yielded run
+    reports the set of them that are open around it.
+
+    The generalisation exists because 11_site/build.py had a FOURTH stack of its
+    own, `text_runs`, deciding which font must cover each run. It was the weaker
+    design this consolidation replaced: it popped on any closing tag without
+    matching the name, its void-element list was missing area, base, col, embed,
+    param, track and wbr, and it pushed comments and the doctype as openers, so
+    its stack ran permanently four frames out of balance. It happened to agree
+    with this walker on both site pages, which is the only reason nothing wrong
+    shipped. Rather than add a fifth rule, the site now asks this one for the two
+    class scopes it cares about.
+    """
+    VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
+            "meta", "param", "source", "track", "wbr"}
+    stack: list[tuple[str, str | None, frozenset[str]]] = []
+
+    for token in re.split(r"(<[^>]+>)", doc):
+        if token.startswith("<"):
+            m = re.match(r"</?\s*([a-zA-Z0-9-]+)", token)
+            tag = m.group(1).lower() if m else ""
+            # A comment or a doctype is not an element and must never be pushed.
+            if token.startswith(("<!--", "<!")):
+                yield token, None, frozenset()
+                continue
+            if token.startswith("</"):
+                for i in range(len(stack) - 1, -1, -1):
+                    if stack[i][0] == tag:
+                        del stack[i:]
+                        break
+            elif not token.rstrip().endswith("/>") and tag not in VOID:
+                lm = re.search(r'\blang="([a-zA-Z-]+)"', token)
+                here = frozenset(k for k in markers if k in token)
+                stack.append((tag, lm.group(1).lower() if lm else None, here))
+            yield token, None, frozenset()          # tags pass through unchanged
+            continue
+
+        if any(t in _SKIP_ELEMENTS for t, _, _ in stack):
+            yield token, "skip", frozenset()
+            continue
+
+        lang = None
+        for _, declared, _ in reversed(stack):
+            if declared:
+                lang = declared
+                break
+        open_marks = frozenset().union(*(m for _, _, m in stack)) if stack else frozenset()
+        yield token, lang, open_marks
+
+
 def walk_language_scopes(doc: str):
     """Yield (text, nearest_declared_lang) for every text run in the document.
 
@@ -2689,34 +2743,7 @@ def walk_language_scopes(doc: str):
 
     Two implementations of the same rule is one implementation and one liability.
     """
-    VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
-            "meta", "param", "source", "track", "wbr"}
-    stack: list[tuple[str, str | None]] = []
-
-    for token in re.split(r"(<[^>]+>)", doc):
-        if token.startswith("<"):
-            m = re.match(r"</?\s*([a-zA-Z0-9-]+)", token)
-            tag = m.group(1).lower() if m else ""
-            if token.startswith("</"):
-                for i in range(len(stack) - 1, -1, -1):
-                    if stack[i][0] == tag:
-                        del stack[i:]
-                        break
-            elif not token.rstrip().endswith("/>") and tag not in VOID:
-                lm = re.search(r'\blang="([a-zA-Z-]+)"', token)
-                stack.append((tag, lm.group(1).lower() if lm else None))
-            yield token, None          # tags pass through unchanged
-            continue
-
-        if any(t in _SKIP_ELEMENTS for t, _ in stack):
-            yield token, "skip"
-            continue
-
-        lang = None
-        for _, declared in reversed(stack):
-            if declared:
-                lang = declared
-                break
+    for token, lang, _ in walk_scopes(doc):
         yield token, lang
 
 
