@@ -737,32 +737,35 @@ def build_svg_icon() -> bytes:
 
 
 def _ink_geometry(data: bytes) -> tuple:
-    """Ink coverage and bounding box, both blind to how a rasteriser antialiases."""
-    from PIL import Image
+    """Ink coverage and bounding box, measured at FULL resolution in C.
+
+    The first version sampled on a stride of about a two-hundredth of each axis, and
+    that stride was the whole problem: on a 1280 px image it steps 5 px, so a
+    one-pixel antialiasing shift changes WHICH pixels get looked at, and the box moved
+    by a hundredth between macOS and Ubuntu. CI caught it on README-header-dark.png.
+
+    Now every pixel is compared, using PIL's own C paths, so the only remaining
+    difference is genuine edge antialiasing — which moves a box edge by at most a
+    pixel, or 0.002 of a 512 px frame, comfortably inside two decimal places.
+    """
+    from PIL import Image, ImageChops
     import io as _io
     im = Image.open(_io.BytesIO(data)).convert("RGBA")
     w, h = im.size
-    px = im.load()
-    # "Ink" is any pixel that differs from the corner pixel by more than a tolerance
-    # well above antialiasing noise.
-    base = px[0, 0]
-    minx, miny, maxx, maxy, n = w, h, -1, -1, 0
-    for y in range(0, h, max(1, h // 220)):
-        for x in range(0, w, max(1, w // 220)):
-            p = px[x, y]
-            if (abs(p[0] - base[0]) + abs(p[1] - base[1]) + abs(p[2] - base[2])
-                    + abs(p[3] - base[3])) > 96:
-                n += 1
-                minx, miny = min(minx, x), min(miny, y)
-                maxx, maxy = max(maxx, x), max(maxy, y)
-    total = len(range(0, h, max(1, h // 220))) * len(range(0, w, max(1, w // 220)))
-    coverage = round(n / max(1, total), 3)
-    if n == 0:
+    corner = im.getpixel((0, 0))
+    flat = Image.new("RGBA", im.size, corner)
+    # Per-channel absolute difference, flattened to one band, then thresholded.
+    diff = ImageChops.difference(im, flat).convert("L")
+    mask = diff.point(lambda v: 255 if v > 24 else 0)
+    counts = mask.histogram()
+    inked = counts[255]
+    coverage = round(inked / float(w * h), 3)
+    box = mask.getbbox()
+    if not box:
         return (w, h, 0.0, None)
-    # the box as a fraction of the frame, so it is resolution-independent
-    box = (round(minx / w, 2), round(miny / h, 2),
-           round(maxx / w, 2), round(maxy / h, 2))
-    return (w, h, coverage, box)
+    frame = (round(box[0] / w, 2), round(box[1] / h, 2),
+             round(box[2] / w, 2), round(box[3] / h, 2))
+    return (w, h, coverage, frame)
 
 
 def _structural_check(out: dict) -> list[str]:
@@ -798,7 +801,9 @@ def _structural_check(out: dict) -> list[str]:
             if want[:2] != got[:2]:
                 problems.append(f"{name}: {got[0]}x{got[1]} on disk, "
                                 f"{want[0]}x{want[1]} from the marks")
-            elif abs(want[2] - got[2]) > 0.02 or want[3] != got[3]:
+            elif (abs(want[2] - got[2]) > 0.01
+                  or want[3] is None or got[3] is None
+                  or max(abs(a - b) for a, b in zip(want[3], got[3])) > 0.02):
                 problems.append(
                     f"{name}: the artwork has moved — ink coverage {got[2]} and box "
                     f"{got[3]} on disk against {want[2]} and {want[3]} from the marks")
