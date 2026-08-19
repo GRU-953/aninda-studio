@@ -140,6 +140,13 @@ jobs:
         # on one rounded icon everywhere, and because no script wrote it this job
         # could not see the contradiction.
         run: git diff --exit-code 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
+      - name: The icon and social assets must match the marks
+        # In THIS job, not `build`, because the check re-renders twenty rasters with
+        # Playwright and only marks and render install Chromium. It first went into
+        # `build` and turned CI red for two commits: locally a browser is always
+        # present, so no local gate could see the difference. It also belongs here on
+        # the merits — these assets are generated from the marks this job just built.
+        run: python 10_assets/build.py --check
 
   # 4 ── a couple of minutes. Everything that has a --check mode.
   build:
@@ -163,10 +170,6 @@ jobs:
       # artefact went unmeasured. All four scripts are committed, so the guard
       # could only ever hide their disappearance — which is the thing most worth
       # failing on. A check that did not run must never read as a pass.
-      - name: The icon and social assets must match the marks
-        # This build had no --check mode at all until 19 August 2026, so twenty
-        # rasters, an .ico and a manifest were regenerated and diffed nowhere.
-        run: python 10_assets/build.py --check
       - name: The committed PDF must still say what the book says
         # A byte diff is impossible: Chromium stamps a creation date, so two runs of
         # the same input differ. Measured. So this compares the PDF's TEXT against
