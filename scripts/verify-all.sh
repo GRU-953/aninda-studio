@@ -55,6 +55,7 @@ run "08_components/build.py"  $PY 08_components/build.py --check
 run "11_site/build.py"        $PY 11_site/build.py --check
 run "09_guidebook/build.py"   $PY 09_guidebook/build.py --check
 run "scripts/readme.py"       $PY scripts/readme.py --check
+run "claude-design bundle"    $PY 13_plugins/claude-design/build.py --check
 
 echo "--- plugins ---"
 run "claude-code plugin"      $PY 13_plugins/claude-code/scripts/check_plugin.py

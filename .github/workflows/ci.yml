@@ -234,6 +234,11 @@ jobs:
             echo "::error::The manifest gate let a placeholder through"; rm -f manifest.json; exit 1
           fi
           rm -f manifest.json
+      - name: The Claude Design bundle must match the system
+        # The only deliverable whose artefact lives on a remote service, so the
+        # only one that can fall behind with nothing saying so. Generated from the
+        # same token files as everything else, and diffed here.
+        run: python 13_plugins/claude-design/build.py --check
       - name: The Claude Code plugin must be well formed
         run: python 13_plugins/claude-code/scripts/check_plugin.py
       - name: The skill bundles must be reproducible

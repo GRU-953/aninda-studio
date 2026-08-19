@@ -1,0 +1,459 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "$description": "Aninda Studio semantic tokens — High contrast, dark theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 7.0:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
+  "$extensions": {
+    "studio.aninda": {
+      "direction": "estuary",
+      "theme": "hc-dark",
+      "polarity": "dark",
+      "highContrast": true,
+      "textTarget": 7.0,
+      "nonTextTarget": 4.5,
+      "generatedBy": "07_tokens/build.py",
+      "note": "DTCG 2025.10 has no theming concept. Themes are separate files with identical token paths, because a tool is permitted to ignore $extensions and would then render one theme's values for all four without erroring."
+    }
+  },
+  "color": {
+    "$type": "color",
+    "surface": {
+      "lowest": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.027451,
+            0.031373,
+            0.027451
+          ],
+          "hex": "#070807"
+        },
+        "$description": "Tonal surface 'lowest' for the High contrast, dark theme",
+        "$extensions": {
+          "studio.aninda": {
+            "luminance": 0.002342,
+            "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
+          }
+        }
+      },
+      "low": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.047059,
+            0.047059,
+            0.047059
+          ],
+          "hex": "#0C0C0C"
+        },
+        "$description": "Tonal surface 'low' for the High contrast, dark theme",
+        "$extensions": {
+          "studio.aninda": {
+            "luminance": 0.003677,
+            "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
+          }
+        }
+      },
+      "base": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.054902,
+            0.058824,
+            0.054902
+          ],
+          "hex": "#0E0F0E"
+        },
+        "$description": "Tonal surface 'base' for the High contrast, dark theme",
+        "$extensions": {
+          "studio.aninda": {
+            "luminance": 0.004667,
+            "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
+          }
+        }
+      },
+      "high": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.066667,
+            0.066667,
+            0.066667
+          ],
+          "hex": "#111111"
+        },
+        "$description": "Tonal surface 'high' for the High contrast, dark theme",
+        "$extensions": {
+          "studio.aninda": {
+            "luminance": 0.005605,
+            "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
+          }
+        }
+      },
+      "highest": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.066667,
+            0.070588,
+            0.066667
+          ],
+          "hex": "#111211"
+        },
+        "$description": "Tonal surface 'highest' for the High contrast, dark theme",
+        "$extensions": {
+          "studio.aninda": {
+            "luminance": 0.005923,
+            "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
+          }
+        }
+      },
+      "dim": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.011765,
+            0.011765,
+            0.011765
+          ],
+          "hex": "#030303"
+        },
+        "$description": "Tonal surface 'dim' for the High contrast, dark theme",
+        "$extensions": {
+          "studio.aninda": {
+            "luminance": 0.000911,
+            "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
+          }
+        }
+      },
+      "bright": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.070588,
+            0.070588,
+            0.070588
+          ],
+          "hex": "#121212"
+        },
+        "$description": "Tonal surface 'bright' for the High contrast, dark theme",
+        "$extensions": {
+          "studio.aninda": {
+            "luminance": 0.006049,
+            "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
+          }
+        }
+      }
+    },
+    "ink": {
+      "default": {
+        "$description": "darkest ground step clearing 7.0:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "ground",
+            "step": 50,
+            "kind": "text",
+            "proof": {
+              "required": 7.0,
+              "measured": 17.5461,
+              "worstCaseLsb": 17.251,
+              "hardestGround": "bright",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "lowest": 18.7888,
+                "low": 18.3216,
+                "base": 17.9896,
+                "high": 17.686,
+                "highest": 17.5857,
+                "dim": 19.317,
+                "bright": 17.5461
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.ground.50}"
+      },
+      "muted": {
+        "$description": "darkest ground step clearing 7.0:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "ground",
+            "step": 400,
+            "kind": "text",
+            "proof": {
+              "required": 7.0,
+              "measured": 8.2853,
+              "worstCaseLsb": 8.1239,
+              "hardestGround": "bright",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "lowest": 8.8721,
+                "low": 8.6515,
+                "base": 8.4947,
+                "high": 8.3514,
+                "highest": 8.304,
+                "dim": 9.1215,
+                "bright": 8.2853
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.ground.400}"
+      }
+    },
+    "line": {
+      "default": {
+        "$description": "darkest ground step clearing 4.5:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "ground",
+            "step": 500,
+            "kind": "nontext",
+            "proof": {
+              "required": 4.5,
+              "measured": 6.0367,
+              "worstCaseLsb": 5.9118,
+              "hardestGround": "bright",
+              "level": "meets policy",
+              "criterion": "policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast",
+              "againstEverySurface": {
+                "lowest": 6.4643,
+                "low": 6.3035,
+                "base": 6.1893,
+                "high": 6.0849,
+                "highest": 6.0504,
+                "dim": 6.646,
+                "bright": 6.0367
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.ground.500}"
+      }
+    },
+    "accent": {
+      "default": {
+        "$description": "darkest accent step clearing 7.0:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "accent",
+            "step": 400,
+            "kind": "text",
+            "proof": {
+              "required": 7.0,
+              "measured": 8.3867,
+              "worstCaseLsb": 8.2253,
+              "hardestGround": "bright",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "lowest": 8.9807,
+                "low": 8.7574,
+                "base": 8.5987,
+                "high": 8.4536,
+                "highest": 8.4057,
+                "dim": 9.2332,
+                "bright": 8.3867
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.accent.400}"
+      },
+      "edge": {
+        "$description": "darkest accent step clearing 4.5:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "accent",
+            "step": 500,
+            "kind": "nontext",
+            "proof": {
+              "required": 4.5,
+              "measured": 6.1294,
+              "worstCaseLsb": 6.0051,
+              "hardestGround": "bright",
+              "level": "meets policy",
+              "criterion": "policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast",
+              "againstEverySurface": {
+                "lowest": 6.5635,
+                "low": 6.4003,
+                "base": 6.2843,
+                "high": 6.1783,
+                "highest": 6.1433,
+                "dim": 6.748,
+                "bright": 6.1294
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.accent.500}"
+      },
+      "hover": {
+        "$description": "nearest accent step beyond 400, away from the label #070807, clearing 7.0:1 as a ground under that label and staying ΔE 7.11 from the resting fill",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "accent",
+            "step": 300,
+            "kind": "fill",
+            "proof": {
+              "required": 7.0,
+              "measured": 11.8572,
+              "worstCaseLsb": 11.6686,
+              "hardestGround": "label (surface.lowest)",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "label (surface.lowest)": 11.8572
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.accent.300}"
+      }
+    },
+    "focus": {
+      "ring": {
+        "$description": "darkest accent step clearing 4.5:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "accent",
+            "step": 500,
+            "kind": "nontext",
+            "proof": {
+              "required": 4.5,
+              "measured": 6.1294,
+              "worstCaseLsb": 6.0051,
+              "hardestGround": "bright",
+              "level": "meets policy",
+              "criterion": "policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast",
+              "againstEverySurface": {
+                "lowest": 6.5635,
+                "low": 6.4003,
+                "base": 6.2843,
+                "high": 6.1783,
+                "highest": 6.1433,
+                "dim": 6.748,
+                "bright": 6.1294
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.accent.500}"
+      }
+    },
+    "status": {
+      "success": {
+        "$description": "darkest success step clearing 7.0:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "success",
+            "step": 400,
+            "kind": "text",
+            "proof": {
+              "required": 7.0,
+              "measured": 8.4947,
+              "worstCaseLsb": 8.3311,
+              "hardestGround": "bright",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "lowest": 9.0963,
+                "low": 8.8701,
+                "base": 8.7094,
+                "high": 8.5624,
+                "highest": 8.5139,
+                "dim": 9.3521,
+                "bright": 8.4947
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.success.400}"
+      },
+      "warning": {
+        "$description": "darkest warning step clearing 7.0:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "warning",
+            "step": 400,
+            "kind": "text",
+            "proof": {
+              "required": 7.0,
+              "measured": 8.0321,
+              "worstCaseLsb": 7.8755,
+              "hardestGround": "bright",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "lowest": 8.601,
+                "low": 8.3871,
+                "base": 8.2351,
+                "high": 8.0961,
+                "highest": 8.0502,
+                "dim": 8.8427,
+                "bright": 8.0321
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.warning.400}"
+      },
+      "danger": {
+        "$description": "darkest danger step clearing 7.0:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "danger",
+            "step": 400,
+            "kind": "text",
+            "proof": {
+              "required": 7.0,
+              "measured": 7.6527,
+              "worstCaseLsb": 7.506,
+              "hardestGround": "bright",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "lowest": 8.1947,
+                "low": 7.9909,
+                "base": 7.8461,
+                "high": 7.7137,
+                "highest": 7.67,
+                "dim": 8.4251,
+                "bright": 7.6527
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.danger.400}"
+      },
+      "info": {
+        "$description": "darkest info step clearing 7.0:1 against all 7 surfaces, hardest being bright",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "info",
+            "step": 400,
+            "kind": "text",
+            "proof": {
+              "required": 7.0,
+              "measured": 8.2101,
+              "worstCaseLsb": 8.0507,
+              "hardestGround": "bright",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "lowest": 8.7916,
+                "low": 8.573,
+                "base": 8.4177,
+                "high": 8.2756,
+                "highest": 8.2287,
+                "dim": 9.0388,
+                "bright": 8.2101
+              }
+            }
+          }
+        },
+        "$value": "{color.ramp.info.400}"
+      }
+    }
+  }
+}
