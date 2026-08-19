@@ -75,6 +75,10 @@ jobs:
         # missing, each found by pushing. A local pass has to mean what a green run
         # means, and that only holds if the two lists agree.
         run: python scripts/check_gates.py
+      - name: The benchmark's acceptance table matches its verdict data
+        # Section 7 held 28 criteria and 28 empty verdict cells: the document that
+        # defines what counts as done had never been run against the finished kit.
+        run: python scripts/benchmark.py --check
       - name: The findings register matches its own data
         # OPEN-FINDINGS.md is the document a reader trusts to say what is wrong
         # here. It was hand-written and drifted: of its 54 open entries, four were

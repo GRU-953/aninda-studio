@@ -96,7 +96,7 @@ README could not be written.
 
 ## Rebuild everything
 
-15 generators, in dependency order. Each step reads the output of
+16 generators, in dependency order. Each step reads the output of
 the ones above it, so the order is not interchangeable.
 
 ```bash
@@ -113,6 +113,7 @@ the ones above it, so the order is not interchangeable.
   ./.venv/bin/python 13_plugins/claude-code/scripts/build_skills.py && \
   ./.venv/bin/python 13_plugins/claude-design/build.py && \
   ./.venv/bin/python scripts/findings.py && \
+  ./.venv/bin/python scripts/benchmark.py && \
   ./.venv/bin/python scripts/readme.py
 ```
 

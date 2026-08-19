@@ -89,6 +89,9 @@ REBUILD_CHAIN = [
     # tree and the register is part of it. It reads only 01_research/_data, so it
     # can run anywhere; here, next to the other document generators.
     "scripts/findings.py",
+    # Before findings.py, because it writes the acceptance verdicts that
+    # findings.py then carries into the register.
+    "scripts/benchmark.py",
     "scripts/readme.py",
 ]
 
@@ -160,7 +163,7 @@ def check_rebuild_chain() -> dict:
     """
     names = ("build.py", "build.mjs", "emit_css.py", "engine.py", "readme.py",
              "pdf.py", "specimen.py", "review_bangla.py", "build_skills.py",
-             "findings.py")
+             "findings.py", "benchmark.py")
     # `git ls-files` rather than rglob, because rglob also walks ignored trees —
     # a stray git worktree under .claude/ made the first version of this guard
     # report eleven generators that are not part of the repository at all.

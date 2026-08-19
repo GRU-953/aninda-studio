@@ -827,6 +827,146 @@
     "severity_now": "not-a-defect",
     "cheap_fix": "Run pdf.py --probe-interactive once and have _pdf_sizes() read PROBE_PDF's size when the file is present, mirroring what it already does for the print PDF; otherwise leave it, since the prose is already honest about what the number is."
    }
+  },
+  {
+   "id": "B7-1",
+   "round": 3,
+   "heading": "Acceptance criterion 1 is met only in part: Icon masters are exported unmasked, at 1024×1024 px for iOS, iPadOS and macOS, and 1088×1088 px for watchOS",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Open each exported file: check pixel dimensions, and check the four corners are opaque artwork rather than transparent rounded-off area.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "minor",
+    "note": "An unmasked 1024 master exists with opaque corners, but the 1088 watchOS file is pre-rounded with transparent corners and no unmasked 1088 exists.",
+    "evidence": "Rendered each candidate master with Playwright at its own declared size and read the alpha of all four corner pixels (/tmp/acc/corners.py). 04_mark/svg/icon-appstore-square-1024.svg: declared 1024x1024, rendered 1024x1024, all four corners (13,26,23,255) fully opaque, no rx/ry in the source — this half of the criterion is met for iOS, iPadOS and macOS. 04_mark/svg/icon-1024.svg: 1024x1024 but carries rx=24 ry=24, all four corners (0,0,0,0), transparent rounded-off area. 04_mark/svg/icon-1088-watch.svg: correct 1088x1088 but also rx=24 ry=24, all four corners (0,0,0,0). No unmasked 1088 file exists anywhere in the repository, so the watchOS master fails the corner-opacity half of the test. Raster exports were also checked: the largest PNG in 10_assets is 512x512, so no 1024 or 1088 bitmap master exists. The rounding is a documented owner's decision (04_mark/manifest.json icon_policy, 14 August 2026): one rounded icon everywhere, square only for App Store submission.",
+    "cheap_fix": ""
+   }
+  },
+  {
+   "id": "B7-6",
+   "round": 3,
+   "heading": "Acceptance criterion 6 is met only in part: A Mono (single-colour) variant exists and is legible at both full size and the smallest specified size",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Render the Mono layer at both sizes and confirm the mark reads.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "minor",
+    "note": "Single-colour recolourable marks render legibly at 1024 px and at the documented 16 px floor, counter open in both. No artefact is designated a Mono icon appearance layer.",
+    "evidence": "Rendered with Playwright Chromium at device_scale_factor 1 on white, then flood-filled the background to test whether the ring's counter stays open. /Users/gru953/Claude/Cowork/Aninda_Studio/04_mark/svg/mark-regular.svg and mark-heavy.svg are the kit's single-colour files ('Recolourable: drawn in currentColor, with no colour on the root'). Results: mark-heavy at 1024 px, ink 31.56 per cent, 1 enclosed counter of 138380 px measuring 419x420; mark-heavy at 16 px, ink 32.42 per cent, 1 enclosed counter of 34 px measuring 6x6; mark-regular at 1024 px, counter 481x481; mark-regular at 24 px, counter 11x11. An ASCII dump of the 16 px render shows the ring, an open counter and the stem tail below it, so the mark reads at both extremes. 16 px is the correct smallest specified size: MARK_FLOOR_PX = 16 in 13_plugins/claude-code/skills/aninda-brand/scripts/asset.py, and 09_guidebook/chapters/03-the-mark.md says 'Below 16 px, use the icon rather than the bare mark'. What does not exist: no file, layer or manifest entry anywhere is designated Mono. `find . -iname \"*mono*\" -o -iname \"*.icon\"` returns only the Aninda Mono typeface files. 04_mark/manifest.json lists 10 artefacts, none of them a Mono or Dark appearance layer, and 13_plugins/claude-code/skills/aninda-brand/references/icons.md names Mono only as one of Apple's three Icon Composer appearances without shipping one.",
+    "cheap_fix": ""
+   }
+  },
+  {
+   "id": "B7-7",
+   "round": 3,
+   "heading": "Acceptance criterion 7 is met only in part: Icon masters are authored in sRGB; any Display P3 variant is additional, and no P3 asset is offered for visionOS",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Read the embedded colour profile of every exported asset.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "minor",
+    "note": "No P3 asset exists anywhere, so none is offered for visionOS. But none of the 19 exported rasters carries an embedded profile, so sRGB is implicit rather than declared.",
+    "evidence": "Parsed the PNG chunk stream of every exported raster and checked PIL's icc_profile for each. All 18 PNGs in /Users/gru953/Claude/Cowork/Aninda_Studio/10_assets/ plus favicon.ico carry no iCCP, no sRGB chunk, no cHRM and no gAMA; icc_profile is False on every file, and the only text chunks present are Software, Comment and Title. The same holds for all 30 other PNGs in the repository. 10_assets/MANIFEST.json records the renderer as 'Chromium via Playwright, device_scale_factor 1' and says nothing about colour space, only 'No colour is typed in the generator.' The vector masters in 04_mark/svg/ carry no colour-profile attribute either; their literals are plain hex, #0D1A17 and #FFFFFF, which are sRGB by the CSS and SVG specifications, and 07_tokens/build/primitive.tokens.json emits every colour as {\\\"colorSpace\\\": \\\"srgb\\\", ...}. On the P3 half of the criterion the result is unambiguous: `grep -rl \"display-p3\"` across all JSON, CSS, PY, SVG, HTML and MD files returns nothing, so no Display P3 asset exists for any platform and none is offered for visionOS.",
+    "cheap_fix": ""
+   }
+  },
+  {
+   "id": "B7-9",
+   "round": 3,
+   "heading": "Acceptance criterion 9 is not met: The type scale has a documented floor per platform: 11 pt iOS/iPadOS, 10 pt macOS, 23 pt tvOS, 12 pt visionOS, 12 pt watchOS",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Compute the smallest specified size for each surface and compare against the list.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "major",
+    "note": "The kit documents one floor, 12 px, for everything. No per-platform table exists and tvOS is absent outside the research file. Caption at 12 px sits below the 23 pt tvOS figure.",
+    "evidence": "Computed the smallest specified size from the token source. /Users/gru953/Claude/Cowork/Aninda_Studio/07_tokens/build/primitive.tokens.json gives dimension.type.caption as 0.7502 rem, described as '12.0px at a 16px root', the bottom step of the scale, and dimension.type.bangla-min as a 12 px hard floor. 07_tokens/css/tokens.css confirms --as-text-caption: 0.7502rem and --as-text-bangla-min: 12px. So one figure, 12 px, is the smallest specified size on every surface. Compared against the required list, 12 clears iOS and iPadOS at 11 pt, macOS at 10 pt, visionOS at 12 pt and watchOS at 12 pt, but sits below tvOS at 23 pt. More decisively, no floor is documented per platform at all. Searching the guidebook text for pt values returns only '28 pt' and '44 pt', which are target sizes, not type floors; tvOS appears zero times in the guidebook and, outside 01_research/BENCHMARK.md, zero times in the whole repository. The 16 mentions of 'floor' in the guidebook are all the 12 px Bangla floor, the line-height collision floor or contrast floors. 13_plugins/claude-code/skills/aninda-brand/references/typography.md documents the scale and the 12 px Bangla floor and names no platform. BENCHMARK.md line 168 had already written the requirement that a single smallest size for the whole kit is not enough.",
+    "cheap_fix": ""
+   }
+  },
+  {
+   "id": "B7-17",
+   "round": 3,
+   "heading": "Acceptance criterion 17 is not met: Spacing between adjacent controls is specified, not only their sizes — approximately 12 pt around bezelled and 24 pt around unbezelled elements where Apple platforms are targeted",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Read the component specifications: each must state an inter-control gap.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "major",
+    "note": "No card, guideline card or reference states a gap between adjacent controls. The kit publishes a 4 px spacing scale and utility gaps in code, but no per-component inter-control figure.",
+    "evidence": "I read the component specifications and none states an inter-control gap. Text-extracted all 30 cards (/tmp/extract.py over 08_components/cards/*/*.html) and grepped each for gap, spacing between, apart, adjacent: 0 hits in all 16 component cards, all 8 pattern cards and 5 of 6 foundation cards. The one foundation hit, space-and-shape.html, is the phrase \"nothing in between is invented on the spot\" about radii, not a control gap; its whole prose is \"A 4 px scale. Ten steps, and everything in the system sits on one of them.\" The same holds for the other two specification surfaces: 13_plugins/claude-code/skills/aninda-brand/references/layout.md publishes the ten-step scale, four radii, four target sizes and focus geometry, and its only gap sentence is \"If a gap needs 20 px, the answer is 16 px or 24 px, not a new token\" — a rounding rule, not a required gap between adjacent controls; 13_plugins/claude-design/dist/guidelines/space.card.html says \"Every gap in the component layer is one of these\", again a constraint on which value to pick rather than a stated figure. The guidebook's components chapter (09_guidebook/build.py, chapter_components_en) lists three enforced rules — no literal colour, focus always visible, nothing by colour alone — and no spacing rule. The gaps exist only in code, unstated: 08_components/src/components.css sets gap: var(--as-space-1) on .as-card__foot and .as-dialog__foot and var(--as-space-2) on the row utilities. Searching the whole repository for the Apple figures, `grep -rniE \"(12|24) ?(pt|point)\"`, returns only 09_guidebook/build.py:2450 (a 24pt print heading) and 01_research/BENCHMARK.md itself, which is where this criterion is written down. No token, prose file or card carries a bezelled or unbezelled spacing figure; `grep -ri bezel` hits only an icon-geometry sentence in references/icons.md.",
+    "cheap_fix": ""
+   }
+  },
+  {
+   "id": "B7-20",
+   "round": 3,
+   "heading": "Acceptance criterion 20 is met only in part: Reduced motion substitutes a fade, never a spatial move, depth transition or blur",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Enable the reduced-motion setting and observe every animation in the kit.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "minor",
+    "note": "Nothing moves, blurs or changes depth, reduced or not. But no fade is substituted either: under reduce the two duration tokens fall to 1 ms and the colour transitions are removed rather than cross-faded.",
+    "evidence": "I ran the named test: /tmp/as_reduced.py opened all 30 cards, 11_site/index.html and 09_guidebook/Aninda-Studio-Guidebook.html in Chromium contexts with reduced_motion set to reduce and then to no-preference, and read the computed animationName, animationDuration, transitionProperty and transitionDuration of every element on every page. With reduce off, the entire kit has exactly three transitioned properties — background-color at 0.12s on 415 elements, border-color at 0.12s on 309, color at 0.12s on 246 — and zero running keyframe animations, zero spatial transitions (transform, translate, scale, rotate, inset, margin, width, height, perspective or all), zero depth or blur transitions (box-shadow, filter, backdrop-filter, perspective) and zero opacity transitions. `grep -rnoE '@keyframes [a-zA-Z0-9_-]+'` across every css, html, py, js and ts file in the repository returns nothing at all. With reduce on, --as-duration-colour and --as-duration-move both read 1ms at the root (07_tokens/css/tokens.css:279-285) and the same three colour transitions run at 0.001s. So the prohibition half of the criterion holds absolutely and on every page: nothing moves, nothing changes depth, nothing blurs, reduced or not. The half that is not met is the positive one. Reduced motion substitutes nothing — it collapses both durations to 1 ms, which is removal, not a cross-fade; opacity is never transitioned anywhere in the kit, so no fade exists to be the substitute. The fade rule is written down (09_guidebook/build.py:2063-2068, \"replace a movement with a fade — never a spatial move and never a blur\") but no animation in the kit exercises it, because there is no movement to replace. I interpreted the test strictly: I observed every animation with the setting enabled rather than accepting the documented rule as evidence, and I am not scoring the fade requirement as vacuously satisfied.",
+    "cheap_fix": ""
+   }
+  },
+  {
+   "id": "B7-22",
+   "round": 3,
+   "heading": "Acceptance criterion 22 is not met: The dynamic-colour position is stated explicitly, naming the mechanism — static brand colours, or harmonised via `HarmonizedColors`",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Read the guidebook: the decision and the mechanism must both appear.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "major",
+    "note": "Nothing in the guidebook states a dynamic-colour position. Zero hits for dynamic colour, wallpaper or HarmonizedColors outside the research file.",
+    "evidence": "`grep -rniI \"dynamic colour|dynamic color|harmoniz|harmonis|Material You|HarmonizedColors|wallpaper\"` over the whole repository returned hits in only one file: /Users/gru953/Claude/Cowork/Aninda_Studio/01_research/BENCHMARK.md, section 4.6 lines 271-276 and the criterion row at line 495. The guidebook itself has zero hits: `grep -c wallpaper 09_guidebook/Aninda-Studio-Guidebook.html` returned 0, as did the same grep against 09_guidebook/build.py. Every occurrence of \"dynamic\" in the guidebook refers to the Apple icon's untested dynamic Liquid Glass cost, in chapters 04-icons.md line 50 and 14-what-this-system-does-not-do.md lines 67 and 79. So neither half of the required statement appears: no decision (hold brand colours static, or harmonise) and no mechanism (`HarmonizedColors`, or the opt-in `applyToActivitiesIfAvailable()`). Strictest reading applied: the named test is a guidebook documentation check and both required elements are absent. I did not grade this not-applicable because the kit does address Android elsewhere, emitting an `--as-target-android-min` token and naming Android in target-size and rendering guidance, and 05_colour/engine.py line 104 claims the surface ladder \"makes the system mappable onto\" Material, which makes the dynamic-colour question live rather than out of scope.",
+    "cheap_fix": ""
+   }
+  },
+  {
+   "id": "B7-26",
+   "round": 3,
+   "heading": "Acceptance criterion 26 is met only in part: Licences are declared per artefact and are machine-readable — Apache-2.0 for code and tokens, the font's own licence for any bundled font (with Reserved Font Name checked before any fork is renamed), PolyForm Noncommercial 1.0.0 for identity assets using the no-trailing-slash canonical URL",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Confirm a licence file in each artefact directory, a licence manifest listing SPDX identifiers, and a link check that every licence URL resolves.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "minor",
+    "note": "All 5 licence URLs return 200 and every font ships its OFL. But six artefact directories hold no licence file, spdx.py --check exits 1 on 47 files, and identity is unlicensed rather than PolyForm.",
+    "evidence": "TEST PART 3 (link check) PASSES. Collected every licence URL in the tree, then curl -sL -o /dev/null -w '%{http_code}': 200 http://www.apache.org/licenses/LICENSE-2.0, 200 https://www.apache.org/licenses/LICENSE-2.0, 200 https://openfontlicense.org/, 200 http://scripts.sil.org/OFL, 200 https://polyformproject.org/licenses/noncommercial/1.0.0, 200 the polyform raw markdown. The trailing-slash form returns 404 and appears nowhere: ./.venv/bin/python scripts/check_licence_claims.py exits 0 over 326 text files with 'no PolyForm URL carries a trailing slash'. FONT CLAUSE PASSES. Every shipped face has its licence beside it in 08_components/fonts (literata-OFL.txt, notoserifbengali-OFL.txt, anindamono-OFL.txt). Reserved Font Name read from source: head -1 06_type/candidates/mono/ibmplexmono/OFL.txt gives 'Copyright (c) 2017 IBM Corp. with Reserved Font Name \"Plex\"'; the subset is renamed 'Aninda Mono' and its shipped OFL preserves that first line, so the name was checked before the fork was renamed. TEST PART 1 (licence file per artefact dir) PARTIAL. Present: 12_packages/npm (LICENSE, NOTICE), 12_packages/python (LICENSE, NOTICE), 13_plugins/claude-code (LICENSE.txt, LICENSE-DOCS.md, NOTICE), 13_plugins/figma (same three), 13_plugins/claude-design/dist (LICENSE, NOTICE). Absent: 04_mark, 10_assets, 07_tokens, 08_components, 09_guidebook, 11_site hold no LICENSE, NOTICE or COPYING at all. TEST PART 2 (SPDX manifest) PARTIAL. Machine-readable SPDX exists per package only: 12_packages/npm/package.json '\"license\": \"Apache-2.0\"', 12_packages/python/pyproject.toml 'license = \"Apache-2.0\"', 13_plugins/claude-code/.claude-plugin/plugin.json and .claude-plugin/marketplace.json both 'Apache-2.0 AND PolyForm-Noncommercial-1.0.0'. There is no repository-wide licence manifest; the SPDX tables live in prose (NOTICE, guidebook chapter 13, licence-matrix.md), and grep -in 'licen|spdx' over 07_tokens/build/*.json, 04_mark/manifest.json and 10_assets/MANIFEST.json returns nothing, so the DTCG token documents and the identity manifests carry no SPDX field. The kit's own enforcer disagrees with its published matrix: ./.venv/bin/python 13_plugins/claude-code/skills/aninda-repo/scripts/spdx.py --check . exits 1 with '99 already correct / 206 exempt / 47 missing / 0 declaring a different licence', the 47 including both READMEs, TRADEMARKS.md, .github/workflows/ci.yml, all 18 guidebook chapter sources, 11_site/index.html and four packaged stylesheets. IDENTITY CLAUSE NOT MET AS WRITTEN. NOTICE section 4 declares 'THE IDENTITY - not licensed at all ... No licence is granted to any of it'; PolyForm-Noncommercial-1.0.0 covers the writing instead. This is a deliberate, consistently documented deviation (13_plugins/claude-design/dist/NOTICE says the same), not an oversight, but the criterion's assignment of PolyForm to identity assets does not hold. ONE STALE CLAIM FOUND. 13_plugins/claude-code/skills/aninda-repo/references/licence-matrix.md line 73 reads '| IBM Plex Mono | `IBM Plex` | Rename it.' - the wrong reserved name the repository's guard exists to catch. It escapes because the guard's pattern requires the phrase 'Reserved Font Name' or 'RFN' and that table's column header reads 'Reserved name'.",
+    "cheap_fix": ""
+   }
+  },
+  {
+   "id": "B7-27",
+   "round": 3,
+   "heading": "Acceptance criterion 27 is met only in part: The brand book and the design system ship as separate artefacts, with separate licences and separate front doors, and the design system remains usable by someone not permitted to use the mark",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Remove the identity assets and confirm the token set still builds and the component documentation still makes sense.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "minor",
+    "note": "Tokens and both packages still verify with 04_mark and 10_assets deleted, and packages ship no identity file. But 08_components and 11_site builds fail-close on the missing mark manifests.",
+    "evidence": "Ran the named test in a throwaway copy, never in the repository: rsync -a (excluding .venv, .git, browsers, node_modules, font candidates) to /tmp/as_c27, baseline verified there first (07_tokens/build.py --check exit 0, emit_css.py --check exit 0), then rm -rf 04_mark 10_assets and re-ran. TOKEN SET STILL BUILDS: 07_tokens/build.py --check exit 0, '--check: 6 files verified, 0 problems. Nothing written.'; 07_tokens/emit_css.py --check exit 0, 'CSS re-parsed and matched against source'; 12_packages/build.py --check exit 0, 'both packages match the source', 'ok npm aninda-studio-tokens - 20 files', 'ok PyPI aninda-studio-tokens - 17 files'. The packages are genuinely clean of the identity: find 12_packages -type f piped to grep -iE 'mark|wordmark|icon|logo|tile|svg|png' returns nothing. COMPONENT DOCUMENTATION STILL READS: of the 30 built cards, grep -rl finds only 08_components/cards/foundations/the-marks.html mentioning the identity, and that card IS the identity card; the other 29 never name it. All three cards I parsed (button, colour, dashboard) have zero external src or href, so they render intact with 04_mark and 10_assets gone. WHAT DOES NOT SURVIVE: 08_components/build.py --check exits 1 with FileNotFoundError '/private/tmp/as_c27/04_mark/manifest.json', and 11_site/build.py --check exits 1 with 'BUILD FAILED - 10_assets/MANIFEST.json is missing. Run 10_assets/build.py first'. So the shipped documentation reads, but someone not permitted to use the mark cannot regenerate the card set or the site, including the 29 cards that have nothing to do with the identity. 09_guidebook/build.py --check exits 1 on 04_mark/svg/wordmark-latin.svg, which is expected of a brand book. SEPARATE LICENCES: yes, and verified per artefact (Apache-2.0 on tokens and code, PolyForm-Noncommercial-1.0.0 on the writing, identity unlicensed; 09_guidebook/chapters/01-welcome.md carries the three-row table stating it). SEPARATE ARTEFACTS AND FRONT DOORS: not as written. The brand-book chapters (01-04, 10, 11, 13) and the design-system chapters (05-09, 12) are one 15 MB guidebook file under the single writing licence, and README.md plus 11_site/index.html are one shared front door for both halves; the only genuinely separate front doors are the two package READMEs. 01_research/BENCHMARK.md states the original intent as 'Ship the two artefacts separately, with separate licences and separate front doors', so the shortfall is against the kit's own plan.",
+    "cheap_fix": ""
+   }
+  },
+  {
+   "id": "B7-28",
+   "round": 3,
+   "heading": "Acceptance criterion 28 is not met: Every factual claim in the guidebook carries a source and a date checked, and no number appears that cannot be traced to one",
+   "file": "01_research/BENCHMARK.md",
+   "body": "This kit's own acceptance criterion, written in section 7 of the benchmark before anything was built and scored for the first time on 19 August 2026.\n\nThe test it names: Read every claim: each must have a citation with a URL and a date; count the untraceable numbers, which must be zero.",
+   "verdict": {
+    "status": "still_open",
+    "severity_now": "major",
+    "note": "The 20,538-word guidebook holds 2 URLs, both licence texts. Of 72 external-authority sentences with a number, none has a URL and 67 have no date. The source table sits in BENCHMARK.md.",
+    "evidence": "Stripped 09_guidebook/Aninda-Studio-Guidebook.html to plain text (styles, scripts and SVG removed, entities unescaped): 20,538 words. URL COUNT: after removing the base64 font blobs, regex over the file finds 22 URLs, of which 20 are http://www.w3.org/2000/svg namespace declarations. Exactly two real URLs exist in the entire book, both being licence texts: https://www.apache.org/licenses/LICENSE-2.0 and https://polyformproject.org/licenses/noncommercial/1.0.0. No claim anywhere cites a source URL. DATE COUNT: 15 full date strings in total, 12 of them the one cover-and-footer line 'Version 1.0.0 - sources verified 14 August 2026'. Only six claim-level 'checked' statements exist, and none carries a URL. CLAIM AUDIT: split the text into sentences and selected those naming an external authority (WCAG, Apple, Android, Material, Google, W3C, CSS Color 4, Bangla Academy, OSI, FSF, SIL, DTCG, Unicode, Human Interface, Carbon, GOV.UK) and containing a digit: 72 sentences. Of those, 0 carry a URL and 67 carry no date in the same sentence. Specific numeric claims attributed to an outside body with neither URL nor date: '--as-target-apple-min 28 Apple's published minimum, in points, for iOS and iPadOS', '--as-target-comfortable 44 Apple's published default, in points', '--as-target-android-min 48 Android's minimum touch target, in density-independent pixels', '--as-target-min 24 WCAG 2.2 criterion 2.5.8', 'Rule 4 of the Bangla Academy's 2012 spelling rules exempts the names of people, institutions and organisations'. The best-cited claims in the book still lack a URL: 'Verified against the Apple Human Interface Guidelines, checked 14 August 2026' and, for the Material 3 spring figures, 'Those figures were checked on 14 August 2026'. WHERE THE APPARATUS ACTUALLY LIVES: 01_research/BENCHMARK.md does carry a proper sources table (lines 552-561 give developer.apple.com paths with change-log dates such as '8 Jun 2026'), but it holds only 2 URLs itself, the guidebook never cites or links it (the word 'benchmark' appears three times, none as a citation), and BENCHMARK.md is not among the 68 files embedded in the guidebook, so a reader of the book alone cannot reach it. WHAT THE BOOK DOES DO WELL, recorded for fairness: ./.venv/bin/python 09_guidebook/build.py --check passes with 'both files match their sources byte for byte', so the measured numbers are generated from the token files and proof JSON rather than typed, and figures with no external source are labelled as house decisions ('Apple publishes no corner radius; this number is ours and is not claimed to be theirs'). That is internal traceability, not the citation with a URL and a date the test requires.",
+    "cheap_fix": ""
+   }
   }
  ]
 }

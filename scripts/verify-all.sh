@@ -114,6 +114,7 @@ run "scripts/readme.py"       $PY scripts/readme.py --check
 run "10_assets/build.py"      $PY 10_assets/build.py --check
 run "guidebook PDF vs the book" $PY 09_guidebook/scripts/pdf.py --check
 run "claude-design bundle"    $PY 13_plugins/claude-design/build.py --check
+run "benchmark verdicts"      $PY scripts/benchmark.py --check
 run "findings register"       $PY scripts/findings.py --check
 
 echo "--- plugins ---"
