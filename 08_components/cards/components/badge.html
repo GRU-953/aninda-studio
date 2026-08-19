@@ -1589,6 +1589,48 @@
   });
   document.addEventListener('submit', function (event) { event.preventDefault(); });
 
+  // Scroll containers become tab stops ONLY while they actually overflow.
+  //
+  // A scroll container is focusable in Chromium whatever we do, so .as-scroll-x was
+  // already a tab stop on the four cards that have one and on the site — carrying
+  // the browser's own 1px ring instead of this system's 3px one, with no accessible
+  // name, and invisible to both harnesses because their INTERACTIVE selector needs a
+  // tabindex, an interactive tag or an ARIA widget role. So the one visual this
+  // project measures hardest was, at those stops, whatever the browser supplied.
+  //
+  // Conditional on purpose. readme.md states the rule: a table needs tabindex="0"
+  // and role="region" "only when it actually overflows". Setting it unconditionally
+  // would add a tab stop that scrolls nothing at wide widths — at 1280 only one
+  // container on one card overflows at all.
+  //
+  // Adding tabindex also brings it inside [tabindex]:focus in components.css, so it
+  // picks up the system ring, and inside [tabindex]:not([tabindex="-1"]) in both
+  // harnesses, so from now on it is measured.
+  var scrollers = document.querySelectorAll('.as-scroll-x');
+  function syncScrollers() {
+    for (var s = 0; s < scrollers.length; s++) {
+      var box = scrollers[s];
+      var overflows = box.scrollWidth > box.clientWidth + 1;
+      if (overflows) {
+        if (!box.hasAttribute('tabindex')) {
+          box.setAttribute('tabindex', '0');
+          box.setAttribute('role', 'region');
+          var cap = box.querySelector('caption');
+          var name = cap ? cap.textContent.trim() : 'Scrollable content';
+          if (name.length > 80) { name = name.slice(0, 77) + '…'; }
+          box.setAttribute('aria-label', name + ' — scrolls sideways');
+        }
+      } else if (box.hasAttribute('tabindex')) {
+        box.removeAttribute('tabindex');
+        box.removeAttribute('role');
+        box.removeAttribute('aria-label');
+      }
+    }
+  }
+  syncScrollers();
+  window.addEventListener('resize', syncScrollers);
+
+
   // The copy button. It had no listener at all: a control whose name is a promise
   // and whose behaviour is nothing, announced identically to one that works, and
   // it matters most to the keyboard-only reader for whom it is the only offered

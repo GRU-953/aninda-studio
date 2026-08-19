@@ -56,6 +56,8 @@ Copyright 2026 Aninda Sundar Howlader
 
 from __future__ import annotations
 
+import html as html_mod
+import re
 import sys
 from pathlib import Path
 
@@ -175,6 +177,85 @@ def inspect_pdf(pdf_path: Path) -> dict:
             "per_page": inked}
 
 
+def pdf_text(pdf_path: Path) -> str:
+    """Every character of text in the PDF, normalised to one line."""
+    import pypdfium2 as pdfium
+    doc = pdfium.PdfDocument(str(pdf_path))
+    parts = [doc[i].get_textpage().get_text_range() for i in range(len(doc))]
+    doc.close()
+    return re.sub(r"\s+", " ", " ".join(parts))
+
+
+def check_against_source(pdf_path: Path, html_path: Path) -> list[str]:
+    """The committed PDF must say what the print build says.
+
+    WHY THIS IS A CONTENT CHECK AND NOT A DIFF
+    Every other generated artefact here is gated by regenerating it and running
+    `git diff --exit-code`. That cannot work for a PDF: Chromium stamps a creation
+    date and a document ID, so two runs of the same input differ in bytes. Measured
+    — two consecutive runs gave sha256 5b747e9b… and dd69c896…. An mtime gate is no
+    use either, because a CI checkout gives every file the same timestamp.
+
+    So the gate is the text. The PDF was three weeks stale and nothing said so: it
+    still read "Three faces ship with this system" after the licence chapter had been
+    corrected to four, still printed the superseded 1.4 MB figure, and never named
+    AnindaMono-Regular.ttf. Every one of those is a string, and a string is checkable.
+
+    Every heading in the print build must appear in the PDF. That is what catches a
+    chapter that was rewritten after the PDF was last made.
+
+    THE LATIN PART ONLY, AND WHY
+    PDF text is stored in VISUAL order. Bangla reorders pre-base vowels and builds
+    conjuncts, so extraction gives back the glyphs as they sit on the page rather
+    than as they were written: "অনিন্দ্য স্টুডিও" comes out "অনি ন্দ্য স্টুডি ও". The
+    first version of this check compared whole headings and failed 15 of 130 on a PDF
+    it had regenerated seconds earlier — every one of them a heading containing
+    Bangla, and none of them actually stale.
+
+    So each heading is reduced to its Latin run before comparing. All 130 headings
+    have one, so nothing drops out of the check. What this cannot see is a Bangla
+    heading that changed while its English stayed put; that is stated rather than
+    papered over.
+    """
+    problems: list[str] = []
+    text = pdf_text(pdf_path)
+    if len(text) < 20000:
+        return [f"only {len(text)} characters of text came out of the PDF, which is "
+                f"too little to compare — the extraction did not really run"]
+
+    html = html_path.read_text(encoding="utf-8")
+    headings = re.findall(r"<h[23][^>]*>(.*?)</h[23]>", html, re.S)
+    missing = []
+    compared = 0
+    for raw in headings:
+        plain = re.sub(r"<[^>]+>", "", raw)
+        plain = html_mod.unescape(plain)
+        plain = re.sub(r"\s+", " ", plain).strip()
+        # Each Latin SEGMENT, not the heading with Bangla squeezed out. Many
+        # headings put Latin on both sides of the Bangla — "Estuary — মোহনা /
+        # ground" — so collapsing them gives "Estuary ground", which is never a
+        # contiguous run in the PDF. Splitting on the Bangla fixes it and is
+        # stricter: both halves have to be there.
+        segments = [seg.strip(" ,·—/·")
+                    for seg in re.split(r"[\u0980-\u09FF]+", plain)]
+        segments = [re.sub(r"\s+", " ", seg) for seg in segments if len(seg.strip()) >= 4]
+        if not segments:
+            continue
+        compared += 1
+        absent = [seg for seg in segments if seg not in text]
+        if absent:
+            missing.append(" + ".join(absent)[:60])
+    if compared < 60:
+        problems.append(f"only {compared} headings were long enough to compare, and "
+                        f"the book has more than that — the check did not really run")
+    if missing:
+        problems.append(
+            f"{len(missing)} of {compared} headings in the print build are absent "
+            f"from the committed PDF, so it was made from an older book: "
+            f"{missing[:4]}")
+    return problems
+
+
 def probe_interactive() -> None:
     """Try to print the interactive build and report what happens. The two-file
     split rests on this, so it is measured rather than asserted."""
@@ -202,6 +283,23 @@ def probe_interactive() -> None:
 
 
 def main(argv: list[str]) -> int:
+    # --check does not re-render. It reads the COMMITTED pdf and asks whether it
+    # still says what the print build says, which is the question a drift guard
+    # asks everywhere else in this repository.
+    if "--check" in argv:
+        if not PRINT_HTML.exists() or not OUT_PDF.exists():
+            print("could not run: the print build or the PDF is missing",
+                  file=sys.stderr)
+            return 2
+        stale = check_against_source(OUT_PDF, PRINT_HTML)
+        if stale:
+            print("CHECK FAILED — the committed PDF has drifted from the book:\n  "
+                  + "\n  ".join(stale), file=sys.stderr)
+            return 1
+        print("--check: the committed PDF still matches the print build. "
+              "Nothing written.")
+        return 0
+
     if not PRINT_HTML.exists():
         print("The print build is not on disk. Run build.py first.",
               file=sys.stderr)
@@ -234,6 +332,12 @@ def main(argv: list[str]) -> int:
     if failures:
         print("PRINT FAILED\n  " + "\n  ".join(failures), file=sys.stderr)
         return 1
+
+    stale = check_against_source(OUT_PDF, PRINT_HTML)
+    if stale:
+        print("PRINT FAILED\n  " + "\n  ".join(stale), file=sys.stderr)
+        return 1
+    print("  every heading in the print build appears in the PDF")
 
     print("  stated limit: the PDF has no bookmark tree. Chromium emits no "
           "outline and this pipeline has no PDF tool to add one. The generated "

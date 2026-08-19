@@ -55,18 +55,30 @@ someone chose on purpose is not a thing to quietly swap.
 
 | File | What goes in it | Licence of the file |
 | --- | --- | --- |
-| `LICENSE` | The full Apache License 2.0 text. | — |
-| `LICENSE-DOCS.md` | The full PolyForm Noncommercial 1.0.0 text, with the "source-available, not open source" note above it. | — |
+| `LICENSE` | The full Apache License 2.0 text. Copy `LICENSE.txt` from this skill; it is that text, byte for byte. | — |
+| `LICENSE-DOCS.md` | The full PolyForm Noncommercial 1.0.0 text, with the "source-available, not open source" note above it. Copy `templates/LICENSE-DOCS.md`. | — |
 | `NOTICE` | All four licences, each with what it covers and where its text lives. | — |
 | `TRADEMARKS.md` | What is not licensed at all, and how to ask. | PolyForm |
 | `README.md` | English. | PolyForm |
 | `README.bn.md` | Bangla, written as Bangla — not translated from the English. | PolyForm |
 | `.gitignore` | The usual, plus anything generated that is not committed. | — |
 | `.github/workflows/brand.yml` | The brand check. | Apache-2.0 |
-| `fonts/*-OFL.txt` | One beside each font file, never one shared copy. | — |
+| `fonts/*-OFL.txt` | One beside each font file, never one shared copy. Copy `templates/OFL.txt` and fill in its first two lines: the dates, the copyright holder, and the Reserved Font Name if the face has one. | — |
 
 `references/licence-matrix.md` has the exact wording for each. Do not paraphrase
-a licence identifier or URL from memory.
+a licence identifier or URL from memory — and do not reproduce a licence text from
+memory either. All three texts ship in this bundle:
+
+| Text | Where it is in this skill |
+| --- | --- |
+| Apache License 2.0 | `LICENSE.txt` |
+| PolyForm Noncommercial 1.0.0 | `templates/LICENSE-DOCS.md` |
+| SIL Open Font License 1.1 | `templates/OFL.txt` |
+
+They were absent until 19 August 2026, which meant this skill asked an agent to
+write two licence texts it did not supply — into a stranger's repository, as its
+governing licence — while the CI workflow this same skill writes fails that
+repository if `LICENSE-DOCS.md` is missing.
 
 ---
 

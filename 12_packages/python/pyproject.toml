@@ -21,7 +21,7 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://anindastudio.com"
+Homepage = "https://github.com/GRU-953/aninda-studio"
 Source = "https://github.com/GRU-953/aninda-studio"
 
 [tool.hatch.build.targets.wheel]

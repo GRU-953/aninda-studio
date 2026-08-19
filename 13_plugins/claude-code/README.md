@@ -202,4 +202,3 @@ copy of it.
 
 `aninda.sh15@gmail.com`
 Source: `https://github.com/GRU-953/aninda-studio`
-Site: `https://anindastudio.com`

@@ -3069,6 +3069,35 @@ def guard_tables(documents: dict[str, str]) -> None:
         )
 
 
+def guard_platform_claims(documents: dict[str, str]) -> None:
+    """The book may not claim the measurements come from one machine.
+
+    README.md's limits block is generated and CI-enforced, and says the rendering
+    checks "run on macOS locally and on Ubuntu in CI, from a clean checkout, so the
+    results are not particular to one machine". Chapter 14 said the opposite twice —
+    "headless Chromium on macOS" and "tested by one person on one machine" — and it
+    is the calibration the whole book is read against. The correct claim was the
+    generated one; the wrong ones were hand-written and unguarded, which is why they
+    drifted.
+    """
+    for name, doc in documents.items():
+        text = strip_tags(doc)
+        for phrase in ("one person on one machine", "on one machine"):
+            if phrase in text:
+                raise SystemExit(
+                    f"{name}: still says {phrase!r}. The rendering checks run on "
+                    f"macOS locally and on Ubuntu in CI, which README.md states and "
+                    f"CI enforces. Say what is true of both, or say nothing."
+                )
+        # Where the book says the measurements come from Chromium, it must not
+        # pin that to a single operating system.
+        if "headless Chromium on macOS" in text:
+            raise SystemExit(
+                f"{name}: says the measurements come from 'headless Chromium on "
+                f"macOS'. They come from macOS and from Ubuntu in CI."
+            )
+
+
 def guard_split_entities(documents: dict[str, str]) -> None:
     """No inserted tag may sit inside an HTML character reference.
 
@@ -3144,6 +3173,7 @@ def build_all() -> dict[str, str]:
         if n_bn or n_en:
             print(f"  tagged {n_bn} Bangla and {n_en} English run(s) in {name}")
     guard_split_entities(docs)
+    guard_platform_claims(docs)
 
     guard_own_css()
     guard_placeholders(docs)

@@ -44,21 +44,26 @@ Those two are counted separately on purpose. **WCAG defines no AAA level for
 non-text contrast**, so a border at 3.9:1 has fully met its criterion; judging it
 against the 4.5:1 text threshold would call a pass a failure.
 
-That is why there are no hand-written contrast figures in this repository. A
-number a person types is a number that can be wrong and stay wrong.
+That is why every contrast figure this system publishes about itself is read from
+the token files or measured in a browser, never typed. A number a person types is a
+number that can be wrong and stay wrong.
+
+The one exception is labelled as one: the Table and Dashboard cards carry five
+illustrative rows each, so those components have something to render. Their caption
+and their alert both say the figures are examples rather than readings.
 
 ## What is in here
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.0 MB) that needs no network, plus a 1.8 MB PDF |
+| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.1 MB) that needs no network, plus a 1.8 MB PDF |
 | `07_tokens/` | The design tokens: DTCG source, and 64 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
 | `04_mark/` | 10 mark, wordmark and icon files |
 | `10_assets/` | 20 ready-made images at exact platform sizes |
 | `11_site/` | The website, generated from the tokens |
 | `12_packages/` | The tokens as an npm package and a Python package |
-| `13_plugins/` | A Figma plugin and a Claude Code plugin |
+| `13_plugins/` | A Figma plugin, a Claude Code plugin, and the Claude Design bundle |
 | `01_research/` | What was checked, when, and against which source — including what could not be verified |
 
 ## Try it in one minute
@@ -73,7 +78,7 @@ below works from a checkout.
 ```
 
 That command opens a real browser and re-measures every colour pairing against the
-pixels it actually produced. It takes about a minute and it either agrees with the
+pixels it actually produced. It takes a few seconds and it either agrees with the
 token files or tells you exactly where it does not.
 
 ```bash
@@ -142,6 +147,10 @@ Stated here rather than discovered later:
 - **The icons are rounded everywhere, Apple included.** That is a deliberate
   choice against Apple's current guidance, and what it trades away is recorded in
   `04_mark/manifest.json`.
+- **The website is not deployed, and its domain is not registered.**
+  `11_site/` names `anindastudio.com` in its CNAME, its canonical URLs, its sitemap
+  and its social image, because that is the address it is built for. The `.com`
+  registry held no record of it on 19 August 2026, so nothing is served there yet.
 
 ## Licence
 

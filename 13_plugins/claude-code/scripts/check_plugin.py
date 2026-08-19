@@ -307,6 +307,14 @@ def check_bangla_agreement(problems: Problems) -> None:
 BUNDLED_FROM_REPO = {
     "aninda-brand/assets/css/tokens.css": "07_tokens/css/tokens.css",
     "aninda-brand/assets/marks/manifest.json": "04_mark/manifest.json",
+    # The two licence texts the aninda-repo skill tells an agent to copy. They were
+    # absent entirely until 19 August 2026: the skill's file table promised the full
+    # PolyForm and OFL texts and shipped neither, so an agent following it had to
+    # reproduce a licence from memory or fetch one. Byte-compared here, because a
+    # licence that has drifted from its source is worse than one that is missing —
+    # it looks authoritative.
+    "aninda-repo/LICENSE.txt": "LICENSE",
+    "aninda-repo/templates/LICENSE-DOCS.md": "LICENSE-DOCS.md",
 }
 
 
@@ -399,6 +407,39 @@ def check_bundled_copies(problems: Problems) -> None:
     if not stale:
         problems.ok(f"{len(pairs)} bundled files are byte-identical to their sources "
                     "in the repository")
+
+
+def check_ofl_template(problems: Problems) -> None:
+    """The OFL template's licence body must match the OFL this repository ships.
+
+    It cannot be a byte copy: the shipped file's first line names IBM Corp and the
+    Plex Reserved Font Name, which would be wrong to hand a stranger as a template.
+    So the header is SIL's placeholder form and everything from the rule onwards is
+    compared byte for byte.
+    """
+    template = SKILLS / "aninda-repo" / "templates" / "OFL.txt"
+    shipped = REPO_ROOT / "08_components" / "fonts" / "anindamono-OFL.txt"
+    if not template.exists() or not shipped.exists():
+        problems.wrong("the OFL template or the shipped OFL is missing, so the "
+                       "template cannot be checked against a real licence text")
+        return
+    marker = "-" * 59
+    a = template.read_text(encoding="utf-8")
+    b = shipped.read_text(encoding="utf-8")
+    if marker not in a or marker not in b:
+        problems.wrong("could not find the OFL rule line in the template or the "
+                       "shipped licence, so the comparison did not really run")
+        return
+    if a[a.index(marker):] != b[b.index(marker):]:
+        problems.wrong("aninda-repo/templates/OFL.txt's licence body differs from "
+                       "08_components/fonts/anindamono-OFL.txt")
+        return
+    if "<Reserved Font Name>" not in a:
+        problems.wrong("the OFL template has no placeholder header — it would hand a "
+                       "stranger somebody else's copyright line")
+        return
+    problems.ok("aninda-repo/templates/OFL.txt carries SIL's placeholder header and "
+                "a licence body byte-identical to the OFL this repository ships")
 
 
 def check_bangla_font_coverage(problems: Problems) -> None:
@@ -785,6 +826,7 @@ def main() -> int:
     check_marketplace(problems)
     check_bundled_copies(problems)
     check_bangla_font_coverage(problems)
+    check_ofl_template(problems)
     check_rule_count(problems)
     check_token_names(problems)
     check_colour_reference(problems)

@@ -52,6 +52,36 @@
       });
     }
     apply(stored());
+
+    // Scroll containers become tab stops ONLY while they actually overflow. A
+    // scroll container is focusable in Chromium regardless, so .as-scroll-x on this
+    // page was already a tab stop carrying the browser's own 1px ring instead of the
+    // system's 3px one, with no accessible name, and invisible to 11_site/check.py
+    // because its INTERACTIVE selector needs a tabindex, an interactive tag or an
+    // ARIA widget role. Conditional because readme.md's rule is that a table needs
+    // tabindex="0" and role="region" "only when it actually overflows".
+    var scrollers = document.querySelectorAll('.as-scroll-x');
+    function syncScrollers() {
+      for (var s = 0; s < scrollers.length; s++) {
+        var box = scrollers[s];
+        if (box.scrollWidth > box.clientWidth + 1) {
+          if (!box.hasAttribute('tabindex')) {
+            box.setAttribute('tabindex', '0');
+            box.setAttribute('role', 'region');
+            var cap = box.querySelector('caption');
+            var name = cap ? cap.textContent.trim() : 'Scrollable content';
+            if (name.length > 80) { name = name.slice(0, 77) + '…'; }
+            box.setAttribute('aria-label', name + ' — scrolls sideways');
+          }
+        } else if (box.hasAttribute('tabindex')) {
+          box.removeAttribute('tabindex');
+          box.removeAttribute('role');
+          box.removeAttribute('aria-label');
+        }
+      }
+    }
+    syncScrollers();
+    window.addEventListener('resize', syncScrollers);
   });
 })();</script>
 </head>

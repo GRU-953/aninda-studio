@@ -39,6 +39,7 @@ from __future__ import annotations
 import argparse
 import io as _io
 import json
+import platform
 import re
 import sys
 import time
@@ -485,8 +486,14 @@ CANNOT_CHECK = [
     "are not exercised. The one keyboard behaviour that is driven for real is the "
     "arrow-key walk through a tablist, because a roving tabindex makes it the "
     "only way to reach most of the tabs.",
-    "Any browser other than the pinned Chromium, and any platform other than "
-    "macOS. Safari, Firefox and Windows high contrast were not run.",
+    # Derived, not asserted. This line said "any platform other than macOS" on
+    # every run — including the Ubuntu runs in CI, where it was simply false, in a
+    # list this file introduces as "part of the result, not an apology". A blind-spot
+    # list that states a falsehood about its own run is worse than a shorter one.
+    f"Any browser other than the pinned Chromium. This run measured on "
+    f"{platform.system()} ({sys.platform}); CI measures the same checkout on Ubuntu, "
+    f"so the readings are not particular to one machine. Safari, Firefox and real "
+    f"Windows high contrast were not run anywhere.",
     "Real reading. Nobody in either script was asked whether these cards are "
     "actually comfortable to read.",
     "Print, and any resolution other than device_scale_factor 1.",

@@ -58,7 +58,11 @@ PY_MODULE = "aninda_studio_tokens"
 AUTHOR = "Aninda Sundar Howlader"
 EMAIL = "aninda.sh15@gmail.com"
 REPO = "https://github.com/GRU-953/aninda-studio"
-HOME = "https://anindastudio.com"
+# The repository, not anindastudio.com. That domain is chosen and NOT registered
+# — the .com registry returned "No match" on 19 August 2026 — so a homepage
+# pointing at it sends anyone who clicks it from npm or PyPI to nothing. The
+# repository is the thing that actually exists.
+HOME = "https://github.com/GRU-953/aninda-studio"
 
 THEMES = ("light", "dark", "hc-light", "hc-dark")
 

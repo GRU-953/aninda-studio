@@ -159,6 +159,17 @@ jobs:
       # artefact went unmeasured. All four scripts are committed, so the guard
       # could only ever hide their disappearance — which is the thing most worth
       # failing on. A check that did not run must never read as a pass.
+      - name: The icon and social assets must match the marks
+        # This build had no --check mode at all until 19 August 2026, so twenty
+        # rasters, an .ico and a manifest were regenerated and diffed nowhere.
+        run: python 10_assets/build.py --check
+      - name: The committed PDF must still say what the book says
+        # A byte diff is impossible: Chromium stamps a creation date, so two runs of
+        # the same input differ. Measured. So this compares the PDF's TEXT against
+        # the print build's headings — the shipped PDF was three weeks stale, still
+        # claiming three fonts after the licence chapter was corrected to four, and
+        # nothing could see it.
+        run: python 09_guidebook/scripts/pdf.py --check
       - run: python 11_site/build.py --check
       - run: python 09_guidebook/build.py --check
       - name: The npm package must actually resolve

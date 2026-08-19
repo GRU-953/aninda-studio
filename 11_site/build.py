@@ -105,6 +105,9 @@ PYTHON_EXAMPLE = (
 )
 DOMAIN = "anindastudio.com"
 ORIGIN = f"https://{DOMAIN}"
+# The repository is the only address in this build that resolves today: DOMAIN is
+# chosen and unregistered. Both package READMEs already ship this URL.
+REPO = "https://github.com/GRU-953/aninda-studio"
 
 DO_NOT_EDIT = (
     "GENERATED FILE. Written by " + GENERATOR + ". Do not hand-edit — the next "
@@ -357,10 +360,19 @@ def guard_site_markup(pages: dict[str, str]) -> None:
 def guard_english(pages: dict[str, str]) -> None:
     """02_strategy/ENGLISH-STANDARD.md bans six words outright, bans exclamation
     marks, and bans Latin abbreviations. Those three are mechanical, so they are
-    enforced rather than trusted."""
+    enforced rather than trusted.
+
+    <script>, <style> and <title> are stripped first, because none of them is this
+    page's English prose. Without that the guard reads JavaScript: it failed the
+    build on the `!` in `if (!box.hasAttribute(...))` and reported it as an
+    exclamation mark in the copy. guard_glyphs, twenty lines below, has always
+    stripped the same three elements for the same reason — this guard simply never
+    had a script to read until one was added.
+    """
     problems = []
     for name, markup in pages.items():
-        text = re.sub(r"<[^>]+>", " ", markup)
+        prose = re.sub(r"<(style|script|title)\b[^>]*>.*?</\1>", " ", markup, flags=re.S)
+        text = re.sub(r"<[^>]+>", " ", prose)
         text = html.unescape(text)
         low = text.lower()
         for word in BANNED_WORDS:
@@ -728,6 +740,36 @@ THEME_JS = """(function () {
       });
     }
     apply(stored());
+
+    // Scroll containers become tab stops ONLY while they actually overflow. A
+    // scroll container is focusable in Chromium regardless, so .as-scroll-x on this
+    // page was already a tab stop carrying the browser's own 1px ring instead of the
+    // system's 3px one, with no accessible name, and invisible to 11_site/check.py
+    // because its INTERACTIVE selector needs a tabindex, an interactive tag or an
+    // ARIA widget role. Conditional because readme.md's rule is that a table needs
+    // tabindex="0" and role="region" "only when it actually overflows".
+    var scrollers = document.querySelectorAll('.as-scroll-x');
+    function syncScrollers() {
+      for (var s = 0; s < scrollers.length; s++) {
+        var box = scrollers[s];
+        if (box.scrollWidth > box.clientWidth + 1) {
+          if (!box.hasAttribute('tabindex')) {
+            box.setAttribute('tabindex', '0');
+            box.setAttribute('role', 'region');
+            var cap = box.querySelector('caption');
+            var name = cap ? cap.textContent.trim() : 'Scrollable content';
+            if (name.length > 80) { name = name.slice(0, 77) + '\u2026'; }
+            box.setAttribute('aria-label', name + ' \u2014 scrolls sideways');
+          }
+        } else if (box.hasAttribute('tabindex')) {
+          box.removeAttribute('tabindex');
+          box.removeAttribute('role');
+          box.removeAttribute('aria-label');
+        }
+      }
+    }
+    syncScrollers();
+    window.addEventListener('resize', syncScrollers);
   });
 })();"""
 
@@ -859,6 +901,19 @@ def section_work(cards: dict, tokens_css: str) -> str:
         '<thead><tr><th scope="col">Part</th><th scope="col" class="as-num">Count</th>'
         '<th scope="col">What it is</th></tr></thead>'
         f"<tbody>{body}</tbody></table></div>"
+        # Somewhere to go. The page described thirty components, a guidebook and two
+        # packages and offered a reader exactly two links: skip-to-content and an
+        # email address. Hyperlinks are not subresources, so none of this costs the
+        # page its offline-and-self-contained property — the npm README already
+        # links the repository from inside a shipped artefact.
+        '<p class="as-prose">'
+        f'<a class="as-nav__link" href="{REPO}">The repository</a> holds all of it: '
+        f'<a class="as-nav__link" href="{REPO}/blob/main/09_guidebook/Aninda-Studio-Guidebook.html">'
+        'the guidebook</a> as one self-contained file, '
+        f'<a class="as-nav__link" href="{REPO}/tree/main/08_components/cards">'
+        'the component cards</a>, and '
+        f'<a class="as-nav__link" href="{REPO}/tree/main/07_tokens">the design tokens</a> '
+        'the rest is generated from.</p>'
         "</section>"
     )
 

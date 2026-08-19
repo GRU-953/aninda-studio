@@ -8,7 +8,7 @@
 
 ## 1. What this document is, and what it is not
 
-This is a comparison between the forthcoming Aninda Studio brand system and the **published**
+This is a comparison between the Aninda Studio brand system and the **published**
 design and brand guidance of the companies whose work is most often held up as the standard —
 principally Apple and Google, then a wider field of public design systems.
 
@@ -23,9 +23,10 @@ Three things it is, stated plainly.
    Google's current design direction is still partly in pre-release code as of August 2026. A
    benchmark without dates is a benchmark that quietly rots. Every row below therefore names the
    page or file it came from and the date on it.
-3. **It is a measuring stick, not a scorecard.** Section 7 lists the criteria this kit will be
-   held to. It deliberately records **no verdicts**, because the kit does not exist yet.
-   Verdicts are filled in later, against a thing that can actually be inspected.
+3. **It was a measuring stick before it was a scorecard.** Section 7 lists the criteria this
+   kit is held to. It recorded no verdicts while the kit did not exist; the verdicts were run
+   against the finished system on 19 August 2026 and are in the table there, each with the
+   evidence that decided it.
 
 Three things it is not.
 
@@ -344,7 +345,7 @@ hosted tool keeps running — the same trap in a different shape.
 
 ---
 
-## 6. Standards this kit will actually be held to
+## 6. Standards this kit is actually held to
 
 Everything above is guidance from a company. This section is the part with external authority.
 

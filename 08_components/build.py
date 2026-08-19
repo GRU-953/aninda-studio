@@ -1129,6 +1129,17 @@ def d_dialog(p, th, T):
 
 
 def d_table(p, th, T):
+    # Typed on purpose, and now labelled as such. These are demo rows for a card
+    # whose subject is the TABLE component — a numeric column, a row header, a
+    # status badge — not a contrast report. The "Failed" row at 4.19 is the giveaway:
+    # nothing in this system measures 4.19, because the colour engine refuses to
+    # emit a role that does not clear its floor.
+    #
+    # The caption used to read "Smallest measured contrast ratio on each card",
+    # which asserted a measurement these five numbers never had, on a card a reader
+    # downloads inside the guidebook. Feeding it check.py's real --json report was
+    # the alternative and it is worse: the figures would change on every run, and
+    # 08_components/build.py --check diffs its output byte for byte.
     rows = [
         ("Colour", "Foundations", "15.90", "success", "check", "Passed"),
         ("Typography", "Foundations", "8.44", "success", "check", "Passed"),
@@ -1144,7 +1155,7 @@ def d_table(p, th, T):
     return f"""
 <div class="as-scroll-x">
   <table class="as-table as-table--numeric">
-    <caption>Smallest measured contrast ratio on each card, light theme.</caption>
+    <caption>Example rows: a contrast report as this table would render it. The figures are illustrative, not measurements — see the Colour card for the real ones.</caption>
     <thead><tr><th scope="col">Card</th><th scope="col">Group</th><th scope="col" class="as-num">Ratio</th><th scope="col">Result</th></tr></thead>
     <tbody>{body}</tbody>
   </table>
@@ -1705,8 +1716,8 @@ def d_dashboard(p, th, T):
   <div class="as-alert as-alert--info">
     {icon('info', 'as-icon as-alert__glyph')}
     <div class="as-alert__body">
-      <p class="as-alert__title">These figures come from check.py</p>
-      <p class="as-alert__text">The numbers on this card are an example, not a live reading. A real dashboard would say when it last measured.</p>
+      <p class="as-alert__title">Example figures, not a live reading</p>
+      <p class="as-alert__text">The numbers on this card are illustrative. A real dashboard would name its source and say when it last measured.</p>
     </div>
   </div>
 </div>"""
@@ -2140,6 +2151,48 @@ SWITCHER_JS = """
     if (anchor) { event.preventDefault(); }
   });
   document.addEventListener('submit', function (event) { event.preventDefault(); });
+
+  // Scroll containers become tab stops ONLY while they actually overflow.
+  //
+  // A scroll container is focusable in Chromium whatever we do, so .as-scroll-x was
+  // already a tab stop on the four cards that have one and on the site — carrying
+  // the browser's own 1px ring instead of this system's 3px one, with no accessible
+  // name, and invisible to both harnesses because their INTERACTIVE selector needs a
+  // tabindex, an interactive tag or an ARIA widget role. So the one visual this
+  // project measures hardest was, at those stops, whatever the browser supplied.
+  //
+  // Conditional on purpose. readme.md states the rule: a table needs tabindex="0"
+  // and role="region" "only when it actually overflows". Setting it unconditionally
+  // would add a tab stop that scrolls nothing at wide widths — at 1280 only one
+  // container on one card overflows at all.
+  //
+  // Adding tabindex also brings it inside [tabindex]:focus in components.css, so it
+  // picks up the system ring, and inside [tabindex]:not([tabindex="-1"]) in both
+  // harnesses, so from now on it is measured.
+  var scrollers = document.querySelectorAll('.as-scroll-x');
+  function syncScrollers() {
+    for (var s = 0; s < scrollers.length; s++) {
+      var box = scrollers[s];
+      var overflows = box.scrollWidth > box.clientWidth + 1;
+      if (overflows) {
+        if (!box.hasAttribute('tabindex')) {
+          box.setAttribute('tabindex', '0');
+          box.setAttribute('role', 'region');
+          var cap = box.querySelector('caption');
+          var name = cap ? cap.textContent.trim() : 'Scrollable content';
+          if (name.length > 80) { name = name.slice(0, 77) + '\u2026'; }
+          box.setAttribute('aria-label', name + ' \u2014 scrolls sideways');
+        }
+      } else if (box.hasAttribute('tabindex')) {
+        box.removeAttribute('tabindex');
+        box.removeAttribute('role');
+        box.removeAttribute('aria-label');
+      }
+    }
+  }
+  syncScrollers();
+  window.addEventListener('resize', syncScrollers);
+
 
   // The copy button. It had no listener at all: a control whose name is a promise
   // and whose behaviour is nothing, announced identically to one that works, and

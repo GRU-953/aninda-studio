@@ -28,7 +28,7 @@ one word.
 | Short form, Bangla | {{bn:wm-2}} |
 | Repository name | `aninda-studio` |
 | The two token packages | `aninda-studio-tokens` |
-| Domain | `anindastudio.com` |
+| Domain | `anindastudio.com` — chosen, and not registered as of 19 August 2026 |
 
 Sentence case, always. Not ANINDA STUDIO, not Aninda STUDIO. Capitals are
 harder to read, and in Bangla they do not exist at all, so an all-capitals

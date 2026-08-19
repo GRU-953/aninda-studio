@@ -52,8 +52,9 @@ below.
 
 Every rendered measurement in this system — the type metrics, the মাত্রা
 continuity, the line-height collision floors, the contrast readings, the focus
-ring — comes from **headless Chromium on macOS**, at a device scale factor of 1
-for measurement and 2 for the specimen images.
+ring — comes from **headless Chromium**, at a device scale factor of 1 for
+measurement and 2 for the specimen images. It runs on macOS here and on Ubuntu in
+CI, from a clean checkout, so the readings are not particular to one machine.
 
 Windows uses DirectWrite. Android has its own stack. Hinting and stem darkening
 differ between them. The findings most likely to move are the sub-pixel মাত্রা
@@ -114,4 +115,5 @@ In the order I would do them, given the chance:
 4. Five people who are not me, building something small with the kit.
 
 Until those happen, the honest description of this system is: carefully
-measured, thoroughly documented, and tested by one person on one machine.
+measured, thoroughly documented, and checked by one person — on two operating
+systems, but in one browser engine, and by nobody who depends on a screen reader.

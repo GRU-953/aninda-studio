@@ -308,8 +308,13 @@ Those two are counted separately on purpose. **WCAG defines no AAA level for
 non-text contrast**, so a border at 3.9:1 has fully met its criterion; judging it
 against the 4.5:1 text threshold would call a pass a failure.
 
-That is why there are no hand-written contrast figures in this repository. A
-number a person types is a number that can be wrong and stay wrong.
+That is why every contrast figure this system publishes about itself is read from
+the token files or measured in a browser, never typed. A number a person types is a
+number that can be wrong and stay wrong.
+
+The one exception is labelled as one: the Table and Dashboard cards carry five
+illustrative rows each, so those components have something to render. Their caption
+and their alert both say the figures are examples rather than readings.
 
 ## What is in here
 
@@ -322,7 +327,7 @@ number a person types is a number that can be wrong and stay wrong.
 | `10_assets/` | {f['assets']} ready-made images at exact platform sizes |
 | `11_site/` | The website, generated from the tokens |
 | `12_packages/` | The tokens as an npm package and a Python package |
-| `13_plugins/` | A Figma plugin and a Claude Code plugin |
+| `13_plugins/` | A Figma plugin, a Claude Code plugin, and the Claude Design bundle |
 | `01_research/` | What was checked, when, and against which source — including what could not be verified |
 
 ## Try it in one minute
@@ -337,7 +342,7 @@ below works from a checkout.
 ```
 
 That command opens a real browser and re-measures every colour pairing against the
-pixels it actually produced. It takes about a minute and it either agrees with the
+pixels it actually produced. It takes a few seconds and it either agrees with the
 token files or tells you exactly where it does not.
 
 ```bash
@@ -393,6 +398,10 @@ Stated here rather than discovered later:
 - **The icons are rounded everywhere, Apple included.** That is a deliberate
   choice against Apple's current guidance, and what it trades away is recorded in
   `04_mark/manifest.json`.
+- **The website is not deployed, and its domain is not registered.**
+  `11_site/` names `anindastudio.com` in its CNAME, its canonical URLs, its sitemap
+  and its social image, because that is the address it is built for. The `.com`
+  registry held no record of it on 19 August 2026, so nothing is served there yet.
 
 ## Licence
 
@@ -473,7 +482,7 @@ def bangla(f: dict) -> str:
 | `10_assets/` | নানা মাপে তৈরি {f['assets']}টি ছবি |
 | `11_site/` | ওয়েবসাইট, টোকেন থেকে বানানো |
 | `12_packages/` | টোকেনগুলো npm ও Python প্যাকেজ হিসেবে |
-| `13_plugins/` | Figma প্লাগইন আর Claude Code প্লাগইন |
+| `13_plugins/` | Figma প্লাগইন, Claude Code প্লাগইন আর Claude Design বান্ডিল |
 
 ## শুরু করতে
 
@@ -488,7 +497,7 @@ def bangla(f: dict) -> str:
 ```
 
 এই কমান্ডটি সত্যিকারের একটি ব্রাউজার খুলে প্রতিটি রঙের জোড়া আবার মেপে
-দেখে। এক মিনিট লাগে। হয় সে টোকেন ফাইলের সঙ্গে একমত হবে, নয়তো ঠিক কোথায় মেলে না
+দেখে। কয়েক সেকেন্ড লাগে। হয় সে টোকেন ফাইলের সঙ্গে একমত হবে, নয়তো ঠিক কোথায় মেলে না
 তা বলে দেবে।
 
 ## যা এই পদ্ধতি করে না
@@ -503,6 +512,13 @@ def bangla(f: dict) -> str:
 - **পরীক্ষা শুধু Chromium-এ।** নিজের ম্যাকে আর CI-তে উবুন্টুতে, দুই জায়গাতেই চলে —
   তাই ফলাফল কোনো একটি যন্ত্রের উপর নির্ভর করে না। Safari, Firefox আর উইন্ডোজের হাই
   কনট্রাস্ট পরীক্ষা করা হয়নি।
+- **সব জায়গায় আইকনের কোণ গোল, Apple-সহ।** এটি Apple-এর বর্তমান নির্দেশনার
+  বিপরীতে নেওয়া একটি সিদ্ধান্ত। এর বিনিময়ে কী ছাড়া হলো, তা
+  `04_mark/manifest.json`-এ লেখা আছে।
+- **ওয়েবসাইটটি এখনো প্রকাশ করা হয়নি, ডোমেইনটিও নিবন্ধন করা হয়নি।** `11_site/`
+  ফোল্ডারে `anindastudio.com` লেখা আছে, কারণ সাইটটি ওই ঠিকানার জন্যই তৈরি।
+  ১৯ অগস্ট ২০২৬ পর্যন্ত `.com` নিবন্ধকের কাছে ওই নামের কোনো রেকর্ড নেই, তাই
+  ওখানে এখনো কিছুই দেখা যাবে না।
 
 ## লাইসেন্স
 
