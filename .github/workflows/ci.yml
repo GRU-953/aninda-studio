@@ -70,6 +70,11 @@ jobs:
           done
           exit $fail
 
+      - name: CI and scripts/verify-all.sh must run the same gates
+        # Three pushes went out red, each on a different gate the local script was
+        # missing, each found by pushing. A local pass has to mean what a green run
+        # means, and that only holds if the two lists agree.
+        run: python scripts/check_gates.py
       - name: The findings register matches its own data
         # OPEN-FINDINGS.md is the document a reader trusts to say what is wrong
         # here. It was hand-written and drifted: of its 54 open entries, four were

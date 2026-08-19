@@ -46,6 +46,38 @@ else
   git ls-files --others --exclude-standard | sed 's/^/    /'
 fi
 
+echo "--- lint ---"
+# TRACKED files only, for both of these. CI checks out a commit, so it only ever
+# sees what git holds; sweeping the working tree instead made the first version of
+# these two gates fail on ten gitignored macOS .DS_Store files and on JSON inside
+# .claude/, neither of which CI can see. A local gate stricter than the CI gate it
+# mirrors is its own kind of wrong: it trains you to ignore the output.
+printf '%-46s ' "every tracked JSON parses"
+if $PY - <<'PYJSON' >/dev/null 2>&1
+import json, subprocess, sys
+files = subprocess.run(["git", "ls-files", "-z", "*.json"], capture_output=True,
+                       text=True).stdout.split("\0")
+bad = []
+for f in files:
+    if not f or f.startswith("00_sandbox/node_modules/"):
+        continue
+    try:
+        json.load(open(f, encoding="utf-8"))
+    except Exception as exc:
+        bad.append(f"{f}: {exc}")
+if bad:
+    print("\n".join(bad)); sys.exit(1)
+PYJSON
+then echo "ok"; else
+  echo "FAILED"; fail=1
+fi
+printf '%-46s ' "no .DS_Store tracked"
+if git ls-files | grep -q '\.DS_Store'; then
+  echo "FAILED"; git ls-files | grep '\.DS_Store' | sed 's/^/    /'; fail=1
+else echo "ok"; fi
+printf '%-46s ' "generated files say they are generated"
+if grep -q "GENERATED" 07_tokens/css/tokens.css; then echo "ok"; else echo "FAILED"; fail=1; fi
+
 echo "--- prose and licences ---"
 for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md \
             00_sandbox/TOOLCHAIN.md 01_research 02_strategy 09_guidebook/chapters \
@@ -57,6 +89,7 @@ for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md \
     || { echo "  english standard FAILED: $path"; fail=1; }
 done
 echo "  english standard: 17 paths"
+run "CI and this script agree" $PY scripts/check_gates.py
 run "licence claims"          $PY scripts/check_licence_claims.py
 run "MEASUREMENTS.md figures" $PY scripts/check_measurements.py
 
@@ -68,6 +101,15 @@ run "12_packages/build.py"    $PY 12_packages/build.py --check
 run "08_components/build.py"  $PY 08_components/build.py --check
 run "11_site/build.py"        $PY 11_site/build.py --check
 run "09_guidebook/build.py"   $PY 09_guidebook/build.py --check
+printf '%-46s ' "marks are current (shaping gates inside)"
+$PY 04_mark/build.py >/dev/null 2>&1 || { echo "FAILED — the mark build refused"; fail=1; }
+if git diff --quiet 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg; then
+  echo "ok"
+else
+  echo "FAILED — the committed marks differ from a fresh build"
+  git diff --stat 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg | sed 's/^/    /'
+  fail=1
+fi
 run "scripts/readme.py"       $PY scripts/readme.py --check
 run "claude-design bundle"    $PY 13_plugins/claude-design/build.py --check
 run "findings register"       $PY scripts/findings.py --check
@@ -84,6 +126,15 @@ else
   git diff --stat 13_plugins/figma/dist 13_plugins/figma/src/tokens.generated.ts \
                   13_plugins/figma/RECEIPT-EXPECTED.json | sed 's/^/    /'
   fail=1
+fi
+printf '%-46s ' "figma plugin typechecks"
+if ( cd 13_plugins/figma && ../../00_sandbox/node_modules/.bin/tsc --noEmit -p tsconfig.json ) \
+     >/dev/null 2>&1; then echo "ok"; else echo "FAILED"; fail=1; fi
+printf '%-46s ' "a placeholder manifest stops the figma build"
+if ( cd 13_plugins/figma && node build.mjs >/dev/null 2>&1 ); then
+  echo "FAILED — the manifest gate let a placeholder through"; fail=1
+else
+  echo "ok"
 fi
 printf '%-46s ' "claude-code skill bundles are current"
 $PY 13_plugins/claude-code/scripts/build_skills.py >/dev/null 2>&1 || true
@@ -116,6 +167,7 @@ else
 fi
 
 echo "--- rendered and measured (slow) ---"
+run "00_sandbox/measure.py"   $PY 00_sandbox/measure.py
 run "11_site/check.py"        $PY 11_site/check.py
 run "08_components/check.py"  $PY 08_components/check.py
 
