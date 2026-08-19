@@ -123,6 +123,7 @@ jobs:
   # 3 ── about a minute. Shaping and geometry.
   marks:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     needs: tokens
     steps:
       - uses: actions/checkout@v5
@@ -130,7 +131,19 @@ jobs:
         with:
           python-version: '3.13'
       - run: pip install -r requirements.txt
-      - run: python -m playwright install --with-deps chromium
+      - name: Install Chromium
+        # timeout-minutes, because this step is the one thing in the workflow that
+        # hangs rather than fails. --with-deps runs apt-get, and twice in one day it
+        # sat past thirty minutes on a GitHub runner with the job showing as merely
+        # in progress: no output, no failure, nothing to diagnose. A bounded failure
+        # can be retried; an unbounded wait cannot even be recognised.
+        #
+        # Kept --with-deps rather than trusting the runner image to carry the
+        # libraries, because a missing shared library fails inside Chromium at launch
+        # and reads like a code fault. This is the honest trade: a slow, occasionally
+        # stalling step that fails loudly, over a fast one that fails obscurely.
+        timeout-minutes: 8
+        run: python -m playwright install --with-deps chromium
       - name: Rebuild the marks — the shaping gates run inside
         run: python 04_mark/build.py
       - name: The marks must not have changed
@@ -278,6 +291,7 @@ jobs:
   # 6 ── slowest, and last. Its failures are usually symptoms of jobs 1 to 5.
   render:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     needs: [marks, build]
     steps:
       - uses: actions/checkout@v5
@@ -285,7 +299,19 @@ jobs:
         with:
           python-version: '3.13'
       - run: pip install -r requirements.txt
-      - run: python -m playwright install --with-deps chromium
+      - name: Install Chromium
+        # timeout-minutes, because this step is the one thing in the workflow that
+        # hangs rather than fails. --with-deps runs apt-get, and twice in one day it
+        # sat past thirty minutes on a GitHub runner with the job showing as merely
+        # in progress: no output, no failure, nothing to diagnose. A bounded failure
+        # can be retried; an unbounded wait cannot even be recognised.
+        #
+        # Kept --with-deps rather than trusting the runner image to carry the
+        # libraries, because a missing shared library fails inside Chromium at launch
+        # and reads like a code fault. This is the honest trade: a slow, occasionally
+        # stalling step that fails loudly, over a fast one that fails obscurely.
+        timeout-minutes: 8
+        run: python -m playwright install --with-deps chromium
       - name: Measure the tokens in a real browser
         run: python 00_sandbox/measure.py
       - name: Measure every component card
