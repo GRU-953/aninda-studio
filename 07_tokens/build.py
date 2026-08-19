@@ -95,11 +95,24 @@ RADIUS_PX = {"badge": 4, "control": 8, "card": 14, "hero": 24}
 
 # The three platform floors are different numbers and the system states all
 # three rather than picking one and implying it is universal.
+# Each description carries the source and the date it was read. These four figures
+# were the clearest example of the fault acceptance criterion 28 found: a number
+# attributed to an outside body with neither a URL nor a date, in a token document
+# that a stranger consumes. A figure like that cannot be re-checked, which is the
+# whole reason to cite one.
 TARGET_PX = {
-    "min": (24, "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA"),
-    "apple-min": (28, "Apple HIG minimum control size, iOS and iPadOS"),
-    "comfortable": (44, "Apple HIG default control size, iOS and iPadOS"),
-    "android-min": (48, "Android accessibility guidance minimum touch target, in dp"),
+    "min": (24, "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA — "
+                "w3.org/TR/WCAG22/#target-size-minimum, Recommendation "
+                "12 December 2024, read 14 August 2026"),
+    "apple-min": (28, "Apple HIG minimum control size, iOS and iPadOS — "
+                      "developer.apple.com/design/human-interface-guidelines/"
+                      "accessibility, read 14 August 2026"),
+    "comfortable": (44, "Apple HIG default control size, iOS and iPadOS — "
+                        "developer.apple.com/design/human-interface-guidelines/"
+                        "accessibility, read 14 August 2026"),
+    "android-min": (48, "Android accessibility guidance minimum touch target, in dp "
+                        "— developer.android.com accessibility pages, "
+                        "read 14 August 2026"),
 }
 
 # WCAG 2.4.13 Focus Appearance is Level AAA, not AA. AA requires only 2.4.11,

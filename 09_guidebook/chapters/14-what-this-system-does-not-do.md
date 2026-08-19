@@ -117,3 +117,17 @@ In the order I would do them, given the chance:
 Until those happen, the honest description of this system is: carefully
 measured, thoroughly documented, and checked by one person — on two operating
 systems, but in one browser engine, and by nobody who depends on a screen reader.
+
+## Where every outside claim comes from
+
+This book leans on outside authorities in a few dozen places — Apple's minimum text
+sizes, Android's touch target, WCAG's contrast floors, the Bangla Academy's spelling
+rules, the DTCG format. Until 19 August 2026 it carried exactly two URLs, both of
+them licence texts, and none of those claims cited anything.
+
+That was the worst omission in the book, because it is the one that asks a reader to
+take a number on trust while the rest of the system is built on refusing to do that.
+The table below is the whole apparatus, generated from the same record the benchmark
+uses, and the benchmark itself now travels inside this file.
+
+{{data:sources}}

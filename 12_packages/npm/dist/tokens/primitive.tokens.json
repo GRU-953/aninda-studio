@@ -1377,10 +1377,10 @@
           "value": 24,
           "unit": "px"
         },
-        "$description": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA",
+        "$description": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA — w3.org/TR/WCAG22/#target-size-minimum, Recommendation 12 December 2024, read 14 August 2026",
         "$extensions": {
           "studio.aninda": {
-            "source": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA"
+            "source": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA — w3.org/TR/WCAG22/#target-size-minimum, Recommendation 12 December 2024, read 14 August 2026"
           }
         }
       },
@@ -1389,10 +1389,10 @@
           "value": 28,
           "unit": "px"
         },
-        "$description": "Apple HIG minimum control size, iOS and iPadOS",
+        "$description": "Apple HIG minimum control size, iOS and iPadOS — developer.apple.com/design/human-interface-guidelines/accessibility, read 14 August 2026",
         "$extensions": {
           "studio.aninda": {
-            "source": "Apple HIG minimum control size, iOS and iPadOS"
+            "source": "Apple HIG minimum control size, iOS and iPadOS — developer.apple.com/design/human-interface-guidelines/accessibility, read 14 August 2026"
           }
         }
       },
@@ -1401,10 +1401,10 @@
           "value": 44,
           "unit": "px"
         },
-        "$description": "Apple HIG default control size, iOS and iPadOS",
+        "$description": "Apple HIG default control size, iOS and iPadOS — developer.apple.com/design/human-interface-guidelines/accessibility, read 14 August 2026",
         "$extensions": {
           "studio.aninda": {
-            "source": "Apple HIG default control size, iOS and iPadOS"
+            "source": "Apple HIG default control size, iOS and iPadOS — developer.apple.com/design/human-interface-guidelines/accessibility, read 14 August 2026"
           }
         }
       },
@@ -1413,10 +1413,10 @@
           "value": 48,
           "unit": "px"
         },
-        "$description": "Android accessibility guidance minimum touch target, in dp",
+        "$description": "Android accessibility guidance minimum touch target, in dp — developer.android.com accessibility pages, read 14 August 2026",
         "$extensions": {
           "studio.aninda": {
-            "source": "Android accessibility guidance minimum touch target, in dp"
+            "source": "Android accessibility guidance minimum touch target, in dp — developer.android.com accessibility pages, read 14 August 2026"
           }
         }
       }

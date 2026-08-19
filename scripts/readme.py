@@ -89,11 +89,17 @@ REBUILD_CHAIN = [
     # tree and the register is part of it. It reads only 01_research/_data, so it
     # can run anywhere; here, next to the other document generators.
     "scripts/findings.py",
-    # Before findings.py, because it writes the acceptance verdicts that
-    # findings.py then carries into the register.
-    "scripts/benchmark.py",
     "scripts/readme.py",
 ]
+
+# benchmark.py runs BEFORE the guidebook, not after it. The guidebook embeds
+# 01_research/BENCHMARK.md among its kit files, so writing the acceptance verdicts
+# after the book was built left the book carrying a stale copy — and the two differed
+# at IDENTICAL byte length, because a verdict cell was swapped for one the same
+# size, which is the confusing shape this ordering bug takes. Inserted rather than
+# listed in place so the reason travels with the line.
+REBUILD_CHAIN.insert(REBUILD_CHAIN.index("09_guidebook/build.py"),
+                     "scripts/benchmark.py")
 
 # The Figma bundle is Node, not Python, so it is named separately in the prose.
 REBUILD_NODE = "13_plugins/figma/build.mjs"

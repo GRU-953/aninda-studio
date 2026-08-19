@@ -1,0 +1,430 @@
+{
+ "_generator": "extracted from 01_research/BENCHMARK.md by hand once, on 19 August 2026, so the guidebook can cite what the research already established. The sources list is parsed from that file's section 9 tables.",
+ "sources": [
+  {
+   "authority": "Apple",
+   "title": "Source",
+   "url": "URL",
+   "date_on_source": "Date on the source"
+  },
+  {
+   "authority": "Apple",
+   "title": "Human Interface Guidelines — App Icons",
+   "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
+   "date_on_source": "Change log 8 Jun 2026 (prev. 9 Jun 2025, 10 Jun 2024)"
+  },
+  {
+   "authority": "Apple",
+   "title": "Human Interface Guidelines — Materials",
+   "url": "developer.apple.com/design/human-interface-guidelines/foundations/materials/",
+   "date_on_source": "Current at check"
+  },
+  {
+   "authority": "Apple",
+   "title": "Human Interface Guidelines — Typography",
+   "url": "developer.apple.com/design/human-interface-guidelines/typography",
+   "date_on_source": "Change log 16 Dec 2025"
+  },
+  {
+   "authority": "Apple",
+   "title": "Human Interface Guidelines — Accessibility",
+   "url": "developer.apple.com/design/human-interface-guidelines/accessibility",
+   "date_on_source": "Current at check"
+  },
+  {
+   "authority": "Apple",
+   "title": "Human Interface Guidelines — Motion",
+   "url": "developer.apple.com/design/human-interface-guidelines/motion",
+   "date_on_source": "Current at check"
+  },
+  {
+   "authority": "Apple",
+   "title": "Human Interface Guidelines — Focus and selection",
+   "url": "developer.apple.com/design/human-interface-guidelines/focus-and-selection",
+   "date_on_source": "Change log 24 Oct 2023"
+  },
+  {
+   "authority": "Apple",
+   "title": "Human Interface Guidelines — Branding",
+   "url": "developer.apple.com/design/human-interface-guidelines/foundations/branding/",
+   "date_on_source": "Current at check"
+  },
+  {
+   "authority": "Apple",
+   "title": "Adopting Liquid Glass",
+   "url": "developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass",
+   "date_on_source": "Current at check"
+  },
+  {
+   "authority": "Apple",
+   "title": "Creating your app icon using Icon Composer (Xcode documentation)",
+   "url": "developer.apple.com/documentation/xcode` — Icon Composer article",
+   "date_on_source": "Current at check"
+  },
+  {
+   "authority": "Apple",
+   "title": "Apple Design Resources (App Icon Template)",
+   "url": "developer.apple.com/design/resources/",
+   "date_on_source": "Refreshed 23 Jun 2026"
+  },
+  {
+   "authority": "Apple",
+   "title": "App Store Marketing Guidelines",
+   "url": "developer.apple.com/app-store/marketing/guidelines/",
+   "date_on_source": "Current at check"
+  },
+  {
+   "authority": "Apple",
+   "title": "Apple Trademark List",
+   "url": "apple.com/legal/intellectual-property/trademark/appletmlist.html",
+   "date_on_source": "States updates as of 14 Jul 2026"
+  },
+  {
+   "authority": "Apple",
+   "title": "Guidelines for Using Apple Trademarks and Copyrights",
+   "url": "apple.com/legal/intellectual-property/guidelinesfor3rdparties.html",
+   "date_on_source": "Current at check"
+  },
+  {
+   "authority": "Apple",
+   "title": "Apple Identity Guidelines for Channel Affiliates (PDF)",
+   "url": "apple.com/legal/sales-support/certification/docs/logo_guidelines.pdf",
+   "date_on_source": "Content c. 2013"
+  },
+  {
+   "authority": "Apple",
+   "title": "Apple Style Guide (PDF)",
+   "url": "help.apple.com/pdf/applestyleguide/en_US/apple-style-guide.pdf",
+   "date_on_source": "Re-published 25 Jun 2026"
+  },
+  {
+   "authority": "Apple",
+   "title": "WWDC26 session 251 — *Communicate your brand identity on iOS*",
+   "url": "developer.apple.com/videos/play/wwdc2026/251/",
+   "date_on_source": "8 Jun 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Source",
+   "url": "URL",
+   "date_on_source": "Date on the source"
+  },
+  {
+   "authority": "Google",
+   "title": "Material 3 Expressive launch announcement",
+   "url": "blog.google/products-and-platforms/platforms/android/material-3-expressive-android-wearos-launch/",
+   "date_on_source": "13 May 2025"
+  },
+  {
+   "authority": "Google",
+   "title": "Material 3 specification",
+   "url": "m3.material.io",
+   "date_on_source": "Current at check"
+  },
+  {
+   "authority": "Google",
+   "title": "Compose Material 3 release notes (versions, alphas, promotions)",
+   "url": "developer.android.com/jetpack/androidx/releases/compose-material3",
+   "date_on_source": "1.4.0 and 1.5.0-alpha26, both 12 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Compose `ColorScheme`, `ShapeTokens.kt`, `MaterialShapes.kt`, `MotionScheme`",
+   "url": "AndroidX source, via `developer.android.com` and the AndroidX repository",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Material Components for Android (maintenance mode)",
+   "url": "github.com/material-components/material-components-android",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Material Web Components (maintenance mode)",
+   "url": "github.com/material-components/material-web",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "`material-color-utilities`",
+   "url": "github.com/material-foundation/material-color-utilities",
+   "date_on_source": "Last push 10 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Material Theme Builder (repository archived)",
+   "url": "github.com/material-foundation/material-theme-builder",
+   "date_on_source": "Archived Jul 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Android accessibility guidance (touch targets, contrast)",
+   "url": "developer.android.com` — accessibility pages",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Expressive design research",
+   "url": "design.google/library/expressive-material-design-google-research",
+   "date_on_source": "**No publish date on the page**"
+  },
+  {
+   "authority": "Google",
+   "title": "Google brand resources (redirect chain)",
+   "url": "google.com/permissions` → `about.google/brand-resource-center` → `partnermarketinghub.withgoogle.com`; `brand.google` → sign-in",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Google Fonts licensing structure",
+   "url": "fonts.google.com` and `github.com/google/fonts` (`ofl/`, `apache/`, `ufl/`)",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Standards and formats",
+   "title": "Source",
+   "url": "URL",
+   "date_on_source": "Date on the source"
+  },
+  {
+   "authority": "Standards and formats",
+   "title": "WCAG 2.2",
+   "url": "w3.org/TR/WCAG22/",
+   "date_on_source": "W3C Recommendation, 12 Dec 2024"
+  },
+  {
+   "authority": "Standards and formats",
+   "title": "WCAG 3.0",
+   "url": "w3.org/TR/wcag-3.0/",
+   "date_on_source": "Working Draft, 3 Mar 2026"
+  },
+  {
+   "authority": "Standards and formats",
+   "title": "Design Tokens Format Module 2025.10",
+   "url": "designtokens.org/tr/2025.10/format/",
+   "date_on_source": "Final Community Group Report, 28 Oct 2025"
+  },
+  {
+   "authority": "Standards and formats",
+   "title": "DTCG schema identifier used by implementers",
+   "url": "tr.designtokens.org/format/",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Standards and formats",
+   "title": "SIL Open Font Licence 1.1",
+   "url": "openfontlicense.org",
+   "date_on_source": "Licence 26 Feb 2007; FAQ 1.1-update7, Nov 2023"
+  },
+  {
+   "authority": "Standards and formats",
+   "title": "Apache License 2.0",
+   "url": "apache.org/licenses/LICENSE-2.0",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Standards and formats",
+   "title": "PolyForm Noncommercial 1.0.0",
+   "url": "polyformproject.org/licenses/noncommercial/1.0.0` (**no trailing slash**)",
+   "date_on_source": "Released 9 Jul 2019"
+  },
+  {
+   "authority": "Standards and formats",
+   "title": "SPDX licence list",
+   "url": "spdx.org/licenses/",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Source",
+   "url": "URL",
+   "date_on_source": "Date on the source"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "IBM Carbon `@carbon/themes` (DTCG tokens)",
+   "url": "github.com/carbon-design-system/carbon",
+   "date_on_source": "11.79.0, 12 Aug 2026, Apache-2.0"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Style Dictionary",
+   "url": "styledictionary.com",
+   "date_on_source": "5.5.1, 7 Aug 2026, Apache-2.0"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Tokens Studio for Figma",
+   "url": "Tokens Studio documentation",
+   "date_on_source": "Checked 14 Aug 2026, MIT"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Figma REST and Plugin APIs; Variables API plan requirements",
+   "url": "developers.figma.com/docs/",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Figma Code Connect — parser deprecation",
+   "url": "developers.figma.com/docs/code-connect/` and `github.com/figma/code-connect",
+   "date_on_source": "Framework-specific parsers unsupported from 17 Aug 2026"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "GitHub Primer",
+   "url": "primer.style",
+   "date_on_source": "Checked 14 Aug 2026, MIT"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Atlassian `@atlaskit/tokens`",
+   "url": "atlassian.design",
+   "date_on_source": "16.7.0, Apache-2.0"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Adobe Spectrum design data (repository renamed)",
+   "url": "github.com/adobe/spectrum-design-data",
+   "date_on_source": "Checked 14 Aug 2026, Apache-2.0"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Microsoft Fluent `@fluentui/tokens`",
+   "url": "github.com/microsoft/fluentui",
+   "date_on_source": "1.0.0-alpha.24"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Shopify Polaris",
+   "url": "polaris.shopify.com",
+   "date_on_source": "Polaris React archived and deprecated 11 Aug 2026; Polaris Web Components released 1 Oct 2025"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Salesforce Lightning Design System",
+   "url": "github.com/salesforce-ux/design-system",
+   "date_on_source": "Repository archived, last push 2 Jun 2026; npm 2.264.0, 22 Jul 2026, BSD-3-Clause"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "GOV.UK Design System and brand site",
+   "url": "design-system.service.gov.uk` and `brand.design-system.service.gov.uk",
+   "date_on_source": "Code MIT; content OGL v3.0; assets \"All rights reserved\""
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Uber Base",
+   "url": "base.uber.com",
+   "date_on_source": "Checked 14 Aug 2026, MIT"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Meta Brand Resource Center",
+   "url": "meta.com/brand/resources/",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Mailchimp content style guide",
+   "url": "styleguide.mailchimp.com",
+   "date_on_source": "Repository last pushed May 2022; no LICENSE file"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Stripe",
+   "url": "No Stripe-owned brand or design-system page reachable",
+   "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Tooling and other design systems",
+   "title": "Spotify Encore",
+   "url": "No public documentation found",
+   "date_on_source": "Checked 14 Aug 2026"
+  }
+ ],
+ "platforms": {
+  "checked": "14 August 2026",
+  "type": {
+   "source": "Apple Human Interface Guidelines — Typography",
+   "source_date": "change log 16 December 2025",
+   "rows": [
+    {
+     "platform": "iOS and iPadOS",
+     "default_pt": 17,
+     "minimum_pt": 11
+    },
+    {
+     "platform": "macOS",
+     "default_pt": 13,
+     "minimum_pt": 10
+    },
+    {
+     "platform": "tvOS",
+     "default_pt": 29,
+     "minimum_pt": 23
+    },
+    {
+     "platform": "visionOS",
+     "default_pt": 17,
+     "minimum_pt": 12
+    },
+    {
+     "platform": "watchOS",
+     "default_pt": 16,
+     "minimum_pt": 12
+    }
+   ],
+   "note": "These apply to custom fonts as well as system fonts."
+  },
+  "targets": {
+   "source": "Apple Human Interface Guidelines — Accessibility",
+   "source_date": "current at check",
+   "rows": [
+    {
+     "platform": "iOS and iPadOS",
+     "default_pt": 44,
+     "minimum_pt": 28
+    },
+    {
+     "platform": "macOS",
+     "default_pt": 28,
+     "minimum_pt": 20
+    },
+    {
+     "platform": "tvOS",
+     "default_pt": 66,
+     "minimum_pt": 56
+    },
+    {
+     "platform": "visionOS",
+     "default_pt": 60,
+     "minimum_pt": 28
+    },
+    {
+     "platform": "watchOS",
+     "default_pt": 44,
+     "minimum_pt": 28
+    }
+   ]
+  },
+  "spacing": {
+   "source": "Apple Human Interface Guidelines — Accessibility",
+   "source_date": "current at check",
+   "bezelled_pt": 12,
+   "unbezelled_pt": 24,
+   "claim": "Apple treats spacing between controls as as important as size, suggesting roughly 12 pt of padding around bezelled elements and roughly 24 pt around unbezelled ones."
+  },
+  "dynamic_colour": {
+   "source": "Material 3 specification and Compose Material 3",
+   "source_date": "checked 14 August 2026",
+   "opt_in": "Dynamic colour derives an app palette from the user's wallpaper and is opt-in per app: a developer must call applyToActivitiesIfAvailable().",
+   "routes": [
+    "hold brand colours static",
+    "harmonise them towards the user's palette using HarmonizedColors"
+   ],
+   "engine": "material-color-utilities, built on HCT — hue, chroma and tone, derived from CAM16 and CIE L* — last pushed 10 August 2026."
+  }
+ }
+}

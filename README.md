@@ -56,7 +56,7 @@ and their alert both say the figures are examples rather than readings.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.1 MB) that needs no network, plus a 1.8 MB PDF |
+| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.2 MB) that needs no network, plus a 1.9 MB PDF |
 | `07_tokens/` | The design tokens: DTCG source, and 64 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
 | `04_mark/` | 10 mark, wordmark and icon files |
@@ -108,12 +108,12 @@ the ones above it, so the order is not interchangeable.
   ./.venv/bin/python 10_assets/build.py && \
   ./.venv/bin/python 12_packages/build.py && \
   ./.venv/bin/python 11_site/build.py && \
+  ./.venv/bin/python scripts/benchmark.py && \
   ./.venv/bin/python 09_guidebook/build.py && \
   ./.venv/bin/python 09_guidebook/scripts/pdf.py && \
   ./.venv/bin/python 13_plugins/claude-code/scripts/build_skills.py && \
   ./.venv/bin/python 13_plugins/claude-design/build.py && \
   ./.venv/bin/python scripts/findings.py && \
-  ./.venv/bin/python scripts/benchmark.py && \
   ./.venv/bin/python scripts/readme.py
 ```
 

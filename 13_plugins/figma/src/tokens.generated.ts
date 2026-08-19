@@ -9,10 +9,10 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "f210bd649b4e2af31378d8f61ed403907469b6e286e896566e32e7500415417b";
+export const BUNDLE_SHA256 = "61a748432320255e59d917de03b297e69c45390dca25b67765cd8eb0867e83a6";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
-  "07_tokens/build/primitive.tokens.json": "359b6b214801145054bd3154b51247b2cc3fbf1983f54664b959b30802aaf43f",
+  "07_tokens/build/primitive.tokens.json": "7be43f00f028eb56f3ac4b853b6ca043aec4cea5ad680a68065f8415725186a3",
   "07_tokens/build/semantic.light.tokens.json": "bcf15346d37fa2566444a2e104355b8d63193219083be5e248e42c62ecddd3f7",
   "07_tokens/build/semantic.dark.tokens.json": "2e76f39e6583772b465e4e346a4fc4682d60f91014bfd22e5bc88179e383159f",
   "07_tokens/build/semantic.hc-light.tokens.json": "46ccb577f108f8d2e4d50e05325ae669ea0fdd2da8304ae11c1b11a1ab6022a2",
@@ -1412,10 +1412,10 @@ export const BUNDLED: RawInput = {
           "value": 24,
           "unit": "px"
         },
-        "$description": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA",
+        "$description": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA — w3.org/TR/WCAG22/#target-size-minimum, Recommendation 12 December 2024, read 14 August 2026",
         "$extensions": {
           "studio.aninda": {
-            "source": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA"
+            "source": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA — w3.org/TR/WCAG22/#target-size-minimum, Recommendation 12 December 2024, read 14 August 2026"
           }
         }
       },
@@ -1424,10 +1424,10 @@ export const BUNDLED: RawInput = {
           "value": 28,
           "unit": "px"
         },
-        "$description": "Apple HIG minimum control size, iOS and iPadOS",
+        "$description": "Apple HIG minimum control size, iOS and iPadOS — developer.apple.com/design/human-interface-guidelines/accessibility, read 14 August 2026",
         "$extensions": {
           "studio.aninda": {
-            "source": "Apple HIG minimum control size, iOS and iPadOS"
+            "source": "Apple HIG minimum control size, iOS and iPadOS — developer.apple.com/design/human-interface-guidelines/accessibility, read 14 August 2026"
           }
         }
       },
@@ -1436,10 +1436,10 @@ export const BUNDLED: RawInput = {
           "value": 44,
           "unit": "px"
         },
-        "$description": "Apple HIG default control size, iOS and iPadOS",
+        "$description": "Apple HIG default control size, iOS and iPadOS — developer.apple.com/design/human-interface-guidelines/accessibility, read 14 August 2026",
         "$extensions": {
           "studio.aninda": {
-            "source": "Apple HIG default control size, iOS and iPadOS"
+            "source": "Apple HIG default control size, iOS and iPadOS — developer.apple.com/design/human-interface-guidelines/accessibility, read 14 August 2026"
           }
         }
       },
@@ -1448,10 +1448,10 @@ export const BUNDLED: RawInput = {
           "value": 48,
           "unit": "px"
         },
-        "$description": "Android accessibility guidance minimum touch target, in dp",
+        "$description": "Android accessibility guidance minimum touch target, in dp — developer.android.com accessibility pages, read 14 August 2026",
         "$extensions": {
           "studio.aninda": {
-            "source": "Android accessibility guidance minimum touch target, in dp"
+            "source": "Android accessibility guidance minimum touch target, in dp — developer.android.com accessibility pages, read 14 August 2026"
           }
         }
       }

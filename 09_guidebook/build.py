@@ -118,6 +118,10 @@ SVG_DIR = MARK_DIR / "svg"
 PROOF_JSON = ROOT / "05_colour" / "generated" / "estuary.proof.json"
 MEASUREMENTS_JSON = ROOT / "06_type" / "_data" / "measurements.json"
 FONT_FACTS_JSON = ROOT / "06_type" / "_data" / "font_facts.json"
+# The external authorities this book cites, with a URL and a date on each. The
+# book carried two URLs before this file existed, both licence texts, and 72
+# sentences that named an outside body and a number without citing either.
+EXTERNAL_JSON = ROOT / "01_research" / "_data" / "external-sources.json"
 NPM_DIST = ROOT / "12_packages" / "npm" / "dist"
 BANGLA_STANDARD = ROOT / "06_type" / "BANGLA-STANDARD.md"
 
@@ -549,6 +553,9 @@ def kit_files() -> list[tuple[str, Path, str]]:
                   "Which system colour each role gives way to in forced colours"))
     items.append(("07_tokens/css/tokens.css", TOKENS_CSS,
                   "Every token as a CSS custom property, in five layers"))
+    items.append(("01_research/BENCHMARK.md", ROOT / "01_research" / "BENCHMARK.md",
+                  "The benchmark this book cites: every external source with its URL "
+                  "and date, and the 28 acceptance criteria with their verdicts"))
     items.append(("08_components/src/components.css", COMPONENTS_CSS,
                   "The component layer. No literal colour in it"))
 
@@ -1277,6 +1284,8 @@ def chapter_colour_en(tok: Tokens) -> str:
         "colours by one bit, in the direction that hurts, gives the worst ratio "
         "the pair can actually produce on a screen. That figure is published "
         "beside the measured one. Where the two differ, trust the worst case.</p>"))
+    out.append(block_dynamic_colour())
+
     return "".join(out)
 
 
@@ -1453,6 +1462,132 @@ def chapter_colour_bn(tok: Tokens) -> str:
 # Sources: 07_tokens/build/primitive.tokens.json, 08_components/_cards.json,
 #          06_type/_data/measurements.json, 06_type/_data/font_facts.json.
 # ---------------------------------------------------------------------------
+
+
+def cite(entry: dict) -> str:
+    """One citation: the authority, the page, its URL and the date it carried."""
+    return (f'<span class="gb-cite">{e(entry["title"])} — '
+            f'<code>{e(entry["url"])}</code>, {e(entry["date_on_source"])}</span>')
+
+
+def _external() -> dict:
+    return read_json(EXTERNAL_JSON)
+
+
+def block_platform_floors() -> str:
+    """The smallest type size each Apple platform allows, and this kit's own floor.
+
+    The kit documented ONE floor — 12 px — for everything, and acceptance criterion 9
+    in 01_research/BENCHMARK.md had already written down why that is not enough: the
+    minimum differs by more than a factor of two across Apple's five platforms, so a
+    single smallest size cannot be checked against any of them. tvOS appeared nowhere
+    in this book at all.
+    """
+    ext = _external()
+    ty = ext["platforms"]["type"]
+    caption_rem = tok_caption = None
+    prim = read_json(TOKENS_DIR / "primitive.tokens.json")
+    px = prim["dimension"]["type"]["caption"]["$value"]["value"] * 16
+    floor_px = prim["dimension"]["type"]["bangla-min"]["$value"]["value"]
+    rows = []
+    for row in ty["rows"]:
+        clears = px >= row["minimum_pt"]
+        rows.append([
+            e(row["platform"]),
+            f'{row["default_pt"]} pt',
+            f'<b>{row["minimum_pt"]} pt</b>',
+            ("clears it" if clears else
+             f'<b>below it</b> — this kit is not specified for {e(row["platform"])}'),
+        ])
+    return (
+        table(["Platform", "Default", "Minimum", "This kit's smallest step, "
+               f"{px:g} px"], rows,
+              caption=("The smallest text size each Apple platform allows, against "
+                       "the smallest step in this scale. Two of these are floors this "
+                       "kit clears with nothing to spare."))
+        + f'<p class="gb-note">Source: {cite({"title": ty["source"], "url": "developer.apple.com/design/human-interface-guidelines/typography", "date_on_source": ty["source_date"]})}. '
+          f'{e(ty["note"])}</p>'
+        + f'<p>This kit is built for the web, where the unit is the CSS pixel and '
+          f'there is no platform minimum to clear — so its own floor is the one it '
+          f'sets: <b>{px:g} px</b> for the smallest step, and a hard '
+          f'<b>{floor_px:g} px</b> for Bangla at any size, because below that the '
+          f'{bn_raw("মাত্রা")} stops resolving into a line. Ported to an Apple '
+          f'platform, that floor clears iOS, iPadOS, macOS, visionOS and watchOS, and '
+          f'does <b>not</b> clear tvOS, whose minimum is '
+          f'{[r["minimum_pt"] for r in ty["rows"] if r["platform"] == "tvOS"][0]} pt. '
+          f'This kit is not specified for tvOS and does not claim to be.</p>'
+    )
+
+
+def block_control_spacing() -> str:
+    """The gap between adjacent controls, which the kit set in code and never stated."""
+    ext = _external()
+    sp = ext["platforms"]["spacing"]
+    prim = read_json(TOKENS_DIR / "primitive.tokens.json")
+    space = {k: v["$value"]["value"]
+             for k, v in prim["dimension"]["space"].items() if not k.startswith("$")}
+    bez = next((k for k, v in space.items() if v == sp["bezelled_pt"]), None)
+    unbez = next((k for k, v in space.items() if v == sp["unbezelled_pt"]), None)
+    return (
+        f'<p><b>Adjacent controls are separated by at least '
+        f'<code>--as-space-{e(bez)}</code>, which is {sp["bezelled_pt"]} px.</b> '
+        f'Where controls have no visible edge of their own — a row of quiet buttons, '
+        f'an icon-only toolbar — the gap goes to '
+        f'<code>--as-space-{e(unbez)}</code>, {sp["unbezelled_pt"]} px. That is the '
+        f'rule; the component layer already obeys it, and now says so.</p>'
+        f'<p class="gb-note">{e(sp["claim"])} Source: '
+        f'{cite({"title": sp["source"], "url": "developer.apple.com/design/human-interface-guidelines/accessibility", "date_on_source": sp["source_date"]})}. '
+        f'The two figures coincide with two steps this scale already had, which is why '
+        f'no token was added for them. A size without a gap is half a specification: '
+        f'two 24 px targets touching are harder to hit accurately than one, however '
+        f'well each measures.</p>'
+    )
+
+
+def block_dynamic_colour() -> str:
+    """This kit's position on Android dynamic colour, and the mechanism it names."""
+    ext = _external()
+    dc = ext["platforms"]["dynamic_colour"]
+    return (
+        '<h3>Dynamic colour: this kit holds its own</h3>'
+        f'<p>{e(dc["opt_in"])} There are two routes: '
+        f'{e(dc["routes"][0])}, or {e(dc["routes"][1])}.</p>'
+        '<p><b>This kit takes the first. Brand colours stay static, and '
+        '<code>HarmonizedColors</code> is not used.</b> The reason is the whole point '
+        'of the colour engine: every pair in this system was measured, and the figure '
+        'published is the worst case under a one-bit perturbation. A palette shifted '
+        'towards a wallpaper at run time has not been measured against anything, so '
+        'every ratio in this book would become an estimate.</p>'
+        '<p>That is a trade, and it is worth naming what it costs: on Android a '
+        'reader who has set a wallpaper palette will see this system ignore it.</p>'
+        f'<p class="gb-note">Source: {cite({"title": dc["source"], "url": "m3.material.io and developer.android.com/jetpack/androidx/releases/compose-material3", "date_on_source": dc["source_date"]})}. '
+        f'The engine behind the other route is {e(dc["engine"])}</p>'
+    )
+
+
+def block_sources() -> str:
+    """Every external authority this book relies on, with a URL and a date."""
+    ext = _external()
+    by: dict[str, list] = {}
+    for src in ext["sources"]:
+        by.setdefault(src["authority"], []).append(src)
+    out = [
+        f'<p>Every claim in this book about an outside body rests on one of the '
+        f'{len(ext["sources"])} sources below. Each carries the URL it was read at '
+        f'and the date the source itself showed, which is not the same as the date it '
+        f'was read: a page with no change log is marked as current at the check '
+        f'rather than given a false date.</p>',
+        f'<p class="gb-note">All checked {e(ext["platforms"]["checked"])}. The full '
+        f'benchmark that produced them, with what each source was read for, is '
+        f'<code>01_research/BENCHMARK.md</code>, which travels inside this file.</p>',
+    ]
+    for authority in sorted(by):
+        rows = [[e(x["title"]), f'<code>{e(x["url"])}</code>',
+                 e(x["date_on_source"])] for x in by[authority]]
+        out.append(f"<h3>{e(authority)}</h3>")
+        out.append(table(["Source", "URL", "Date on the source"], rows,
+                         caption=f"{len(rows)} sources from {e(authority)}."))
+    return "".join(out)
 
 
 def chapter_type_en(tok: Tokens) -> str:
@@ -1666,6 +1801,9 @@ def chapter_type_en(tok: Tokens) -> str:
         "audiences are equal, that is the one failure that is not acceptable. "
         "Literata has an x-height a full pixel taller, which lifts the multiplier "
         "to ×0.816 and holds it nearly flat across the whole scale.</p>")
+    out.append("<h2>The floor, per platform</h2>")
+    out.append(block_platform_floors())
+
     return "".join(out)
 
 
@@ -1797,6 +1935,9 @@ def chapter_space_en(tok: Tokens) -> str:
         "all</strong>, and its focus guidance page predates its current material "
         "system entirely. There was nothing to inherit here, so this system "
         "specifies its own numbers and meets WCAG's instead.</p>"))
+    out.append("<h2>The gap between two controls</h2>")
+    out.append(block_control_spacing())
+
     return "".join(out)
 
 
@@ -2146,6 +2287,7 @@ def render_markdown(path: Path, bn_key: str | None, print_mode: bool) -> str:
                 "banned-words": block_banned_words,
                 "banned-latin": block_banned_latin,
                 "bangla-punctuation": block_bangla_punctuation,
+                "sources": block_sources,
             }
             if name == "output-files":
                 return stash(block_output_files(print_mode))
