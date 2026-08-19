@@ -81,6 +81,14 @@ REBUILD_CHAIN = [
     "09_guidebook/build.py",
     "09_guidebook/scripts/pdf.py",
     "13_plugins/claude-code/scripts/build_skills.py",
+    # After the tokens, the marks and the component stylesheet, because it bundles
+    # all three, and before readme.py, which counts what it wrote.
+    "13_plugins/claude-design/build.py",
+    # The findings register is generated from its own data, so it belongs in the
+    # chain — but AFTER readme.py would be wrong too, because readme.py counts the
+    # tree and the register is part of it. It reads only 01_research/_data, so it
+    # can run anywhere; here, next to the other document generators.
+    "scripts/findings.py",
     "scripts/readme.py",
 ]
 
@@ -151,7 +159,8 @@ def check_rebuild_chain() -> dict:
     to add one.
     """
     names = ("build.py", "build.mjs", "emit_css.py", "engine.py", "readme.py",
-             "pdf.py", "specimen.py", "review_bangla.py", "build_skills.py")
+             "pdf.py", "specimen.py", "review_bangla.py", "build_skills.py",
+             "findings.py")
     # `git ls-files` rather than rglob, because rglob also walks ignored trees —
     # a stray git worktree under .claude/ made the first version of this guard
     # report eleven generators that are not part of the repository at all.

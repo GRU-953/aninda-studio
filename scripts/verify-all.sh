@@ -32,6 +32,20 @@ run() {
   fi
 }
 
+# One sequencing trap, learned the hard way. scripts/readme.py discovers the
+# repository's generators with `git ls-files`, so a NEW generator is invisible to
+# its rebuild-chain guard until it is tracked. Running this script before staging
+# therefore cannot see an unregistered new generator, and CI — which checks out a
+# commit — can. So stage first: `git add -A`, then run this. The check below makes
+# the trap visible rather than leaving it to be discovered by a red run.
+printf '%-46s ' "new files are staged, so guards can see them"
+if [ -z "$(git ls-files --others --exclude-standard)" ]; then
+  echo "ok"
+else
+  echo "WARNING — untracked files present; git ls-files based guards cannot see them:"
+  git ls-files --others --exclude-standard | sed 's/^/    /'
+fi
+
 echo "--- prose and licences ---"
 for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md \
             00_sandbox/TOOLCHAIN.md 01_research 02_strategy 09_guidebook/chapters \
@@ -56,6 +70,7 @@ run "11_site/build.py"        $PY 11_site/build.py --check
 run "09_guidebook/build.py"   $PY 09_guidebook/build.py --check
 run "scripts/readme.py"       $PY scripts/readme.py --check
 run "claude-design bundle"    $PY 13_plugins/claude-design/build.py --check
+run "findings register"       $PY scripts/findings.py --check
 
 echo "--- plugins ---"
 run "claude-code plugin"      $PY 13_plugins/claude-code/scripts/check_plugin.py

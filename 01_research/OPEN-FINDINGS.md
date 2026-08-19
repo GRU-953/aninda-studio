@@ -1,330 +1,155 @@
-# Open findings — carried forward
+# Aninda Studio — what is still open
 
-<!-- This file ships, so it is held to 02_strategy/ENGLISH-STANDARD.md like any
-     other prose here — including the banned-word list. Four banned words arrived
-     in it when the findings were copied in verbatim from the reviewers' own
-     wording, and CI's lint job caught them. If you paste a finding in, reword it.
-     A findings record that breaks the rule it records findings about is a poor
-     advertisement for the rule. -->
+**Every entry below was re-verified against the tree on 19 August 2026.** Each carries the command that was run and what it returned. Nothing here is asserted from memory, and nothing was marked fixed because it looked like the sort of thing that had probably been fixed — a claim was either reproduced or it was not.
 
-Round 1 of the convergence review raised 59 findings across six independent
-lenses, each adversarially verified before it counted. The blockers and majors
-were fixed. These minors were judged not worth the change at the time, and are
-recorded here rather than dropped, because an unwritten known fault becomes an
-unknown one within a week.
+That pass was needed because this document had drifted. It was written across three review rounds and never re-checked, and of its 54 entries **4 were already fixed** and **6 were half right**. A register that is wrong in either direction is worse than a short accurate one.
 
-Each is real and reproducible. None affects correctness of the design system's
-output. If you disagree with a judgement, the finding is here to be picked up.
+## Where it stands
 
-### 1. Overflowing horizontal scroll containers on every card and on the site are real tab stops that the design system's focus rule and check.py's INTERACTIVE selector both exclude
+| | |
+|---|---|
+| Entries re-verified | **54** |
+| Still open | 44 |
+| Half stale — part reproduced, part not | 6 |
+| Already fixed, kept as a record | 4 |
+| Closed earlier, by the owner's decision | 2 |
+
+Of the 50 that carry work: 11 major · 38 minor · 1 not-a-defect. **No blocker.** Everything below is a thing this system says about itself that is not quite true, a guard that is narrower than its message, or a piece of work not yet done — not a defect in what it produces.
+
+## The register
+
+### Majors (11)
+
+#### 1 · Overflowing horizontal scroll containers on every card and on the site are real tab stops that the design system's focus rule and check.py's INTERACTIVE selector both exclude
 
 `08_components/src/components.css`
 
 These are the only tab stops in the system whose focus indicator is not the system's. The token ring is 3 px solid var(--as-focus-ring) at 2 px offset; what actually appears is Chromium's UA default, outline: auto 1px rgb(0, 95, 204), in all four themes including hc-dark — so the one visual the project measures hardest is, at these stops, whatever the browser supplies. This is not a contrast failure (the UA ring measured 5.71:1 in light and 18.77:1 in dark against the ground it replaced), which is why it is minor; the defect is that no check can ever confirm that. check.py's INTERACTIVE selector requires a tabindex, an interactive tag or an ARIA widget role, and these containers have none, so a stop that Tab reaches on all 30 cards and the site has never been measured for ring thickness, ring contrast or forced-colors survival. Adding tabindex="0" with role="region" and an aria-label — the standard technique for a scrollable region — would fix the indicator, replace role "generic" with a named region, bring the stops inside INTERACTIVE, and remove the dependence on a Chromium-only behaviour that WebKit does not implement.
 
-### 2. Semantic theme files are not resolvable as standalone DTCG documents, and nothing shipped says so
+**Still open, 19 August 2026.** Still open, and the shipped focus ring is the browser default (`1px auto rgb(0,95,204)`), not the system's ring — so it is below the harness's own RING_MIN_PX = 2 floor and is never measured, and the tab stop has no accessible name. One correction to the record: it is NOT on every card — only 4 of the 30 cards contain scroll containers at all (table, dashboard, typography, colour), plus the site page; the class appears in all 30 cards only because each card inlines the stylesheet. Chromium is confirmed; Firefox was not available to test, so that half of the browser claim is untested.
 
-`07_tokens/build/semantic.light.tokens.json`
+*How that was checked.* Reproduced in the pinned Chromium (151.0.7922.34) with Playwright against the committed card, read-only: `PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers .venv/bin/python` driving Tab over `08_components/cards/components/table.html` at 360x900 returned `scroll-x focus hits: 45` with the focused element reported as `{'tag': 'DIV', 'cls': 'as-scroll-x', 'ring': '1px auto rgb(0, 95, 204)'}`, and the containers report `{'i': 0, 'overflows': 175, 'tabindex': None, 'focusableKids': 0}`. Harness coverage: applying check.py's own INTERACTIVE constant in the page returned `table card | INTERACTIVE matches: 6 | scroll-x matching INTERACTIVE: 0` and `site index | INTERACTIVE matches: 6 | scroll-x matching INTERACTIVE: 0 | overflow px: [25] | tab-stop hits in 200 tabs: 17`. Source confirms why: `08_components/src/components.css:133` is `.as-root :is(a, button, input, select, textarea, summary, [tabindex]):focus`, which a bare `<div class="as-scroll-x">` (the markup emitted at `08_components/build.py:1145`, `:1387`, `:1429` and `11_site/build.py:857`, with no tabindex and no aria) cannot match; `08_components/check.py:67` still lists only `a[href], button, input…, [tabindex]:not([tabindex='-1']), [role='button']…`; `11_site/check.py:139` has the same shape; and check.py's own limitations list at line 484 states "Keyboard order. Tab order, focus trapping in a dialog and Escape handling are not exercised." Overflow scope measured per surface: at 360px, 5 overflowing containers on the table card, 5 on dashboard, 5 on typography, 4 on colour, 1 on the site, 0 in the guidebook; at 1280px, 4 on the typography card and 0 elsewhere.
 
-The kit describes each of these files as DTCG 2025.10 in its own right, and the plugin hands them to a consumer individually. A spec-conformant single-document tool loading semantic.dark.tokens.json gets ten unresolvable references and no instruction telling it what to load alongside. The fix is documentation, not restructuring — one sentence in SKILL.md and the guidebook token chapter saying the semantic files resolve only when merged with primitive.tokens.json — but as shipped a reader has to infer it from the failure.
+*Smallest fix.* In 08_components/build.py and 11_site/build.py emit the container as `<div class="as-scroll-x" tabindex="0" role="region" aria-label="…">` — the existing `[tabindex]:focus` rule in components.css and the `[tabindex]:not([tabindex='-1'])` term in both harnesses' INTERACTIVE selectors then fire on it automatically, making it a styled, named, measured tab stop.
 
-### 3. Reserved-Font-Name family count is wrong in two research documents that label the figure as mechanically extracted
-
-`06_type/SHORTLIST.md`
-
-Both documents mark this figure **[file]**, the repository's own convention for "read directly out of the font file, reproduce with 06_type/specimen.py", which invites the reader to trust it without rechecking. The count is the one that decides whether a family can be subsetted without renaming, so a reader picking a substitute face from the shortlist could take a Plex or Source family as RFN-free. It contradicts the table printed three lines above it.
-
-### 4. The $schema every token file declares resolves to the DTCG living draft, not the 2025.10 report the same file pins
-
-`07_tokens/build/primitive.tokens.json`
-
-The files go to unusual lengths to distinguish the frozen 2025.10 report from the moving draft — it is the point of the `spec` extension string and of BENCHMARK section 6.2 — and then the machine-readable field points at the moving one. Anything that dereferences `$schema` to decide which rules to apply lands on the 30 July 2026 draft, whose requirements can diverge from the version the file claims. Pinning `https://www.designtokens.org/TR/2025.10/format/` would make the two agree; leaving it as is means the version claim survives only in prose a tool is permitted to ignore.
-
-### 5. README.bn.md mixes Bengali and Western numerals inside single sentences, against house rule 9 of the Bangla standard
-
-`README.bn.md`
-
-The Bangla README is one of two front doors to the project and the main demonstration that the Bangla is written as Bangla rather than translated. Two numeral systems inside one sentence is the most visible possible signal that the Bangla was assembled rather than written, and it lands in the paragraph whose whole point is that the numbers are trustworthy. It also breaks a rule the project itself researched, sourced and wrote down.
-
-### 6. The plugin reference file that documents the mark is named logo.md, the one word the plugin's own naming rule forbids for it
-
-`13_plugins/claude-code/skills/aninda-brand/references/naming.md`
-
-This is the exact failure the naming rule was written to prevent, in the artefact whose job is to teach the rule. An agent or a person reading SKILL.md is told to open references/logo.md to learn that the thing is never called a logo, and SKILL.md's own description offers 'a logo' and 'mark' as two different things you might ask for. Because check_plugin.py hard-requires the filename, the wrong name is now pinned in place by CI.
-
-### 7. The wordmark ships set in lowercase while the chapter that presents it says "Sentence case, always", with nothing reconciling the two
-
-`09_guidebook/chapters/02-the-name.md`
-
-The chapter's own second section is titled "The one thing that looks like an inconsistency, and is not", and it spends five sentences explaining the অনিন্দ্য/aninda transliteration gap so that nobody has to wonder. The casing gap gets none of that treatment: a reader sees lowercase artwork at the top of the page and an unqualified "Sentence case, always" twenty-six lines below, with no row in the table and no note. Anyone setting the name in a lockup has to guess which of the two governs, and the earlier draft shows the distinction was understood and then lost.
-
-### 8. The guidebook PDF and three other committed generated trees have no drift guard anywhere
-
-`.github/workflows/ci.yml`
-
-The PDF and the 20 platform assets are both named deliverables, and .gitignore's header claims the reason they are committed is "what lets CI regenerate them and fail on any difference" — true for the token set, the marks, the cards and the packages, not true for these. Change a guidebook chapter and CI proves the HTML was rebuilt while the shipped PDF silently stays the old book. That is precisely the failure the tokens job was built to catch, in the one artefact a reader is most likely to print and keep.
-
-### 9. The 18 August coverage correction was applied to the two READMEs only; the wording it set out to remove survives in the guidebook and in the harness that prints it while running on Ubuntu
-
-`09_guidebook/chapters/14-what-this-system-does-not-do.md`
-
-The commit's own reasoning was that a claim stale in a favourable direction is still stale. It was fixed in the two files whose numbers are generated and checked, and left in the flagship deliverable and in a script that now states it about itself while contradicting it. A reader of the guidebook gets the superseded scope, and the two documents now disagree on a coverage claim.
-
-### 10. Two superseded pre-decision drafts ship in the published repository, unlabelled, arguing against the decisions the system actually made
-
-`_reference/DRAFT-benchmark.html`
-
-This is a brand repository, so an unlabelled HTML page that presents a different palette, different typefaces and a contradicted icon policy is the one kind of stray file that does real damage: opened on its own it reads as the brand. The directory is documented nowhere, so there is nothing to tell a reader these were superseded on the way to the decision recorded in 04_mark/manifest.json.
-
-### 11. README.bn.md silently drops a whole section and the asset.py demonstration, with no note that it is abridged
-
-`README.bn.md`
-
-Everywhere else the project declares its Bangla gaps at the point of the gap — 11_site/index.html closes with "Bangla appears only where the verified table in 06_type/BANGLA-STANDARD.md holds a string ... those places are listed in this build's output", and the Bangla guidebook chapters carry a {{gap-notice}}. The README pair is the one place that omits without declaring, so a Bangla reader has no way to know a section exists that they were not shown — including the commands for rebuilding the system, which need no translation.
-
-### 12. Outstanding, not a defect: the Claude Design push has not been done; the local side is ready and only the push remains
-
-`08_components/cards`
-
-This is the one requested artefact with no local work left. What remains is the push itself: pick or create a design-system project, finalize a plan covering 08_components/cards/**/*.html, upload the 30 files, and let the pane build its card index from the @dsCard markers (the three groups are already Foundations 6, Components 16, Patterns 8). Worth recording so it is not mistaken for a build gap — and worth doing before the 30 cards move again, since nothing will tell you the remote copy has fallen behind.
-
-### 13. TOOLCHAIN.md documents Jinja2 as the templating engine for the guidebook and the component cards; nothing in the repository imports it
-
-`00_sandbox/TOOLCHAIN.md`
-
-The document's stated purpose is a traceable account of what this build depends on and what each dependency does. A pinned package with an invented job in it is the same class of error the project's own README warns about — a sentence a human wrote once that nobody re-reads. It also misleads anyone auditing the licence surface, since Jinja2's BSD-3-Clause is listed as in-use when no code path touches it.
-
-### 14. pypdfium2 is a pinned dependency imported by the PDF verifier but is missing from TOOLCHAIN.md's package table
-
-`00_sandbox/TOOLCHAIN.md`
-
-The one dependency omitted from the toolchain document is the one that backs a verification claim ("no page is blank — every page is rendered with pypdfium2 and its pixels sampled"). A reader auditing the build from TOOLCHAIN.md alone gets an incomplete dependency and licence list, and the file's closing assurance about "every package above" silently excludes it.
-
-### 15. pdf.py records a probe measurement of 55 pages; re-running the documented probe today gives 58
-
-`09_guidebook/scripts/pdf.py`
-
-The docstring's whole point is that "the reason for the two-file split stays a measurement rather than a memory", and it has become a memory — the recorded page count no longer matches what the script reports. The MB/MiB mislabelling means the repository states two different sizes for the same PDF and the same HTML file in its two most-read technical documents, with no way for a reader to tell which convention is meant.
-
-### 16. BENCHMARK.md still says the kit does not exist yet, and all 28 promised verdicts are unfilled
+#### 16 · BENCHMARK.md still says the kit does not exist yet, and all 28 promised verdicts are unfilled
 
 `01_research/BENCHMARK.md`
 
 README.md line 62 sells 01_research/ as "What was checked, when, and against which source". The document instead asserts, in a published repository, that the artefact it is measuring does not exist — a statement that is false today — and leaves unredeemed an explicit promise that the verdict column would be completed by inspection. Its own criterion 28 ("no number appears that cannot be traced to one") is among the 28 left unjudged.
 
-### 17. The guidebook and the card harness state that measurement happened on macOS only and on one machine, which CI contradicts on every run
+**Still open, 19 August 2026.** Still true throughout. BENCHMARK.md twice states in the present tense that the kit does not exist, calls it "forthcoming", and titles a section for standards it "will" be held to — in a repository tagged 1.0.0 and described in its own latest commit as live. The sharpest version of the defect is not the tense: it is that all 28 of 28 acceptance verdicts are still unfilled, so the document that defines this project's own pass/fail criteria has never been run against the finished thing, and says so.
+
+*How that was checked.* The kit exists and is released: `cat VERSION` → "1.0.0"; `git log --oneline -3` → "289533b The Claude Design push: a generated bundle, and the project is live".
+
+The forward-looking language is all still there. `grep -n` returns:
+ · line 11: "This is a comparison between the forthcoming Aninda Studio brand system and the **published**"
+ · line 26: "Section 7 lists the criteria this kit will be" / line 27: "held to. It deliberately records **no verdicts**, because the kit does not exist yet."
+ · line 254: "Shape morphing is a genuine capability this kit will not have."
+ · line 347: "## 6. Standards this kit will actually be held to"
+ · line 468: "Twenty-six testable criteria. **No verdicts are recorded**, because the kit does not exist yet."
+
+And the consequence is measurable, not merely tonal. Section 7's own promise at line 27 is that "Verdicts are filled in later, against a thing that can actually be inspected." That thing now exists, and nothing has been filled in: `awk 'NR>=468 && /^\| *[0-9]+ *\|/' 01_research/BENCHMARK.md | grep -c '| — |$'` → "28", out of 28 criterion rows. Every single verdict is still an em dash.
+
+No disclaimer was added to excuse it: `grep -n -iE "snapshot|frozen|as it stood|written before|superseded|pre-build|historical" 01_research/BENCHMARK.md` → no output. The file was edited after the release (`git log` shows "02af5e7 Convergence round 1: fix the remaining 2 blockers and 22 majors") without these lines being touched.
+
+*Smallest fix.* Fix the five stale sentences (lines 11, 26-27, 254, 347, 468) to the present tense and fill in the 28 verdicts in section 7, or state plainly at the top that verdicts are recorded elsewhere and link there.
+
+#### 17 · The guidebook and the card harness state that measurement happened on macOS only and on one machine, which CI contradicts on every run
 
 `09_guidebook/chapters/14-what-this-system-does-not-do.md`
 
 Two of the five measurements the chapter attributes to macOS alone — the contrast readings and the focus ring — are re-run on Ubuntu on every push, which is the basis of the README's stronger claim. One of the two documents is wrong about the same fact, and the harness's own blind-spot list, which it introduces as "part of the result, not an apology", prints a false line about the platform whenever CI runs it. A limit stated wrongly is as costly here as a limit omitted, because the whole chapter is offered as the calibration for everything earlier in the book.
 
-### 18. NOTICE publishes a studio website address that does not resolve
+**Still open, 19 August 2026.** Still true, and it is the worst of the six because it ships. Two documents in one repository now state opposite facts about the same measurements: README.md:137-138 says the contrast readings and focus ring run on macOS locally and on Ubuntu in CI "so the results are not particular to one machine", while guidebook chapter 14 (lines 55 and 117) says they come from macOS and were "tested by one person on one machine" — and that chapter is the calibration the whole book is read against. The harness is worse than stale prose: check.py:924-927 prints "any platform other than macOS … were not run" unconditionally, so a list the file introduces as "part of the result, not an apology" emits a false result on every Ubuntu CI run. The correct claim is generated and CI-enforced; the wrong ones are hand-written and unguarded, which is why they drifted.
+
+*How that was checked.* The chapter claim, `grep -n -iE "macOS|one machine" 09_guidebook/chapters/14-what-this-system-does-not-do.md`:
+ · line 55: "ring — comes from **headless Chromium on macOS**, at a device scale factor of 1" — the sentence begins at line 53 and enumerates "the type metrics, the মাত্রা continuity, the line-height collision floors, the contrast readings, the focus ring".
+ · line 117: "measured, thoroughly documented, and tested by one person on one machine."
+
+The harness claim, 08_components/check.py:488-489: "Any browser other than the pinned Chromium, and any platform other than " / "macOS. Safari, Firefox and Windows high contrast were not run."
+
+CI contradicts both on every push. .github/workflows/ci.yml: "on: push / pull_request"; job 6, "render: runs-on: ubuntu-latest", steps "Measure the tokens in a real browser → python 00_sandbox/measure.py", "Measure every component card → python 08_components/check.py", "Measure the site → python 11_site/check.py". Those are exactly the harnesses that produce the two items the chapter names: check.py's docstring lines 18-20 describe the focus ring measured "from pixels … a ring at least 2 CSS px thick at 3:1 contrast", and contrast is read at check.py:120/221/429 and measure.py:79/243.
+
+I checked the guard direction too, per the adversarial rule. The false line is printed unconditionally — CANNOT_CHECK appears at only two sites, its definition (472) and the print loop at 924-927: "print(\"What this harness CANNOT check:\") / for line in CANNOT_CHECK: print(f\" · {line}\")". There is no platform conditional, so it prints "any platform other than macOS" while running on Ubuntu.
+
+The repository already contains the correct sentence, generated and CI-checked, in the other document. README.md:137-138 (emitted by scripts/readme.py:381): "- **Rendering checks are Chromium only.** They run on macOS locally and on Ubuntu / in CI, from a clean checkout, so the results are not particular to one machine."
+
+It ships to the reader. `grep -o "headless Chromium on macOS" 09_guidebook/Aninda-Studio-Guidebook-print.html` → "headless Chromium on macOS"; the same string is present once in Aninda-Studio-Guidebook.html, and "tested by one person on one machine" once in the print build.
+
+Nothing checks the two against each other: `grep -rln "macOS\|Ubuntu" scripts/*.py` → only scripts/readme.py, that is, the generator of the correct claim, with no guard over the prose that carries the wrong one.
+
+*Smallest fix.* Bring chapter 14 lines 55 and 117 and check.py lines 488-489 into line with README.md:137-138, and add a lint step asserting that the platform sentence in the chapter and the harness matches the one scripts/readme.py generates.
+
+#### 18 · NOTICE publishes a studio website address that does not resolve
 
 `NOTICE`
 
 NOTICE is the file a redistributor is required to carry, and it is where the project directs anyone seeking permissions. It points at a domain that is not registered. The site build already knows how to state an unfinished fact plainly — 11_site/index.html carries a "Not published yet" panel about the packages — so the omission here is inconsistent with the project's own standard, and a sitemap and CNAME built on an unregistered domain will silently do nothing when the site is deployed.
 
-### 19. 07_tokens/build.py's proof check ignores its own `proof` argument and compares two numbers the generator guarantees agree
+**Still open, 19 August 2026.** Still true, and confirmed stronger than recorded: anindastudio.com is not merely unresolvable but unregistered — the .com registry returns "No match" as of 19 August 2026. NOTICE:76 prints it as "Site:" next to a working GitHub URL, so a reader has every reason to treat it as live. NOTICE is the redistribution document, and the same dead address is carried into the Claude Code plugin's own NOTICE and its plugin.json "homepage", plus every canonical URL, og:image, robots Sitemap and the CNAME in 11_site — so the site as built cannot be served from the address it declares.
 
-`07_tokens/build.py`
+*How that was checked.* The address is still published. `grep -n -iE "anindastudio|http" NOTICE` → line 74 "Contact for questions and permissions: aninda.sh15@gmail.com", line 75 "Source: https://github.com/GRU-953/aninda-studio", line 76 "Site: https://anindastudio.com". Presented flatly beside a live source URL, with no hedge: `grep -n -iE "not yet|planned|reserved|intended|will be live|placeholder" NOTICE` returns nothing relevant to the Site line.
 
-The docstring promises two things the code does not do — re-reading, and comparison against the proof — and the ratio assertion is structurally incapable of failing on any output this generator produces. It reads as independent verification and is not. Either re-derive the ratio from the two hexes with the same formula the engine uses, or delete the claim; the component and site harnesses are the only places contrast is actually re-measured.
+It does not resolve. `host anindastudio.com` → "Host anindastudio.com not found: 3(NXDOMAIN)", exit 1; `dig +short anindastudio.com A`, `… NS`, `… SOA` → all empty; `nslookup` → "** server can't find anindastudio.com: NXDOMAIN".
 
-### 20. engine.py and emit_css.py --check never compare against the committed output, so a hand-edited generated file passes
+I verified this is not a sandbox DNS artefact. Control lookups on the same resolver: example.com → 172.66.147.243, anthropic.com → 160.79.104.10, github.com → 20.205.243.166; and a deliberately fake name behaves identically to the target — "Host thisdomaindefinitelydoesnotexist-zzq7.com not found: 3(NXDOMAIN)".
 
-`05_colour/engine.py`
+It is not registered at all, not merely unpointed. `whois -h whois.verisign-grs.com anindastudio.com` → "No match for domain \"ANINDASTUDIO.COM\"." with "Last update of whois database: 2026-08-19T08:32:29Z". Verified 19 August 2026.
 
-Five of the seven --check modes in this repository compare against the committed bytes; these two do not, and emit_css.py's message ("CSS re-parsed and matched against source") reads as if it had. Anyone using --check locally as the drift gate — which is what the phrase invites — gets a false pass, and the only thing actually holding the line is one git-diff step in CI. Either compare against disk or reword to "re-verified the freshly generated set".
+The reach is wider than NOTICE alone: `grep -rn -i "anindastudio.com"` also hits 13_plugins/claude-code/NOTICE:74, 13_plugins/claude-code/.claude-plugin/plugin.json:9 and :11 ("homepage"), 13_plugins/claude-code/README.md:205, 11_site/CNAME:1, 11_site/index.html:10 (canonical) and :23-24 (og:url, og:image), 11_site/404.html:11/24/25, 11_site/robots.txt:5 (Sitemap), 11_site/sitemap.xml:5, and the built guidebook at Aninda-Studio-Guidebook-print.html:1829.
 
-### 21. A malformed direction spec escapes 05_colour/engine.py as a traceback with exit 1, not the documented exit 2
+*Smallest fix.* Remove the `Site:` line from NOTICE and from 13_plugins/claude-code/NOTICE (and the plugin.json homepage) until the domain is registered and serving.
 
-`05_colour/engine.py`
+#### 8 · The guidebook PDF and three other committed generated trees have no drift guard anywhere
 
-The two exit codes exist so a caller can tell "this palette cannot support the role you asked for" from "I could not read your input" — the distinction the file spends a paragraph justifying. A malformed spec reports the first while meaning the second, and does it as an unhandled traceback. Wrap the family construction in the same NotEquipped conversion the JSON parse already gets.
+`.github/workflows/ci.yml`
 
-### 22. 12_packages/build.py --check writes VERSION to disk while printing "Nothing written"
+The PDF and the 20 platform assets are both named deliverables, and .gitignore's header claims the reason they are committed is "what lets CI regenerate them and fail on any difference" — true for the token set, the marks, the cards and the packages, not true for these. Change a guidebook chapter and CI proves the HTML was rebuilt while the shipped PDF silently stays the old book. That is precisely the failure the tokens job was built to catch, in the one artefact a reader is most likely to print and keep.
 
-`12_packages/build.py`
+**Still open, 19 August 2026.** Still open, and now demonstrably realised, so it is worth more than when filed: the shipped PDF is the pre-19-August book. It still says "Three faces ship with this system", never names AnindaMono-Regular.ttf — the 136 kB unsubset font the licence chapter was corrected to include — and still prints the superseded 1.4 MB figure. 10_assets (20 rasters + MANIFEST.json), 03_directions and 06_type/BANGLA-REVIEW.* are regenerated and diffed nowhere either, and 10_assets/build.py has no --check mode to gate on.
 
-A verify-only mode that mutates the tree is the one thing --check must never do, and CI runs this mode. It also means a missing VERSION is silently resurrected as 1.0.0 rather than reported: if the real version were 2.3.0, the packages would be regenerated against a fabricated version rather than the run failing. Split the read from the create, and have --check report a missing VERSION instead of writing one.
+*How that was checked.* CI has no PDF or asset step: `grep -n 'pdf.py|10_assets|03_directions|specimen.py|review_bangla' .github/workflows/ci.yml scripts/verify-all.sh` returns nothing. The only guidebook gate is `python 09_guidebook/build.py --check`, whose code builds `targets = {OUT_INTERACTIVE.name: OUT_INTERACTIVE, OUT_PRINT.name: OUT_PRINT}` and compares only those two HTML files; I ran it: `CHECK PASSED — both files match their sources byte for byte.` The PDF is committed (`git ls-files | grep pdf$` → `09_guidebook/Aninda-Studio-Guidebook.pdf`) and 10_assets/build.py has no --check at all (its `main` ignores argv and calls `run()`, which writes). The predicted failure has already happened: `git log -1 -- 09_guidebook/chapters` → `661b657 2026-08-19 02:17`; `-- Aninda-Studio-Guidebook.html` → `641f7a3 2026-08-19 02:40`; `-- Aninda-Studio-Guidebook.pdf` → `d5e4320 2026-08-18 20:29`. Extracting the shipped PDF's text with pypdfium2: `AnindaMono in PDF: False`, `Three faces ship in PDF: True`, `1.4 MB True`, `1.8 MB False`. The same strings in the HTML: AnindaMono 1, "Three faces ship" 0, "1.4 MB" 0, "1.8 MB" 2.
 
-### 23. 08_components/check.py drops measureText's "could not measure" list in the forced-colours pass
+*Smallest fix.* Regenerate and commit the PDF, then add a CI step that rebuilds it and runs `git diff --exit-code 09_guidebook/Aninda-Studio-Guidebook.pdf`; if byte-determinism is not achievable, gate on the PDF being newer than every chapter and both HTML builds.
 
-`08_components/check.py`
-
-The docstring says "The harness prints what it could NOT check at the end. That list is part of the result, not an apology." In forced-colours mode it silently is not: an element whose background cannot be composited is skipped, unmeasured and unreported, so the forced-colours contrast pass can report clean over text it never looked at. One extra loop, matching the main pass.
-
-### 24. 11_site/check.py's external-reference finding is only ever an ok note, never a problem
-
-`11_site/check.py`
-
-"the page works offline" is a stated property of this site, and 11_site/build.py enforces it at build time (lines 1085-1097, `raise BuildError(f"{name} fetches {target} from the network.")`). The browser check, which is the only thing that sees the rendered page, records a violation as a pass and phrases it as reassurance. Make it a problem, or drop the collection so the note cannot be mistaken for enforcement.
-
-### 25. 09_guidebook's external-asset guard inspects <source> but its regex cannot see srcset
-
-`09_guidebook/build.py`
-
-A 14 MB self-contained book whose whole promise is that it opens with no network. The guard lists the one element whose entire purpose is the attribute it cannot read, which reads as coverage it does not have. Add `srcset` and `poster` to the attribute alternation.
-
-### 26. ring_from_diff's `thickness` is not ring thickness, so the 2px focus-ring floor cannot fail for a whole-box change
-
-`08_components/check.py`
-
-A background inversion is a legitimate focus indicator under SC 2.4.13, so the pass is defensible — but the number reported is the control's own size dressed as a ring measurement, which means RING_MIN_PX is dead for any element whose focused appearance differs across its whole box. A focus style that changed the fill and put a border on one side only would report sides [60, 60, 44, 44] and clear the floor with three sides bare. Measure the ring as changed pixels OUTSIDE the element's own box, or rename the figure to what it is.
-
-### 27. engine.py's header states the perturbation sweep is 64 measurements; it is 729
-
-`05_colour/engine.py`
-
-This paragraph is the file's own account of its central method, quoted onward into 07_tokens/build.py's generated $description text ("nudged by ±1. The published figure is the worst of those"). The measurement is stronger than the number claimed, so the error is in the safe direction, but it is the kind of unverified stated fact this repository otherwise refuses to ship.
-
-### 28. scripts/readme.py walks the entire repository to compute a figure neither README uses, and prints it as a counted fact
-
-`scripts/readme.py`
-
-Every line of the --check output reads as "this number in the README was verified against the thing it describes". One of the eighteen is asserted nowhere, is derived from the working tree rather than the repository, and costs a full recursive walk. It invites the reader to trust a figure that is not under any guard.
-
-
----
-
-## From round 2
-
-Same judgement as above: real, reproducible, not affecting the correctness of the
-system's output. Recorded rather than dropped.
-
-### R2-1. Both published site pages date themselves 2026-08-14 and claim their counts were taken that day, while the same page reports checking registries on 2026-08-18 and the file was regenerated on 18 August
-
-`11_site/build.py`
-
-"Counted on 2026-08-14" sits in the same sentence as the assurance that every number is counted at build time, so a typed date is presenting itself as provenance for figures that were recomputed on a different day. The page states two different dates about itself and the wrong one is the one a reader would use to judge how current the counts are. The sitemap's lastmod misinforms crawlers for the same reason, and nothing in CI or in 11_site/build.py --check can notice, because the constant is regenerated identically every time.
-
-### R2-2. The table and dashboard cards ship hand-typed contrast figures under a caption saying they were measured and an alert titled "These figures come from check.py", against README's claim that no hand-written contrast figures exist in the repository
+#### R2-2 · The table and dashboard cards ship hand-typed contrast figures under a caption saying they were measured and an alert titled "These figures come from check.py", against README's claim that no hand-written contrast figures exist in the repository
 
 `08_components/build.py`
 
 The README's blanket claim is falsified by the shipped cards: five typed contrast ratios carried under a caption that calls them measured, on 2 of the 30 cards. The alert's title and body contradict each other, so whichever a reader believes, the card has told them something untrue. In a kit whose stated reason for having no typed ratios is that a typed number can be wrong and stay wrong, an invented "Failed" verdict against one of its own cards is the one kind of demo content that cannot be read as neutral filler.
 
-### R2-3. CI enforces a seventh banned word that appears in no published blocklist, so a writer who follows the English standard exactly can be failed by it
+**Still open, 19 August 2026.** Reproduced in full, and it reaches a reader: the table card ships the typed figures under a caption asserting they were measured, with no disclaimer anywhere in that card, including inside the guidebook file readers download. Only the dashboard card carries a qualifier, and it is self-cancelling — the alert title says "These figures come from check.py" while the body underneath says the numbers are "an example, not a live reading". Meanwhile README.md still states flatly that no hand-written contrast figures exist in the repository.
 
-`02_strategy/ENGLISH-STANDARD.md`
+*How that was checked.* `08_components/build.py:1131-1147` still hard-codes the rows `("Colour",…,"15.90"), ("Typography",…,"8.44"), ("Button",…,"6.34"), ("Badge",…,"5.61"), ("Dashboard",…,"4.19","danger","cross","Failed")` under `<caption>Smallest measured contrast ratio on each card, light theme.</caption>`, and line 1684 hard-codes the tile `("Contrast floor", "4.19:1", …)` above the alert titled "These figures come from check.py" (line 1708). `git log -S "Smallest measured contrast ratio"` and `git log -S "not a live reading"` both return only e418bcc, the initial commit — nothing was touched after the review. The figures are shipped: they are in `08_components/cards/components/table.html` and `08_components/cards/patterns/dashboard.html`, and I decoded the guidebook's own embedded copy — the base64 payload behind `download="table.html"` in `09_guidebook/Aninda-Studio-Guidebook.html` contains the caption and all five typed figures (15.90, 8.44, 6.34, 5.61, 4.19: all True). The contradicted claim is still live at `README.md:47` and `scripts/readme.py:302`: "That is why there are no hand-written contrast figures in this repository", plus its Bangla twin at scripts/readme.py:453.
 
-The rule as published is the rule a writer reads, and it is a strict subset of the rule CI applies. A contributor who obeys the standard word for word can still be failed on a step that names this document as its authority, and neither of the two places the project publishes the blocklist — the standard itself and the guidebook chapter whose whole purpose is to state it — lists the seventh word. The standard's assurance about what CI covers is written as an exact account ("stated exactly, because the previous version of this section overstated it") and is still not exact.
+*Smallest fix.* Reword the two labels so they say what the data is — caption to "Example rows: a contrast report as this table would render it" and the alert title to "Example figures, not a live reading" — or feed both cards from check.py's real --json report; and qualify README.md:47 to cover the labelled demo rows.
 
-### R2-4. OPEN-FINDINGS.md records as an open, reproducible fault a directory that was removed and gitignored one commit before the file was written
-
-`01_research/OPEN-FINDINGS.md`
-
-This is the project's register of what is still wrong, and it makes a false statement about the repository it ships in — that superseded drafts are being published — while asserting that every entry is real and reproducible. A reader auditing the outstanding list will go looking for a path that does not exist, and finding one entry closed silently makes the other twenty-seven harder to trust. Item 12 of the same file is also labelled "not a defect", so the count of twenty-eight minors does not describe twenty-eight minors.
-
-### R2-5. README's headline command is described as taking about a minute; it takes 3.3 seconds
-
-`README.md`
-
-This is the first command the README asks a reader to run, and the duration is the one figure in that paragraph a person can check in three seconds. It is wrong by a factor of eighteen, in a document generated by a script whose header states "Every number below is counted from the repository, not typed" — this one is typed, and it sits beside numbers that are not. The project's own voice rule (chapter 10: "Say the number and its unit") makes a stale duration a rule break as well as an inaccuracy.
-
-### R2-6. The Bangla README omits the rounded-icon limitation entirely, so one of the two front doors does not disclose the deliberate departure from Apple's guidance
-
-`README.bn.md`
-
-Both READMEs open by promising the same thing — README.bn.md: "কোনো কিছুর সীমা থাকলে সেটা এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না" ("if something has a limit it will be written here, not hidden"). The icon decision is the one place the kit knowingly departs from a platform vendor's published guidance, and it is disclosed to English readers and not to Bangla readers, in the section whose only job is disclosure. Elsewhere the project declares its Bangla gaps at the point of the gap; here a limit is absent, so a Bangla reader has no way to know one was withheld.
-
-### R2-7. The tabs card's panels are unreachable by keyboard and the markup it teaches omits the tabindex that would fix it
-
-`08_components/cards/components/tabs.html`
-
-The WAI-ARIA Authoring Practices tabs pattern requires tabindex="0" on a tabpanel that holds no focusable element, so that after choosing a tab the reader can put focus into the panel and page through it. Without it a keyboard-only user activates a tab and focus jumps past the content they only revealed, with nothing focused inside the region they were reading. The card is the system's teaching artefact for this pattern and says so in its own panel text — 'Arrow keys move between the tabs and Home and End jump to the ends, which is what the roving tabindex on this pattern requires' — so the omission is copied by anyone following it. This is guidance rather than a WCAG success criterion, and the panels here are two short paragraphs, which is why it is minor rather than more.
-
-### R2-8. The site harness's structure and Bangla-language probe runs on index.html only, and its Bangla expression has no script/style skip list
-
-`11_site/check.py`
-
-Round 1 removed four CI steps that could pass without running. This is the same shape one level down: a harness that measures two pages reports a structure result derived from one, and prints it as an unqualified pass, so a regression on 404.html — a missing skip link, a lost <main>, an untagged Bangla string — is green. The skip-list omission is the reason the check cannot be pointed at the component cards as it stands: it would fire on every card's own stylesheet comment and the real defects would be indistinguishable from the noise. Both are cheap to close, and closing them is what would let one guard cover all thirty-two shipped pages instead of one.
-
-### R2-9. The accessibility card's subtitle double-escapes an em dash, so the entity is read out as literal text on the one card whose subject is accessibility
-
-`08_components/build.py`
-
-A screen reader reads the visible characters, so the card's one-line summary is announced as 'forced colours ampersand m dash semicolon the mode where…' — six syllables of markup in the middle of a sentence, on the card a reader most likely reaches with a screen reader precisely because it is the accessibility card. It is also a visible defect for everyone. The site and the guidebook prove the string itself is right and only the card's escaping is wrong, so three surfaces built from one entry in 08_components/_cards.json now disagree about what that entry says, and the card generator is the only one that cannot pass an entity through.
-
-### R2-10. A banned word is used in shipped prose in a lint-covered path, and the CI blocklist guard cannot see it because the same paragraph contains a rule-statement phrase
-
-`01_research/OPEN-FINDINGS.md`
-
-The one file round 1 added to carry findings forward breaks the rule it was added under, in a path CI lints, and CI passes it. The mechanism matters more than the single word: RULE_STATEMENT operates on a whole line, and "rather than" and "instead of" are ordinary connectives, so any paragraph-per-line document — which is the house style for 01_research — gets a free pass on all six banned words the moment one appears. ENGLISH-STANDARD.md tells the reader "every banned word and idiom above is in the checker's blocklist, and CI fails on a hit", which is now true only for files that hard-wrap.
-
-### R2-11. The site header's brand lockup loses its tile in both dark themes: the icon's baked-in ground measures 1.05:1 against the page it sits on
-
-`11_site/index.html`
-
-The primary lockup on the studio's front door reads as two different marks depending on theme — a rounded dark tile with a knocked-out 'a' in the two light themes, a bare floating 'a' in the two dark ones — on a site whose own theme switcher makes all four first-class. The mark stays legible, which is why this is minor, and the icon is fixed artwork by policy, but nothing shipped says the header deliberately keeps a fixed ground, so a reader comparing the header against the marks card's stated rule finds them disagreeing. The site's contrast harness cannot catch it: the icon is aria-hidden and the site's claim is scoped to "the contrast of every piece of text".
-
-### R2-12. The token files name a ramp "family", the one word the naming reference forbids for it
-
-`07_tokens/build/semantic.light.tokens.json`
-
-One thing carries two names inside the same shipped file — `ramp` in the token path and `family` in the extension on the leaf beside it — and the second is the word the project's own naming authority names as wrong. A consumer reading $extensions.studio.aninda to group roles by ramp has to learn that `family` means `ramp`, which is the exact cost the naming rule exists to avoid. It is minor because the key is machine-readable rather than prose, and because nothing breaks; it is worth recording because naming.md is enforced nowhere and this is the one place its vocabulary table is contradicted by generated output rather than by prose.
-
-### R2-13. 07_tokens/build.py's $schema check compares the emitted document against the constant that wrote it, so it is structurally incapable of failing
-
-`07_tokens/build.py`
-
-It reads as a conformance check on the one machine-readable field that tells a consuming tool which rules to apply, and it can never report anything. This is the same shape as the already-recorded finding 19 about the proof-ratio assertion, but a different check that OPEN-FINDINGS.md does not cover, and the two together mean two of check()'s gates are tautologies inside a function whose docstring is "Re-read what was built and prove it, rather than trusting that it was built." The only thing standing between a wrong $schema and a release is the CI git-diff, which reports that bytes changed without knowing why.
-
-### R2-14. 11_site/check.py's reduced-motion check reports "reduced motion honoured" and exits 0 when the property it measures does not exist at all
-
-`11_site/check.py`
-
-This harness exists because "build.py can only prove that the site was WRITTEN correctly. This proves it BEHAVES correctly." Reporting a measurement as honoured when the measured value is absent is the same shape as the already-fixed bug where the site's stylesheet never loaded and no check noticed: a note that reads as reassurance about something the script never saw. The nearby forced-colours check gets this right — it probes for liveness first and refuses to pass if the emulation is inert — so the pattern for handling "I could not see it" already exists in the same file, eleven lines above.
-
-### R2-15. 05_colour/engine.py's documented exit-1 failure — a palette that cannot support a role — is unreachable, and its remedy names an input that provably cannot change the outcome
-
-`05_colour/engine.py`
-
-The file spends a paragraph justifying the 1-versus-2 exit-code split, and the meaning it gives to 1 is "a real failure — a palette cannot support a role". That is the branch a reader is told to expect when a direction is unbuildable, and it is the one branch that no direction spec can produce. Worse, the message instructs the reader to change the anchor, which alters only hue and chroma while the outcome depends entirely on lightness — so a reader who somehow reached it would be sent to the wrong file. Either derive the ramp's lightness from the anchor as well, or state plainly that a direction spec cannot fail a contrast target and that this branch guards against a future change to LIGHTNESS.
-
-### R2-16. tag_inline_bangla's docstring claims Bangla inside attributes is counted by the guard and named in a chapter; neither the counter nor the chapter text exists
-
-`09_guidebook/build.py`
-
-This is a claimed check that does not exist, in the docstring of the function that fixed 286 Bangla nodes shipping announced as English. A reader auditing WCAG 2.2 SC 3.1.2 coverage is told the residual attribute case is counted and documented, so they will not look for it; if a future chapter adds a Bangla alt text or aria-label, nothing counts it, nothing reports it, and the limit the docstring promises is written down is written down nowhere. The fix is small — either add the count the sentence describes, or delete the second half of the sentence.
-
-### R2-17. 08_components/build.py's no-literal-colour guard does not treat CSS system colour keywords as literals, so hard-coded ButtonFace, ButtonText and AccentColor pass
-
-`08_components/build.py`
-
-A system colour keyword outside a forced-colors block paints one fixed operating-system colour in all four themes and ignores every token, which is exactly the class of value the guard exists to keep out of the hand-authored layer — 07_tokens/build.py puts them in a separate non-DTCG file precisely because they are colours the system supplies. Nothing downstream would catch it either: it would not change with data-theme, and no check verifies that a painted colour differs between themes. It is minor because reaching it takes a deliberate edit to components.css and the keywords are arguably outside the guard's intended vocabulary — but the guard's stated rule is unqualified, and the same omission lets `color-mix()` through when both its operands are keywords.
-
-### R2-18. The Bangla review sheet's checkboxes are 16 px, below SC 2.5.8, and no harness measures the page
-
-`06_type/BANGLA-REVIEW.html`
-
-The kit's central accessibility claim is WCAG 2.2 AA proven, and its own checker fails a committed interactive page against SC 2.5.8. The buttons on the same page were given `min-height:44px` deliberately, so the floor was understood and the 24 controls a reviewer actually clicks were missed. It is also the page a second Bangla reader is asked to work through, which is the audience least well served by a 16 px target.
-
-### R2-19. 12_packages --check reports "6 DTCG documents" while one of the six is declared not DTCG
-
-`12_packages/build.py`
-
-This line is the one confirmation a reader gets that the DTCG documents in the package are conformant, and it counts a file the kit insists three times over is not one — so the number that certifies conformance is the number that includes the exception. The file's own comment names this string as a past false claim and then re-emits it, which is exactly the drift the repository built its guards to stop.
-
-### R2-20. The aninda-repo skill promises two full licence texts and ships neither a template nor the text
+#### R2-20 · The aninda-repo skill promises two full licence texts and ships neither a template nor the text
 
 `13_plugins/claude-code/skills/aninda-repo/SKILL.md`
 
 Two of the eight files the skill exists to write have no source in the bundle, so an agent following it either reproduces a licence text from memory or fetches one — in a skill whose own reference file forbids paraphrasing a licence identifier from memory, and for the one licence (PolyForm Noncommercial) most readers cannot recall. The Apache text is sitting in the bundle root and could be copied, but nothing says so.
 
-### R2-21. The website inventories the guidebook, the 30 cards and both packages and provides a route to none of them
+**Still open, 19 August 2026.** Still open, and one file worse than recorded: the PolyForm text and the OFL text have no source in the bundle at all, and the Apache text is present only as the skill's own LICENSE.txt, never pointed at. The CI workflow the same skill writes then fails the repository if LICENSE-DOCS.md is absent, so an agent following it must produce a licence text from memory or fetch one — into a stranger's repository, as its governing licence.
+
+*How that was checked.* SKILL.md's 'What a repository gets' table (lines 58-66) promises '`LICENSE` | The full Apache License 2.0 text.', '`LICENSE-DOCS.md` | The full PolyForm Noncommercial 1.0.0 text ...' and '`fonts/*-OFL.txt` | One beside each font file'. `find . -type f` in 13_plugins/claude-code/skills/aninda-repo lists 13 files: LICENSE.txt, NOTICE, SKILL.md, references/{ci.md,licence-matrix.md}, scripts/spdx.py, templates/{NOTICE,README.bn.md,README.md,TRADEMARKS.md,brand.yml,gitignore}. `grep -rl "PolyForm Noncommercial License 1.0.0"`, `grep -rl "Noncommercial Purposes"` and `grep -rl "PERMISSION & CONDITIONS"` over the bundle all return nothing — no PolyForm text, no OFL text. The shipped bundle matches: listing dist/aninda-repo.skill gives the same 12 entries. `grep -rn "LICENSE.txt"` in SKILL.md, references/ and templates/ returns nothing, so the full Apache text that IS present (./LICENSE.txt, 202 lines, first line 'Apache License') is never named as the source for the repository's LICENSE. scripts/spdx.py only stamps one-line headers. And templates/brand.yml:75-76 hard-fails the repository it writes: 'test -f LICENSE-DOCS.md || test -f LICENSE-DOCS.txt || { echo "::error::no LICENSE-DOCS file for the PolyForm text"; exit 1; }'. Nothing catches it: `./.venv/bin/python 13_plugins/claude-code/scripts/check_plugin.py` reports 'dist/aninda-repo.skill: SKILL.md at the root, 12 entries, one timestamp' and 'WRONG (0) ... Nothing.'
+
+*Smallest fix.* Add templates/LICENSE-DOCS.md (verbatim PolyForm Noncommercial 1.0.0) and templates/OFL.txt (verbatim OFL 1.1) to the bundle, name LICENSE.txt in SKILL.md as the source to copy for the repository's LICENSE, and add all three to check_plugin.py's byte-identity list.
+
+#### R2-21 · The website inventories the guidebook, the 30 cards and both packages and provides a route to none of them
 
 `11_site/index.html`
 
 The site is a named deliverable and the kit's public front door. A reader who arrives, reads descriptions of 30 components and two packages, and wants to see one has nowhere to go: no link to the guidebook, no link to a card, and no mention of the public repository that holds them. Hyperlinks are not subresources, so the site's offline-and-self-contained property does not stand in the way — the npm README already links the repository from inside a shipped artefact.
 
-### R2-22. COMPARE.pdf and all eight files in 03_directions/shots have no writer anywhere in the repository
+**Still open, 19 August 2026.** Reproduced exactly. The public front door describes 30 components and two packages and offers a reader precisely two links: skip-to-content and an email address. One detail of the recorded wording has drifted — the guidebook is no longer inventoried on the page either (zero mentions), so it is now absent rather than described-but-unreachable.
 
-`03_directions/build.py`
+*How that was checked.* `grep -o 'href="[^"]*"' 11_site/index.html | sort | uniq -c` returns only 8 hrefs, all local assets or self-references: `styles.css`, `site.webmanifest`, `mailto:aninda.sh15@gmail.com`, `icon.svg`, `https://anindastudio.com/` (its own canonical), `favicon.ico`, `apple-touch-icon.png`, `#main`. `grep -o '<a [^>]*>'` returns exactly two anchors — the skip link (`href="#main"`) and the mailto button. Counts of key words in index.html: guidebook 0, Guidebook 0, github.com 0, repo 0, .pdf 0. `./.venv/bin/python 11_site/build.py --check` → "No drift. 15 files match.", so this is the current generated output. The page still inventories what it cannot reach: rows reading "Foundations 6", "Components 16", "Patterns 8" (the 30 cards) plus `npm install aninda-studio-tokens` and `pip install aninda-studio-tokens`. 11_site/404.html links only back into index.html anchors, and sitemap.xml holds one `<loc>`, the site root.
 
-10_assets/build.py opens by stating the house rule — "Nothing here is hand-drawn and nothing here should be hand-edited" — and these nine files are the exception: no generator, so no way to reproduce or check them, and no document explaining what they are. Two of them are unlabelled pre-decision pages showing marks and palettes the project rejected, which is the same class of stray the repository removed _reference/ to stop shipping. A reader opening _m2.html sees four candidate identities with no indication which, if any, is the brand.
+*Smallest fix.* In 11_site/build.py add a repository link (https://github.com/GRU-953/aninda-studio, the URL both package READMEs already ship) to the hero or the "The work" section, plus links to the guidebook HTML and the card index — 11_site/check.py only prints external references as a note, it does not fail on them, so nothing structurally blocks it.
 
-### R2-23. Outstanding, not a defect: the Claude Design push is still to be done, and the deliverable is named in no shipped surface
+#### R2-23 · Outstanding, not a defect: the Claude Design push is still to be done, and the deliverable is named in no shipped surface
 
 `08_components/cards`
 
@@ -339,7 +164,513 @@ Round 3 raised 53 findings across three lenses: one blocker, five majors and
 thirty-two minors, with eight refuted. The blocker, all five majors and
 twenty-eight minors are fixed. What follows is what is knowingly left.
 
-### R3-1. About forty tracked files carry no SPDX header, against the licence matrix this system publishes
+**Half stale, 19 August 2026.** The push half is stale — there is now a generator, a byte-for-byte --check, a CI step and a verify-all step, so the "no local work left, only the push remains" framing is inverted. The naming half is not merely still open: adding the ninth deliverable without registering it in scripts/readme.py has left HEAD red on the repository's own README drift check, and therefore on verify-all and CI. I could not verify the remote claude.ai project from the tree — no project URL is recorded anywhere (`grep -rn "claude.ai"` finds only a prose comment at build.py:10), so the push itself rests on the commit message alone.
+
+*How that was checked.* HALF ONE, STALE: 13_plugins/claude-design/ now holds build.py (44,605 bytes) and dist/ (9 entries: LICENSE, NOTICE, SKILL.md, assets, css, guidelines, readme.md, styles.css, tokens). `./.venv/bin/python 13_plugins/claude-design/build.py --check` → "--check: 48 files match the system. Nothing written." It is wired into CI at .github/workflows/ci.yml:237-241 ("The Claude Design bundle must match the system") and scripts/verify-all.sh:58. Commit 289533b states the project is live on claude.ai. HALF TWO, STILL OPEN AND NOW HARDER: `grep -n "claude-design" README.md README.bn.md scripts/readme.py` returns nothing at all. README.md:61 still reads `| `13_plugins/` | A Figma plugin and a Claude Code plugin |` — a row that no longer describes the folder's contents (`ls 13_plugins` → claude-code, claude-design, figma). And the repo's own drift guard now fails on it: `./.venv/bin/python scripts/readme.py --check` → "FAILED — nothing written: these generators are in the tree but in neither REBUILD_CHAIN nor NOT_IN_CHAIN: 13_plugins/claude-design/build.py". `git status --short` is empty, so this is committed HEAD, and that step runs in CI at ci.yml:143 and in scripts/verify-all.sh:57.
+
+*Smallest fix.* Add "13_plugins/claude-design/build.py" to REBUILD_CHAIN in scripts/readme.py (between build_skills.py and readme.py) and widen the `13_plugins/` row in both READMEs to name the Claude Design bundle, then regenerate — that clears the red check and closes the naming gap in one pass.
+
+#### R2-5 · README's headline command is described as taking about a minute; it takes 3.3 seconds
+
+`README.md`
+
+This is the first command the README asks a reader to run, and the duration is the one figure in that paragraph a person can check in three seconds. It is wrong by a factor of eighteen, in a document generated by a script whose header states "Every number below is counted from the repository, not typed" — this one is typed, and it sits beside numbers that are not. The project's own voice rule (chapter 10: "Say the number and its unit") makes a stale duration a rule break as well as an inaccuracy.
+
+**Still open, 19 August 2026.** Still open, and worse than recorded: the measured time is now 2.8 s, not 3.3 s, and the same wrong duration also ships in the Bangla front door — README.bn.md line 68 and scripts/readme.py line 482 both say 'এক মিনিট লাগে' (takes one minute). The record only named README.md.
+
+*How that was checked.* README.md line 64 is `## Try it in one minute` and line 76 reads 'pixels it actually produced. It takes about a minute and it either agrees with the'. Timed three times with `PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers /usr/bin/time -p ./.venv/bin/python 00_sandbox/measure.py`: `real 2.82`, `real 2.86`, `real 2.83`, each ending `7 checks passed, 0 failed.` The claim is off by roughly a factor of twenty-one. The text is typed, not counted: it lives in the generator at scripts/readme.py lines 319 and 331, and scripts/readme.py line 257 still states 'Every number below is counted from the repository, not typed.'
+
+*Smallest fix.* In scripts/readme.py change the heading and the sentence at lines 319/331 and the Bangla sentence at line 482 to a few seconds, or better, have readme.py time the run and insert the measured figure.
+
+#### R2-6 · The Bangla README omits the rounded-icon limitation entirely, so one of the two front doors does not disclose the deliberate departure from Apple's guidance
+
+`README.bn.md`
+
+Both READMEs open by promising the same thing — README.bn.md: "কোনো কিছুর সীমা থাকলে সেটা এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না" ("if something has a limit it will be written here, not hidden"). The icon decision is the one place the kit knowingly departs from a platform vendor's published guidance, and it is disclosed to English readers and not to Bangla readers, in the section whose only job is disclosure. Elsewhere the project declares its Bangla gaps at the point of the gap; here a limit is absent, so a Bangla reader has no way to know one was withheld.
+
+**Still open, 19 August 2026.** Reproduced precisely. The one deliberate departure from Apple's icon guidance is disclosed in English and nowhere in Bangla, so the two front doors do not make the same disclosure.
+
+*How that was checked.* README.md lines 140–142 carry the disclosure: '- **The icons are rounded everywhere, Apple included.** That is a deliberate / choice against Apple's current guidance, and what it trades away is recorded in / `04_mark/manifest.json`.' In README.bn.md, `grep -n -i "Apple|আইকন|রাউন্ড|গোল|icon"` returns one hit only — line 49, the directory table row `| `04_mark/` | চিহ্ন, নামলিপি আর আইকনের 10টি ফাইল |`. The Bangla limits section `## যা এই পদ্ধতি করে না` (README.bn.md lines 71–83, generated from scripts/readme.py lines 484–495) holds four bullets: screen reader, no user research, no second Bangla reader, Chromium only. The English section holds six. The npm/PyPI limit is disclosed elsewhere in the Bangla file (lines 59–60), so the rounded-icon bullet is the only one with no Bangla equivalent anywhere.
+
+*Smallest fix.* Add a fifth bullet to the Bangla limits block in scripts/readme.py (around line 495) mirroring the rounded-icon disclosure, then regenerate the READMEs.
+
+### Minors (38)
+
+#### 11 · README.bn.md silently drops a whole section and the asset.py demonstration, with no note that it is abridged
+
+`README.bn.md`
+
+Everywhere else the project declares its Bangla gaps at the point of the gap — 11_site/index.html closes with "Bangla appears only where the verified table in 06_type/BANGLA-STANDARD.md holds a string ... those places are listed in this build's output", and the Bangla guidebook chapters carry a {{gap-notice}}. The README pair is the one place that omits without declaring, so a Bangla reader has no way to know a section exists that they were not shown — including the commands for rebuilding the system, which need no translation.
+
+**Still open, 19 August 2026.** Still true, both halves. The Bangla README omits the whole "Rebuild everything" section — the 13-generator chain, the Figma bundle command and the three deliberately excluded generators — and the asset.py refusal demonstration, with no declaration of the gap, in a project whose stated practice is to name a Bangla gap at the point of the gap. The omitted commands are shell lines needing no translation.
+
+*How that was checked.* `grep -n '^#' README.md` → `27 ## The one thing to understand`, `50 ## What is in here`, `64 ## Try it in one minute`, `92 ## Rebuild everything`, `123 ## What this does not do`, `144 ## Licence`. `grep -n '^#' README.bn.md` → `20 ## মূল কথাটা`, `42 ## এখানে কী আছে`, `55 ## শুরু করতে`, `71 ## যা এই পদ্ধতি করে না`, `84 ## লাইসেন্স` — no counterpart to "Rebuild everything". `grep -n asset.py README.md README.bn.md` → only `README.md:80`. Code fences: README.md has four (lines 71, 79, 97, 114), README.bn.md has one (line 63). Reading README.bn.md lines 1-95 in full, its only English notice is the "Not published yet" registry paragraph; there is no note that the file is abridged.
+
+*Smallest fix.* In scripts/readme.py, emit the same rebuild code block in the Bangla README under a one-line Bangla heading, or add a short Bangla note at the omission point saying the section exists in the English README.
+
+#### 12 · Outstanding, not a defect: the Claude Design push has not been done; the local side is ready and only the push remains
+
+`08_components/cards`
+
+This is the one requested artefact with no local work left. What remains is the push itself: pick or create a design-system project, finalize a plan covering 08_components/cards/**/*.html, upload the 30 files, and let the pane build its card index from the @dsCard markers (the three groups are already Foundations 6, Components 16, Patterns 8). Worth recording so it is not mistaken for a build gap — and worth doing before the 30 cards move again, since nothing will tell you the remote copy has fallen behind.
+
+**Half stale, 19 August 2026.** Half stale, half open. The local side moved from "ready but unpushed" to a generated, byte-diffed bundle with a real CI guard, and the owner's commit says the remote project is live, which I cannot verify here. What still reproduces is the second half: Claude Design is named in no reader-facing surface, and the one shipped sentence describing its directory undercounts it as "A Figma plugin and a Claude Code plugin". Nothing records which remote project was pushed to, so the guard proves the local dist is current and still cannot say whether the copy on claude.ai has fallen behind.
+
+*How that was checked.* Push half: HEAD is `289533b The Claude Design push: a generated bundle, and the project is live`, stating "The design system is now a project on claude.ai — 48 files, 18 preview cards". Locally 13_plugins/claude-design/{build.py,dist} exists; its --check compares generated bytes against dist on disk and also fails on files not generated by the build (build.py, main), and it is both a CI step ("The Claude Design bundle must match the system") and a verify-all.sh step. Whether the remote project exists cannot be checked from here — that needs the claude.ai service. Naming half: `grep -rn -i 'claude design|claude-design' README.md README.bn.md 11_site/ 09_guidebook/Aninda-Studio-Guidebook.html` → no output; `grep -rln claude-design .` (excluding .git/.venv) → only 13_plugins/claude-design/{build.py,dist/SKILL.md,dist/styles.css,dist/readme.md}, scripts/verify-all.sh and .github/workflows/ci.yml. README.md:61 still reads `| \`13_plugins/\` | A Figma plugin and a Claude Code plugin |` (hard-coded at scripts/readme.py:316, Bangla twin at :467) while `ls 13_plugins` → `claude-code claude-design figma`. `git ls-files 14_delivery | wc -l` → `0`, and the only "claude.ai" string in the tree is a comment at build.py:10 — no project id, URL or push date is recorded anywhere.
+
+*Smallest fix.* Change the `13_plugins/` row in scripts/readme.py (both languages) to name all three plugins, and commit a short record of the push — project name or id, date, and bundle version — so remote drift is detectable by inspection.
+
+#### 13 · TOOLCHAIN.md documents Jinja2 as the templating engine for the guidebook and the component cards; nothing in the repository imports it
+
+`00_sandbox/TOOLCHAIN.md`
+
+The document's stated purpose is a traceable account of what this build depends on and what each dependency does. A pinned package with an invented job in it is the same class of error the project's own README warns about — a sentence a human wrote once that nobody re-reads. It also misleads anyone auditing the licence surface, since Jinja2's BSD-3-Clause is listed as in-use when no code path touches it.
+
+**Still open, 19 August 2026.** Still true, and both halves reproduce exactly. TOOLCHAIN.md:39 attributes a job to Jinja2 that no code path performs — both named consumers (the guidebook build and the component cards) are pure stdlib plus f-strings, 261 and 130 of them respectively, and nothing in the repository imports jinja2 at all. In a file whose stated purpose is a traceable account of what the build depends on and what each dependency does, this is an invented dependency role, and it puts BSD-3-Clause on the in-use licence list for code that never runs.
+
+*How that was checked.* `grep -n -i jinja 00_sandbox/TOOLCHAIN.md requirements.txt` → "00_sandbox/TOOLCHAIN.md:39:| `Jinja2` | 3.1.6 | BSD-3-Clause | Templating, for building the guidebook and the component cards |" and "requirements.txt:1:Jinja2==3.1.6".
+
+`grep -rn -iE "import[[:space:]]+jinja|from[[:space:]]+jinja|jinja2" --include="*.py" --include="*.js" --include="*.ts" --include="*.mjs" --exclude-dir=.venv --exclude-dir=node_modules .` → no output, "EXIT=1". Zero importers anywhere in the tree.
+
+`grep -nE "^(import|from) " 09_guidebook/build.py` → only stdlib: base64, html as html_mod, json, mimetypes, os, re, sys, pathlib. Same for 08_components/build.py: base64, html, io, json, re, sys, pathlib. f-string counts: 09_guidebook/build.py 261, 08_components/build.py 130.
+
+`grep -rlnE "import (jinja2|mako|chevron|pystache)|Template\(" --include="*.py" --exclude-dir=.venv .` → no output. No templating engine of any kind.
+
+The package is really installed and really unused: `.venv/lib/python3.13/site-packages/jinja2` exists and `./.venv/bin/python -c "import jinja2..."` → "jinja2 importable, version 3.1.6".
+
+`git status --porcelain 00_sandbox/TOOLCHAIN.md` → empty (nothing fixed in the working tree either).
+
+*Smallest fix.* Delete the Jinja2 row from TOOLCHAIN.md:39 and the `Jinja2==3.1.6` line from requirements.txt, since nothing imports it.
+
+#### 14 · pypdfium2 is a pinned dependency imported by the PDF verifier but is missing from TOOLCHAIN.md's package table
+
+`00_sandbox/TOOLCHAIN.md`
+
+The one dependency omitted from the toolchain document is the one that backs a verification claim ("no page is blank — every page is rendered with pypdfium2 and its pixels sampled"). A reader auditing the build from TOOLCHAIN.md alone gets an incomplete dependency and licence list, and the file's closing assurance about "every package above" silently excludes it.
+
+**Still open, 19 August 2026.** Still true, and worse than the record states. pypdfium2 is not merely undocumented: it is the single omission from a ten-package list, it is the dependency that backs the guidebook's blank-page verification claim, and it is the only dependency in the build whose licence is a bundle (BSD-3-Clause plus Apache-2.0 plus CC-BY-4.0 plus vendored PDFium/abseil notices) rather than one line. Anyone auditing the licence surface from TOOLCHAIN.md alone misses precisely the entry that needed the most care.
+
+*How that was checked.* Pinned: `cat requirements.txt` → line 9 "pypdfium2==5.13.0". Imported: `grep -rn -i pypdfium ...` → "09_guidebook/scripts/pdf.py:154: import pypdfium2 as pdfium", and the docstring at pdf.py:43 leans on it — "4. no page is blank — every page is rendered with pypdfium2 and its pixels".
+
+Absent from the table: the TOOLCHAIN.md grep returned no TOOLCHAIN.md line for pypdfium. Confirmed by differencing every requirement against the document:
+`while read -r line; do pkg="${line%%==*}"; grep -qi "\`$pkg\`" 00_sandbox/TOOLCHAIN.md || echo "MISSING from TOOLCHAIN.md: $line"; done < requirements.txt` → "MISSING from TOOLCHAIN.md: pypdfium2==5.13.0" and nothing else. It is the only one of the ten requirements omitted.
+
+Sharper than recorded — it is also the licence-heaviest entry. `grep -iE "^License|Classifier: License" .venv/lib/python3.13/site-packages/pypdfium2*.dist-info/METADATA` → "License: BSD-3-Clause, Apache-2.0, dependency licenses", plus "License-File: LICENSES/CC-BY-4.0.txt" and bundled third-party files such as "License-File: data/darwin_arm64/BUILD_LICENSES/abseil.txt". Every listed package in TOOLCHAIN.md carries a single simple licence; the one omitted is the multi-licence bundle.
+
+TOOLCHAIN.md still closes the section with "**Nothing failed to install.** Every package above resolved to a pre-built wheel" — an assurance whose scope silently excludes it.
+
+*Smallest fix.* Add a `pypdfium2` / 5.13.0 row to the Python table in TOOLCHAIN.md, giving its licence as the bundle it actually is and its job as rendering each PDF page to pixels so the blank-page check is a measurement.
+
+#### 15 · pdf.py records a probe measurement of 55 pages; re-running the documented probe today gives 58
+
+`09_guidebook/scripts/pdf.py`
+
+The docstring's whole point is that "the reason for the two-file split stays a measurement rather than a memory", and it has become a memory — the recorded page count no longer matches what the script reports. The MB/MiB mislabelling means the repository states two different sizes for the same PDF and the same HTML file in its two most-read technical documents, with no way for a reader to tell which convention is meant.
+
+**Still open, 19 August 2026.** Still true. I could not re-measure the 55 itself without writing a PDF, which is out of bounds here — but I did not need to: two of the three numbers in the same recorded sentence are reproducibly wrong (13.6 MB input is now 14.3 MB, the 1.4 MB print PDF is now 1.7 MB by the script's own formatter), which proves the whole measurement block describes a superseded state of the document. The comment's own escape clause, "Re-run the probe after the kit grows", has been triggered and not acted on: pdf.py has not been touched since the 1.0.0 commit. This is an internal source comment, not reader-facing, which is the only reason it is not worse.
+
+*How that was checked.* The comment is unchanged. `sed -n '46,50p' 09_guidebook/scripts/pdf.py` → "memory. As at 15 August 2026, at 13.6 MB, it printed: 55 pages, none blank, a / 14.2 MB PDF against the print build's 1.4 MB, with the page breaks in the wrong places. ... Re-run the probe after the kit grows."
+
+Unchanged since the initial release: `git log --oneline -- 09_guidebook/scripts/pdf.py` → one commit only, "e418bcc Aninda Studio 1.0.0 …"; `git diff --stat HEAD -- 09_guidebook/scripts/pdf.py` → empty.
+
+I could not re-run the probe read-only — `probe_interactive()` calls `render_pdf(INTERACTIVE_HTML, PROBE_PDF, …)`, which writes 09_guidebook/_probe-interactive.pdf (absent: "ls: 09_guidebook/_probe-interactive.pdf: No such file or directory"), and OUT_PDF is rewritten before the probe is reached. So I reasoned from source and measured the inputs instead.
+
+Two of the three figures in that one sentence reproduce as WRONG, using the script's own `fmt_bytes` (pdf.py:82-87, `f"{n / (1024*1024):.1f} MB"`):
+ · the probe's input, "at 13.6 MB": `stat -f %z 09_guidebook/Aninda-Studio-Guidebook.html` → 15024974 bytes = 14.3 MB.
+ · "the print build's 1.4 MB": `stat -f %z 09_guidebook/Aninda-Studio-Guidebook.pdf` → 1791468 bytes = 1.7 MB.
+For scale, the current print PDF is far larger than the recorded era: `pypdfium2.PdfDocument(...)` → "print-build PDF pages = 76".
+
+*Smallest fix.* Re-run `pdf.py --probe-interactive` and replace all three figures, or drop the numbers and keep only the instruction to re-run the probe.
+
+#### 19 · 07_tokens/build.py's proof check ignores its own `proof` argument and compares two numbers the generator guarantees agree
+
+`07_tokens/build.py`
+
+The docstring promises two things the code does not do — re-reading, and comparison against the proof — and the ratio assertion is structurally incapable of failing on any output this generator produces. It reads as independent verification and is not. Either re-derive the ratio from the two hexes with the same formula the engine uses, or delete the claim; the component and site harnesses are the only places contrast is actually re-measured.
+
+**Still open, 19 August 2026.** 07_tokens/build.py:510 `check(files, proof)` never touches `proof`, so the one thing that argument could uniquely verify — that emitted token values still equal the measured proof they claim to come from — is not verified; an emitter that fabricated a hex would be reported clean.
+
+*How that was checked.* AST scan of the current file: `python -c` over `ast.parse(open('07_tokens/build.py'))` printed "def check at line 510 args: ['files', 'proof']" and "param 'proof' referenced in body: False" — the Name list for the whole function body contains no `proof`. Consequence proved in an isolated scratchpad copy (repo untouched) by monkeypatching the emitter in memory so it disagreed with the proof: "proof says ground.50 = #F2F9F7 / emitted ground.50 = #FF00FF / check(files, proof) problems: []". The only in-file use of the word is the string key `tok["$extensions"][NS]["proof"]` at line 656, which reads the token's own copy, not the argument.
+
+*Smallest fix.* In `check()`, walk the primitive ramps and semantic roles and compare each emitted `$value["hex"]` against `proof["families"][fam]["ramp"][step]` and `proof["themes"][t]["roles"][name]["value"]`, appending a problem on mismatch (or delete the unused parameter if no cross-check is wanted).
+
+#### 2 · Semantic theme files are not resolvable as standalone DTCG documents, and nothing shipped says so
+
+`07_tokens/build/semantic.light.tokens.json`
+
+The kit describes each of these files as DTCG 2025.10 in its own right, and the plugin hands them to a consumer individually. A spec-conformant single-document tool loading semantic.dark.tokens.json gets ten unresolvable references and no instruction telling it what to load alongside. The fix is documentation, not restructuring — one sentence in SKILL.md and the guidebook token chapter saying the semantic files resolve only when merged with primitive.tokens.json — but as shipped a reader has to infer it from the failure.
+
+**Half stale, 19 August 2026.** Half stale: "every colour value is an alias" is now false — 7 of the 18 tokens per theme file carry literal sRGB objects. The other half reproduces exactly: 11 of 18 are `{color.ramp.*}` references whose target group exists only in primitive.tokens.json, so a tool handed one semantic file alone still cannot resolve those 11, and no field in the file tells it which companion file to load.
+
+*How that was checked.* Resolved each semantic file against itself only, in Python: `UNRESOLVABLE within this file alone: 11 of 18 tokens`, listing `.color.ink.default -> {color.ramp.ground.950}`, `.color.accent.default -> {color.ramp.accent.700}`, `.color.status.info -> {color.ramp.info.700}` and eight more. The other 7 are now literal objects: `.color.surface.lowest -> OBJ:#FDFFFE` … `.color.surface.bright -> OBJ:#FFFFFF`. Counted across all four: each of semantic.light/dark/hc-light/hc-dark reports `tokens: 18 | string values: 11 | aliases: 11 | object values: 7`. The alias root really is absent from the semantic files — `[k for k in d['color']]` gives `['surface','ink','line','accent','focus','status']` with no `ramp`, while primitive.tokens.json's colour group is `['ramp']`. 07_tokens/build.py:398 states the rule deliberately: "A semantic token is an alias if and only if its value is bit-identical to a primitive. Anything else is a literal carrying its derivation", and the validation gate at build.py:621 resolves aliases against `prim`, that is, only ever with both files loaded. The same 11 dangling aliases ship in 12_packages/npm/dist/tokens/ and 13_plugins/claude-code/skills/aninda-brand/assets/tokens/ (`tokens 18 aliases 11` each). Nothing in each file's $description or $extensions names primitive.tokens.json as a required companion.
+
+*Smallest fix.* Add one line to each semantic file's `$extensions.studio.aninda` — for example `"requires": "primitive.tokens.json"` — in the generator, so a single-file consumer is told what the 11 aliases need.
+
+#### 20 · engine.py and emit_css.py --check never compare against the committed output, so a hand-edited generated file passes
+
+`05_colour/engine.py`
+
+Five of the seven --check modes in this repository compare against the committed bytes; these two do not, and emit_css.py's message ("CSS re-parsed and matched against source") reads as if it had. Anyone using --check locally as the drift gate — which is what the phrase invites — gets a false pass, and the only thing actually holding the line is one git-diff step in CI. Either compare against disk or reword to "re-verified the freshly generated set".
+
+**Still open, 19 August 2026.** Both --check modes still verify only their in-memory rebuild, so a hand-edited committed artefact passes them (and 07_tokens/build.py has the same hole); CI's regenerate-and-diff job closes the gap, but scripts/verify-all.sh omits that step, so its own claim that a local pass means the same as a green CI run is false for exactly this gate. Separately and outside this finding: `./.venv/bin/python scripts/readme.py --check` currently FAILS on the real tree — "these generators are in the tree but in neither REBUILD_CHAIN nor NOT_IN_CHAIN: 13_plugins/claude-design/build.py".
+
+*How that was checked.* In a scratchpad copy of the tree: after hand-editing the committed 05_colour/generated/estuary.proof.json (ground ramp 50 → "#FF00FF", name → "Estuary TAMPERED"), `engine.py --check` printed "--check: 4 direction(s) verified. Nothing written." exit=0. After hand-editing the committed 07_tokens/css/tokens.css (comment inserted, `--as-space-0` corrupted to #FF00FF; file 9019 → 9072 bytes), `emit_css.py --check` printed "tokens.css 9019 bytes 64 custom properties" then "--check: CSS re-parsed and matched against source. Nothing written." exit=0, and the edit was still on disk. Same hole in 07_tokens/build.py: "--check: 6 files verified, 0 problems" exit=0 while an in-process comparison gave "fresh == committed: False". Source confirms it: neither main() ever reads its OUT path. BUT .github/workflows/ci.yml:104 regenerates and runs `git diff --exit-code 05_colour/generated 07_tokens/build 07_tokens/css`, which does catch it; scripts/verify-all.sh has no equivalent step (its only git-diff guards are for 13_plugins/figma and 13_plugins/claude-code/dist).
+
+*Smallest fix.* Add the CI regenerate-and-diff step (or, better, a disk comparison inside each --check as 12_packages/build.py already does at main()) covering 05_colour/generated, 07_tokens/build and 07_tokens/css to scripts/verify-all.sh.
+
+#### 21 · A malformed direction spec escapes 05_colour/engine.py as a traceback with exit 1, not the documented exit 2
+
+`05_colour/engine.py`
+
+The two exit codes exist so a caller can tell "this palette cannot support the role you asked for" from "I could not read your input" — the distinction the file spends a paragraph justifying. A malformed spec reports the first while meaning the second, and does it as an unhandled traceback. Wrap the family construction in the same NotEquipped conversion the JSON parse already gets.
+
+**Half stale, 19 August 2026.** The guard added since the record covers only the four top-level keys (run() line 604), so those now fail closed with a message; the per-family dict is still indexed raw at engine.py:609, so a family missing label, kind or anchor still escapes as a bare KeyError traceback. Nothing is written and the exit code is non-zero, so CI still goes red — only the diagnostic is wrong.
+
+*How that was checked.* Scratchpad copy of 05_colour with three malformed specs. Top level, spec missing "premise": "COULD NOT RUN — nothing written:\n\n - notop.json is missing 'premise'" exit=2 — fail-closed, as promised. Family level, ground missing "kind": "File .../engine.py, line 609, in run\n kind=f[\"kind\"], anchor=f[\"anchor\"], note=f.get(\"note\", \"\"),\nKeyError: 'kind'" exit=1. Accent missing "anchor": "KeyError: 'anchor'" at the same line. `grep -n "except KeyError"` over engine.py returns nothing.
+
+*Smallest fix.* Inside the `for key, f in spec["families"].items()` loop, check for ("label", "kind", "anchor") and `raise NotEquipped(f"{spec_path.name}: family '{key}' is missing '{req}'")` before constructing Family.
+
+#### 22 · 12_packages/build.py --check writes VERSION to disk while printing "Nothing written"
+
+`12_packages/build.py`
+
+A verify-only mode that mutates the tree is the one thing --check must never do, and CI runs this mode. It also means a missing VERSION is silently resurrected as 1.0.0 rather than reported: if the real version were 2.3.0, the packages would be regenerated against a fabricated version rather than the run failing. Split the read from the create, and have --check report a missing VERSION instead of writing one.
+
+**Still open, 19 August 2026.** The write is still on the --check path: with VERSION absent, a verify-only run creates VERSION at the repo root while printing "Nothing written." Only reachable when VERSION is missing, which the committed tree never is, so it is a broken promise rather than a live corruption.
+
+*How that was checked.* Scratchpad copy: `rm VERSION`, confirmed absent ("No such file or directory"), then `12_packages/build.py --check` printed " ok npm 'aninda-studio-tokens' — 20 files … \n--check: both packages match the source. Nothing written." exit=0 — and afterwards "-rw-r--r-- 1 gru953 staff 6 … /VERSION" containing "1.0.0". Source path: read_version() at line 288 does `VERSION_FILE.write_text("1.0.0\n")`, and build() calls it at line 318, that is, before the --check branch at line 892 can return.
+
+*Smallest fix.* Make read_version() side-effect free — return "1.0.0" (or raise SystemExit naming the missing file) and do the `write_text` only in main()'s write phase, alongside the other writes.
+
+#### 23 · 08_components/check.py drops measureText's "could not measure" list in the forced-colours pass
+
+`08_components/check.py`
+
+The docstring says "The harness prints what it could NOT check at the end. That list is part of the result, not an apology." In forced-colours mode it silently is not: an element whose background cannot be composited is skipped, unmeasured and unreported, so the forced-colours contrast pass can report clean over text it never looked at. One extra loop, matching the main pass.
+
+**Still open, 19 August 2026.** The code defect is unchanged — the forced-colours pass still throws away the problems array, so a text node whose background it cannot composite in that mode is skipped and never reported — but on today's 30 cards that array is empty, so it is currently masking nothing. Latent hole in exactly the pass where compositing is most likely to fail.
+
+*How that was checked.* `grep -c 'text["problems"]' 08_components/check.py` → "1" (line 773, the per-width/per-theme pass). The forced-colours pass at lines 876-884 calls the same `window.__as.measureText(...)` and then consumes only `text["failures"]` — no loop over `text["problems"]` (nor `shouted`, nor `counted`). In the JS a problems entry is pushed with `continue`, so that text node's contrast is never measured. A read-only Playwright probe mirroring the harness's own forced-colours setup over all 30 cards × 4 themes reported: "text nodes measured: 15460 / problems returned but DISCARDED by the forced pass: 0".
+
+*Smallest fix.* In the forced-colours pass, add `for problem in text["problems"]: found.fail(f"{label}: could not measure a background — {problem}")`, mirroring line 773.
+
+#### 24 · 11_site/check.py's external-reference finding is only ever an ok note, never a problem
+
+`11_site/check.py`
+
+"the page works offline" is a stated property of this site, and 11_site/build.py enforces it at build time (lines 1085-1097, `raise BuildError(f"{name} fetches {target} from the network.")`). The browser check, which is the only thing that sees the rendered page, records a violation as a pass and phrases it as reassurance. Make it a problem, or drop the collection so the note cannot be mistaken for enforcement.
+
+**Still open, 19 August 2026.** The external-reference check is still note-only, so it cannot fail a run; an external asset is caught only incidentally, and only when its request fails, which means a reachable CDN font or script would ship with the harness reporting "ok". Nothing external ships on the real page today (only an anindastudio.com link and a mailto), so no reader is affected yet.
+
+*How that was checked.* 11_site/check.py:444 is still `notes.append(f"external references: {s['external'] or 'none — the page works offline'}")` with no matching problems.append. Proved end to end on a scratchpad copy with two external references injected into index.html: the run printed " ok external references: ['https://anindastudio.com/', 'https://cdn.example.com/tracker.js', 'https://fonts.googleapis.com/css2?family=Inter', 'mailto:aninda.sh15@gmail.com']". The 24 FAILs it did report all name cdn.example.com ("failed request https://cdn.example.com/tracker.js", "net::ERR_NAME_NOT_RESOLVED") and come from the unrelated requestfailed/console listeners at lines 262-264; `grep -n googleapis` over the output hit only the ok line, so the Google Fonts stylesheet — an external asset that did not fail to load — produced no problem at all.
+
+*Smallest fix.* After the note, append a problem for any entry in s['external'] whose scheme is http/https and which is a loaded asset (src, rel=stylesheet, rel=preload), while still allowing plain anchor hrefs and mailto:.
+
+#### 25 · 09_guidebook's external-asset guard inspects <source> but its regex cannot see srcset
+
+`09_guidebook/build.py`
+
+A 14 MB self-contained book whose whole promise is that it opens with no network. The guard lists the one element whose entire purpose is the attribute it cannot read, which reads as coverage it does not have. Add `srcset` and `poster` to the attribute alternation.
+
+**Still open, 19 August 2026.** The guard is unchanged and still partial: it inspects seven element names and two attributes, so `<video src>`, `<audio src>`, `srcset`, `poster`, `object data`, `<input type=image src>`, `<track src>`, SVG `use`/`image` `href`, `xlink:href` and CSS `@import` all pass. Nothing in the tree currently exploits the gap, so the "one file, no network" claim happens to be true today — it is merely not proven by this guard, and the interactive build has no behavioural backstop the way the print build does.
+
+*How that was checked.* Read the guard: `09_guidebook/build.py:2933-2946` matches only `(?:src|href)\s*=\s*["'](?:https?:)?//` inside `<(?:img|script|link|source|iframe|object|embed)\b[^>]*>`, plus `url(...)` in CSS. I loaded the real module and fed it synthetic documents (no file written): `./.venv/bin/python` importing `09_guidebook/build.py` and calling `m.guard_no_external({...})` returned:
+ NOT CAUGHT: video src / audio src / video poster / img srcset / input image / track src / svg use href / svg image href / xlink:href / css @import / object data
+ caught : img src (control)
+Note `object data=` escapes even though `<object>` IS in the element list, because `data` is not in the attribute pattern. The compensating behavioural check is print-only: `09_guidebook/scripts/pdf.py:212` calls `render_pdf(PRINT_HTML, OUT_PDF, strict=True)` (fails on any request), but line 185 renders the interactive build with `strict=False` and discards the observation — so the 15 MB file readers download is covered by the regex alone. No live violation: `grep -o -E '<(video|audio|track|input|use|image)\b|srcset=|poster=|xlink:href=|@import'` over both built HTML files returned nothing.
+
+*Smallest fix.* Add video|audio|track|input|use|image to the element list and srcset|poster|data|xlink:href to the attribute pattern plus an `@import` check — or, better, run the interactive build through pdf.py's request observer with strict=True so the claim is measured rather than pattern-matched.
+
+#### 26 · ring_from_diff's `thickness` is not ring thickness, so the 2px focus-ring floor cannot fail for a whole-box change
+
+`08_components/check.py`
+
+A background inversion is a legitimate focus indicator under SC 2.4.13, so the pass is defensible — but the number reported is the control's own size dressed as a ring measurement, which means RING_MIN_PX is dead for any element whose focused appearance differs across its whole box. A focus style that changed the fill and put a border on one side only would report sides [60, 60, 44, 44] and clear the floor with three sides bare. Measure the ring as changed pixels OUTSIDE the element's own box, or rename the figure to what it is.
+
+**Still open, 19 August 2026.** The quantity is a run-length of changed pixels, not a ring thickness, so the docstring line "the changed pixels are checked for a ring at least 2 CSS px thick" is not what the code tests — proven by case C, where no ring at all scores 24. The other half does not reproduce: on every real card the number is exactly 3 and equals the outline width, because the one `:focus` rule in components.css is a 3px outline at 2px offset and nothing else changes. So the defect is latent, not a wrong published number.
+
+*How that was checked.* `08_components/check.py:609` computes `thickness = min(left, right, top, bottom)` where each side is `run(...)` — the count of contiguous changed pixels inward from the diff bounding box along a midline. `git log -L :ring_from_diff:08_components/check.py` shows one commit only, e418bcc (initial), so nothing was changed after the review. I called the harness's own function on synthetic before/after buffers:
+ A clean 3px ring, 2px offset -> {'thickness': 3, 'sides': [3,3,3,3]}
+ B 1px ring + fill change (contiguous) -> {'thickness': 24, 'sides': [40,40,24,24]}
+ C no ring, fill change only -> {'thickness': 24, 'sides': [40,40,24,24]}
+ D 3px ring + one stray pixel -> {'thickness': 0, 'sides': [0,3,0,3]}
+Case C is the important one: an element with NO focus ring that merely repaints its background reports 24 px and clears the `RING_MIN_PX = 2` floor. I also drove real Chromium (PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers) over `08_components/cards/components/button.html` with the harness's pad of 8 and its own `ring_from_diff`: every button returned `thickness 3, sides [3,3,3,3]`, matching `--as-focus-ring-width: 3px`. The full harness run `check.py --only button --widths 1280` printed "40 focus rings" and "PASS".
+
+*Smallest fix.* Before trusting the runs, assert the changed pixels form a hollow band (interior unchanged) and fail with "no ring — only a fill change" otherwise; and start each run from the extreme pixel ON the midline rather than from the bounding box, so one stray changed pixel cannot zero the reading.
+
+#### 27 · engine.py's header states the perturbation sweep is 64 measurements; it is 729
+
+`05_colour/engine.py`
+
+This paragraph is the file's own account of its central method, quoted onward into 07_tokens/build.py's generated $description text ("nudged by ±1. The published figure is the worst of those"). The measurement is stronger than the number claimed, so the error is in the safe direction, but it is the kind of unverified stated fact this repository otherwise refuses to ship.
+
+**Still open, 19 August 2026.** Still 729 and still documented as 64. Contained to the engine's own header comment — no reader-facing copy carries the number — but it is a factual error in the file whose stated purpose is that nothing is asserted without measurement.
+
+*How that was checked.* `sed -n 18,18p 05_colour/engine.py` returns: "with each channel of both colours nudged by ±1 — the worst of those 64 results". Importing the module and counting: `len(_neighbours('#278492')) = 27, unique = 27`, and `worst_case_ratio` is `min(ratio(f, b) for f in _neighbours(fg) for b in _neighbours(bg))`, so `pairs compared = 27*27 = 729`. The helper's own docstring at line 184 is correct ("27 values"); only the header is wrong. `grep -rn "those 64"` over the tree matches exactly one line, 05_colour/engine.py:18, so the wrong figure is not repeated in any README, the site or the guidebook.
+
+*Smallest fix.* Change "those 64 results" to "those 729 results (27 neighbours of each colour)" on 05_colour/engine.py:18.
+
+#### 28 · scripts/readme.py walks the entire repository to compute a figure neither README uses, and prints it as a counted fact
+
+`scripts/readme.py`
+
+Every line of the --check output reads as "this number in the README was verified against the thing it describes". One of the eighteen is asserted nowhere, is derived from the working tree rather than the repository, and costs a full recursive walk. It invites the reader to trust a figure that is not under any guard.
+
+
+---
+
+## From round 2
+
+Same judgement as above: real, reproducible, not affecting the correctness of the
+system's output. Recorded rather than dropped.
+
+**Still open, 19 August 2026.** All three parts hold: the fact is computed, is never asserted in either README, and is derived from the working tree — it counts 35 untracked files including .DS_Store while excluding tracked `candidates/` paths, giving 428 against git's 461. The cost claim is the weak part: the walk takes 0.08 s, so "costs a full recursive walk" is true but negligible. Separately and more urgently, readme.py --check is failing outright on the new claude-design generator.
+
+*How that was checked.* `grep -n files scripts/readme.py` shows `f["files"]` assigned once, at line 238, and read nowhere: the only other hits are `git ls-files` comments, the unrelated `{f['marks']} … files` table cell, and the local `files = {ROOT / "README.md": …}` dict. There is no `**f` or `format(**f)` — both templates are plain f-strings — so an unread key cannot reach either README. The basis is the working tree, not the repository: I ran the exact expression from line 238 and compared it with git — "rglob count = 428 in 0.08s / git ls-files count = 461 / counted but NOT tracked = 35 / examples: ['.DS_Store', '04_mark/.DS_Store', '09_guidebook/.DS_Store', …]". The same file explains at line 155 why this is wrong: "`git ls-files` rather than rglob, because rglob also walks ignored trees". The figure is not entirely invisible — line 536 prints every fact as `counted {k} {v}` to the operator's console. Incidental blocker found while running it: `./.venv/bin/python scripts/readme.py --check` exits 1 with "these generators are in the tree but in neither REBUILD_CHAIN nor NOT_IN_CHAIN: 13_plugins/claude-design/build.py", so neither README can currently be regenerated or verified.
+
+*Smallest fix.* Delete line 238; if the figure is wanted, count it from the `git ls-files` output that check_rebuild_chain already fetches and actually print it in the READMEs. Then add 13_plugins/claude-design/build.py to REBUILD_CHAIN or NOT_IN_CHAIN so --check can run at all.
+
+#### 3 · Reserved-Font-Name family count is wrong in two research documents that label the figure as mechanically extracted
+
+`06_type/SHORTLIST.md`
+
+Both documents mark this figure **[file]**, the repository's own convention for "read directly out of the font file, reproduce with 06_type/specimen.py", which invites the reader to trust it without rechecking. The count is the one that decides whether a family can be subsetted without renaming, so a reader picking a substitute face from the shortlist could take a Plex or Source family as RFN-free. It contradicts the table printed three lines above it.
+
+**Still open, 19 August 2026.** Still open in both documents, and both are now contradicted by the repo's own machine-extracted 06_type/_data/font_facts.json, which says 6 families. SHORTLIST.md's "other 26" should be 24; RECOMMENDATION.md's "Four of the shortlisted families" conflates four reserved names with six families.
+
+*How that was checked.* Ground truth from the licences shipped in the tree: `grep -rl "with Reserved Font Name" 06_type/candidates/` returns exactly 6 files — bangla/galada, bangla/mina, latin/ibmplexsans, latin/sourcesans3, mono/ibmplexmono, mono/sourcecodepro — while `ls -d 06_type/candidates/*/*/ | wc -l` is 30 and `ls 06_type/candidates/*/*/OFL.txt | wc -l` is 30. The repo's own generated data agrees: reading 06_type/_data/font_facts.json gives `families in font_facts: 30` and `carrying an RFN: 6 ['ibmplexsans', 'sourcesans3', 'galada', 'mina', 'ibmplexmono', 'sourcecodepro']`. Both documents still contradict that. 06_type/SHORTLIST.md:65: "**The other 26 families carry no Reserved Font Name at all.**" — 30 − 6 = 24, not 26. 06_type/RECOMMENDATION.md:76: "Four of the shortlisted families carry one (`Plex`, `Source`, `Lobster`, `Exo`)" — four is the number of distinct reserved names, not of families; six families carry them. SHORTLIST.md contradicts itself in place: the table immediately above line 65 lists six family names across its four rows. No guard covers it — scripts/check_licence_claims.py checks only the "Plex" string, the PolyForm URL and the two package names, and scripts/check_measurements.py mentions families only at line 111 ("there are 20 families to find").
+
+*Smallest fix.* Change SHORTLIST.md:65 to "other 24" and RECOMMENDATION.md:76 to "Six of the shortlisted families carry one of four reserved names" — or better, have the generator derive both figures from the `rfn` field in 06_type/_data/font_facts.json.
+
+#### 4 · The $schema every token file declares resolves to the DTCG living draft, not the 2025.10 report the same file pins
+
+`07_tokens/build/primitive.tokens.json`
+
+The files go to unusual lengths to distinguish the frozen 2025.10 report from the moving draft — it is the point of the `spec` extension string and of BENCHMARK section 6.2 — and then the machine-readable field points at the moving one. Anything that dereferences `$schema` to decide which rules to apply lands on the 30 July 2026 draft, whose requirements can diverge from the version the file claims. Pinning `https://www.designtokens.org/TR/2025.10/format/` would make the two agree; leaving it as is means the version claim survives only in prose a tool is permitted to ignore.
+
+**Still open, 19 August 2026.** Still open: the declared $schema is the DTCG prose specification (a ReSpec HTML page), not a JSON Schema document, so no validator can dereference it, and it ships on 25 JSON files plus the Figma bundle — including the copies inside the npm, Python and plugin packages a consumer would feed to a validator.
+
+*How that was checked.* `grep -rho '"\$schema": "[^"]*"' --include="*.json"` over the tree returns a single distinct value, 25 times: `"$schema": "https://tr.designtokens.org/format/"` (set at 07_tokens/build.py:72, `SCHEMA = "https://tr.designtokens.org/format/"`), and it is also baked into 13_plugins/figma/dist/code.js and 13_plugins/figma/src/tokens.generated.ts. Dereferenced the URL: `curl -sS -L -o /dev/null -w "status=%{http_code} type=%{content_type} url=%{url_effective}"` returned `status=200 type=text/html; charset=UTF-8 url=https://www.designtokens.org/tr/drafts/format/`, and the body begins `<!DOCTYPE html><html lang="en"><head>… <meta name="generator" content="ReSpec 37.1.0">` with `<title>Design Tokens Format Module 2025.10</title>`. Requesting it with `Accept: application/schema+json, application/json` returns the same HTML. Checked 19 August 2026. No comment near build.py:72 qualifies the claim.
+
+*Smallest fix.* Either drop the `$schema` key from the generator, or point it at a real JSON Schema file shipped in 07_tokens/ and say in the file's $description that the DTCG URL is the prose spec, not a schema.
+
+#### 5 · README.bn.md mixes Bengali and Western numerals inside single sentences, against house rule 9 of the Bangla standard
+
+`README.bn.md`
+
+The Bangla README is one of two front doors to the project and the main demonstration that the Bangla is written as Bangla rather than translated. Two numeral systems inside one sentence is the most visible possible signal that the Bangla was assembled rather than written, and it lands in the paragraph whose whole point is that the numbers are trustworthy. It also breaks a rule the project itself researched, sourced and wrote down.
+
+**Still open, 19 August 2026.** Still open. Every number read from the tree is interpolated as Western digits directly next to the hand-typed Bengali ones — the same sentence carries `5.3348:1` and `৪.৫:১`. README.bn.md is generated, so hand-editing it would be overwritten; the fix belongs in scripts/readme.py.
+
+*How that was checked.* House rule quoted from 06_type/BANGLA-STANDARD.md:421: "9. **Bengali numerals** in prose and measurements; Western digits only where a string must be copied literally." README.bn.md breaks it inside single sentences. Line 24: "4টি থিমে মোট **44টি জোড়া** আছে" — Western 4 and 44 — two lines above "মাপা হয়েছে সেই ৮-বিট হেক্স মানে" (Bengali ৮). Lines 30-31, in one sentence pair: "লেখার জন্য 28টি জোড়া। সবচেয়ে কম **5.3348:1** — সাধারণ থিমে সীমা ৪.৫:১, বেশি কনট্রাস্টে ৭:১।" — Western `28` and `5.3348:1` beside Bengali `৪.৫:১` and `৭:১`. Lines 32-33 repeat it: "লেখা ছাড়া 12টি জোড়া … **3.8134:1** — সীমা ৩:১।" Also line 46 ("14টি অধ্যায়", "15.0 মেগাবাইট", "1.8 মেগাবাইটের PDF") and lines 47-50 (64টি, 30টি, 10টি, 20টি). Cause is in the generator, not the file: scripts/readme.py:444-447 reads `- **লেখার জন্য {f['n_text']}টি জোড়া।** সবচেয়ে কম **{f['worst_text']}:1** — সাধারণ থিমে সীমা ৪.৫:১, বেশি কনট্রাস্টে ৭:১।`, and `grep -n "numeral" scripts/readme.py` returns nothing — there is no digit-conversion step anywhere in `bangla()`.
+
+*Smallest fix.* Add a one-line `bn_digits()` translation helper in scripts/readme.py and wrap every `{f[...]}` interpolation inside `bangla()` (including the `:1` of each ratio) with it.
+
+#### 6 · The plugin reference file that documents the mark is named logo.md, the one word the plugin's own naming rule forbids for it
+
+`13_plugins/claude-code/skills/aninda-brand/references/naming.md`
+
+This is the exact failure the naming rule was written to prevent, in the artefact whose job is to teach the rule. An agent or a person reading SKILL.md is told to open references/logo.md to learn that the thing is never called a logo, and SKILL.md's own description offers 'a logo' and 'mark' as two different things you might ask for. Because check_plugin.py hard-requires the filename, the wrong name is now pinned in place by CI.
+
+**Still open, 19 August 2026.** Still open, unchanged, and now shipped inside dist/aninda-brand.skill: the file teaching that the thing is never called a logo is itself called logo.md, and check_plugin.py holds the wrong name in place — a rename without touching line 35 would fail CI.
+
+*How that was checked.* `ls 13_plugins/claude-code/skills/aninda-brand/references/` still shows `logo.md` (3999 bytes, 18 Aug), whose own H1 is `# The mark and the wordmark`. The rule it breaks is in the sibling file, naming.md:5-6: "One name for one thing, everywhere. If it is the *mark*, it is never also the *logo* in a different paragraph", and its table row reads `| **mark** | The `a` glyph on its own | logo, icon, symbol, logomark |`. naming.md's single stated exception does not cover it: "**One exception, and it is deliberate: platform-facing FILENAMES follow the platform's word**", naming favicon.ico, avatar-512.png and linkedin-company-logo.png — a skill reference document has no platform asking for the word. The name is pinned by CI: 13_plugins/claude-code/scripts/check_plugin.py:35 hard-lists it in `BRAND_REFERENCES = ("colour", "typography", "layout", "logo", "icons", …)`. Two files point readers at it — SKILL.md:51 `| The mark, the wordmark, clear space | `references/logo.md` |` and icons.md:8 "see `references/logo.md`" — and it ships in the built bundle: reading 13_plugins/claude-code/dist/aninda-brand.skill lists `references/logo.md` alongside `references/naming.md`. SKILL.md's description also still offers "a logo, mark, icon" as separate things and both `"the mark"` and `"the logo"` as triggers.
+
+*Smallest fix.* Rename references/logo.md to references/mark.md and update the three places that name it: check_plugin.py:35, SKILL.md:51 and icons.md:8, then rebuild the .skill bundle.
+
+#### 7 · The wordmark ships set in lowercase while the chapter that presents it says "Sentence case, always", with nothing reconciling the two
+
+`09_guidebook/chapters/02-the-name.md`
+
+The chapter's own second section is titled "The one thing that looks like an inconsistency, and is not", and it spends five sentences explaining the অনিন্দ্য/aninda transliteration gap so that nobody has to wonder. The casing gap gets none of that treatment: a reader sees lowercase artwork at the top of the page and an unqualified "Sentence case, always" twenty-six lines below, with no row in the table and no note. Anyone setting the name in a lockup has to guess which of the two governs, and the earlier draft shows the distinction was understood and then lost.
+
+**Still open, 19 August 2026.** Still true today and unchanged in substance: the artwork is drawn from the literal string "aninda studio", the chapter prints "Aninda Studio" and states "Sentence case, always" twenty-six lines below the lowercase figure, and no sentence in the book, the mark folder or the plugin references says the artwork's casing is a drawn letterform rather than a breach of the rule.
+
+*How that was checked.* `grep -n 'WORD_LATIN' 04_mark/build.py` → `92:WORD_LATIN = "aninda studio"`, and the shipped artwork's own title is `<title>Aninda Studio — wordmark, aninda studio</title>` (04_mark/svg/wordmark-latin.svg). The chapter that presents it writes the name capitalised and gives an unqualified rule: 09_guidebook/chapters/02-the-name.md line 3 `The studio is called **Aninda Studio** in English`, the table row `| Full name, English | Aninda Studio |`, and line 33 `Sentence case, always. Not ANINDA STUDIO, not Aninda STUDIO.` Nothing reconciles the two: `grep -c lowercase 09_guidebook/Aninda-Studio-Guidebook.html` → `1`, and that one hit is line 1861, chapter 03 describing the mark as `a lowercase` 'd' — not the wordmark. `grep -rn -i 'lowercase|lower case' 09_guidebook/chapters 04_mark README.md README.bn.md` returns only that line plus a comment in 04_mark/build.py. The chapter's table has no wordmark row, and 13_plugins/claude-code/skills/aninda-brand/references/naming.md mentions lowercase only for repo, package and plugin names.
+
+*Smallest fix.* Add one row to the chapter's "How to write it" table — the wordmark artwork is drawn lowercase, the rule governs text rather than the drawing — or one sentence to that effect under the figure.
+
+#### 9 · The 18 August coverage correction was applied to the two READMEs only; the wording it set out to remove survives in the guidebook and in the harness that prints it while running on Ubuntu
+
+`09_guidebook/chapters/14-what-this-system-does-not-do.md`
+
+The commit's own reasoning was that a claim stale in a favourable direction is still stale. It was fixed in the two files whose numbers are generated and checked, and left in the flagship deliverable and in a script that now states it about itself while contradicting it. A reader of the guidebook gets the superseded scope, and the two documents now disagree on a coverage claim.
+
+**Still open, 19 August 2026.** Still true in both halves. The README says the checks run on macOS and on Ubuntu; the flagship guidebook says every rendered measurement comes from headless Chromium on macOS and that the system was tested on one machine; and the component harness prints "any platform other than macOS" as a blind spot while executing on Ubuntu. Two shipped surfaces disagree on the same fact, inside the chapter offered as the calibration for the whole book.
+
+*How that was checked.* The correction commit is `b7acf0c 2026-08-18 Correct the rendering-coverage claim: the checks run on Ubuntu too`, touching only README.bn.md, README.md and scripts/readme.py (`git show b7acf0c --stat`). README.md:137 now reads `- **Rendering checks are Chromium only.** They run on macOS locally and on Ubuntu in CI`. The chapter was not updated: 09_guidebook/chapters/14-what-this-system-does-not-do.md:55 still reads `ring — comes from **headless Chromium on macOS**, at a device scale factor of 1`, and :117 still closes `measured, thoroughly documented, and tested by one person on one machine.` `grep -rln -i ubuntu 09_guidebook/chapters/` returns nothing. Both shipped builds carry it: `grep -c 'headless Chromium on macOS'` → 1 in Aninda-Studio-Guidebook.html and 1 in Aninda-Studio-Guidebook-print.html. The harness still prints it too: 08_components/check.py:488-489 `"Any browser other than the pinned Chromium, and any platform other than " "macOS. Safari, Firefox and Windows high contrast were not run."`, and ci.yml runs `python 08_components/check.py` on `runs-on: ubuntu-latest`.
+
+*Smallest fix.* Change chapter 14 to "headless Chromium — on macOS locally and on Ubuntu in CI", adjust the closing "one machine" sentence, and reduce the 08_components/check.py blind-spot string to the browser limit only.
+
+#### R2-11 · The site header's brand lockup loses its tile in both dark themes: the icon's baked-in ground measures 1.05:1 against the page it sits on
+
+`11_site/index.html`
+
+The primary lockup on the studio's front door reads as two different marks depending on theme — a rounded dark tile with a knocked-out 'a' in the two light themes, a bare floating 'a' in the two dark ones — on a site whose own theme switcher makes all four first-class. The mark stays legible, which is why this is minor, and the icon is fixed artwork by policy, but nothing shipped says the header deliberately keeps a fixed ground, so a reader comparing the header against the marks card's stated rule finds them disagreeing. The site's contrast harness cannot catch it: the icon is aria-hidden and the site's claim is scoped to "the contrast of every piece of text".
+
+**Still open, 19 August 2026.** Reproduced. The tile ground sits at 1.07:1 (dark) and 1.10:1 (dark high contrast) against the page it is drawn on, which is imperceptible, so in two of the four themes the header shows a bare white ring-and-bar instead of an app-icon tile. The literal-colour guard at 11_site/build.py:303 explicitly whitelists these three literals as a declared exception and never measures the tile against the page, so no guard covers this.
+
+*How that was checked.* 11_site/index.html line 57 ships the header lockup as <span class="site-brand__mark"><svg …><rect width="100" height="100" rx="24" ry="24" fill="#0D1A17"/>…, produced by read_mark("icon-192.svg", …) at 11_site/build.py:1115 and :1139 (so index.html and 404.html both). The page ground is .as-root { background-color: var(--as-surface-low) } at 11_site/styles.css:392. Computing WCAG contrast of the tile against that token in each theme (07_tokens/css/tokens.css): light #FBFCFC → 17.356:1; dark #0E100F → 1.071:1; hc-light #FAFAFA → 17.090:1; hc-dark #0C0C0C → 1.097:1. Against every dark surface token the range is 1.037–1.156:1, and #111212 gives exactly 1.052:1, which is the 1.05 figure recorded. grep for "rect|site-brand__mark" in styles.css shows only sizing rules (lines 1465–1466) — nothing recolours or hides the rect per theme. The white glyph on the tile is 17.84:1, so the mark is visible; the tile is not.
+
+*Smallest fix.* Draw the header lockup from the recolourable mark (currentColor, no baked rect) instead of the fixed-colour icon-192.svg master, or give .site-brand__mark a token-driven tile background and drop the baked rect.
+
+#### R2-12 · The token files name a ramp "family", the one word the naming reference forbids for it
+
+`07_tokens/build/semantic.light.tokens.json`
+
+One thing carries two names inside the same shipped file — `ramp` in the token path and `family` in the extension on the leaf beside it — and the second is the word the project's own naming authority names as wrong. A consumer reading $extensions.studio.aninda to group roles by ramp has to learn that `family` means `ramp`, which is the exact cost the naming rule exists to avoid. It is minor because the key is machine-readable rather than prose, and because nothing breaks; it is worth recording because naming.md is enforced nowhere and this is the one place its vocabulary table is contradicted by generated output rather than by prose.
+
+**Still open, 19 August 2026.** Reproduced, and wider than recorded: the key now ships in the npm package, the Python package, the plugin skill assets and the colour proofs as well as 07_tokens/build. The extension names a ramp 'family' — the exact word the kit's own naming reference forbids for it — while the sibling key 'step' does follow the reference. (The unrelated 'family' keys for fontFamily at build.py:134–146 are correct; a font family really is a family.)
+
+*How that was checked.* 13_plugins/claude-code/skills/aninda-brand/references/naming.md:32 reads: | **ramp** | A primitive scale of eleven steps | palette, family | — the third column is the never-use list. Walking 07_tokens/build/semantic.light.tokens.json for 'family' keys returns 11 hits, all under $extensions/studio.aninda, for example /color/ink/default/$extensions/studio.aninda -> "ground", and sed -n 145,160p shows "family": "ground", "step": 950 side by side. primitive.tokens.json confirms 'ground' is a ramp: list(d['color']['ramp'].keys()) → ['ground', 'accent', 'success', 'warning', 'danger', 'info']. The emitter is 07_tokens/build.py:384, "family": r["family"]. A tree grep for '"family"' finds it shipped in all four semantic token files, all four 05_colour/generated/*.proof.json, 12_packages/npm/dist/tokens/*, 12_packages/python/src/aninda_studio_tokens/data/tokens/* and 13_plugins/claude-code/skills/aninda-brand/assets/tokens/*.
+
+*Smallest fix.* Rename the extension key from "family" to "ramp" in 07_tokens/build.py:384 and 05_colour/engine.py:422/:504, then regenerate the tokens, proofs and the two packages.
+
+#### R2-13 · 07_tokens/build.py's $schema check compares the emitted document against the constant that wrote it, so it is structurally incapable of failing
+
+`07_tokens/build.py`
+
+It reads as a conformance check on the one machine-readable field that tells a consuming tool which rules to apply, and it can never report anything. This is the same shape as the already-recorded finding 19 about the proof-ratio assertion, but a different check that OPEN-FINDINGS.md does not cover, and the two together mean two of check()'s gates are tautologies inside a function whose docstring is "Re-read what was built and prove it, rather than trusting that it was built." The only thing standing between a wrong $schema and a release is the CI git-diff, which reports that bytes changed without knowing why.
+
+**Still open, 19 August 2026.** Reproduced exactly as recorded. Both sides of the comparison are the same module-level constant, so the branch cannot be taken by any input; the check's docstring claim to "re-read what was built" is not what the code does. Practical exposure is limited — a hand-edit to the committed JSON would still be caught by CI's `git diff --exit-code 07_tokens/build` step — but the check itself measures nothing.
+
+*How that was checked.* 07_tokens/build.py:72 defines SCHEMA = "https://tr.designtokens.org/format/". The only two document constructors set it from that constant: line 237 (primitives) and line 408 (semantic), each `"$schema": SCHEMA,`. main() at line 674–676 does `proof = json.loads(PROOF.read_text())` / `files = emit(proof)` / `problems = check(files, proof)` — check() is handed the in-memory dicts emit() merely built, never the files on disk. check() then asserts at line 533–534: `if doc.get("$schema") != SCHEMA: problems.append(f"{name}: wrong or missing $schema")`. emit() (line 501) produces only those two constructors' output plus forced-colors.map.json, which line 531 skips by name.
+
+*Smallest fix.* Have check() load the committed files from OUT with json.loads and compare their $schema against the literal DTCG URL, or drop the tautological branch and say plainly that the drift guard covers it.
+
+#### R2-14 · 11_site/check.py's reduced-motion check reports "reduced motion honoured" and exits 0 when the property it measures does not exist at all
+
+`11_site/check.py`
+
+This harness exists because "build.py can only prove that the site was WRITTEN correctly. This proves it BEHAVES correctly." Reporting a measurement as honoured when the measured value is absent is the same shape as the already-fixed bug where the site's stylesheet never loaded and no check noticed: a note that reads as reassurance about something the script never saw. The nearby forced-colours check gets this right — it probes for liveness first and refuses to pass if the emulation is inert — so the pattern for handling "I could not see it" already exists in the same file, eleven lines above.
+
+**Still open, 19 August 2026.** Reproduced as a logic defect: an absent property yields '', which is falsy, so control falls to the success branch, and the note's own `{d or 'unset'}` prints the word 'unset' while still calling it honoured. The token does exist today, so the check is not currently masking a real regression — but rename or drop --as-duration-move and the harness reports a green pass on motion it never measured.
+
+*How that was checked.* 11_site/check.py:404–410 reads: d = pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--as-duration-move').trim()") / `if d and not d.startswith(("1ms", "0")): problems.append(...)` / `else: notes.append(f"reduced motion honoured (move duration {d or 'unset'})")`. I drove the identical expression with the pinned Chromium against a page that does not define the property: returned value = '' , truthiness = False, BRANCH -> note appended: "reduced motion honoured (move duration unset)". A real run today prints "ok reduced motion honoured (move duration 1ms)" and "8 checks passed, 0 failed", because 11_site/styles.css:57 and :292 do currently define --as-duration-move (220ms, and 1ms under @media (prefers-reduced-motion: reduce)). grep -rn "as-duration-move" over 11_site/*.py and 07_tokens/*.py returns only check.py:406 — nothing anywhere asserts the property exists.
+
+*Smallest fix.* Fail when d is empty: treat a missing --as-duration-move as a problem in its own right, for example `if not d: problems.append("--as-duration-move is not defined; the reduced-motion check measured nothing")` before the value test.
+
+#### R2-15 · 05_colour/engine.py's documented exit-1 failure — a palette that cannot support a role — is unreachable, and its remedy names an input that provably cannot change the outcome
+
+`05_colour/engine.py`
+
+The file spends a paragraph justifying the 1-versus-2 exit-code split, and the meaning it gives to 1 is "a real failure — a palette cannot support a role". That is the branch a reader is told to expect when a direction is unbuildable, and it is the one branch that no direction spec can produce. Worse, the message instructs the reader to change the anchor, which alters only hue and chroma while the outcome depends entirely on lightness — so a reader who somehow reached it would be sent to the wrong file. Either derive the ramp's lightness from the anchor as well, or state plainly that a direction spec cannot fail a contrast target and that this branch guards against a future change to LIGHTNESS.
+
+**Still open, 19 August 2026.** Still open, and sharper than recorded: pick()'s Fail — the one the exit-1 line describes — cannot fire for any spec, because the lightness ladder is a module constant and the anchor supplies only hue and chroma. The extreme ramp step clears at least 10.08:1 against the worst surface the engine may build, versus a 7.0 maximum target.
+
+*How that was checked.* Docstring at 05_colour/engine.py:43-46 still promises: "EXIT CODES ... 1 a real failure — a palette cannot support a role". main() (lines 679-693) returns 1 only when a Fail propagates out of run(). Fail and NotEquipped are independent Exception subclasses (lines 150-156), so the routing is correct — but no direction spec can raise Fail. Family.build() (lines 240-257) takes ONLY hue and chroma from the anchor: `self.hue = ...a['hue']`, `self.chroma_ceiling = self.max_chroma if ... else float(a['chroma'])`, then `self.ramp[s] = to_hex(Color('oklch', [LIGHTNESS[s], self.chroma_ceiling * CHROMA_ARC[s], self.hue]))`. LIGHTNESS is a hard-coded constant dict (lines 89-92); the anchor's own lightness is discarded. Ran run() directly on five pathological specs written to the scratchpad (repo untouched): 'accent near-white zero chroma -> no exception (exit 0)', 'accent max chroma 0.4 yellow -> no exception (exit 0)', 'ground pure white -> no exception (exit 0)', 'ground max chroma 0.5 -> no exception (exit 0)', 'everything grey zero chroma -> no exception (exit 0)'. Structural bound over 36 hues x 4 chroma multipliers, extreme ramp step vs the least favourable legally-permitted surface in each polarity: 'light: 10.9054', 'dark: 10.0799', 'hc-lite: 10.3762', 'hc-dark: 10.7006' — against 'targets: AA 4.5 AAA 7.0 HC nontext 4.5'.
+
+*Smallest fix.* Change the EXIT CODES block to say what is true — anchors supply hue and chroma only, the lightness ladder is fixed, so exit 1 is a safety net no direction spec can currently trigger — or make the ladder spec-derived if role failure is meant to be a real possibility.
+
+#### R2-17 · 08_components/build.py's no-literal-colour guard does not treat CSS system colour keywords as literals, so hard-coded ButtonFace, ButtonText and AccentColor pass
+
+`08_components/build.py`
+
+A system colour keyword outside a forced-colors block paints one fixed operating-system colour in all four themes and ignores every token, which is exactly the class of value the guard exists to keep out of the hand-authored layer — 07_tokens/build.py puts them in a separate non-DTCG file precisely because they are colours the system supplies. Nothing downstream would catch it either: it would not change with data-theme, and no check verifies that a painted colour differs between themes. It is minor because reaching it takes a deliberate edit to components.css and the keywords are arguably outside the guard's intended vocabulary — but the guard's stated rule is unqualified, and the same omission lets `color-mix()` through when both its operands are keywords.
+
+**Still open, 19 August 2026.** Still open. Every CSS system colour keyword — ButtonFace, ButtonText, AccentColor, Canvas, CanvasText, LinkText — passes both the stylesheet guard and the markup guard, so a hand-authored one would ship reported as a clean run. Nothing in 08_components currently uses them, so the gap is latent rather than live.
+
+*How that was checked.* Imported 08_components/build.py and called its own guard functions. colour_literal_in returns None for every CSS system colour: "colour_literal_in('ButtonFace') -> None", "colour_literal_in('ButtonText') -> None", "colour_literal_in('AccentColor') -> None", "colour_literal_in('Canvas') -> None", "colour_literal_in('CanvasText') -> None", "colour_literal_in('LinkText') -> None", while "colour_literal_in('#ff0000') -> '#ff0000'" and "colour_literal_in('red') -> 'red'". Both guards then pass: "guard_markup: PASSED (no error) for <div style=\"background: ButtonFace; color: ButtonText; outline-color: AccentColor\">x</div><svg><rect fill=\"Canvas\"/></svg>" and "guard_stylesheet: PASSED (no error) for a { background: ButtonFace; color: ButtonText; accent-color: AccentColor; }". Cause: NAMED_COLOURS (lines 152-181) holds only the CSS named colours; no system colour keyword is in it, and the membership test at lines 233 and 275 is the only name-based branch.
+
+*Smallest fix.* Add the CSS Color 4 system colour keywords to NAMED_COLOURS in 08_components/build.py (they are colour values by definition), keeping ALLOWED_COLOUR_KEYWORDS for currentcolor and transparent.
+
+#### R2-18 · The Bangla review sheet's checkboxes are 16 px, below SC 2.5.8, and no harness measures the page
+
+`06_type/BANGLA-REVIEW.html`
+
+The kit's central accessibility claim is WCAG 2.2 AA proven, and its own checker fails a committed interactive page against SC 2.5.8. The buttons on the same page were given `min-height:44px` deliberately, so the floor was understood and the 24 controls a reviewer actually clicks were missed. It is also the page a second Bangla reader is asked to work through, which is the audience least well served by a 16 px target.
+
+**Half stale, 19 August 2026.** Half reproduces, half does not. The 16px measurement and the absent harness are exactly as recorded, but the SC 2.5.8 conclusion does not hold: the Spacing exception is met with zero violations at five viewport widths, so the page conforms. It does fail this project's own stricter internal floor — 08_components/check.py:493 states the harness 'applies none of them: every interactive element is 24x24 or it fails' — which the review sheet's 19.38px labels would not survive if anything opened it.
+
+*How that was checked.* Measured in the pinned Chromium via Playwright against 06_type/BANGLA-REVIEW.html (read-only, PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers): 'inputs found: 218 / min input WxH: [16, 16] / min wrapping-label WxH: [39.94, 19.38]'. Source: 06_type/review_bangla.py:434 '.mark input{{accent-color:{accent};width:16px;height:16px;cursor:pointer}}'. But the SC 2.5.8 Spacing exception is satisfied — a 24px-diameter circle centred on each of the 436 undersized targets intersects nothing, at every width tested: '375 {"total": 547, "undersized": 436, "violations": 0}' and '1400 {... "violations": 0}'; minimum centre-to-centre distance 28.01px at 375/768/1280/1400/1920. Harness half reproduces: `grep -rn BANGLA-REVIEW` finds only '06_type/review_bangla.py:47:OUT = HERE / "BANGLA-REVIEW.html"' and the findings record; the only rendered gates in scripts/verify-all.sh are '11_site/check.py' (PAGES = ["index.html", "404.html"], line 41) and '08_components/check.py' (opens only card HTML under 08_components); `grep -rn 06_type` in both returns nothing.
+
+*Smallest fix.* In 06_type/review_bangla.py raise '.mark input' to 24x24 and add min-height:24px to '.mark label' so the page meets the project's own no-exceptions floor, and add the generated sheet to one rendered harness so the number is measured rather than asserted.
+
+#### R2-19 · 12_packages --check reports "6 DTCG documents" while one of the six is declared not DTCG
+
+`12_packages/build.py`
+
+This line is the one confirmation a reader gets that the DTCG documents in the package are conformant, and it counts a file the kit insists three times over is not one — so the number that certifies conformance is the number that includes the exception. The file's own comment names this string as a past false claim and then re-emits it, which is exactly the drift the repository built its guards to stop.
+
+**Still open, 19 August 2026.** Still open. Five DTCG documents plus one that declares itself non-DTCG are reported as '6 DTCG documents shipped verbatim' — the same wrong count the comment above verify() (lines 779-783) cites as a past packaging bug. Console output only; nothing shipped carries the number.
+
+*How that was checked.* `./.venv/bin/python 12_packages/build.py --check` prints ' ok 6 DTCG documents shipped verbatim'. The count is `f"{len(docs)} DTCG documents shipped verbatim"` (line 769) over `docs = {p.name: ... for p in sorted(TOKENS.glob('*.json'))}` (line 325), and that glob is exactly six files: forced-colors.map.json, primitive.tokens.json, semantic.{dark,hc-dark,hc-light,light}.tokens.json. The same build file declares one of them non-DTCG at line 248: 'The forced-colours map. Deliberately **not** DTCG'. The document says so of itself too — its JSON contains 'non-dtcg' and "Forced-colors mode cannot be expressed in DTCG. Its values are CSS system colour keywords supplied by the operating system — they have no colour space, no components and no hex".
+
+*Smallest fix.* Split the note in 12_packages/build.py:769 — count only the five DTCG documents and name the forced-colours map separately, for example '5 DTCG documents and the forced-colours map shipped verbatim'.
+
+#### R2-22 · COMPARE.pdf and all eight files in 03_directions/shots have no writer anywhere in the repository
+
+`03_directions/build.py`
+
+10_assets/build.py opens by stating the house rule — "Nothing here is hand-drawn and nothing here should be hand-edited" — and these nine files are the exception: no generator, so no way to reproduce or check them, and no document explaining what they are. Two of them are unlabelled pre-decision pages showing marks and palettes the project rejected, which is the same class of stray the repository removed _reference/ to stop shipping. A reader opening _m2.html sees four candidate identities with no indication which, if any, is the brand.
+
+**Still open, 19 August 2026.** Reproduced in full, including the second half: _m2.html and _marks.html open on candidate marks and palettes with no page-level label saying which, if any, was chosen. Nine tracked files with no generator and no explanatory document, against 10_assets/build.py's stated house rule.
+
+*How that was checked.* `git ls-files 03_directions` shows all nine tracked: `03_directions/COMPARE.pdf` and the eight files `shots/_m2.html`, `shots/_marks.html`, `shots/derived.png`, `shots/estuary.png`, `shots/full.png`, `shots/instrument.png`, `shots/marks.png`, `shots/sandhya.png`. 03_directions/build.py writes only two things: line 30 `OUT = HERE / "COMPARE.html"` with line 439 `OUT.write_text(html)`, and line 356 `(MARKS / f"{key}-mark-{label}.svg").write_text(` — no .pdf, no shots/. Repo-wide `grep -rn "COMPARE"` (excluding .venv/__pycache__) hits only 01_research/OPEN-FINDINGS.md:321 and 03_directions/build.py:30; `grep -rn "shots"` hits only OPEN-FINDINGS.md:321. The only PDF printer, 09_guidebook/scripts/pdf.py, is hardcoded to the guidebook (`if not PRINT_HTML.exists()` … `render_pdf(PRINT_HTML, OUT_PDF, strict=True)`) and cannot produce COMPARE.pdf. No document covers them: README.md:118 names 03_directions/build.py as "one-off exploration: it writes the three rejected colour directions" and mentions neither shots/ nor COMPARE.pdf, and there is no README in 03_directions/. `head -c 600` on both HTML files confirms they carry no heading or label — _marks.html opens straight into a flex row of swatch panels and _m2.html likewise, each with `<title>Aninda Studio — Estuary mark, regular weight</title>` inside the SVGs of rejected candidates.
+
+*Smallest fix.* Either delete the nine files (the decision they record is already written up in COMPARE.html, which does have a generator) or add a short 03_directions/README.md naming each one as a superseded pre-decision artefact and stating that it has no writer.
+
+#### R2-3 · CI enforces a seventh banned word that appears in no published blocklist, so a writer who follows the English standard exactly can be failed by it
+
+`02_strategy/ENGLISH-STANDARD.md`
+
+The rule as published is the rule a writer reads, and it is a strict subset of the rule CI applies. A contributor who obeys the standard word for word can still be failed on a step that names this document as its authority, and neither of the two places the project publishes the blocklist — the standard itself and the guidebook chapter whose whole purpose is to state it — lists the seventh word. The standard's assurance about what CI covers is written as an exact account ("stated exactly, because the previous version of this section overstated it") and is still not exact.
+
+**Still open, 19 August 2026.** Reproduced exactly: CI fails on `easily`, a word the published standard never lists. Sharper today — the mismatch also runs the other way: the standard's sentence 'Every banned word and idiom above is in the checker's blocklist' is false about the idioms, because `grep -n "ballpark|touch base|out of the box|whilst|amongst|IDIOMS" check.py` returns nothing, so no idiom is enforced at all.
+
+*How that was checked.* Line 105 of 02_strategy/ENGLISH-STANDARD.md publishes six words: `- **Banned outright: **, *merely*, *straightforward*, **, **, **.**`. `grep -n "easily" 02_strategy/ENGLISH-STANDARD.md` returns nothing (exit 1); `grep -n -i "inflect|variant|its forms|and their forms|easi"` on the same file returns `EXIT=1`. Line 35 of 13_plugins/claude-code/skills/aninda-review/scripts/check.py reads `BANNED_WORDS = ("", "merely", "straightforward", "easily", "", "", "")` — seven. Importing the module and calling its own `check_prose` in memory: `'The tokens can easily be rebuilt from the checkout.' -> [("the banned word 'easily'", 'demo.md:1')]` while the same sentence without the word returns `[]`. The CI step `The English standard's blocklist is enforced` in .github/workflows/ci.yml runs this checker over `01_research`, `02_strategy`, both READMEs, the guidebook chapters and more, with `|| { echo "::error::$path fails the English standard"; fail=1; }`.
+
+*Smallest fix.* Add *easily* to the banned list on line 105 of 02_strategy/ENGLISH-STANDARD.md, and soften the 'every banned word and idiom' sentence to say the words are enforced and the idioms are not.
+
+#### R2-4 · OPEN-FINDINGS.md records as an open, reproducible fault a directory that was removed and gitignored one commit before the file was written
+
+`01_research/OPEN-FINDINGS.md`
+
+This is the project's register of what is still wrong, and it makes a false statement about the repository it ships in — that superseded drafts are being published — while asserting that every entry is real and reproducible. A reader auditing the outstanding list will go looking for a path that does not exist, and finding one entry closed silently makes the other twenty-seven harder to trust. Item 12 of the same file is also labelled "not a defect", so the count of twenty-eight minors does not describe twenty-eight minors.
+
+**Still open, 19 August 2026.** Untouched. The register still publishes as a real, reproducible fault a path that does not exist and is gitignored, under a blanket claim that every entry reproduces. The heading also says 'Two ... drafts' while naming one path.
+
+*How that was checked.* `sed -n '73,78p' 01_research/OPEN-FINDINGS.md` still reads `### 10. Two superseded pre-decision drafts ship in the published repository, unlabelled, arguing against the decisions the system actually made` followed by the path `` `_reference/DRAFT-benchmark.html` `` and the sentence 'The directory is documented nowhere'. Against the tree: `ls 01_research/_reference` → `No such file or directory`; `ls _reference` → `No such file or directory`; `find . -name "*_reference*" -not -path "./.git/*" -not -path "./.venv/*"` returns nothing; `git ls-files | grep -i _reference` returns nothing; `.gitignore` line 40 is `_reference/`. `git log --oneline -- 01_research/OPEN-FINDINGS.md` shows the last five touches (db71259, 641f7a3, 30d3688, d5e4320, 02af5e7) and `git log -p` shows `+`_reference/DRAFT-benchmark.html`` added in 02af5e7 and never edited since. The file still opens with 'Each is real and reproducible.' (line 16) and line 340 still says 'twenty-eight minors are fixed', while item 12 (line 85) is still headed 'Outstanding, not a defect'.
+
+*Smallest fix.* Rewrite finding 10 in place as closed — say the directory was removed and gitignored — rather than deleting it, and correct 'Two' to match the one path named.
+
+#### R2-7 · The tabs card's panels are unreachable by keyboard and the markup it teaches omits the tabindex that would fix it
+
+`08_components/cards/components/tabs.html`
+
+The WAI-ARIA Authoring Practices tabs pattern requires tabindex="0" on a tabpanel that holds no focusable element, so that after choosing a tab the reader can put focus into the panel and page through it. Without it a keyboard-only user activates a tab and focus jumps past the content they only revealed, with nothing focused inside the region they were reading. The card is the system's teaching artefact for this pattern and says so in its own panel text — 'Arrow keys move between the tabs and Home and End jump to the ends, which is what the roving tabindex on this pattern requires' — so the omission is copied by anyone following it. This is guidance rather than a WCAG success criterion, and the panels here are two short paragraphs, which is why it is minor rather than more.
+
+**Half stale, 19 August 2026.** The roving-tabindex/arrow-key half is genuinely fixed and the harness proves it by pressing keys. The half the recorded body actually argues is untouched: no tabpanel carries tabindex="0", in the live card or in the markup it teaches, so after choosing a tab a keyboard-only reader has nothing focused inside the region they revealed. The card also teaches markup only — `grep -o 'as-code__name">[^<]*'` returns a single `markup` block and no JS — so a copier gets the roving tabindex and must supply the handler from the comment.
+
+*How that was checked.* STALE HALF — the arrow-key handler now exists. tabs.html lines 1584–1628 contain a real roving-tabindex handler ('The other half of the ARIA tabs pattern ... Click, arrow keys, Home and End all move the selection') with `ArrowRight/ArrowDown/ArrowLeft/ArrowUp/Home/End` and `select(next, true)`. 08_components/check.py line 944 `check_tablists` presses real keys (`page.keyboard.press("ArrowRight")`) and fails on any tab not reached. `PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers ./.venv/bin/python 08_components/check.py --only tabs` printed 'Measured: ... 15 tabs reached by keyboard.' and 'PASS — every measurement above met its floor.' The taught markup now also carries `tabindex="-1"` on the unselected tab (line 1505) plus the comment 'tabindex="-1" without them takes the tab off the keyboard entirely' (line 1510). OPEN HALF — the record's own body is about `tabindex="0"` on the tabpanel, not the arrow keys: 'The WAI-ARIA Authoring Practices tabs pattern requires tabindex="0" on a tabpanel that holds no focusable element'. `grep -o 'role="tabpanel"[^>]*' tabs.html` returns all 15 panels with only `id` and `aria-labelledby` (plus `hidden`) — no tabindex. `grep -c 'tabindex="0"' tabs.html` → `0` and `grep -c 'tabindex=&quot;0&quot;' tabs.html` → `0`, so the taught markup omits it too. Every panel holds only `<p>` text, which is the case the APG guidance covers.
+
+*Smallest fix.* Add tabindex="0" to each tabpanel in the tabs card generator in 08_components/build.py and to the taught markup sample, then regenerate and re-run 08_components/check.py --only tabs.
+
+#### R2-8 · The site harness's structure and Bangla-language probe runs on index.html only, and its Bangla expression has no script/style skip list
+
+`11_site/check.py`
+
+Round 1 removed four CI steps that could pass without running. This is the same shape one level down: a harness that measures two pages reports a structure result derived from one, and prints it as an unqualified pass, so a regression on 404.html — a missing skip link, a lost <main>, an untagged Bangla string — is green. The skip-list omission is the reason the check cannot be pointed at the component cards as it stands: it would fire on every card's own stylesheet comment and the real defects would be indistinguishable from the noise. Both are cheap to close, and closing them is what would let one guard cover all thirty-two shipped pages instead of one.
+
+**Still open, 19 August 2026.** Still open as written. The gap is latent rather than live: 404.html satisfies all four structure checks and has no untagged Bangla today, so nothing ships wrong — but the harness reports a one-page result as an unqualified pass directly beneath a '2 pages' line, and the missing script/style skip list still blocks pointing the guard at the 30 cards.
+
+*How that was checked.* Both halves reproduce by reading 11_site/check.py. Scope: line 41 is `PAGES = ["index.html", "404.html"]`, but the block at lines 413–444 is headed `# --- structure, once ---` and hardcodes `pg.goto((HERE / "index.html").as_uri())` (line 416); every message is hardcoded too — 'index.html has no <main> landmark', 'index.html has no skip link'. Running it: `PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers ./.venv/bin/python 11_site/check.py` prints 'ok 2 pages × 3 widths × 4 themes' and then, unqualified, 'ok structure: <h1>×1, lang=''en'', <main> present, skip link present', ending '8 checks passed, 0 failed.' Bangla probe: line 425 is `[...el.childNodes].some(n => n.nodeType === 3 && /[ঀ-৿]/.test(n.textContent)) && !el.closest('[lang="bn"]')` — the only filter is the lang ancestor; there is no script/style exclusion, and a <style> or <script> element's contents are node type 3. I re-ran that exact probe against both pages in Chromium: `index.html {'h1': 1, 'lang': 'en', 'skip': True, 'main': 1, 'bnWithoutLang': 0}` and `404.html {'h1': 1, 'lang': 'en', 'skip': True, 'main': 1, 'bnWithoutLang': 0}`. 404.html does hold 6 Bangla runs that are never probed. The skip-list consequence is concrete: 08_components/cards/components/tabs.html has Bangla inside its <style> block — 'style bangla in block: [''মাত্রা'', ''মাত্রা'']' — so pointing this probe at the cards fires two false positives on that card alone.
+
+*Smallest fix.* Loop the structure block over PAGES with the page name in each message, and add `&& !el.closest('script, style, pre, code')` to the Bangla filter.
+
+#### R2-9 · The accessibility card's subtitle double-escapes an em dash, so the entity is read out as literal text on the one card whose subject is accessibility
+
+`08_components/build.py`
+
+A screen reader reads the visible characters, so the card's one-line summary is announced as 'forced colours ampersand m dash semicolon the mode where…' — six syllables of markup in the middle of a sentence, on the card a reader most likely reaches with a screen reader precisely because it is the accessibility card. It is also a visible defect for everyone. The site and the guidebook prove the string itself is right and only the card's escaping is wrong, so three surfaces built from one entry in 08_components/_cards.json now disagree about what that entry says, and the card generator is the only one that cannot pass an entity through.
+
+**Still open, 19 August 2026.** Still true and unchanged. The one card whose subject is accessibility renders the seven characters &mdash; as literal text where an em dash belongs. Sharper than recorded: the same source string is passed through UNescaped by the other two consumers — 11_site/index.html and 09_guidebook/Aninda-Studio-Guidebook.html both contain the raw "&mdash;", which renders correctly there — so one source string renders as a dash on the site and the guidebook and as visible markup on the card.
+
+*How that was checked.* grep -n "&mdash;" 08_components/build.py → line 1955: subtitle="…what happens in forced colours &mdash; the mode where the operating system replaces every colour with its own.". The subtitle is emitted at line 2317 as f'<p class="as-doc-sub">{e(card["subtitle"])}</p>', and e() is defined at line 498 as `return html.escape(str(text), quote=True)`. Reading the shipped output: grep -n "as-doc-sub" 08_components/cards/foundations/accessibility.html → line 1451: '<p class="as-doc-sub">Target sizes … in forced colours &amp;mdash; the mode …</p>'. A tree-wide grep for "&amp;mdash" over *.html/*.json/*.md/*.css returns exactly one file: 08_components/cards/foundations/accessibility.html. 08_components/check.py contains no match for "amp;|escape|mdash|&#", and a full run finished PASS (exit 0), so nothing catches it.
+
+*Smallest fix.* In 08_components/build.py line 1955 replace the entity &mdash; with the literal em dash character —, as every other subtitle in the CARDS list already uses, then regenerate the cards.
+
+#### R3-1 · About forty tracked files carry no SPDX header, against the licence matrix this system publishes
 
 `13_plugins/claude-code/skills/aninda-repo/scripts/spdx.py`
 
@@ -363,10 +694,17 @@ fault: the checker was calling seven files missing a header they carry, because
 the house docstring style puts the essay above the identifier. The deepest real
 identifier in the tree sits at line 69.
 
-### R3-2. The plugin and the review sheet use the same `gb-*` ids for different things
+**Still open, 19 August 2026.** Reproduced precisely, and the count has grown to 47. The mitigation still stands: the published matrix in aninda-brand/references/licence.md lines 16-21 states the four-licence split by part, and NOTICE plus both READMEs carry it, so no file is ambiguously licensed. This remains a decision about the scope of the matrix, not a sweep.
+
+*How that was checked.* `./.venv/bin/python 13_plugins/claude-code/skills/aninda-repo/scripts/spdx.py --check .` → "97 already correct / 204 exempt, by the rules in this script / 47 missing / 0 declaring a different licence / 65 no rule, so left alone". I then tested each of the 47 with `git ls-files --error-unmatch`: tracked=47, untracked=none — so "about forty tracked files" is if anything an understatement. The named categories all appear in the MISSING list: README.md, README.bn.md, TRADEMARKS.md, .github/workflows/ci.yml, the guidebook chapter sources (18 files under 09_guidebook/chapters/ and chapters/bn/), the reference documents (00_sandbox/TOOLCHAIN.md, 01_research/BENCHMARK.md, 01_research/OPEN-FINDINGS.md, 02_strategy/ENGLISH-STANDARD.md, 06_type/BANGLA-STANDARD.md, BANGLA-STRINGS.md, MEASUREMENTS.md, RECOMMENDATION.md, SHORTLIST.md, pairings.md) and four stylesheets (12_packages/python/src/aninda_studio_tokens/data/tokens.{light,dark,hc-light,hc-dark}.css). No CI step runs it: `grep -rn "spdx" .github/workflows/ci.yml scripts/*.sh scripts/*.py` returns nothing. The recorded over-reach sub-claim also holds exactly: the flagged non-matrix files are six .html (03_directions/COMPARE.html, shots/_m2.html, shots/_marks.html, 06_type/BANGLA-REVIEW.html, 11_site/404.html, 11_site/index.html) plus .gitignore — seven, as stated.
+
+*Smallest fix.* Scope BY_SUFFIX in spdx.py down to hand-written files (drop .html and add a name-based exemption for generated output), then run --write over what remains and add the check to verify-all.sh — but only after deciding the matrix question, since --write on a generated file breaks scripts/readme.py --check.
+
+#### R3-2 · The plugin and the review sheet use the same `gb-*` ids for different things
+
+`06_type/review_bangla.py`
 
 `13_plugins/claude-code/skills/aninda-brand/assets/bangla-verified.json`,
-`06_type/review_bangla.py`
 
 `gb-1` is a single chapter title, "Welcome", in the plugin. In the review sheet it
 is a display row carrying three at once, "Welcome · The name · The mark". One id
@@ -377,9 +715,60 @@ The guidebook was moved onto `chapter.<slug>` keys from the register in this
 pass, which is the shape the plugin should follow. Until it does, those ids are
 outside the comparison. Nothing wrong ships: the Bangla itself agrees everywhere.
 
-### R3-3. CLOSED 19 August 2026 — the three English glosses are settled
+**Still open, 19 August 2026.** Still open, and sharper than recorded: the guard's own pass line claims all 31 strings agree with the review sheet when 10 of them — the entire gb-* range — were never compared to it, and 4 of the sheet's 23 rows were skipped. The exclusion hides no live error today (BANGLA-STANDARD.md:398 confirms gb-1 স্বাগতম and :407 confirms gb-10's change to পদ্ধতি, both matching the plugin), so the defect is the unmeasured claim in the printed output, not a wrong string.
 
-`13_plugins/claude-code/skills/aninda-brand/assets/bangla-verified.json`
+*How that was checked.* The collision is intact and the exclusion is exactly as described. Review sheet, 06_type/review_bangla.py:160: `("gb-1", "Welcome · The name · The mark", "স্বাগতম · নাম · চিহ্ন",` — one id, three chapter titles. Plugin, references/bangla.md:79: `| gb-1 | স্বাগতম | Welcome |`, and assets/bangla-verified.json:112 `"id": "gb-1"` — one id, one title. 09_guidebook/build.py:187 agrees with the plugin (`"gb-1": "স্বাগতম",`). The guard, 13_plugins/claude-code/scripts/check_plugin.py, drops the whole namespace: `GROUPED = {key for key in source if key.startswith("gb-")}`, with both the Bangla loop and the gloss loop guarded by `if key in GROUPED: continue` / `if key not in GROUPED`. Counts: 10 gb-* ids in bangla-verified.json, 10 rows in bangla.md, 4 rows in the review sheet. Running `./.venv/bin/python 13_plugins/claude-code/scripts/check_plugin.py` prints "the 31 verified Bangla strings agree between bangla.md, bangla-verified.json and the 23 in 06_type/review_bangla.py, in Bangla and in English".
+
+*Smallest fix.* Re-key the plugin's ten chapter ids to the `chapter.<slug>` register the guidebook already uses, or at minimum change the pass line to name the number actually compared (21 of 31) instead of implying all 31 were.
+
+### Recorded, not defects (1)
+
+#### R3-5 · The interactive guidebook's PDF size is a recorded one-off, not a measurement
+
+`09_guidebook/build.py`
+
+The print build's PDF size is now read from the file. The interactive build's is
+not: that PDF is not shipped, and 14.2 MB was measured once while deciding to
+ship two HTML builds. It is labelled as exactly that. Producing it on every build
+to keep the figure current would cost more than the sentence is worth.
+
+**Still open, 19 August 2026.** Reproduced as a statement of fact, but it is no longer a defect in effect: the shipped prose says in as many words that the number was measured once, while deciding the split, and that the PDF is not shipped, so nothing false reaches a reader and the figure is a historical claim that cannot drift into being wrong. Worth noting the machinery to close it already exists — 09_guidebook/scripts/pdf.py has `probe_interactive()` behind `--probe-interactive`, which prints the interactive build to PROBE_PDF and reports `fmt_bytes(PROBE_PDF.stat().st_size)`.
+
+*How that was checked.* 09_guidebook/build.py:1004 `_pdf_sizes()` reads the print PDF from disk — `if pdf.exists(): printed = (f"Printing the print build gives a PDF of " f"{fmt_bytes(pdf.stat().st_size)}, read from the file in this " f"repository. ")` — and then returns a hardcoded literal for the other: line 1027, `return (printed + "Printing the interactive build gave one of about 14.2 MB " "when that was measured, once, while deciding this split; that PDF is " "not shipped, ")`. The sentence ships in both builds: grep against 09_guidebook/Aninda-Studio-Guidebook.html and -print.html returns "Printing the print build gives a PDF of 1.8 MB, read from the file in this repository. Printing the interactive build gave one of about 14.2 MB when that was measured, once, while deciding this split". The print figure checks out — Aninda-Studio-Guidebook.pdf is 1,791,468 bytes, 1.8 MB at the file's own SI convention (fmt_bytes, line 354, `n / 1_000_000`). No probe output exists to read: `ls 09_guidebook/_probe-interactive.pdf` → "No such file or directory".
+
+*Smallest fix.* Run pdf.py --probe-interactive once and have _pdf_sizes() read PROBE_PDF's size when the file is present, mirroring what it already does for the print PDF; otherwise leave it, since the prose is already honest about what the number is.
+
+### Already fixed, kept as a record (4)
+
+These were true when written and are not true now. They stay because the record of what went wrong is the useful part, and because deleting them would hide that this document had drifted.
+
+#### 10 · Two superseded pre-decision drafts ship in the published repository, unlabelled, arguing against the decisions the system actually made
+
+**Fixed.** Fixed. Both pre-decision drafts were deleted in commit 70c7f45, are absent from HEAD and from the working tree, and `_reference/` is now gitignored with a comment recording why, so a re-copy cannot be committed again.
+
+*How that was checked.* `ls -la _reference` → `ls: _reference: No such file or directory`. `git ls-files | grep -i -E '_reference|DRAFT'` → no output. `find . -name 'DRAFT*'` → no output. `git log --diff-filter=D --format='%h %s' -- _reference` → `70c7f45 Convergence round 1: fix four blockers and the Reserved Font Name`, whose deletion list includes `_reference/DRAFT-benchmark.html` and `_reference/DRAFT-reference-sheet.html`. `git ls-tree -r HEAD --name-only | grep -c _reference` → `0`. .gitignore now carries a `_reference/` entry under "The superseded Aninda drafts" ending "They are gone; this stops them returning."
+
+#### R2-1 · Both published site pages date themselves 2026-08-14 and claim their counts were taken that day, while the same page reports checking registries on 2026-08-18 and the file was regenerated on 18 August
+
+**Fixed.** Fixed properly, not cosmetically: the constant was removed rather than updated, the sitemap now ships no <lastmod> at all, and guard_dates() (wired at build.py:1339) demonstrably rejects any ISO date that no committed record supplies. One residual limit worth knowing: the guard only recognises ISO-format dates, so a typed "14 August 2026" would slip through — no built page contains one today.
+
+*How that was checked.* The typed constant is gone and its absence is documented: `11_site/build.py:80-95` — "There is deliberately no BUILT_ON constant here any more, and no call to date.today() either." Scanning the built output, `grep -o -E '[0-9]{4}-[0-9]{2}-[0-9]{2}'` returns `2026-08-18` for index.html and NOTHING for 404.html, sitemap.xml, robots.txt, site.webmanifest and styles.css. `grep -rn lastmod 11_site/sitemap.xml` returns nothing (build.py:1246 replaces it with a comment explaining why). `grep -i 'counted on'` over index.html and 404.html returns nothing. The one surviving date is sourced, not typed: `12_packages/PUBLICATION.json:4` holds `"checked": "2026-08-18"`, and it appears as "On 2026-08-18 I checked the npm registry and the Python Package Index". I also confirmed the new guard would actually fire, by calling it directly: `guard_dates({"index.html": b"<p>Counted on 2026-08-14.</p>"}, {"checked": "2026-08-18"})` raised "The typed-date rule failed", while the PUBLICATION.json date passed.
+
+#### R2-10 · A banned word is used in shipped prose in a lint-covered path, and the CI blocklist guard cannot see it because the same paragraph contains a rule-statement phrase
+
+**Fixed.** Fixed by commit 30d3688; the four words were removed from OPEN-FINDINGS.md and nothing has replaced them. Worth recording that the exemption mechanism the finding named is unchanged and still line-scoped: RULE_STATEMENT matches "rather than", "instead of", "never ", "do not" and "does not exist", any of which appear in ordinary prose, so a future banned word sharing a line with one of them would still pass silently. Today no such line exists in any lint-covered path.
+
+*How that was checked.* grep -niE "\\b(|merely|straightforward|easily|||)\\b" 01_research/OPEN-FINDINGS.md → no output. Running the guard the CI job runs: .venv/bin/python 13_plugins/claude-code/skills/aninda-review/scripts/check.py 01_research → "Checked 2 file(s)", "1 banned words cited rather than used", "FAILURES (0) … None." I then re-implemented the guard's own loop (BANNED_WORDS, CITED, RULE_STATEMENT, inside(), MAX_LINE_CHARS imported from check.py) and ran it over all 18 lint-covered paths from .github/workflows/ci.yml: "files scanned: 94 / total exempted-by-rule-statement, not quoted: 0". The only banned word anywhere in 01_research is BENCHMARK.md:148, inside quotation marks — Apple asks for " defined edges" — which CITED exempts as a genuine citation. git show 30d3688 -- 01_research/OPEN-FINDINGS.md confirms the four uses (three "", one "merely") were deleted in "Remove four banned words from the findings record".
+
+#### R2-16 · tag_inline_bangla's docstring claims Bangla inside attributes is counted by the guard and named in a chapter; neither the counter nor the chapter text exists
+
+**Fixed.** Stale. Commit 1677ee3 deleted the four docstring lines that made the claim; the text appears nowhere in the file now, so there is no promise left to be unmet.
+
+*How that was checked.* `sed -n '2820,2839p' 09_guidebook/build.py` prints the whole current tag_inline_bangla docstring; it ends 'Returns (bangla_runs, english_runs, document).' with no attribute claim. `grep -rn "counted separately\|named in the chapter" 09_guidebook/build.py` returns only unrelated hits (line 19 and line 294, both the chapter-title list); `grep -rn "ALT attribute\|alt attribute\|inside an attribute\|part of an attribute" 09_guidebook/build.py` -> 'grep-exit=1' (no matches). `git log --oneline -S "Those are counted separately by the guard" -- 09_guidebook/build.py` -> '1677ee3 / 70c7f45'; `git show 1677ee3 -- 09_guidebook/build.py` shows the removal: '- Note the honest limit: a Bangla word inside an ALT attribute cannot be marked / - up at all ... / - Those are counted separately by the guard and named in the chapter on what this / - system does not do.' replaced by '+ Two implementations of the same rule is one implementation and one liability.'
+
+### Closed by the owner's decision (2)
+
+#### R3-3 · CLOSED 19 August 2026 — the three English glosses are settled
 
 Settled by the owner. One was a real inconsistency and two were not.
 
@@ -410,9 +799,7 @@ against a source saying "too large", and it is corrected.
 With the ambiguous cases resolved, the gloss comparison now **fails** the plugin
 check on any drift rather than merely reporting it.
 
-### R3-4. CLOSED 19 August 2026 — the two revised Bangla strings are approved
-
-`06_type/bangla-strings.json`
+#### R3-4 · CLOSED 19 August 2026 — the two revised Bangla strings are approved
 
 `card.colour.subtitle` lost the numeral ১৭, and `card.the-marks.subtitle` lost
 মোহনা. Both were changed because what they said had become false — seventeen
@@ -422,11 +809,6 @@ kept; only the false part is gone. The owner confirmed both on 19 August 2026;
 `pending_review` is cleared and each entry's basis records the confirmation
 alongside the reason for the change.
 
-### R3-5. The interactive guidebook's PDF size is a recorded one-off, not a measurement
+---
 
-`09_guidebook/build.py`
-
-The print build's PDF size is now read from the file. The interactive build's is
-not: that PDF is not shipped, and 14.2 MB was measured once while deciding to
-ship two HTML builds. It is labelled as exactly that. Producing it on every build
-to keep the figure current would cost more than the sentence is worth.
+Generated by `scripts/findings.py` from `01_research/_data/findings.json`. Editing this file by hand is undone by the next build; change the data and regenerate. The counts above are counted, not typed.

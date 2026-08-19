@@ -70,6 +70,12 @@ jobs:
           done
           exit $fail
 
+      - name: The findings register matches its own data
+        # OPEN-FINDINGS.md is the document a reader trusts to say what is wrong
+        # here. It was hand-written and drifted: of its 54 open entries, four were
+        # already fixed and six were half right. It is generated now, and its
+        # counts are counted.
+        run: python scripts/findings.py --check
       - name: The derived figures in MEASUREMENTS.md match the measurements
         # MEASUREMENTS.md opens by saying every number in it is a measurement, and
         # nothing compared it to 06_type/_data/measurements.json. Three x/cap cells
