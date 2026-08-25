@@ -30,7 +30,7 @@ was made on purpose.
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     ./.venv/bin/python scripts/check_gates.py
 """
 
@@ -45,13 +45,65 @@ CI = ROOT / ".github" / "workflows" / "ci.yml"
 SCRIPT = ROOT / "scripts" / "verify-all.sh"
 
 # Commands that prepare a runner rather than check anything.
+#
+# `cd ` is deliberately NOT in this list, and that is the whole point of the note.
+# It used to be, and combined with a parser that read only the first line of a
+# `run: |` block it silently exempted three real gates — the npm resolve check and
+# both manifest gates, the two newest and the ones added to close exactly the class
+# of bug this file exists to catch. Deleting any of them from verify-all.sh still
+# printed "all 32 CI gates appear". A step is setup only when EVERY line in it is
+# setup, which is what is tested below.
 SETUP = (
-    "npm ci", "pip install", "playwright install", "cd ", "tsc --noEmit",
+    "npm ci", "pip install", "playwright install",
+    "python -m playwright install", "tsc --noEmit",
 )
+
+# Lines that are neither setup nor a check: they move around, name a thing, or
+# report. A block made only of these plus SETUP is not a gate.
+NOISE_PREFIXES = ("cd ", "export ", "set ", "echo ", "#", "fi", "else", "done", "}")
+
+
+def is_setup(body: str) -> bool:
+    """True when nothing in this block actually checks anything.
+
+    Judged line by line. A block that changes directory and THEN runs a gate is a
+    gate; a block that only changes directory is setup. Reading the first line
+    alone cannot tell those apart, and for three steps it got it wrong.
+    """
+    lines = [ln.strip() for ln in body.splitlines() if ln.strip()]
+    if not lines:
+        return True
+    for line in lines:
+        if any(line.startswith(s) or line == s.strip() for s in SETUP):
+            continue
+        if any(line.startswith(n) for n in NOISE_PREFIXES) or line in ("|", "\\"):
+            continue
+        return False
+    return True
 
 # The artefact each CI command names, and the text that must appear somewhere in
 # verify-all.sh for that gate to be covered. Only needed where the two phrase the
 # same check differently.
+# Keyed by the STEP'S NAME, and checked before ALIAS. Needed where the command
+# names an artefact that several gates name — three steps all run `build.mjs`, so
+# a substring test on "build.mjs" passes even when the specific gate has been
+# deleted from the script. The value is the distinctive label verify-all.sh prints
+# for that gate, which is unique by construction because it is what a reader sees.
+NAME_ALIAS = {
+    "The full build completes and the manifest is adopted":
+        "the full figma build completes",
+    "A placeholder manifest must stop the build":
+        "a placeholder manifest stops the figma build",
+    "The npm package must actually resolve":
+        "npm entry points import and agree",
+    "Nothing built may differ from what was committed":
+        "figma plugin build is current",
+    "Nothing bundled may differ from what was committed":
+        "claude-code skill bundles are current",
+    "Rebuild the Figma plugin": "figma plugin build is current",
+    "The Figma plugin must typecheck": "figma plugin typechecks",
+}
+
 ALIAS = {
     "python 04_mark/build.py": "04_mark/build.py",
     "git diff --exit-code 04_mark/svg": "04_mark/svg",
@@ -74,15 +126,48 @@ ALIAS = {
 
 
 def ci_commands() -> list[tuple[str, str]]:
+    """Every `run:` in the workflow, with its WHOLE body.
+
+    The body used to be `(?P<body>.*)$` under re.M, and `.` does not cross a
+    newline — so a `run: |` block collapsed to its first line. Three gates opened
+    with `cd`, were read as a bare directory change, and were dropped. The block is
+    now taken in full: every line indented deeper than the `run:` key belongs to it.
+    """
     text = CI.read_text(encoding="utf-8")
     out: list[tuple[str, str]] = []
-    for block in re.finditer(
-            r"^\s+- name: (?P<name>.+)\n(?:\s+#.*\n)*\s+run: (?:\|\s*\n)?(?P<body>.*)$",
-            text, re.M):
-        out.append((block.group("name").strip(), block.group("body").strip()))
-    # `run:` steps with no name (there are a few) still count as gates.
-    for block in re.finditer(r"^\s+- run: (?P<body>.*)$", text, re.M):
-        out.append(("(unnamed)", block.group("body").strip()))
+    lines = text.splitlines()
+    name = "(unnamed)"
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        m_name = re.match(r"^\s+- name: (?P<n>.+)$", line)
+        if m_name:
+            name = m_name.group("n").strip()
+            i += 1
+            continue
+        m_run = re.match(r"^(?P<indent>\s+)-? ?run: (?P<rest>.*)$", line)
+        if m_run:
+            indent = len(m_run.group("indent"))
+            rest = m_run.group("rest").strip()
+            body_lines: list[str] = []
+            if rest and rest != "|":
+                body_lines.append(rest)
+            i += 1
+            while i < len(lines):
+                nxt = lines[i]
+                if not nxt.strip():
+                    body_lines.append("")
+                    i += 1
+                    continue
+                depth = len(nxt) - len(nxt.lstrip())
+                if depth <= indent:
+                    break
+                body_lines.append(nxt.strip())
+                i += 1
+            out.append((name, "\n".join(body_lines).strip()))
+            name = "(unnamed)"
+            continue
+        i += 1
     return out
 
 
@@ -164,19 +249,25 @@ def main() -> int:
     missing: list[tuple[str, str]] = []
     checked = 0
     for name, body in ci_commands():
-        if any(body.startswith(s) or body == s.strip() for s in SETUP):
+        if is_setup(body):
             continue
-        if any(s in body for s in ("npm ci", "pip install", "playwright install")):
-            continue
-        needle = None
-        for prefix, alias in ALIAS.items():
-            if body.startswith(prefix):
+        # Match an alias against ANY line of the block, not just the first. With
+        # whole blocks now in hand, a gate's identifying command is often on line
+        # two or three, after a cd or an export.
+        needle = NAME_ALIAS.get(name)
+        block_lines = [ln.strip() for ln in body.splitlines() if ln.strip()]
+        for prefix, alias in ALIAS.items() if needle is None else ():
+            if any(ln.startswith(prefix) for ln in block_lines):
                 needle = alias
                 break
         if needle is None:
-            # Default: the first path-looking token in the command.
-            token = re.search(r"[\w./-]+\.(?:py|mjs|sh)", body)
-            needle = token.group(0) if token else body[:40]
+            # Default: the first path-looking token in the first line that is not
+            # setup or noise — the command the step is actually about.
+            meat = [ln for ln in block_lines
+                    if not any(ln.startswith(n) for n in NOISE_PREFIXES)
+                    and not any(ln.startswith(s) for s in SETUP)]
+            token = re.search(r"[\w./-]+\.(?:py|mjs|sh)", "\n".join(meat))
+            needle = token.group(0) if token else (meat[0][:40] if meat else body[:40])
         checked += 1
         if needle.lower() not in script:
             missing.append((name, needle))

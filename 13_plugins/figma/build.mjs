@@ -6,8 +6,11 @@
 //
 // --code-only exists for one reason: continuous integration has to be able to
 // rebuild dist/ and compare it against what is committed, and that check does
-// not need a plugin id. It is not a way to ship an unadopted manifest — the
-// output of --code-only will not load in Figma either.
+// not need to read the manifest. What it does NOT do is check the manifest, so a
+// --code-only build proves nothing about it. Since 25 August 2026 a manifest IS
+// committed, carrying a development id, so the dist/ that --code-only writes will
+// load in Figma — it is the gate that was skipped, not the output that is broken.
+// Only a full `node build.mjs` checks the manifest.
 //
 // Nothing here writes a date or a timestamp into a generated file. Every
 // artefact is a pure function of its inputs, so a rebuild that changes nothing
@@ -135,6 +138,13 @@ try {
   await esbuild.build({
     entryPoints: [join(SRC, 'plan.ts')],
     outfile: planBundle,
+    // esbuild writes each module's path into the bundle as a comment, RELATIVE to
+    // its working directory — so the same sources built from the repository root
+    // produced a different dist/code.js than the same build run from this folder,
+    // and the CI diff would have failed on a build that changed nothing. The
+    // header three lines up claims every artefact is a pure function of its
+    // inputs; without this it was a function of where you were standing.
+    absWorkingDir: PLUGIN_DIR,
     bundle: true,
     format: 'esm',
     platform: 'node',
@@ -185,6 +195,54 @@ say('Wrote RECEIPT-EXPECTED.json');
 for (const key of Object.keys(plan.totals)) say(`  expected ${key}: ${plan.totals[key]}`);
 
 // ---------------------------------------------------------------------------
+// 3b. The README's "What gets made" table must agree with what was just planned
+// ---------------------------------------------------------------------------
+// Those numbers were hand-typed, drifted from the plan in commit 641f7a3, and sat
+// wrong on four rows until a review found them — in the very document that tells
+// the owner to compare the plugin's receipt against this file. Then the correction
+// itself claimed "the counts in the table above are checked against
+// RECEIPT-EXPECTED.json every time build.mjs runs", and nothing checked them. A
+// promise of a check is worse than no check: it stops anyone looking. So here is
+// the check.
+{
+  const readme = readFileSync(join(PLUGIN_DIR, 'README.md'), 'utf8');
+  const row = (label) => {
+    const m = readme.match(
+      new RegExp(`^\\|\\s*${label}\\s*\\|\\s*(\\d+)\\s*\\|`, 'm'));
+    return m ? Number(m[1]) : null;
+  };
+  const wanted = [
+    ['Variables', plan.totals.variables],
+    ['Variable aliases', plan.totals.variableAliases],
+    ['Paint styles', plan.totals.paintStyles],
+    ['Text styles', plan.totals.textStyles],
+  ];
+  const wrong = [];
+  for (const [label, expected] of wanted) {
+    const found = row(label);
+    if (found === null) wrong.push(`README.md has no "${label}" row to check`);
+    else if (found !== expected) wrong.push(`README.md says ${label} ${found}, the plan makes ${expected}`);
+  }
+  // The prose count beside the variables row, and the gap list, are numbers too.
+  const roles = readme.match(/(\d+)\s+primitives,\s*(\d+)\s+semantic roles/);
+  if (!roles) wrong.push('README.md no longer states the primitive and semantic role split');
+  else if (Number(roles[1]) !== plan.totals.primitiveVariables
+           || Number(roles[2]) !== plan.totals.themeVariables) {
+    wrong.push(`README.md says ${roles[1]} primitives and ${roles[2]} semantic roles, `
+      + `the plan makes ${plan.totals.primitiveVariables} and ${plan.totals.themeVariables}`);
+  }
+  if (wrong.length) {
+    say('');
+    say('BUILD STOPPED — the README disagrees with the plan it describes:');
+    for (const w of wrong) say(`  ${w}`);
+    say('');
+    say('  Correct the table in 13_plugins/figma/README.md, or the plan.');
+    process.exit(1);
+  }
+  say('  README table agrees with the plan on 5 counts');
+}
+
+// ---------------------------------------------------------------------------
 // 4. Bundle the plugin
 // ---------------------------------------------------------------------------
 
@@ -193,6 +251,7 @@ mkdirSync(DIST, { recursive: true });
 await esbuild.build({
   entryPoints: [join(SRC, 'code.ts')],
   outfile: join(DIST, 'code.js'),
+  absWorkingDir: PLUGIN_DIR,   // see the note on the plan bundle above
   bundle: true,
   format: 'iife',
   target: 'es2017',

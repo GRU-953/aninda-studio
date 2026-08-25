@@ -1,11 +1,11 @@
 # Aninda Studio — candidate type pairings
 
 **Date:** 14 August 2026
-**Specimens:** `06_type/specimens/01-*.png` … `07-*.png` — one rendered page per
+**Specimens:** `06_type/specimens/01-*.png` … `08-*.png` — one rendered page per
 pairing, both scripts side by side at the same measure.
 **Raw data:** `06_type/_data/measurements.json`
 
-Seven pairings, each Latin + Bangla + monospace. Every pairing was rendered and
+Eight pairings, each Latin + Bangla + monospace. Every pairing was rendered and
 measured; none of the judgements below rest on looking at a specimen image alone.
 
 ---
@@ -41,7 +41,7 @@ axis have a single flat multiplier at every size.
 
 ---
 
-## Summary — all seven measured
+## Summary — all eight measured
 
 Bangla size multiplier, measured at each step of the scale **[rendered]**:
 
@@ -116,7 +116,7 @@ deliberately: its optical-size axis grows the x-height as the text gets smaller,
 from 0.5156em at display sizes to 0.5459em at caption sizes **[rendered]**. Because
 Bangla's problem is that it is *taller* than Latin, a Latin face that grows when
 small is exactly what closes the gap — so this pairing needs the least size
-correction of all seven, ×0.872 at body size, and its worst case across the whole
+correction of all eight, ×0.872 at body size, and its worst case across the whole
 scale (×0.829 at 56px) is still better than four of the other pairings' best. On
 the other side, Noto Sans Bengali has the sturdiest মাত্রা of any text face measured
 (0.0750em, 1.20px at 16px), the joint-widest Bengali coverage at 96 of 128 code
@@ -219,7 +219,8 @@ partner, drawn for the US Web Design System, with tall caps (11.57px) and unusua
 shallow descenders (2.58px) **[rendered]** that give a compact, official texture. The
 multiplier is a flat ×0.831 with no scale-dependence, all three families share a
 weight axis, and none of the three carries a Reserved Font Name — so this is the
-most administratively frictionless pairing of the seven. It reads as
+most administratively frictionless pairing of the eight — the only flat one whose
+three families are all free of a Reserved Font Name. It reads as
 institutional, trustworthy and unexciting, which is exactly right for a government
 tender or a university contract and exactly wrong for anything that needs to feel
 like a person made it **[judgement]**. Watch the variable default: Public Sans defaults
@@ -233,8 +234,8 @@ or expand the whole system across both scripts and the code face at once, and
 Archivo's `wdth` range of 62–125 is the broadest of any Latin candidate. Archivo
 also has the largest x-height-to-cap ratio measured (0.767) and Anek Bangla is a
 contemporary Bangla from Ek Type with genuine Indic expertise behind it, so the two
-share a large, even, modern texture; the multiplier is a flat ×0.840, third-best of
-the seven **[rendered]**. It is the most distinctive-looking pairing here and the one
+share a large, even, modern texture; the multiplier is a flat ×0.840, second-highest of
+the eight at body size **[rendered]**. It is the most distinctive-looking pairing here and the one
 most likely to be mistaken for a considered brand rather than a default
 **[judgement]**. The costs: Anek Bangla's default line box is 30px at 16px, by far the
 loosest of any candidate (1.866em) **[rendered]**, so it will fight a tight vertical

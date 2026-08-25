@@ -882,8 +882,12 @@ def section_work(cards: dict, tokens_css: str) -> str:
          "tables, tabs, navigation and the rest."),
         ("Patterns", counts["Patterns"], "Whole screens assembled from the "
          "components, including sign in, settings and a dashboard."),
-        ("Fonts", len(fonts), "All three are SIL Open Font Licence 1.1, subset to "
-         "what this page draws and carried inside the stylesheet."),
+        # Derived, not asserted. This row said "All three are ... subset ... and
+        # carried inside the stylesheet" beside a counted 4, and none of the three
+        # claims held for the fourth: it is the whole face, not a subset, and it
+        # ships in 08_components/fonts/ rather than in this page. A counted number
+        # under a typed sentence is the drift this table exists to prevent.
+        ("Fonts", len(fonts), _fonts_note(fonts)),
     ]
     body = "".join(
         f"<tr><th scope=\"row\">{e(name)}</th>"
@@ -1066,11 +1070,40 @@ def section_contact(email: str) -> str:
     )
 
 
+def _font_note(f: dict) -> str:
+    """What was actually done to this face, read from the registry.
+
+    The footer used to call every face "subset", reading only the `renamed` flag —
+    so the desktop TTF, which the registry records as `subset: false` and which
+    08_components/build.py describes as the whole face renamed, was published as a
+    subset. Both flags are read now.
+    """
+    subset = f.get("subset", True)
+    renamed = f.get("renamed", False)
+    if subset and renamed:
+        return ", subset and renamed"
+    if subset:
+        return ", subset"
+    if renamed:
+        return ", renamed in full, not subset"
+    return ", shipped in full"
+
+
+def _fonts_note(fonts: list) -> str:
+    inlined = [f for f in fonts if f.get("subset", True)]
+    whole = [f for f in fonts if not f.get("subset", True)]
+    note = (f"{len(inlined)} are SIL Open Font Licence 1.1, subset to what this page "
+            f"draws and carried inside the stylesheet.")
+    if whole:
+        names = " and ".join(f["family"] for f in whole)
+        note += (f" {names} is the whole face, renamed rather than subset, and ships "
+                 f"in 08_components/fonts/ for installing rather than in this page.")
+    return note
+
+
 def footer(cards: dict) -> str:
     fonts = "".join(
-        f'<li>{e(f["family"])} — {e(f["licence"])}'
-        + (", subset and renamed" if f["renamed"] else ", subset")
-        + "</li>"
+        f'<li>{e(f["family"])} — {e(f["licence"])}' + _font_note(f) + "</li>"
         for f in cards["_fonts"]
     )
     return (

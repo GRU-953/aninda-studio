@@ -26,7 +26,7 @@ part.
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     ./.venv/bin/python scripts/findings.py
     ./.venv/bin/python scripts/findings.py --check
 """
@@ -41,7 +41,37 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "01_research" / "_data" / "findings.json"
 OUT = ROOT / "01_research" / "OPEN-FINDINGS.md"
 
+# The first full re-verification pass. Entries carry their own date now: a later
+# pass that re-checks six of seventy entries must not stamp the other sixty-four
+# with today's date, which is exactly the drift this register exists to catch. An
+# entry with no date of its own belongs to the pass below.
 VERIFIED_ON = "19 August 2026"
+
+
+def verified_on(finding: dict) -> str:
+    """The date of the CHECK THIS ENTRY NOW SHOWS — its most recent one."""
+    return finding["verdict"].get("verified_on", VERIFIED_ON)
+
+
+def passes(finding: dict) -> list[str]:
+    """Every pass this entry has been through, oldest first.
+
+    A pass is a historical fact and does not change when an entry is looked at
+    again. Deriving membership from the latest date instead made the prose
+    retroactively false: entry 12 was checked on 19 August and again on 25 August,
+    and the 19 August tally silently dropped from 64 to 63 — a statement about a
+    pass that had already happened, rewritten by a later one, in the one document
+    whose whole purpose is that its statements stay true.
+    """
+    seen = finding["verdict"].get("passes")
+    if seen:
+        return list(seen)
+    # No explicit history: the entry belongs to exactly the pass whose date it
+    # carries. An entry raised on a later date was NOT in the first pass, and
+    # assuming it was would inflate that pass's tally — the same falsification in
+    # the other direction. Say so with `passes` when an entry has been through more
+    # than one.
+    return [finding["verdict"].get("verified_on", VERIFIED_ON)]
 
 STATUS_LABEL = {
     "still_open": "Still open",
@@ -79,18 +109,44 @@ def render(data: dict) -> str:
 
     out: list[str] = []
     out.append("# Aninda Studio — what is still open\n")
+    first_pass = [f for f in verified if VERIFIED_ON in passes(f)]
+    later_dates = sorted({d for f in verified for d in passes(f)} - {VERIFIED_ON})
+    rechecked = [f for f in verified if len(passes(f)) > 1]
+    later = later_dates
+    # What each pass FOUND is frozen in the data, because it is history. Deriving it
+    # from today's statuses made the same sentence false twice: an entry fixed in
+    # September would silently change what a pass in August is recorded as having
+    # found. What CAN still be measured is the size of the pass, so it is — and a
+    # disagreement stops the build rather than being written out.
+    recorded = {p["date"]: p for p in data.get("_passes", [])}
+    first_record = recorded.get(VERIFIED_ON)
+    if first_record and first_record["covered"] != len(first_pass):
+        raise SystemExit(
+            f"FAILED — nothing written: _passes says the {VERIFIED_ON} pass covered "
+            f"{first_record['covered']} entries, and {len(first_pass)} entries carry "
+            f"that date. One of the two is wrong; fix the data, not this file.")
     out.append(
-        f"**Every entry below was re-verified against the tree on {VERIFIED_ON}.** "
-        f"Each carries the command that was run and what it returned. Nothing here "
-        f"is asserted from memory, and nothing was marked fixed because it looked "
-        f"like the sort of thing that had probably been fixed — a claim was either "
-        f"reproduced or it was not.\n")
+        f"**Every entry below was re-verified against the tree, and each says on "
+        f"what date.** Each also carries the command that was run and what it "
+        f"returned. Nothing here is asserted from memory, and nothing was marked "
+        f"fixed because it looked like the sort of thing that had probably been "
+        f"fixed — a claim was either reproduced or it was not.\n")
     out.append(
-        f"That pass was needed because this document had drifted. It was written "
-        f"across three review rounds and never re-checked, and of its "
-        f"{len(verified)} entries **{n_stale} were already fixed** and "
-        f"**{n_half} were half right**. A register that is wrong in either "
-        f"direction is worse than a short accurate one.\n")
+        f"{len(first_pass)} entries were checked in the pass of {VERIFIED_ON}"
+        + (f". {len(verified) - len(first_pass)} more were raised later, and "
+           + (f"{len(rechecked)} of the original entries was re-checked"
+              if len(rechecked) == 1 else
+              f"{len(rechecked)} of the original entries were re-checked")
+           + f" — {', '.join(later)}"
+           if later else "")
+        + ". That first pass was needed because this document had drifted. It was "
+        f"written across three review rounds and never re-checked, and of the "
+        f"{len(first_pass)} entries it covered, "
+        f"**{first_record['already_fixed'] if first_record else 0} were already "
+        f"fixed** and "
+        f"**{first_record['half_right'] if first_record else 0} were half right** — "
+        f"what that pass found, on the day, kept as it was reported. A register that "
+        f"is wrong in either direction is worse than a short accurate one.\n")
 
     counts = " · ".join(
         f"{len(by_sev.get(s, []))} {s}" for s in SEVERITY_ORDER if by_sev.get(s))
@@ -125,7 +181,7 @@ def render(data: dict) -> str:
             if f["file"]:
                 out.append(f"`{f['file']}`\n")
             out.append(f"{f['body']}\n")
-            out.append(f"**{STATUS_LABEL[v['status']]}, {VERIFIED_ON}.** "
+            out.append(f"**{STATUS_LABEL[v['status']]}, {verified_on(f)}.** "
                        f"{v['note']}\n")
             out.append(f"*How that was checked.* {v['evidence']}\n")
             if v.get("cheap_fix"):
@@ -141,7 +197,7 @@ def render(data: dict) -> str:
         for f in sorted(by_status["stale"], key=lambda x: (x["round"], x["id"])):
             v = f["verdict"]
             out.append(f"#### {f['id']} · {f['heading']}\n")
-            out.append(f"**Fixed.** {v['note']}\n")
+            out.append(f"**Fixed, confirmed {verified_on(f)}.** {v['note']}\n")
             out.append(f"*How that was checked.* {v['evidence']}\n")
 
     if closed:
@@ -173,8 +229,12 @@ def main(argv: list[str]) -> int:
     OUT.write_text(text, encoding="utf-8")
     data = load()
     verified = [f for f in data["findings"] if f.get("verdict")]
+    dates: dict[str, int] = {}
+    for f in verified:
+        dates[verified_on(f)] = dates.get(verified_on(f), 0) + 1
+    when = "; ".join(f"{n} on {d}" for d, n in sorted(dates.items(), key=lambda x: -x[1]))
     print(f"Wrote {OUT.relative_to(ROOT)} — {len(data['findings'])} findings, "
-          f"{len(verified)} re-verified on {VERIFIED_ON}.")
+          f"{len(verified)} re-verified ({when}).")
     return 0
 
 

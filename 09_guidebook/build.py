@@ -1568,6 +1568,19 @@ def block_dynamic_colour() -> str:
 def block_sources() -> str:
     """Every external authority this book relies on, with a URL and a date."""
     ext = _external()
+    # The four rows this refuses were in the data for weeks and the book printed
+    # them: `| Source | URL | Date on the source |` is the HEADER of each of
+    # BENCHMARK.md's four tables, and the extractor took them as sources. So the
+    # book said "57 sources" over 53 real ones, and rendered four rows whose URL
+    # was the word URL. Fail closed rather than filter quietly — a header row in
+    # here means the extractor is wrong, and that is worth knowing.
+    for src in ext["sources"]:
+        if src["url"] in ("URL", "") or src["title"] == "Source":
+            raise SystemExit(
+                f"FAILED — nothing written: {EXTERNAL_JSON.name} holds a Markdown "
+                f"table header as if it were a source ({src['authority']}: "
+                f"{src['title']!r} / {src['url']!r}). Re-extract it from "
+                f"01_research/BENCHMARK.md without the header lines.")
     by: dict[str, list] = {}
     for src in ext["sources"]:
         by.setdefault(src["authority"], []).append(src)

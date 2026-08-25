@@ -3,12 +3,6 @@
  "sources": [
   {
    "authority": "Apple",
-   "title": "Source",
-   "url": "URL",
-   "date_on_source": "Date on the source"
-  },
-  {
-   "authority": "Apple",
    "title": "Human Interface Guidelines — App Icons",
    "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
    "date_on_source": "Change log 8 Jun 2026 (prev. 9 Jun 2025, 10 Jun 2024)"
@@ -105,12 +99,6 @@
   },
   {
    "authority": "Google",
-   "title": "Source",
-   "url": "URL",
-   "date_on_source": "Date on the source"
-  },
-  {
-   "authority": "Google",
    "title": "Material 3 Expressive launch announcement",
    "url": "blog.google/products-and-platforms/platforms/android/material-3-expressive-android-wearos-launch/",
    "date_on_source": "13 May 2025"
@@ -183,12 +171,6 @@
   },
   {
    "authority": "Standards and formats",
-   "title": "Source",
-   "url": "URL",
-   "date_on_source": "Date on the source"
-  },
-  {
-   "authority": "Standards and formats",
    "title": "WCAG 2.2",
    "url": "w3.org/TR/WCAG22/",
    "date_on_source": "W3C Recommendation, 12 Dec 2024"
@@ -234,12 +216,6 @@
    "title": "SPDX licence list",
    "url": "spdx.org/licenses/",
    "date_on_source": "Checked 14 Aug 2026"
-  },
-  {
-   "authority": "Tooling and other design systems",
-   "title": "Source",
-   "url": "URL",
-   "date_on_source": "Date on the source"
   },
   {
    "authority": "Tooling and other design systems",

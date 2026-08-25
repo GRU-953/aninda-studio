@@ -30,7 +30,7 @@ Mark it up. Anything you change here changes at the source, not in a patch.
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers ./.venv/bin/python 06_type/review_bangla.py
 """
 

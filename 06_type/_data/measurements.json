@@ -19441,7 +19441,7 @@
    "matra_thickness_em": 0.075,
    "matra_thickness_px_at_16": 1.2,
    "matra_thickness_px_at_11": 0.825,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_notosansbengali.png"
+   "crop": "06_type/_data/crops/matra_notosansbengali.png"
   },
   "notoserifbengali": {
    "word": "কলকাতা",
@@ -19460,7 +19460,7 @@
    "matra_thickness_em": 0.05417,
    "matra_thickness_px_at_16": 0.867,
    "matra_thickness_px_at_11": 0.596,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_notoserifbengali.png"
+   "crop": "06_type/_data/crops/matra_notoserifbengali.png"
   },
   "notosansbengaliui": {
    "word": "কলকাতা",
@@ -19479,7 +19479,7 @@
    "matra_thickness_em": 0.075,
    "matra_thickness_px_at_16": 1.2,
    "matra_thickness_px_at_11": 0.825,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_notosansbengaliui.png"
+   "crop": "06_type/_data/crops/matra_notosansbengaliui.png"
   },
   "anekbangla": {
    "word": "কলকাতা",
@@ -19498,7 +19498,7 @@
    "matra_thickness_em": 0.06667,
    "matra_thickness_px_at_16": 1.067,
    "matra_thickness_px_at_11": 0.733,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_anekbangla.png"
+   "crop": "06_type/_data/crops/matra_anekbangla.png"
   },
   "hindsiliguri": {
    "word": "কলকাতা",
@@ -19517,7 +19517,7 @@
    "matra_thickness_em": 0.07083,
    "matra_thickness_px_at_16": 1.133,
    "matra_thickness_px_at_11": 0.779,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_hindsiliguri.png"
+   "crop": "06_type/_data/crops/matra_hindsiliguri.png"
   },
   "balooda2": {
    "word": "কলকাতা",
@@ -19536,7 +19536,7 @@
    "matra_thickness_em": 0.05833,
    "matra_thickness_px_at_16": 0.933,
    "matra_thickness_px_at_11": 0.642,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_balooda2.png"
+   "crop": "06_type/_data/crops/matra_balooda2.png"
   },
   "tirobangla": {
    "word": "কলকাতা",
@@ -19555,7 +19555,7 @@
    "matra_thickness_em": 0.06667,
    "matra_thickness_px_at_16": 1.067,
    "matra_thickness_px_at_11": 0.733,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_tirobangla.png"
+   "crop": "06_type/_data/crops/matra_tirobangla.png"
   },
   "galada": {
    "word": "কলকাতা",
@@ -19574,7 +19574,7 @@
    "matra_thickness_em": 0.10833,
    "matra_thickness_px_at_16": 1.733,
    "matra_thickness_px_at_11": 1.192,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_galada.png"
+   "crop": "06_type/_data/crops/matra_galada.png"
   },
   "atma": {
    "word": "কলকাতা",
@@ -19593,7 +19593,7 @@
    "matra_thickness_em": 0.06667,
    "matra_thickness_px_at_16": 1.067,
    "matra_thickness_px_at_11": 0.733,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_atma.png"
+   "crop": "06_type/_data/crops/matra_atma.png"
   },
   "mina": {
    "word": "কলকাতা",
@@ -19612,7 +19612,7 @@
    "matra_thickness_em": 0.0625,
    "matra_thickness_px_at_16": 1.0,
    "matra_thickness_px_at_11": 0.688,
-   "crop": "/Users/gru953/Claude/Cowork/Aninda_Studio/06_type/_data/crops/matra_mina.png"
+   "crop": "06_type/_data/crops/matra_mina.png"
   }
  },
  "line_height": {

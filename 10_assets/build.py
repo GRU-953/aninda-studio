@@ -768,6 +768,31 @@ def _ink_geometry(data: bytes) -> tuple:
     return (w, h, coverage, frame)
 
 
+def _ico_planes(raw: bytes):
+    """Every plane inside an .ico, measured the way the PNGs are measured.
+
+    Returns {(w, h): _ink_geometry(...)} or None when the bytes are not an icon at
+    all. Pillow reads an .ico as a multi-size container; each plane is extracted and
+    put through the same ink-geometry comparison, because an .ico is a raster and
+    two rasterisers do not agree byte for byte.
+    """
+    import io as _io
+    if Image is None:
+        return None
+    try:
+        with Image.open(_io.BytesIO(raw)) as ico:
+            sizes = list(ico.ico.sizes()) if hasattr(ico, "ico") else [ico.size]
+            planes = {}
+            for size in sizes:
+                frame = ico.ico.getimage(size) if hasattr(ico, "ico") else ico
+                buf = _io.BytesIO()
+                frame.convert("RGBA").save(buf, format="PNG")
+                planes[tuple(size)] = _ink_geometry(buf.getvalue())
+            return planes
+    except Exception:
+        return None
+
+
 def _structural_check(out: dict) -> list[str]:
     import json as _json
     problems: list[str] = []
@@ -796,6 +821,28 @@ def _structural_check(out: dict) -> list[str]:
             if strip(on_disk) != strip(data):
                 problems.append("differs (ignoring the per-file byte sizes, which a "
                                 "rasteriser changes): MANIFEST.json")
+        elif name.endswith(".ico"):
+            # The .ico fell through every branch above, so the only thing checked
+            # about it was that a file existed. Replacing it with 26 bytes of text
+            # left this reporting "21 asset files match the source". It is a
+            # container of PNG planes, so it gets the same rasteriser-tolerant
+            # comparison the PNGs get, plane by plane, plus its size list.
+            want_planes, got_planes = _ico_planes(data), _ico_planes(on_disk)
+            if want_planes is None or got_planes is None:
+                problems.append(f"{name}: could not be read as an icon container")
+            elif sorted(want_planes) != sorted(got_planes):
+                problems.append(f"{name}: holds sizes {sorted(got_planes)} on disk, "
+                                f"{sorted(want_planes)} from the marks")
+            else:
+                for size in sorted(want_planes):
+                    want, got = want_planes[size], got_planes[size]
+                    if (abs(want[2] - got[2]) > 0.01
+                            or want[3] is None or got[3] is None
+                            or max(abs(a - b) for a, b in zip(want[3], got[3])) > 0.02):
+                        problems.append(
+                            f"{name} at {size[0]}x{size[1]}: the artwork has moved — "
+                            f"ink coverage {got[2]} and box {got[3]} on disk against "
+                            f"{want[2]} and {want[3]} from the marks")
         elif name.endswith(".png"):
             want, got = _ink_geometry(data), _ink_geometry(on_disk)
             if want[:2] != got[:2]:

@@ -40,7 +40,7 @@ primitive.tokens.json rather than carrying a copy. Every other card paints with
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     ./.venv/bin/python 13_plugins/claude-design/build.py
     ./.venv/bin/python 13_plugins/claude-design/build.py --check
 """
@@ -869,10 +869,19 @@ def build() -> dict[str, bytes]:
 
     out["SKILL.md"] = skill_md(cards).encode("utf-8")
     out["readme.md"] = readme_md(cards, prim).encode("utf-8")
-    for name in ("LICENSE", "NOTICE"):
+    # All four, not two. The NOTICE copied in here is the repository's own: it is
+    # headed "FOUR LICENCES APPLY TO DIFFERENT PARTS OF THIS REPOSITORY" and sends
+    # the reader to LICENSE-DOCS.md for the writing's terms and TRADEMARKS.md for
+    # the identity detail. Neither travelled, and this is the one deliverable whose
+    # artefact lives on a remote service — so that NOTICE is the only licence
+    # statement a recipient gets, and it pointed at nothing. The `if exists` guard
+    # is gone too: a missing licence file must stop the build, not vanish quietly.
+    for name in ("LICENSE", "NOTICE", "LICENSE-DOCS.md", "TRADEMARKS.md"):
         src = ROOT / name
-        if src.exists():
-            out[name] = src.read_bytes()
+        if not src.exists():
+            raise SystemExit(f"FAILED — nothing written: {name} is missing from the "
+                             f"repository root, so the bundle cannot carry it")
+        out[name] = src.read_bytes()
 
     # Every var(--as-...) on every card must be a property styles.css defines.
     # A card that paints with a name the stylesheet does not have renders with the

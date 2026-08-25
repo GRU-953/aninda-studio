@@ -33,7 +33,7 @@ to dark can never choose light. The order is not cosmetic.
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     ./.venv/bin/python 07_tokens/emit_css.py
     ./.venv/bin/python 07_tokens/emit_css.py --check
 """

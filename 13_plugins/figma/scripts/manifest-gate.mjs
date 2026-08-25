@@ -30,6 +30,13 @@ export const PLACEHOLDER = 'REPLACE_ME__FIGMA_GENERATES_THIS';
 export const ADOPTED_FIELDS = ['id', 'api'];
 
 /**
+ * The one api version this repository has a source for.
+ * Recorded, with both sources and the date each was read, in
+ * scripts/figma-api-version.txt. adopt-headless.mjs writes the same value.
+ */
+export const KNOWN_API = '1.0.0';
+
+/**
  * Read manifest.json and report what is still a placeholder.
  * Returns { ok, missingFile, problems, manifest }.
  */
@@ -51,13 +58,39 @@ export function inspectManifest(pluginDir) {
     };
   }
   const problems = [];
+  // Each field must be a non-empty string. This used to accept anything that was
+  // not undefined, null or '' — so a number, an object, an array, a boolean and a
+  // whitespace-only string all passed, and the build then printed
+  // "adopted for DEVELOPMENT: id [object Object], api [object Object]" and exited
+  // 0. adopt-scaffold.mjs was already this strict; the two disagreed about what a
+  // valid manifest is, and the looser one was the one that ships.
   for (const field of ADOPTED_FIELDS) {
     const value = manifest[field];
     if (value === undefined || value === null || value === '') {
       problems.push(`"${field}" is missing.`);
-    } else if (typeof value === 'string' && value.includes('REPLACE_ME')) {
+    } else if (typeof value !== 'string') {
+      problems.push(
+        `"${field}" is ${Array.isArray(value) ? 'an array' : typeof value}, ` +
+        `not a string: ${JSON.stringify(value)}.`);
+    } else if (value.trim() === '') {
+      problems.push(`"${field}" is only whitespace.`);
+    } else if (value.includes('REPLACE_ME')) {
       problems.push(`"${field}" is still the placeholder ${JSON.stringify(value)}.`);
     }
+  }
+  // And the api is checked against the one value this repository records, rather
+  // than merely being non-empty. The gate's own failure text says "a wrong id or
+  // api version makes Figma refuse the plugin with an error that does not say why"
+  // — it could not act on that, because it never compared. scripts/figma-api-version.txt
+  // holds the value and both of its sources.
+  if (typeof manifest.api === 'string' && manifest.api.trim() !== ''
+      && !manifest.api.includes('REPLACE_ME') && manifest.api !== KNOWN_API) {
+    problems.push(
+      `"api" is ${JSON.stringify(manifest.api)}. The only value this repository ` +
+      `has a source for is ${JSON.stringify(KNOWN_API)} — Figma's manifest guide ` +
+      `and all 32 of its official sample manifests. See ` +
+      `scripts/figma-api-version.txt. If Figma has published a new version, adopt ` +
+      `it there first, with its source and the date it was read.`);
   }
   // Loadable and publishable are different states, and the gate used to know only
   // one of them. A slug id — the shape Figma's own samples use for unpublished

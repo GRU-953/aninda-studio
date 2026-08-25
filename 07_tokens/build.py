@@ -50,7 +50,7 @@ rather than being bent into a shape the specification does not have.
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     ./.venv/bin/python 07_tokens/build.py
     ./.venv/bin/python 07_tokens/build.py --check    # verify, write nothing
 """

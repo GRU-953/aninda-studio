@@ -58,7 +58,8 @@ names. `Aninda Mono` cannot, because the name exists nowhere else. Until 18 Augu
 step 1 below ended in a refusal.
 
 1. Open the Terminal app.
-2. Type `cd /Users/gru953/Claude/Cowork/Aninda_Studio` and press Return.
+2. Type `cd` followed by a space, drag the repository folder onto the Terminal
+   window, and press Return.
 3. Type `./.venv/bin/python 08_components/build.py` and press Return.
 4. That writes `08_components/fonts/AnindaMono-Regular.ttf`. It is the whole IBM
    Plex Mono Regular with its family name changed, not a subset — a subset would
@@ -80,10 +81,11 @@ tell me — I would rather fix the instructions than have you guess.
 ### 1. Build the plugin files
 
 1. Open the Terminal app.
-2. Type `cd /Users/gru953/Claude/Cowork/Aninda_Studio/13_plugins/figma` and press Return.
+2. Type `cd 13_plugins/figma` from the repository folder and press Return.
 3. Type `node build.mjs` and press Return.
-4. Read what it prints. The first time, it will stop and say the manifest has
-   not been adopted yet. That is expected. Go to step 2.
+4. Read what it prints. It ends with `manifest.json is adopted for
+   DEVELOPMENT: id aninda-studio-build-the-library, api 1.0.0.` and
+   `Build finished.` Skip to step 3 — step 2 is only needed to publish.
 
 ### 2. The plugin id — only needed to publish
 
@@ -153,9 +155,16 @@ development one.
 
 ### 7. Check the receipt against what was expected
 
-The **Expected** column comes from `RECEIPT-EXPECTED.json`, which `build.mjs`
-wrote from the same code the plugin ran. A row where the two numbers agree is
-shown in green; a row where they differ is shown in red and bold.
+The **Expected** column is what this run's own plan intended to make, and the
+other column is what it managed to make. A row where the two agree is shown in
+green; a row where they differ is shown in red and bold. That catches a step
+Figma refused — it does **not** catch the plugin drifting from the repository,
+because both numbers come from the one plan the plugin computed a moment earlier.
+
+To catch that, compare the receipt's SHA-256 and its counts against
+`RECEIPT-EXPECTED.json`, which `build.mjs` wrote from the same sources before you
+opened Figma. The plugin cannot read that file itself: its manifest declares no
+network access and the file is not bundled.
 
 Anything the plugin could not do appears under **Skipped, with the reason**.
 There is no silent omission: if a thing is not in the file, its reason is in
@@ -203,9 +212,9 @@ missing, the plugin says which and makes nothing.
 | Thing | How many | Notes |
 | --- | --- | --- |
 | Variable collections | 2 | `Primitives` with one mode, `Theme` with four. |
-| Variables | 127 | 110 primitives, 17 semantic roles. |
-| Variable aliases | 40 | Ten roles across four themes point at a primitive rather than repeating its value. |
-| Paint styles | 17 | One per semantic role, bound to the `Theme` variable so it follows the mode. |
+| Variables | 128 | 110 primitives, 18 semantic roles. |
+| Variable aliases | 44 | 11 roles across four themes point at a primitive rather than repeating its value. |
+| Paint styles | 18 | One per semantic role, bound to the `Theme` variable so it follows the mode. |
 | Text styles | 16 | Seven Latin, seven Bangla, two monospaced. |
 | Effect styles | 1 | The focus ring. |
 | Grid styles | 2 | A twelve-column layout and an 8 px square grid. |
@@ -224,9 +233,12 @@ Some things are deliberately not made, and the receipt says so each run:
   agreed to.
 - **No line height on the Latin and monospaced text styles.** The token set
   defines a line height for Bangla only, so Figma's automatic setting is used.
-- **No Bangla on 25 of the 30 card frames.** `BANGLA-STANDARD.md` holds a
-  verified string for the others and none for these. Writing new Bangla to fill
-  the space is not allowed, so the frame says so on its face.
+A fourth bullet used to sit here — "no Bangla on 25 of the 30 card frames". Every
+card now carries a verified Bangla name and subtitle, so the plan reports no such
+gap and no frame says so.
+
+The counts in the table above are checked against `RECEIPT-EXPECTED.json` every
+time `build.mjs` runs, so they cannot drift from the plugin again.
 
 ---
 
@@ -253,8 +265,13 @@ ran `adopt-scaffold.mjs` in this folder and not in a copy. The file it writes is
 
 ## For the record
 
-- `manifest.json` is not committed. It holds an id issued to one person, and a
-  committed one would let the build pass with a value nobody checked.
+- `manifest.json` **is** committed, since 25 August 2026. Its `api` is adopted
+  from Figma's own published value and its `id` is a development slug of the
+  shape Figma's official samples use for unpublished plugins, so the build
+  completes and the gate can be exercised on the file that ships. The gate reports
+  it as DEVELOPMENT rather than publishable: publishing needs a numeric id that
+  only Figma issues, and `scripts/adopt-scaffold.mjs` writes that one in.
+  `scripts/figma-api-version.txt` records both values and every source.
 - `dist/` **is** committed, because Figma loads the built JavaScript and asking
   the owner to run a build before opening Figma is one more place to get stuck.
   Continuous integration rebuilds it and fails if it differs from what is

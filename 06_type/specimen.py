@@ -43,7 +43,7 @@ Terms used below, explained once:
                 tighter when large. Most families do not have one.
 
 Run:
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     export PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers
     .venv/bin/python 06_type/specimen.py
 """
@@ -62,6 +62,24 @@ import sys
 # outside this project directory.
 # ---------------------------------------------------------------------------
 HERE = pathlib.Path(__file__).resolve().parent          # .../06_type
+ROOT = HERE.parent                                      # the repository root
+
+
+def rel(path) -> str:
+    """A path as this repository sees it, never as this Mac sees it.
+
+    The two data files this script writes carried 70 absolute paths into the
+    repository — every font's `path` and `licence_file`, and every crop — which
+    breaks the project's own rule that nothing generated may hold an absolute path,
+    and makes the committed output different on anyone else's machine. Stored
+    repo-relative and resolved through `absolute()` at the point of use.
+    """
+    return str(pathlib.Path(path).resolve().relative_to(ROOT))
+
+
+def absolute(rel_path: str) -> pathlib.Path:
+    """The inverse of rel(), for the places that must open the file."""
+    return ROOT / rel_path
 PROJECT = HERE.parent                                    # .../Aninda_Studio
 CANDIDATES = HERE / "candidates"
 SPECIMENS = HERE / "specimens"
@@ -287,11 +305,11 @@ def collect_font_facts() -> dict:
         cps = set(cmap.keys())
         facts[key] = {
             "key": key, "script": script, "human": human,
-            "file": path.name, "path": str(path),
+            "file": path.name, "path": rel(path),
             "family_name": name(f, 16) or name(f, 1),
             "version": name(f, 5), "designer": name(f, 9), "manufacturer": name(f, 8),
             "copyright": (name(f, 0) or "")[:400],
-            "licence": licence, "licence_file": str(ofl), "rfn": rfn,
+            "licence": licence, "licence_file": rel(ofl), "rfn": rfn,
             "upem": upem,
             "variable": bool(axes), "axes": axes, "named_instances": instances,
             "os2_capHeight": getattr(os2, "sCapHeight", None),
@@ -331,7 +349,7 @@ def face_css(facts: dict, keys: list[str] | None = None) -> str:
     out = []
     for key in (keys if keys is not None else list(facts)):
         fx = facts[key]
-        uri = pathlib.Path(fx["path"]).as_uri()
+        uri = absolute(fx["path"]).as_uri()
         wght = next((a for a in fx["axes"] if a["tag"] == "wght"), None)
         wdth = next((a for a in fx["axes"] if a["tag"] == "wdth"), None)
         w = f"{int(wght['min'])} {int(wght['max'])}" if wght else "400"
@@ -373,13 +391,13 @@ def shape_bangla(facts: dict) -> dict:
     for key, fx in facts.items():
         if fx["script"] != "bangla":
             continue
-        tt = TTFont(fx["path"], lazy=True)
+        tt = TTFont(str(absolute(fx["path"])), lazy=True)
         cmap, order = tt.getBestCmap(), tt.getGlyphOrder()
         dotted = order.index(cmap[DOTTED]) if DOTTED in cmap else None
         virama = order.index(cmap[VIRAMA]) if VIRAMA in cmap else None
         tt.close()
 
-        face = hb.Face(open(fx["path"], "rb").read())
+        face = hb.Face(absolute(fx["path"]).read_bytes())
         font = hb.Font(face)
 
         def run(text):
@@ -624,7 +642,7 @@ def matra_continuity(page, facts) -> dict:
             "matra_thickness_em": round(thick_em, 5),
             "matra_thickness_px_at_16": round(thick_em * 16, 3),
             "matra_thickness_px_at_11": round(thick_em * 11, 3),
-            "crop": str(out),
+            "crop": rel(out),
         }
     return results
 

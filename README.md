@@ -120,8 +120,12 @@ the ones above it, so the order is not interchangeable.
 Then the Figma plugin bundle, which is Node rather than Python:
 
 ```bash
-cd 13_plugins/figma && node build.mjs --code-only
+cd 13_plugins/figma && node build.mjs
 ```
+
+That step ends by checking the manifest, so what it writes is a bundle Figma will
+load. `--code-only` compiles the same artefacts and stops before that check; it is
+what continuous integration runs to compare `dist/` against what is committed.
 
 Three generators are deliberately not in that chain: `03_directions/build.py` — one-off exploration: it writes the three rejected colour directions, which are a record of a decision already taken and do not move again; `06_type/specimen.py` — one-off: the type specimen pages that fed the typeface decision; `06_type/review_bangla.py` — a review instrument, run when a Bangla reader is available, not part of the build.
 

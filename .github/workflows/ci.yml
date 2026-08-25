@@ -54,6 +54,11 @@ jobs:
           for f in 07_tokens/css/tokens.css; do
             grep -q "GENERATED" "$f" || { echo "::error::$f lost its header"; exit 1; }
           done
+      - name: No tracked file may carry an absolute home-directory path
+        # The rule was written down from the start and never measured. When it
+        # finally was, the tree held 86 of them — including 70 in two generated
+        # data files, which is the exact drift the rule exists to stop.
+        run: python scripts/check_no_absolute_paths.py
       - name: The English standard's blocklist is enforced
         # ENGLISH-STANDARD.md told the reader "every banned word and idiom above is
         # in a blocklist the checker enforces". The checker existed and no job ran
@@ -65,7 +70,7 @@ jobs:
         # which read this prose rather than writing their own.
         run: |
           fail=0
-          for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md                       00_sandbox/TOOLCHAIN.md 01_research 02_strategy                       09_guidebook/chapters 13_plugins/claude-code/README.md                       13_plugins/claude-code/skills 13_plugins/figma/README.md                       06_type/BANGLA-STANDARD.md 06_type/BANGLA-STRINGS.md                       06_type/SHORTLIST.md 06_type/RECOMMENDATION.md                       06_type/MEASUREMENTS.md 06_type/pairings.md ; do
+          for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md                       00_sandbox/TOOLCHAIN.md 01_research 02_strategy                       09_guidebook/chapters 13_plugins/claude-code/README.md                       13_plugins/claude-code/skills 13_plugins/figma/README.md 13_plugins/claude-design/PUSH-RECORD.md                       06_type/BANGLA-STANDARD.md 06_type/BANGLA-STRINGS.md                       06_type/SHORTLIST.md 06_type/RECOMMENDATION.md                       06_type/MEASUREMENTS.md 06_type/pairings.md ; do
             python 13_plugins/claude-code/skills/aninda-review/scripts/check.py "$path"               || { echo "::error::$path fails the English standard"; fail=1; }
           done
           exit $fail
@@ -116,6 +121,13 @@ jobs:
         run: python 07_tokens/emit_css.py
       - name: Nothing generated may differ from what was committed
         run: |
+          # `git add -N` first, every time. git diff compares TRACKED content, so a
+          # generator that starts emitting a NEW output file produces no diff at all
+          # and this gate passes green over output nobody committed. Several
+          # generators here write one file per input discovered by a glob, so that is
+          # a step away, not a hypothetical. --intent-to-add makes an untracked file
+          # visible to diff without staging its content.
+          git add -N -- 05_colour/generated 07_tokens/build 07_tokens/css
           git diff --exit-code 05_colour/generated 07_tokens/build 07_tokens/css \
             || { echo "::error::A generated file differs. Either a generator changed
                  without regenerating its output, or an output was hand-edited."; exit 1; }
@@ -152,7 +164,9 @@ jobs:
         # watchOS panels as square, unmasked masters long after the owner decided
         # on one rounded icon everywhere, and because no script wrote it this job
         # could not see the contradiction.
-        run: git diff --exit-code 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
+        run: |
+          git add -N -- 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
+          git diff --exit-code 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
       - name: The icon and social assets must match the marks
         # In THIS job, not `build`, because the check re-renders twenty rasters with
         # Playwright and only marks and render install Chromium. It first went into
@@ -229,10 +243,13 @@ jobs:
   # more place to get stuck. Committed build output drifts unless something
   # watches it, so this job rebuilds and diffs, exactly as the tokens job does.
   #
-  # build.mjs runs with --code-only here. That flag compiles the artefacts and
-  # stops before the manifest gate. It is not a way to ship an unadopted
-  # manifest — the manifest is not committed at all, because it holds a plugin
-  # id issued to one person, and CI has no way to obtain one.
+  # build.mjs runs twice here, for two different questions. --code-only compiles
+  # the artefacts and stops before the manifest gate, which is all the dist/ drift
+  # diff needs. The full build runs after it, because the manifest IS committed as
+  # of 25 August 2026: its api is adopted from Figma's own published value and its
+  # id is a development slug of the shape Figma's own samples use, so the gate can
+  # be exercised here on the file that ships. What CI still cannot obtain is a
+  # numeric, Figma-issued id, and the gate says so rather than implying otherwise.
   plugins:
     runs-on: ubuntu-latest
     needs: tokens
@@ -263,6 +280,8 @@ jobs:
         working-directory: 13_plugins/figma
       - name: Nothing built may differ from what was committed
         run: |
+          git add -N -- 13_plugins/figma/dist 13_plugins/figma/src/tokens.generated.ts \
+            13_plugins/figma/RECEIPT-EXPECTED.json
           git diff --exit-code 13_plugins/figma/dist \
             13_plugins/figma/src/tokens.generated.ts \
             13_plugins/figma/RECEIPT-EXPECTED.json \
@@ -291,7 +310,12 @@ jobs:
             echo "::error::The manifest gate let a placeholder through"; exit 1
           fi
           cp /tmp/manifest.committed.json manifest.json
-          git diff --exit-code 13_plugins/figma/manifest.json \
+          # Paths are relative to this step's working directory, which is
+          # 13_plugins/figma — the cd above. Written repo-root-relative, this line
+          # turned CI red with "fatal: ambiguous argument", while the restore it was
+          # checking had in fact worked. The `--` is what tells git the argument is a
+          # path and not a revision, so a missing file fails as a missing file.
+          git diff --exit-code -- manifest.json \
             || { echo "::error::the placeholder test did not restore the manifest"; exit 1; }
       - name: The Claude Design bundle must match the system
         # The only deliverable whose artefact lives on a remote service, so the
@@ -303,7 +327,9 @@ jobs:
       - name: The skill bundles must be reproducible
         run: python 13_plugins/claude-code/scripts/build_skills.py --prove
       - name: Nothing bundled may differ from what was committed
-        run: git diff --exit-code 13_plugins/claude-code/dist
+        run: |
+          git add -N -- 13_plugins/claude-code/dist
+          git diff --exit-code 13_plugins/claude-code/dist
 
   # 6 ── slowest, and last. Its failures are usually symptoms of jobs 1 to 5.
   render:

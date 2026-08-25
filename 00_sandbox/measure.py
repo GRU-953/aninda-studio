@@ -28,7 +28,7 @@ EXIT CODES
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers ./.venv/bin/python 00_sandbox/measure.py
 """
 

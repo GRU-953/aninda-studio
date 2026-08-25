@@ -58,7 +58,7 @@ to disappear behind an "ok" line and a successful exit.
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     export PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers
     ./.venv/bin/python 04_mark/build.py
 """

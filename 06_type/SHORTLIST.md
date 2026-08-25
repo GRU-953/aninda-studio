@@ -567,7 +567,7 @@ decides how much code fits on a line. **[rendered]**
 ## Reproducing every number here
 
 ```bash
-cd /Users/gru953/Claude/Cowork/Aninda_Studio
+# from the repository root
 export PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers
 .venv/bin/python 06_type/specimen.py
 ```

@@ -47,7 +47,7 @@ EXIT CODES
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     ./.venv/bin/python 05_colour/engine.py
     ./.venv/bin/python 05_colour/engine.py --only estuary
     ./.venv/bin/python 05_colour/engine.py --check     # verify, write nothing

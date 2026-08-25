@@ -1,5 +1,23 @@
 {
- "_generator": "verified by 9 read-only agents, 19 August 2026; written by scripts/findings.py",
+ "_generator": "verified by 9 read-only agents, 19 August 2026; a fourth pass and a fifth, adversarially verified by 14 agents, on 25 August 2026; written by scripts/findings.py",
+ "_passes": [
+  {
+   "date": "19 August 2026",
+   "covered": 64,
+   "already_fixed": 18,
+   "half_right": 12,
+   "by": "9 read-only agents",
+   "note": "What this pass FOUND, frozen. Some of these have been fixed since, and that must not change what the pass reported — recomputing it from today's statuses is how this sentence twice became false about a day that had already happened. `covered` is cross-checked against the entries below."
+  },
+  {
+   "date": "25 August 2026",
+   "covered": 42,
+   "already_fixed": 0,
+   "half_right": 0,
+   "by": "14 agents in an adversarial workflow — seven lenses, each finding re-run by an independent skeptic instructed to refute it",
+   "note": "Rounds 4 and 5. 38 entries raised here and 4 of the first pass's entries re-checked. Every entry raised here was fixed the same day, so its status is recorded as fixed rather than open."
+  }
+ ],
  "_preamble": "# Open findings — carried forward\n\n<!-- This file ships, so it is held to 02_strategy/ENGLISH-STANDARD.md like any\n other prose here — including the banned-word list. Four banned words arrived\n in it when the findings were copied in verbatim from the reviewers' own\n wording, and CI's lint job caught them. If you paste a finding in, reword it.\n A findings record that breaks the rule it records findings about is a poor\n advertisement for the rule. -->\n\nRound 1 of the convergence review raised 59 findings across six independent\nlenses, each adversarially verified before it counted. The blockers and majors\nwere fixed. These minors were judged not worth the change at the time, and are\nrecorded here rather than dropped, because an unwritten known fault becomes an\nunknown one within a week.\n\nEach is real and reproducible. None affects correctness of the design system's\noutput. If you disagree with a judgement, the finding is here to be picked up.\n",
  "findings": [
   {
@@ -130,11 +148,15 @@
    "body": "The commit's own reasoning was that a claim stale in a favourable direction is still stale. It was fixed in the two files whose numbers are generated and checked, and left in the flagship deliverable and in a script that now states it about itself while contradicting it. A reader of the guidebook gets the superseded scope, and the two documents now disagree on a coverage claim.",
    "verdict": {
     "id": "9",
-    "status": "still_open",
-    "evidence": "The correction commit is `b7acf0c 2026-08-18 Correct the rendering-coverage claim: the checks run on Ubuntu too`, touching only README.bn.md, README.md and scripts/readme.py (`git show b7acf0c --stat`). README.md:137 now reads `- **Rendering checks are Chromium only.** They run on macOS locally and on Ubuntu in CI`. The chapter was not updated: 09_guidebook/chapters/14-what-this-system-does-not-do.md:55 still reads `ring — comes from **headless Chromium on macOS**, at a device scale factor of 1`, and :117 still closes `measured, thoroughly documented, and tested by one person on one machine.` `grep -rln -i ubuntu 09_guidebook/chapters/` returns nothing. Both shipped builds carry it: `grep -c 'headless Chromium on macOS'` → 1 in Aninda-Studio-Guidebook.html and 1 in Aninda-Studio-Guidebook-print.html. The harness still prints it too: 08_components/check.py:488-489 `\"Any browser other than the pinned Chromium, and any platform other than \" \"macOS. Safari, Firefox and Windows high contrast were not run.\"`, and ci.yml runs `python 08_components/check.py` on `runs-on: ubuntu-latest`.",
-    "note": "Still true in both halves. The README says the checks run on macOS and on Ubuntu; the flagship guidebook says every rendered measurement comes from headless Chromium on macOS and that the system was tested on one machine; and the component harness prints \"any platform other than macOS\" as a blind spot while executing on Ubuntu. Two shipped surfaces disagree on the same fact, inside the chapter offered as the calibration for the whole book.",
+    "status": "stale",
+    "evidence": "`grep -rln -i ubuntu 09_guidebook/chapters/` → `09_guidebook/chapters/14-what-this-system-does-not-do.md`, where the evidence said it returned nothing. `grep -c 'headless Chromium on macOS' 09_guidebook/Aninda-Studio-Guidebook.html 09_guidebook/Aninda-Studio-Guidebook-print.html` → `0` and `0`, where the evidence said `1` and `1`. `grep -n 'any platform other than' 08_components/check.py` → one hit, line 489, inside a comment recording that the string was removed; the live line is derived from `platform.system()`.",
+    "note": "Fixed, and it was already fixed when the 19 August pass recorded it as open — the same correction is recorded under entry 17. Both halves are gone: the chapter names both operating systems, and the harness derives its blind-spot line from the platform it is running on.",
     "severity_now": "minor",
-    "cheap_fix": "Change chapter 14 to \"headless Chromium — on macOS locally and on Ubuntu in CI\", adjust the closing \"one machine\" sentence, and reduce the 08_components/check.py blind-spot string to the browser limit only."
+    "verified_on": "25 August 2026",
+    "passes": [
+     "19 August 2026",
+     "25 August 2026"
+    ]
    }
   },
   {
@@ -176,10 +198,15 @@
    "verdict": {
     "id": "12",
     "status": "partly_stale",
-    "evidence": "Push half: HEAD is `289533b The Claude Design push: a generated bundle, and the project is live`, stating \"The design system is now a project on claude.ai — 48 files, 18 preview cards\". Locally 13_plugins/claude-design/{build.py,dist} exists; its --check compares generated bytes against dist on disk and also fails on files not generated by the build (build.py, main), and it is both a CI step (\"The Claude Design bundle must match the system\") and a verify-all.sh step. Whether the remote project exists cannot be checked from here — that needs the claude.ai service. Naming half: `grep -rn -i 'claude design|claude-design' README.md README.bn.md 11_site/ 09_guidebook/Aninda-Studio-Guidebook.html` → no output; `grep -rln claude-design .` (excluding .git/.venv) → only 13_plugins/claude-design/{build.py,dist/SKILL.md,dist/styles.css,dist/readme.md}, scripts/verify-all.sh and .github/workflows/ci.yml. README.md:61 still reads `| \\`13_plugins/\\` | A Figma plugin and a Claude Code plugin |` (hard-coded at scripts/readme.py:316, Bangla twin at :467) while `ls 13_plugins` → `claude-code claude-design figma`. `git ls-files 14_delivery | wc -l` → `0`, and the only \"claude.ai\" string in the tree is a comment at build.py:10 — no project id, URL or push date is recorded anywhere.",
-    "note": "Half stale, half open. The local side moved from \"ready but unpushed\" to a generated, byte-diffed bundle with a real CI guard, and the owner's commit says the remote project is live, which I cannot verify here. What still reproduces is the second half: Claude Design is named in no reader-facing surface, and the one shipped sentence describing its directory undercounts it as \"A Figma plugin and a Claude Code plugin\". Nothing records which remote project was pushed to, so the guard proves the local dist is current and still cannot say whether the copy on claude.ai has fallen behind.",
+    "evidence": "Push half, now closed. `DesignSync list_projects` returns **Aninda Studio Design System**, owned, updated 2026-08-19T07:47:14Z. `DesignSync list_files` on it returned 48 paths; `find dist -type f` returns 48; sorted and compared with `comm`, neither side holds a path the other lacks. `DesignSync get_file readme.md` against `dist/readme.md` under `cmp`: identical byte for byte, sha256 4809caa13c81633088265745bb208a53cf40623a38f103d522a2835ca222c3dc on both sides. That is now written down in 13_plugins/claude-design/PUSH-RECORD.md, which also states the limit — one file was compared, not 48. Naming half, half closed. `grep -n '13_plugins' README.md README.bn.md` → `README.md:66 | \\u006013_plugins/\\u0060 | A Figma plugin, a Claude Code plugin, and the Claude Design bundle |` and its Bangla twin at README.bn.md:53; the wording changed in commit 66fc0f7, one commit before this register was last regenerated, and the register kept the stale claim anyway. Still true: `grep -c -i 'claude design' 11_site/index.html 09_guidebook/Aninda-Studio-Guidebook.html` → `0` and `0`.",
+    "note": "Two of its three claims are now false and one still reproduces. The push happened and the remote copy is current — measured today, not taken from the commit message. The README pair now names the bundle. What still reproduces is narrower than it was: the two surfaces a non-developer actually reads, the site and the guidebook, still do not mention that this deliverable exists.",
     "severity_now": "minor",
-    "cheap_fix": "Change the `13_plugins/` row in scripts/readme.py (both languages) to name all three plugins, and commit a short record of the push — project name or id, date, and bundle version — so remote drift is detectable by inspection."
+    "cheap_fix": "Name the Claude Design bundle where the guidebook and the site list what ships, or decide it is a developer surface that neither should carry and record that decision. Either closes this; leaving it undecided is what keeps it open.",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "19 August 2026",
+     "25 August 2026"
+    ]
    }
   },
   {
@@ -190,11 +217,15 @@
    "body": "The document's stated purpose is a traceable account of what this build depends on and what each dependency does. A pinned package with an invented job in it is the same class of error the project's own README warns about — a sentence a human wrote once that nobody re-reads. It also misleads anyone auditing the licence surface, since Jinja2's BSD-3-Clause is listed as in-use when no code path touches it.",
    "verdict": {
     "id": "13",
-    "status": "still_open",
-    "evidence": "`grep -n -i jinja 00_sandbox/TOOLCHAIN.md requirements.txt` → \"00_sandbox/TOOLCHAIN.md:39:| `Jinja2` | 3.1.6 | BSD-3-Clause | Templating, for building the guidebook and the component cards |\" and \"requirements.txt:1:Jinja2==3.1.6\".\n\n`grep -rn -iE \"import[[:space:]]+jinja|from[[:space:]]+jinja|jinja2\" --include=\"*.py\" --include=\"*.js\" --include=\"*.ts\" --include=\"*.mjs\" --exclude-dir=.venv --exclude-dir=node_modules .` → no output, \"EXIT=1\". Zero importers anywhere in the tree.\n\n`grep -nE \"^(import|from) \" 09_guidebook/build.py` → only stdlib: base64, html as html_mod, json, mimetypes, os, re, sys, pathlib. Same for 08_components/build.py: base64, html, io, json, re, sys, pathlib. f-string counts: 09_guidebook/build.py 261, 08_components/build.py 130.\n\n`grep -rlnE \"import (jinja2|mako|chevron|pystache)|Template\\(\" --include=\"*.py\" --exclude-dir=.venv .` → no output. No templating engine of any kind.\n\nThe package is really installed and really unused: `.venv/lib/python3.13/site-packages/jinja2` exists and `./.venv/bin/python -c \"import jinja2...\"` → \"jinja2 importable, version 3.1.6\".\n\n`git status --porcelain 00_sandbox/TOOLCHAIN.md` → empty (nothing fixed in the working tree either).",
-    "note": "Still true, and both halves reproduce exactly. TOOLCHAIN.md:39 attributes a job to Jinja2 that no code path performs — both named consumers (the guidebook build and the component cards) are pure stdlib plus f-strings, 261 and 130 of them respectively, and nothing in the repository imports jinja2 at all. In a file whose stated purpose is a traceable account of what the build depends on and what each dependency does, this is an invented dependency role, and it puts BSD-3-Clause on the in-use licence list for code that never runs.",
+    "status": "stale",
+    "evidence": "`grep -rn -iE 'import jinja|from jinja|jinja2' --include='*.py' --include='*.mjs'` → no output, before and after. `grep -c -i 'jinja\\|svgo' 00_sandbox/TOOLCHAIN.md` → `0`. requirements.txt went from 10 pinned packages to 9. 00_sandbox/package.json lost `svgo` and the lockfile was regenerated offline with `npm install --package-lock-only --offline`; `grep -c '\"svgo\"' 00_sandbox/package-lock.json` → `0`, and `npm ci --offline` on a copy still installs, 4 packages. `tsc` and the Figma build both still run.",
+    "note": "Fixed 25 August 2026, together with its Node twin. Jinja2 is no longer pinned, and TOOLCHAIN.md no longer gives it a job. The same sweep found `svgo` pinned in 00_sandbox/package.json with a documented job and no caller anywhere, so both were removed rather than one.",
     "severity_now": "minor",
-    "cheap_fix": "Delete the Jinja2 row from TOOLCHAIN.md:39 and the `Jinja2==3.1.6` line from requirements.txt, since nothing imports it."
+    "verified_on": "25 August 2026",
+    "passes": [
+     "19 August 2026",
+     "25 August 2026"
+    ]
    }
   },
   {
@@ -475,11 +506,15 @@
    "body": "This is the project's register of what is still wrong, and it makes a false statement about the repository it ships in — that superseded drafts are being published — while asserting that every entry is real and reproducible. A reader auditing the outstanding list will go looking for a path that does not exist, and finding one entry closed silently makes the other twenty-seven harder to trust. Item 12 of the same file is also labelled \"not a defect\", so the count of twenty-eight minors does not describe twenty-eight minors.",
    "verdict": {
     "id": "R2-4",
-    "status": "still_open",
-    "evidence": "`sed -n '73,78p' 01_research/OPEN-FINDINGS.md` still reads `### 10. Two superseded pre-decision drafts ship in the published repository, unlabelled, arguing against the decisions the system actually made` followed by the path `` `_reference/DRAFT-benchmark.html` `` and the sentence 'The directory is documented nowhere'. Against the tree: `ls 01_research/_reference` → `No such file or directory`; `ls _reference` → `No such file or directory`; `find . -name \"*_reference*\" -not -path \"./.git/*\" -not -path \"./.venv/*\"` returns nothing; `git ls-files | grep -i _reference` returns nothing; `.gitignore` line 40 is `_reference/`. `git log --oneline -- 01_research/OPEN-FINDINGS.md` shows the last five touches (db71259, 641f7a3, 30d3688, d5e4320, 02af5e7) and `git log -p` shows `+`_reference/DRAFT-benchmark.html`` added in 02af5e7 and never edited since. The file still opens with 'Each is real and reproducible.' (line 16) and line 340 still says 'twenty-eight minors are fixed', while item 12 (line 85) is still headed 'Outstanding, not a defect'.",
-    "note": "Untouched. The register still publishes as a real, reproducible fault a path that does not exist and is gitignored, under a blanket claim that every entry reproduces. The heading also says 'Two ... drafts' while naming one path.",
+    "status": "stale",
+    "evidence": "`grep -c '^### 10\\.' 01_research/OPEN-FINDINGS.md` → `0`; the heading format the evidence quotes does not exist. `grep -n 'twenty-eight minors' 01_research/OPEN-FINDINGS.md` → one hit, line 453, inside R2-4's own body. `sed -n '73,78p'` now prints the pypdfium2 entry. Entry 10 renders under \"Already fixed, kept as a record\".",
+    "note": "Fixed. The document it describes no longer exists in that form: OPEN-FINDINGS.md is generated from this data file, and the numbered-heading layout the evidence quotes was replaced by it. The _reference entry now renders as fixed, which is what R2-4 said was missing.",
     "severity_now": "minor",
-    "cheap_fix": "Rewrite finding 10 in place as closed — say the directory was removed and gitignored — rather than deleting it, and correct 'Two' to match the one path named."
+    "verified_on": "25 August 2026",
+    "passes": [
+     "19 August 2026",
+     "25 August 2026"
+    ]
    }
   },
   {
@@ -966,6 +1001,663 @@
     "note": "The apparatus now exists and is reachable: 38 distinct real URLs against 2 before, a generated 57-source appendix, and BENCHMARK.md embedded in the book. Per-sentence citation is not met — 68 of 76 external-authority sentences still carry no URL of their own.",
     "evidence": "Re-ran the audit on the rebuilt book. Distinct real URLs went from 2, both licence texts, to 38. A Sources appendix generated from 01_research/_data/external-sources.json lists all 57 sources across Apple, Google, standards and formats, and tooling, each with its URL and the date the source itself carried rather than the date it was read. BENCHMARK.md is now file 69 in the embedded kit, so a reader of the book alone can reach the record it cites — that was the specific defect, that the apparatus existed and was unreachable. The four target tokens now carry a URL and a read date in their own $description, so the figures a stranger consumes can be re-checked. What is NOT met is the literal reading: of 76 sentences naming an external authority and a number, 68 still carry no URL in the same sentence. Grading this a pass would be the kind of rounding-up this system exists to refuse.",
     "cheap_fix": ""
+   }
+  },
+  {
+   "id": "R4-1",
+   "round": 4,
+   "heading": "The manifest gate asserted that Figma publishes neither manifest value, and the false half of that sentence is what stopped the Figma build from ever completing",
+   "file": "13_plugins/figma/scripts/manifest-gate.mjs",
+   "body": "The gate's header, adopt-scaffold.mjs and the plugin README all said the same thing: `api` and `id` are both issued by the Figma desktop app and neither is published anywhere readable, so the manifest cannot be written without it. Because both values were treated as unobtainable, no manifest was ever committed, `node build.mjs` stopped at the gate every time it was run, and CI could only ever run `--code-only` — so the gate itself was never once exercised against a manifest that ships. A claim nobody re-checked blocked a deliverable for the life of the project.",
+   "verdict": {
+    "id": "R4-1",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "note": "Half of it was false. `api` is published, in two independent places, and adopting it from those is not a guess. `id` genuinely is not obtainable headlessly — but Figma's own samples show an unpublished plugin does not need a numeric one. Fixed 25 August 2026: the manifest is committed, the gate distinguishes a publishable manifest from a development one instead of calling both adopted, and the full build is a CI gate for the first time.",
+    "evidence": "Figma's manifest guide documents the `api` field and shows `1.0.0` (https://developers.figma.com/docs/plugins/manifest, read 19 August 2026). Sweeping every manifest.json on `main` in figma/plugin-samples: 32 of 32 declare exactly `\"api\": \"1.0.0\"`, with no other value anywhere in the repository. For `id`, the same sweep shows unpublished samples shipping readable slugs rather than numbers — png-crop, bar-chart-sample, pie-chart-sample, document-statistics-sample. Both sources and their read dates are recorded in 13_plugins/figma/scripts/figma-api-version.txt. `cd 13_plugins/figma && node build.mjs` now ends `manifest.json is adopted for DEVELOPMENT: id aninda-studio-build-the-library, api 1.0.0.` and exits 0."
+   }
+  },
+  {
+   "id": "R4-2",
+   "round": 4,
+   "heading": "CI's placeholder-manifest test ended in `rm -f manifest.json`, which was harmless only for as long as no manifest was committed",
+   "file": ".github/workflows/ci.yml",
+   "body": "The step writes a placeholder over manifest.json to prove the gate refuses it, then cleaned up by deleting the file. That was safe while the manifest was untracked. The moment a real manifest was committed, the same step would delete it out of the checkout — a test destroying the artefact it exists to protect, in the job that is supposed to prove the artefact is sound.",
+   "verdict": {
+    "id": "R4-2",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "note": "Caught by the new full-build gate the same day the manifest was first committed, before either reached main. Fixed 25 August 2026: the step copies the committed manifest aside, restores it, and then runs `git diff --exit-code` on it so a restore that silently fails is itself a failure rather than a quietly damaged checkout.",
+    "evidence": "The step now reads `cp manifest.json /tmp/manifest.committed.json` … `cp /tmp/manifest.committed.json manifest.json` … `git diff --exit-code -- manifest.json` (relative to the step's working directory, which is 13_plugins/figma; the repo-root form is the bug R4-9 records). Proved locally by running the equivalent block with the manifest left overwritten: it printed `FAILED — manifest.json was not restored` and set the failure flag; with the restore in place it prints `ok` and `git diff --quiet 13_plugins/figma/manifest.json` returns 0."
+   }
+  },
+  {
+   "id": "R4-3",
+   "round": 4,
+   "heading": "Two gates in verify-all.sh ran a generator with `|| true`, so a build that refused to run printed ok while the same refusal fails the job in CI",
+   "file": "scripts/verify-all.sh",
+   "body": "Both gates work by rebuilding and then diffing against what is committed. With the build's exit code discarded, a build that died wrote nothing, the committed files were therefore unchanged, the diff found nothing, and the gate reported ok. CI runs the same builds as steps of their own, where a non-zero exit fails the job. This file exists precisely so a local pass means what a green run means; a local gate that cannot fail where CI can teaches you to trust a pass CI will not give you.",
+   "verdict": {
+    "id": "R4-3",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "note": "Fixed 25 August 2026. Both now test the build's exit status first and report the refusal, then diff. The mark gate three lines above them was believed to be the model, and was not: it reported the refusal and then ran the diff anyway, printing ok on the next line. It was fixed the same day — see R5-21.",
+    "evidence": "`grep -n '|| true' scripts/verify-all.sh` returned lines 123 and 153 — the Figma bundle build and the claude-code skill bundle build. Proved the new branch fires by replacing 13_plugins/figma/build.mjs with `process.exit(3);` and running the gate: `figma plugin build is current FAILED — the figma build refused to run`, failure flag 1. build.mjs restored and `git diff --quiet 13_plugins/figma/build.mjs` returns 0. `grep -c '^[^#]*|| true' scripts/verify-all.sh` now returns 0 — a plain `grep -c '|| true'` returns 2, both of them prose in comments explaining this very fix, which is why the quoted command discriminates code from comment."
+   }
+  },
+  {
+   "id": "R4-4",
+   "round": 4,
+   "heading": "verify-all.sh overwrote the committed manifest to test the gate and put it back without ever checking that the restore worked",
+   "file": "scripts/verify-all.sh",
+   "body": "The local placeholder test does what the CI one does — write a placeholder over a committed file, prove the build refuses it, copy the original back — but CI then diffs the file and this did not. A restore nobody checks is how a working tree quietly ends up holding a placeholder, and the next commit ships it.",
+   "verdict": {
+    "id": "R4-4",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "note": "Fixed 25 August 2026: a gate of its own, `the placeholder test put the manifest back`, now diffs the file immediately after the restore, matching CI.",
+    "evidence": "Proved it fires by leaving the placeholder in place and running the new block: `the placeholder test put the manifest back  FAILED — manifest.json was not restored`, failure flag 1. After restoring, the same block prints ok and `git diff --quiet 13_plugins/figma/manifest.json` returns 0."
+   }
+  },
+  {
+   "id": "R4-5",
+   "round": 4,
+   "heading": "The CI job's own comment said the Figma manifest is not committed, three lines above the steps that check the committed manifest",
+   "file": ".github/workflows/ci.yml",
+   "body": "The comment explained why `--code-only` was the only build CI could run: the manifest is not committed at all, because it holds an id issued to one person and CI has no way to obtain one. It was true when written. It stopped being true in the same commit that added two steps directly beneath it which read that very file.",
+   "verdict": {
+    "id": "R4-5",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "note": "Fixed 25 August 2026. The comment now says why the build runs twice, states that the manifest is committed and since when, and keeps the part that is still true: CI cannot obtain a numeric Figma-issued id, and the gate says so rather than implying otherwise.",
+    "evidence": "`grep -n 'the manifest is not committed' .github/workflows/ci.yml` now returns nothing. `sed -n '232,240p' .github/workflows/ci.yml` shows the replacement, and the file still parses as YAML."
+   }
+  },
+  {
+   "id": "R4-6",
+   "round": 4,
+   "heading": "The README told the reader to build the Figma plugin with `--code-only`, the one flag whose own build says its output will not load in Figma",
+   "file": "README.md",
+   "body": "Under \"Rebuild everything\", the single Node command given to a reader was `node build.mjs --code-only`. build.mjs's own header says the output of `--code-only` will not load in Figma. So the documented way to build the plugin produced a bundle that could not be used, and nothing on the page said so. It was written when the full build could not complete at all, and was never revisited once it could.",
+   "verdict": {
+    "id": "R4-6",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "note": "Fixed 25 August 2026 in scripts/readme.py, which generates both READMEs. The reader is now given the full build, with one line saying what the flag is for and who runs it.",
+    "evidence": "`grep -n 'code-only' README.md` → no match in the rebuild block; the block now reads `cd 13_plugins/figma && node build.mjs`, followed by a sentence explaining that `--code-only` is what continuous integration runs to compare dist/ against what is committed. Regenerated with `./.venv/bin/python scripts/readme.py`; `--check` passes."
+   }
+  },
+  {
+   "id": "R4-7",
+   "round": 4,
+   "heading": "The guidebook told its reader to `cd` into a directory that exists on exactly one Mac in the world",
+   "file": "09_guidebook/chapters/12-applying-it.md",
+   "body": "Under \"Rebuilding this book\", the shipped guidebook opened its command block with `cd /Users/gru953/Claude/Cowork/Aninda_Studio` — the author's home directory, in a book published for anyone. The sibling block twenty lines above it, for the component harness, correctly assumes the repository root and says no such thing, so the book contradicted itself on the same page. It also put a machine-specific absolute path into a generated artefact, which this project's own rule forbids.",
+   "verdict": {
+    "id": "R4-7",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "note": "Fixed 25 August 2026 in the source chapter, which is where it was authored — the generator was copying it faithfully. The block now says \"From the repository root, as with every command in this book\", matching its neighbour.",
+    "evidence": "`grep -c '/Users/' 09_guidebook/Aninda-Studio-Guidebook.html` → `1` before, `0` after; the one hit was line 2409, traced to 09_guidebook/chapters/12-applying-it.md:132 with `git grep -n '/Users/gru953' -- 09_guidebook/chapters`. Book and PDF regenerated; the chapters still pass the English standard, and `09_guidebook/build.py --check` and the PDF-versus-book check both pass."
+   }
+  },
+  {
+   "id": "R4-8",
+   "round": 4,
+   "heading": "The English standard's own gate printed a count it had typed: 17 paths, for a list of 18",
+   "file": "scripts/verify-all.sh",
+   "body": "The gate loops over the authored English prose and then prints how many paths it covered. The number was a literal in the printf, and the list beneath it had grown to eighteen entries. It is a small number to be wrong about, and it is wrong in the one place this project claims never to be: a figure typed rather than counted, printed as though it had been measured.",
+   "verdict": {
+    "id": "R4-8",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "note": "Fixed 25 August 2026. The loop counts what it visits and prints that. Caught while adding a nineteenth path — the Claude Design push record, which is authored English prose and was not being held to the standard that governs authored English prose. Both the CI list and the local list now hold it, in the same order.",
+    "evidence": "Counting the loop body by hand gave 18 against a printed 17. The gate now prints `english standard: 19 paths` for 19 entries. `./.venv/bin/python 13_plugins/claude-code/skills/aninda-review/scripts/check.py 13_plugins/claude-design/PUSH-RECORD.md` → `FAILURES (0)`, exit 0. `scripts/check_gates.py` still reports that every CI gate appears in verify-all.sh."
+   }
+  },
+  {
+   "id": "R4-9",
+   "round": 4,
+   "heading": "The guard added to stop CI destroying the manifest was itself broken, and turned CI red on the commit that introduced it",
+   "file": ".github/workflows/ci.yml",
+   "body": "The placeholder test now saves the committed manifest, overwrites it, proves the gate refuses it, and restores it. The line added to prove the restore worked read `git diff --exit-code 13_plugins/figma/manifest.json` — a repo-root path, in a step whose working directory is 13_plugins/figma, because the step begins `cd 13_plugins/figma`. Git could not find that path from there and said `fatal: ambiguous argument`, so the step failed and reported that the restore had not happened. The restore had happened. The check was wrong about the thing it was checking, which is the worst way for a guard to fail: it accuses the code it is watching.",
+   "verdict": {
+    "id": "R4-9",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "note": "Found by CI, not by the local mirror of the same gate — the local one runs from the repository root, where the path resolves, so it passed. Fixed the same day: the path is now relative to the step's own working directory and carries `--`, which tells git the argument is a path rather than a revision, so a missing file fails as a missing file instead of as an ambiguous argument.",
+    "evidence": "Run 32863139436, job `plugins`, step `A placeholder manifest must stop the build`: `fatal: ambiguous argument '13_plugins/figma/manifest.json': unknown revision or path not in the working tree` followed by `::error::the placeholder test did not restore the manifest`. Every other job in that run passed. Reproduced and fixed locally by running the step verbatim from inside 13_plugins/figma: with `git diff --exit-code -- manifest.json` it prints that the gate refused the placeholder and the restore was proved, exit 0. Negative control in the same directory: leaving the placeholder in place makes the check exit non-zero, with no `ambiguous argument`. Auditing all five `git diff` invocations in ci.yml — `grep -n 'git diff'` returns six lines and the first is prose in a comment against the working directory each runs in, this was the only one inside a `cd`."
+   }
+  },
+  {
+   "id": "R5-1",
+   "round": 5,
+   "heading": "The guard that proves CI and the local script hold the same gates read only the first line of each CI step, so three real gates were exempt from it",
+   "file": "scripts/check_gates.py",
+   "body": "`ci_commands()` captured the step body with `(?P<body>.*)$` under `re.M`, and `.` does not cross a newline — so a multi-line `run: |` block collapsed to its first line. Three gates open with `cd`, `cd ` was in the SETUP list, and `main()` dropped them. They were the npm resolve check and both manifest gates: the two newest, added on 19 and 25 August to close exactly the class of bug this file exists to catch. Deleting any of the three from verify-all.sh still printed \"all 32 CI gates appear in scripts/verify-all.sh\", exit 0.",
+   "verdict": {
+    "id": "R5-1",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. The parser takes the whole block — every line indented deeper than the `run:` key — and a step counts as setup only when EVERY line in it is setup, tested line by line. `cd ` is out of SETUP entirely, with a note saying why. Where a gate's command names a file several gates name, the step is keyed by its own name instead, because a substring test on `build.mjs` passes even when the specific gate is gone.",
+    "evidence": "Before: 32 gates compared, and deleting the full-build gate, the placeholder gate or the npm gate from a copy of verify-all.sh left the guard printing a clean pass, exit 0, each time. After: 36 gates compared, and each of those three deletions produces `1 of 36 CI gates are not in scripts/verify-all.sh`, exit 1. Enumerating the skips now shows only the six genuine installs. The change also exposed a real gap it had been hiding — see R5-2's sibling, R5-20."
+   }
+  },
+  {
+   "id": "R5-2",
+   "round": 5,
+   "heading": "Both publishable packages shipped the Apache-2.0 appendix boilerplate as their LICENSE, not a copy of the licence",
+   "file": "12_packages/npm/LICENSE",
+   "body": "Apache-2.0 section 4(a) requires giving each recipient \"a copy of this License\". Both LICENSE files were 751 bytes: the \"APPENDIX: How to apply the Apache License to your work\" note, which is instructions for an author, ending at \"See the License for the specific language governing permissions and limitations under the License.\" Neither carried a single term. Both packages declare `\"license\": \"Apache-2.0\"` and list LICENSE among their shipped files, and every other bundle in this tree ships the full text.",
+   "verdict": {
+    "id": "R5-2",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. Both are now the repository's own LICENSE, read at build time rather than retyped, so there is one copy to keep right; and the build refuses to run if that file does not hold the Apache-2.0 terms.",
+    "evidence": "`wc -c LICENSE 12_packages/npm/LICENSE 12_packages/python/LICENSE` → `11358`, `751`, `751` before; `11358`, `11358`, `11358` after. `grep -c 'TERMS AND CONDITIONS'` → `1`, `0`, `0` before; `1`, `2`, `2` after."
+   }
+  },
+  {
+   "id": "R5-3",
+   "round": 5,
+   "heading": "The package build's --check compared neither LICENSE and never noticed a file the build did not write",
+   "file": "12_packages/build.py",
+   "body": "`--check` walks only the `files` dict that `build()` returns. Both LICENSE files were written afterwards, in the non-check branch, so a hand-edited, replaced or deleted package LICENSE passed CI's drift gate — the sibling NOTICE files were in the dict and did fail, which shows the exclusion was specific. There was also no sweep in the other direction: a file added to a published package passed, where 13_plugins/claude-design/build.py has swept for extras from the start.",
+   "verdict": {
+    "id": "R5-3",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026 alongside R5-2. Both licences are in the dict, so the write path and the check path see one set, and --check now also fails on any file in either package that the build did not generate.",
+    "evidence": "On a copy: replacing 12_packages/npm/LICENSE with \"All rights reserved.\" gave `--check: both packages match the source. Nothing written.` exit 0 before, and `--check: 12_packages/npm/LICENSE differs from the build` exit 1 after. Adding `sneaky-extra.json` to the package gave exit 0 before and `--check: 12_packages/npm/sneaky-extra.json is in the package and is not generated by this build` exit 1 after. Baseline: `39 files`, exit 0."
+   }
+  },
+  {
+   "id": "R5-4",
+   "round": 5,
+   "heading": "The asset check never compared favicon.ico, the one binary it cannot regenerate and diff",
+   "file": "10_assets/build.py",
+   "body": "`_structural_check` branched on `.svg`, then `MANIFEST.json`, then `.png`. `favicon.ico` matched none of them, so the only thing ever checked about it was that a file existed. It is a published asset with no drift guard anywhere in CI or the local script.",
+   "verdict": {
+    "id": "R5-4",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. An `.ico` branch reads the container with Pillow and compares its size list, then puts every plane through the same ink-geometry comparison the PNGs get — rasteriser-tolerant, because two rasterisers do not agree byte for byte.",
+    "evidence": "On a copy: replacing favicon.ico with 26 bytes of text gave `--check: 21 asset files match the source.` exit 0 before, and `favicon.ico: could not be read as an icon container` exit 1 after. Stronger control — a structurally VALID .ico holding a red circle at the same three sizes — also fails now, per plane: `favicon.ico at 16x16: the artwork has moved — ink coverage 0.707 ... against 0.32`, and likewise at 32 and 48. Baseline unchanged, exit 0."
+   }
+  },
+  {
+   "id": "R5-5",
+   "round": 5,
+   "heading": "The Bangla cross-check degraded silently to nothing when its regex stopped matching, and no floor caught it",
+   "file": "13_plugins/claude-code/scripts/check_plugin.py",
+   "body": "`check_bangla_agreement` parses 06_type/review_bangla.py with a regex over its STRINGS tuples, then compares intersections only — `if key in from_json`. Nothing asserted a minimum, so a purely cosmetic re-quoting of those literals emptied the parse and a real gloss drift then passed. The count was printed and never gated, which is the shape this project has now found four times.",
+   "verdict": {
+    "id": "R5-5",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. The count is measured against the id literals the file declares, not typed, and a parse that falls short by more than two reports that the comparison did not really run.",
+    "evidence": "On a copy, inserting a comment between the id and the English string — valid Python, purely cosmetic — took the parse from 23 entries to 0. Before: exit 0, `WRONG (0) Nothing.` After: exit 1, `only 0 strings were parsed out of 06_type/review_bangla.py and it declares about 24 — the parse broke, so this comparison did not really run`. Baseline unchanged: 23 parsed, exit 0."
+   }
+  },
+  {
+   "id": "R5-6",
+   "round": 5,
+   "heading": "The guidebook said its claims rest on 57 sources; four of the 57 were Markdown table headers, and the book printed them as sources",
+   "file": "09_guidebook/build.py",
+   "body": "01_research/_data/external-sources.json was extracted from BENCHMARK.md section 9 and took the `| Source | URL | Date on the source |` header line of each of its four tables as a source. So the Sources appendix said \"one of the 57 sources below\" over 53 real ones, each per-authority caption was one too many, and the book rendered four table BODY rows whose URL was the word URL.",
+   "verdict": {
+    "id": "R5-6",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. The four rows are out of the data, and `block_sources()` now refuses to build at all if one reappears — a header row here means the extractor is wrong, which is worth stopping for rather than filtering away.",
+    "evidence": "`len(sources)` 57 → 53; header rows 4 → 0. Per authority now Apple 16, Google 12, Standards and formats 8, Tooling and other design systems 17 = 53, which matches counting the data rows in BENCHMARK.md by hand. The book now reads \"rests on one of the 53 sources\", and `grep -o 'Date on the source' ... | wc -l` → 4, the four real `<th>` headers, where it was 8."
+   }
+  },
+  {
+   "id": "R5-7",
+   "round": 5,
+   "heading": "The Figma plugin README disagreed with the generated receipt beside it on four counts",
+   "file": "13_plugins/figma/README.md",
+   "body": "The \"What gets made\" table stated 127 variables (\"110 primitives, 17 semantic roles\"), 40 aliases and 17 paint styles. RECEIPT-EXPECTED.json, written by build.mjs from the same plan code the plugin runs, holds 128, 18, 44 and 18. The numbers changed in commit 641f7a3 and the README was not updated, so the document telling the owner what to expect disagreed with the file it tells them to compare against.",
+   "verdict": {
+    "id": "R5-7",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026: the four rows are taken from the receipt.",
+    "evidence": "`RECEIPT-EXPECTED.json['expected']` → `variables 128, primitiveVariables 110, themeVariables 18, variableAliases 44, paintStyles 18`. The README rows now read 128 (\"110 primitives, 18 semantic roles\"), 44 (\"11 roles across four themes\") and 18."
+   }
+  },
+  {
+   "id": "R5-8",
+   "round": 5,
+   "heading": "The Figma README told a first-time reader the build would stop, and recorded that the manifest is not committed — both untrue since the day before",
+   "file": "13_plugins/figma/README.md",
+   "body": "Step 1.4 said \"The first time, it will stop and say the manifest has not been adopted yet. That is expected. Go to step 2.\" The \"For the record\" section said \"`manifest.json` is not committed.\" The manifest was committed in 06793e5 and the gate passes, so the build finishes and the reader was being sent to a step they do not need — while CI's placeholder test depends on the file being tracked.",
+   "verdict": {
+    "id": "R5-8",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. Step 1.4 states what the build actually prints and sends the reader on; the record states that the manifest is committed, why, and what still requires a Figma-issued id.",
+    "evidence": "`git ls-files 13_plugins/figma/manifest.json` → tracked, added in 06793e5. `inspectManifest('.')` → `{ok: true, problems: [], publishable: false}`, so `node build.mjs` reaches \"Build finished.\" `grep -c 'is not committed' 13_plugins/figma/README.md` → 0."
+   }
+  },
+  {
+   "id": "R5-9",
+   "round": 5,
+   "heading": "The README credited the receipt's Expected column to a file the plugin cannot read, so it claimed to catch drift it structurally cannot catch",
+   "file": "13_plugins/figma/README.md",
+   "body": "Step 7 said the Expected column \"comes from RECEIPT-EXPECTED.json, which build.mjs wrote from the same code the plugin ran\". The plugin never reads that file: both columns come from one in-plugin `buildPlan()` call, so the comparison is self-referential. The manifest declares no network access and the file is not bundled, so it could not read it even in principle.",
+   "verdict": {
+    "id": "R5-9",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. The README now says what the table compares — what this run intended against what it managed — and tells the owner to compare the printed SHA-256 and counts against RECEIPT-EXPECTED.json by hand, which is what that file's own comment describes.",
+    "evidence": "`grep -c 'RECEIPT-EXPECTED' 13_plugins/figma/dist/code.js dist/ui.html src/ui.html` → `0`, `0`, `0`. `src/code.ts:1383` sets `expected: activePlan.totals`; `src/ui.html:274` reads `expected = message.expected`."
+   }
+  },
+  {
+   "id": "R5-10",
+   "round": 5,
+   "heading": "The README listed a Bangla gap the plugin no longer reports",
+   "file": "13_plugins/figma/README.md",
+   "body": "Under \"deliberately not made, and the receipt says so each run\" it listed \"No Bangla on 25 of the 30 card frames\". Every card now carries a verified Bangla name and subtitle, so plan.ts pushes no such gap and no frame says so — the README described a gap that had closed.",
+   "verdict": {
+    "id": "R5-10",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026: the bullet is replaced by a sentence saying the gap closed and what the receipt does still report.",
+    "evidence": "`08_components/_cards.json` → 30 cards, 0 missing `name_bn`, 0 missing `subtitle_bn`. `RECEIPT-EXPECTED.json['knownGaps']` → a single entry, about line height. `src/plan.ts:746` pushes the Bangla gap only when a count is above zero, and both are zero."
+   }
+  },
+  {
+   "id": "R5-11",
+   "round": 5,
+   "heading": "The manifest gate accepted any non-empty value for id and api — the exact thing its own failure text says it exists to prevent",
+   "file": "13_plugins/figma/scripts/manifest-gate.mjs",
+   "body": "The gate rejected only undefined, null, '' and a string containing REPLACE_ME. Everything else passed: `\"api\": \"2.0.0\"`, a number, an object, an array, a boolean, a whitespace-only id. The build then printed `adopted for DEVELOPMENT: id [object Object], api [object Object]` and exited 0, under a failure message that reads \"A wrong id or api version makes Figma refuse the plugin with an error that does not say why\". adopt-scaffold.mjs was already stricter, so the two disagreed about what a valid manifest is, and the looser one was the one that ships.",
+   "verdict": {
+    "id": "R5-11",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. Each field must be a non-empty trimmed string, and the api is compared against the single value this repository has a source for, naming scripts/figma-api-version.txt in the failure so the next version is adopted there first.",
+    "evidence": "Against the real gate, eleven shapes: both good ones accepted (the committed slug, and a numeric Figma id), and all nine bad ones refused with a specific message — `\"api\" is \"2.0.0\". The only value this repository has a source for is \"1.0.0\"`, `\"api\" is number, not a string: 1`, `\"id\" is an array, not a string: [\"x\"]`, `\"id\" is only whitespace`, and so on. Before the change, six of those nine were ACCEPTED."
+   }
+  },
+  {
+   "id": "R5-12",
+   "round": 5,
+   "heading": "The plugin bundle was not a pure function of its inputs: esbuild wrote the caller's working directory into it",
+   "file": "13_plugins/figma/build.mjs",
+   "body": "build.mjs's header claims \"Every artefact is a pure function of its inputs, so a rebuild that changes nothing produces a byte-identical file and the CI diff means something.\" No `absWorkingDir` was passed, so esbuild wrote each module's path relative to wherever the build was invoked. The same sources built from the repository root produced a dist/code.js differing from the committed one in three lines — and build.mjs resolves all its inputs from `import.meta.url`, so running it from the root is a natural thing to do.",
+   "verdict": {
+    "id": "R5-12",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026: both esbuild calls pin `absWorkingDir` to the plugin directory.",
+    "evidence": "sha256 of dist/code.js built from 13_plugins/figma and from the repository root: `d4b5afd0316e99d0` both, identical, and identical to what is committed. Before, the two differed (275254 against 275203 bytes) in three module-path comment lines."
+   }
+  },
+  {
+   "id": "R5-13",
+   "round": 5,
+   "heading": "build.mjs's header said the --code-only output will not load in Figma, which stopped being true when the manifest was committed",
+   "file": "13_plugins/figma/build.mjs",
+   "body": "The comment justified the flag with \"It is not a way to ship an unadopted manifest — the output of --code-only will not load in Figma either.\" With a manifest committed and adopted, a dist/ built by --code-only sits beside it and loads through Import plugin from manifest. What is still true is narrower: --code-only skips the gate, so it proves nothing about the manifest.",
+   "verdict": {
+    "id": "R5-13",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026, to the narrower true statement.",
+    "evidence": "`git ls-files 13_plugins/figma/manifest.json` → tracked; `inspectManifest(...).ok` → true. The header now says only a full `node build.mjs` checks the manifest."
+   }
+  },
+  {
+   "id": "R5-14",
+   "round": 5,
+   "heading": "The plugin README's proof sentence counted 17 roles where there are 18, and claimed a pass over a space where 196 of 504 pairings are refused",
+   "file": "13_plugins/claude-code/README.md",
+   "body": "\"every one of the 17 × 7 × 4 role-and-ground pairings passes, so refusal 6 cannot fire on a bad measurement today. That is the proof the token set is sound.\" Running the checker's own code: 18 roles, 7 grounds, 4 themes = 504, of which 308 pass and 196 are refused. The sentence offered as proof was arithmetically wrong about the space and wrong about the result.",
+   "verdict": {
+    "id": "R5-14",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026 to the pairings the checker actually judges, with the reason the rest are outside the claim rather than inside it and failing.",
+    "evidence": "Importing asset.py and running check_ground over every combination: all roles → 504 total, 308 pass, 196 refused. The judged set — seven TEXT_ROLES plus three NON_TEXT_ROLES — → 280 total, 280 pass, 0 refused. The README now says 10 × 7 × 4 = 280 and explains that a surface on a surface is not a contrast pairing."
+   }
+  },
+  {
+   "id": "R5-15",
+   "round": 5,
+   "heading": "The plugin README said the checker ends every run with nine things it cannot see; there are ten",
+   "file": "13_plugins/claude-code/README.md",
+   "body": "\"It ends every run with what it cannot see — nine items\". BLIND_SPOTS holds ten. The list is the part the README tells the reader to read out, so undercounting it understates what the check does not cover.",
+   "verdict": {
+    "id": "R5-15",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026.",
+    "evidence": "`ast.parse` over check.py, counting the elements of the BLIND_SPOTS assignment → `10`. README line 117 now reads ten."
+   }
+  },
+  {
+   "id": "R5-16",
+   "round": 5,
+   "heading": "The type comparison said seven pairings while documenting eight, and ranked one of them wrongly",
+   "file": "06_type/pairings.md",
+   "body": "Line 4 named specimens 01 to 07, line 8 said \"Seven pairings\", and the summary heading said \"all seven measured\" — while sections 01 to 08 are all present, `ls 06_type/specimens` returns 8, and measurements.json holds 8 ratio sets. The eighth is the pairing the system actually ships. Separately, pairing 07 was called \"third-best of the seven\" at body size; sorting the file's own bolded figures puts it second, and it was second under seven as well.",
+   "verdict": {
+    "id": "R5-16",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026: six statements now match the eight the file documents, and the ranking claim is stated as measured. Two neighbouring claims were re-derived rather than assumed — pairing 01 still needs the least correction of all eight, and pairing 06 is still the most frictionless, being the only flat one whose three families are all free of a Reserved Font Name.",
+    "evidence": "Body-size multipliers, best first: 01 0.872, 07 0.840, 06 0.831, 02 0.830, 04 0.818, 08 0.816, 05 0.757, 03 0.708 — so 07 is second. Reserved Font Names from font_facts.json: pairing 06 → none on any of the three; pairing 08 → `Plex` on IBM Plex Mono. `06_type/RECOMMENDATION.md` already said 8 pairings and 8 rendered pages, so the two documents had disagreed."
+   }
+  },
+  {
+   "id": "R5-17",
+   "round": 5,
+   "heading": "The website's counted \"Fonts: 4\" row carried a typed caption saying all three are subset and inlined, and none of the three claims held for the fourth",
+   "file": "11_site/build.py",
+   "body": "The table is introduced as \"Every row is counted from the file named in it, each time this page is built\", and this row rendered `Fonts | 4 | All three are SIL Open Font Licence 1.1, subset to what this page draws and carried inside the stylesheet.` The registry records the fourth face with `subset: false`, the stylesheet holds three `@font-face` rules and three inlined woff2, and the fourth ships in 08_components/fonts/. A counted number under a typed sentence is the drift the table exists to prevent.",
+   "verdict": {
+    "id": "R5-17",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026: the note is derived from the registry, naming the whole faces separately from the subset ones.",
+    "evidence": "`_cards.json['_fonts']` → Literata, Noto Serif Bengali, Aninda Mono (no subset flag, so subset) and Aninda Mono (desktop) with `subset: False`. `grep -c '@font-face' 11_site/styles.css` → 3; `data:font/woff2` occurrences → 3. The page now reads \"3 are SIL Open Font Licence 1.1, subset to what this page draws and carried inside the stylesheet. Aninda Mono (desktop) is the whole face, renamed rather than subset, and ships in 08_components/fonts/ ...\"."
+   }
+  },
+  {
+   "id": "R5-18",
+   "round": 5,
+   "heading": "The site footer called every face a subset, including the one its own registry records as not subset",
+   "file": "11_site/build.py",
+   "body": "The footer read the `renamed` flag and ignored `subset`, so it printed \"Aninda Mono (desktop) — SIL OFL 1.1, subset and renamed\" for the face 08_components/build.py describes as the whole IBM Plex Mono renamed and NOT subset, and which the registry marks `subset: false`. It is the largest redistributed font in the tree, so describing it as a subset understates what is being redistributed.",
+   "verdict": {
+    "id": "R5-18",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026: both flags are read, and each of the four states has its own wording.",
+    "evidence": "The rendered footer now reads `Aninda Mono (desktop) — SIL OFL 1.1, renamed in full, not subset`."
+   }
+  },
+  {
+   "id": "R5-19",
+   "round": 5,
+   "heading": "The rule that nothing generated may carry an absolute path was written down and never measured, and the tree held 86 of them",
+   "file": "06_type/_data/font_facts.json",
+   "body": "70 were in two generated data files — every font's `path` and `licence_file` in font_facts.json, and every `crop` in measurements.json — so the committed output was different on any other machine, which is precisely the drift the rule exists to stop. Five more told a reader to `cd` into one person's home directory: the Figma README twice, SHORTLIST.md, RECOMMENDATION.md and TOOLCHAIN.md, which also gave that path as the \"sandbox root\". Sixteen were run-instructions inside generators. One more had been found by hand in the guidebook hours earlier, which is what prompted the sweep.",
+   "verdict": {
+    "id": "R5-19",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. specimen.py stores paths repo-relative and resolves them at the point of use; the two data files were migrated; every reader-facing instruction is repo-relative; and scripts/check_no_absolute_paths.py now measures the rule in CI and locally. Three evidence records are exempt by name, because they quote commands as they were run and rewriting a quotation would falsify the record.",
+    "evidence": "`git grep -c '/Users/gru953'` totalled 86 across 25 files before; it now returns hits only in the three exempt evidence records. The new gate reports `no absolute home-directory paths in 326 tracked text files (3 evidence records exempt by name)`, exit 0, and refuses on injection: adding `# cd /Users/somebody/elsewhere/thing` to a copy of 05_colour/engine.py gives exit 1 naming the file and line. It matches any /Users/<name>/ or /home/<name>/, not only this Mac's, and exits 2 if it read fewer than 100 files. Every consumer still resolves: check_measurements.py passes, the guidebook --check passes, and the stored paths resolve to real files."
+   }
+  },
+  {
+   "id": "R5-20",
+   "round": 5,
+   "heading": "Every drift guard compared tracked content only, so a generator that started emitting a new file passed green over output nobody committed",
+   "file": ".github/workflows/ci.yml",
+   "body": "`git diff` does not see an untracked file, and all five CI drift guards and the three local ones used it. Several generators here write one output per input discovered by a glob — 05_colour/engine.py globs its directions, build_skills.py globs the skill directories — so committing a new input without its regenerated output leaves every guard green while the committed set is short. The workflow header nevertheless says the job \"regenerates every generated file and then runs git diff --exit-code\".",
+   "verdict": {
+    "id": "R5-20",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. CI marks the paths with `git add -N` before each diff, and the local script has a `drift()` helper that checks the diff and then looks for `??` entries under the same paths.",
+    "evidence": "On a throwaway repository, adding a fifth colour direction and regenerating gave `git diff --exit-code` exit 0 with `?? 05_colour/generated/monsoon.proof.json` untracked. With the helper: a clean tree prints ok, `touch 04_mark/svg/_pretend_new_output.svg` prints `FAILED — the build wrote files that are not committed` and names it, and removing it prints ok again."
+   }
+  },
+  {
+   "id": "R5-21",
+   "round": 5,
+   "heading": "The mark gate reported a refusal and then printed ok on the next line, for the same gate",
+   "file": "scripts/verify-all.sh",
+   "body": "It ran the build with `|| { echo FAILED; fail=1; }` and then ran the diff unconditionally. A refused build writes nothing, so the diff found nothing changed and printed ok directly beneath the failure — one gate saying both things. R4-3 had named this gate as the model the two `|| true` gates were rewritten to follow; it was not.",
+   "verdict": {
+    "id": "R5-21",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026 to the same shape as the other two, and R4-3's note is corrected.",
+    "evidence": "Reproduced as a five-line shell script: `FAILED — the mark build refused` followed by `ok`, `fail=1`. After: one line, `FAILED — the mark build refused`, `fail=1`."
+   }
+  },
+  {
+   "id": "R5-22",
+   "round": 5,
+   "heading": "The Claude Design bundle shipped a NOTICE directing recipients to two files the bundle did not contain",
+   "file": "13_plugins/claude-design/build.py",
+   "body": "build.py copied only LICENSE and NOTICE from the repository root. The NOTICE is the root one verbatim — headed \"FOUR LICENCES APPLY TO DIFFERENT PARTS OF THIS REPOSITORY\", sending the reader to LICENSE-DOCS.md for the writing's terms and TRADEMARKS.md for the identity detail. Neither travelled, and the bundle contains exactly the writing that clause governs. This is the only deliverable whose artefact lives on a remote service, so its NOTICE is the only licence statement a recipient gets.",
+   "verdict": {
+    "id": "R5-22",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026: all four root licence files travel with the bundle, and a missing one stops the build instead of being skipped by an `if exists` guard. The bundle went from 48 files to 50, so the copy on claude.ai is now behind — stated in 13_plugins/claude-design/PUSH-RECORD.md rather than left to be discovered.",
+    "evidence": "`grep -rn 'LICENSE-DOCS\\|TRADEMARKS' dist/` → two hits in dist/NOTICE, lines 31 and 67; `git ls-files 13_plugins/claude-design | grep -E 'LICENSE-DOCS|TRADEMARKS'` → nothing, before. After: `50 files`, and both files are present at the bundle root."
+   }
+  },
+  {
+   "id": "R5-23",
+   "round": 5,
+   "heading": "A typed word carried a count inside a generated sentence, where the count three lines above it is computed",
+   "file": "scripts/readme.py",
+   "body": "The README's exclusion sentence was built as the literal `\"Three generators are deliberately not in that chain: \"` joined to a list derived from NOT_IN_CHAIN. It was true only because the dict happened to hold three, and `--check` could never catch a change, because it regenerates from the same expression and both sides would carry the same wrong word.",
+   "verdict": {
+    "id": "R5-23",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026: the word is looked up from the length of the dict.",
+    "evidence": "NOT_IN_CHAIN holds 3 keys and the README still reads \"Three generators are deliberately not in that chain\" — the same output, now derived. `scripts/readme.py --check` passes."
+   }
+  },
+  {
+   "id": "R5-24",
+   "round": 5,
+   "heading": "The register rewrote the history of its own first pass every time an entry was re-checked",
+   "file": "scripts/findings.py",
+   "body": "The prose said \"N entries were checked in the pass of 19 August 2026\", but N was computed as \"entries whose LATEST check was 19 August\". Re-checking one entry on 25 August therefore dropped it out of the 19 August tally, taking it from 64 to 63 and the half-right count from 12 to 11 — retroactively falsifying a statement about a pass that had already happened, in the document whose whole purpose is that its statements stay true.",
+   "verdict": {
+    "id": "R5-24",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. A pass is a historical fact: an entry carries the passes it has been through, an entry raised later belongs only to its own pass, and the heading of each entry shows the date of its most recent check.",
+    "evidence": "The generated line now reads \"64 entries were checked in the pass of 19 August 2026. 9 more were raised later, and 1 of the original entries was re-checked — 25 August 2026 ... of the 64 entries it covered, 18 were already fixed and 12 were half right\" — 64, 18 and 12 again, matching what `git show origin/main:01_research/OPEN-FINDINGS.md` says at line 5."
+   }
+  },
+  {
+   "id": "R5-25",
+   "round": 5,
+   "heading": "The push record's card row contradicted itself: the breakdown summed to 30 and the total said 18",
+   "file": "13_plugins/claude-design/PUSH-RECORD.md",
+   "body": "The row read \"Preview cards | 18 — Foundations 6, Components 16, Patterns 8\". Those are two different populations: 18 is the number of card files in the pushed bundle, and 6/16/8 is the grouping of the 30 source cards, whose groups do not appear in the bundle at all. In a file whose stated point is that its facts are measured, two populations shared one row.",
+   "verdict": {
+    "id": "R5-25",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026: two rows, each naming its own population.",
+    "evidence": "`find dist -name '*.card.html' | wc -l` → 18. `grep -rho '@dsCard group=[^ ]*' 08_components/cards | sort | uniq -c` → Components 16, Foundations 6, Patterns 8 = 30. The bundle's own groups are seven different ones summing to 18."
+   }
+  },
+  {
+   "id": "R5-26",
+   "round": 5,
+   "heading": "Three evidence quotes written into the register the same day did not reproduce",
+   "file": "01_research/_data/findings.json",
+   "body": "R4-2 quoted the CI step as reading `git diff --exit-code 13_plugins/figma/manifest.json` — a string absent from ci.yml, and the very repo-root form that R4-9, in the same register, records as the bug that turned CI red. R4-3 closed with \"`grep -c '|| true' scripts/verify-all.sh` now returns 0\"; it returns 2, both of them prose in comments explaining the fix. R4-9 said it audited \"all six `git diff` invocations in ci.yml\"; there are five, the sixth grep hit being a comment.",
+   "verdict": {
+    "id": "R5-26",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed 25 August 2026. Each quote is replaced by a command that reproduces, and the `|| true` one now discriminates code from comment. The register's rule is that a claim is either reproduced or it is not, and these three had been typed from memory a few hours after that rule was restated.",
+    "evidence": "`grep -c 'git diff --exit-code 13_plugins/figma/manifest.json' .github/workflows/ci.yml` → 0. `grep -c '|| true' scripts/verify-all.sh` → 2; `grep -c '^[^#]*|| true' scripts/verify-all.sh` → 1, and that one is a `grep` whose empty result is not a failure. `grep -n 'git diff' .github/workflows/ci.yml` → 7 lines now, of which 5 are invocations."
+   }
+  },
+  {
+   "id": "R5-27",
+   "round": 5,
+   "heading": "The correction to the README's counts announced a check that did not exist — a promise of a guard, which is worse than no guard",
+   "file": "13_plugins/figma/README.md",
+   "body": "R5-7 corrected four hand-typed counts against the generated receipt, and the correction added: \"The counts in the table above are checked against RECEIPT-EXPECTED.json every time build.mjs runs, so they cannot drift from the plugin again.\" Nothing checked them. `grep -c README 13_plugins/figma/build.mjs` returned 0 — the build never opened the README. A stated guard stops the next person looking, so this is worse than leaving the numbers unguarded and saying so. It is also precisely the class of defect the pass that produced it was closing.",
+   "verdict": {
+    "id": "R5-27",
+    "status": "stale",
+    "severity_now": "major",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed the same day, by making the sentence true rather than by deleting it. build.mjs now reads the README after computing the plan and compares five figures — variables, aliases, paint styles, text styles, and the primitive-versus-semantic split stated in prose beside the first — and stops the build on any disagreement.",
+    "evidence": "`grep -c README 13_plugins/figma/build.mjs` → 0 before, and the build printed nothing about the README. After: `README table agrees with the plan on 5 counts`, then `Build finished.` Negative controls, both restored afterwards: changing `| Variables | 128 |` to 127 gives `BUILD STOPPED — the README disagrees with the plan it describes: README.md says Variables 127, the plan makes 128`; changing \"18 semantic roles\" to 17 exits 1. `git diff --quiet 13_plugins/figma/README.md` returns 0 after each."
+   }
+  },
+  {
+   "id": "R5-28",
+   "round": 5,
+   "heading": "The same correction left a typed count describing three bullets as four",
+   "file": "13_plugins/figma/README.md",
+   "body": "Replacing the closed Bangla bullet with prose took the gap list from four bullets to three, and the sentence beneath it still opened \"These four are what the plugin's own plan records.\" One typed count was removed and another introduced two lines away.",
+   "verdict": {
+    "id": "R5-28",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Fixed the same day: the sentence no longer counts the bullets it follows.",
+    "evidence": "Counting `^- \\*\\*` between \"Some things are deliberately not made\" and that sentence → 3, against a stated four. `grep -n 'These four' 13_plugins/figma/README.md` → no output now."
+   }
+  },
+  {
+   "id": "R5-29",
+   "round": 5,
+   "heading": "Two of this pass's own fixes were verified by reading rather than by running, and one of them could not have been",
+   "file": "scripts/verify-all.sh",
+   "body": "The CI drift guards were changed to `git add -N` before each diff, and the change was checked only by reading it and confirming the workflow still parses — the local helper had a negative control, the CI form did not. Separately, 06_type/specimen.py was changed to store repository-relative paths and was never re-run, because it is a one-off generator outside the rebuild chain that renders specimen pages. A fix nobody exercised is a claim, not a result, which is the standard this register is held to.",
+   "verdict": {
+    "id": "R5-29",
+    "status": "stale",
+    "severity_now": "minor",
+    "verified_on": "25 August 2026",
+    "passes": [
+     "25 August 2026"
+    ],
+    "note": "Both closed on the same day. The `git add -N` form was proved on a throwaway repository. specimen.py has not been run end to end and this says so rather than implying otherwise: what was proved is that its two new helpers round-trip against all 70 stored paths and that every stored path resolves to a real file. Re-running it fully is the remaining check, and it needs a browser and renders every specimen page.",
+    "evidence": "`git add -N` control, in a scratch repository with one committed and one new file under gen/: `git diff --exit-code gen` → exit 0, the hole; `git add -N -- gen && git diff --exit-code gen` → exit 1, closed. specimen.py: importing it and applying `rel(absolute(x)) == x` to all 70 paths in font_facts.json and measurements.json gives 0 problems, and every one resolves to a file that exists. Downstream, `scripts/check_measurements.py` passes and `09_guidebook/build.py --check` passes."
    }
   }
  ]

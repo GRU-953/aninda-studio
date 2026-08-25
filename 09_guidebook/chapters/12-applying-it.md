@@ -128,8 +128,9 @@ It prints what it could not check at the end. That list is part of the result.
 
 ## Rebuilding this book
 
+From the repository root, as with every command in this book:
+
 ```bash
-cd /Users/gru953/Claude/Cowork/Aninda_Studio
 export PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers
 ./.venv/bin/python 09_guidebook/build.py
 ./.venv/bin/python 09_guidebook/scripts/pdf.py

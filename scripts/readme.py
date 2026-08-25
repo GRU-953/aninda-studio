@@ -21,7 +21,7 @@ regenerates the files and fails on any difference.
 
 RUN
 ---
-    cd /Users/gru953/Claude/Cowork/Aninda_Studio
+    cd <the repository folder>
     ./.venv/bin/python scripts/readme.py
     ./.venv/bin/python scripts/readme.py --check
 """
@@ -69,6 +69,13 @@ REFUSAL_EXIT = 2
 #   11_site    needs 12_packages, 10_assets, 04_mark and 08_components
 #   pdf.py     needs the guidebook print build
 #   readme.py  runs last, because it counts what the others produced
+# Spelled numbers, so a counted figure can still read as prose. Ten is as far as
+# this needs to go; past that the code says so rather than guessing.
+NUMBER_WORDS = {
+    0: "No", 1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five",
+    6: "Six", 7: "Seven", 8: "Eight", 9: "Nine", 10: "Ten",
+}
+
 REBUILD_CHAIN = [
     "05_colour/engine.py",
     "07_tokens/build.py",
@@ -204,7 +211,12 @@ def check_rebuild_chain() -> dict:
     return {
         "chain_count": len(REBUILD_CHAIN) + 1,
         "chain": " && \\\n  ".join(f"./.venv/bin/python {s}" for s in REBUILD_CHAIN),
-        "chain_excluded": "Three generators are deliberately not in that chain: " +
+        # Counted from the dict, not typed. The word was "Three" and NOT_IN_CHAIN
+        # happened to hold three; adding a fourth would change the list and not the
+        # word, and --check could not catch it, because it regenerates from this
+        # same expression and both sides would carry the same wrong word.
+        "chain_excluded": f"{NUMBER_WORDS[len(NOT_IN_CHAIN)]} generators are "
+                          "deliberately not in that chain: " +
                           "; ".join(f"`{k}` — {v}" for k, v in NOT_IN_CHAIN.items()) +
                           ".",
     }
@@ -379,8 +391,12 @@ the ones above it, so the order is not interchangeable.
 Then the Figma plugin bundle, which is Node rather than Python:
 
 ```bash
-cd 13_plugins/figma && node build.mjs --code-only
+cd 13_plugins/figma && node build.mjs
 ```
+
+That step ends by checking the manifest, so what it writes is a bundle Figma will
+load. `--code-only` compiles the same artefacts and stops before that check; it is
+what continuous integration runs to compare `dist/` against what is committed.
 
 {f['chain_excluded']}
 

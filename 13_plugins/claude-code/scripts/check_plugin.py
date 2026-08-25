@@ -226,6 +226,18 @@ def check_bangla_agreement(problems: Problems) -> None:
                 r'\(\s*"([a-z]+-\d+)"\s*,\s*"((?:[^"\\]|\\.)*)"\s*,\s*\n?\s*"((?:[^"\\]|\\.)*)"',
                 text):
             source[match.group(1)] = (match.group(2), match.group(3))
+        # A FLOOR, because everything below compares intersections only. If this
+        # regex stops matching — a re-quoting of those literals is enough — `source`
+        # empties, every `if key in source` finds nothing, and the whole comparison
+        # reports success having compared nothing. Proved: re-quoting the tuples cut
+        # the parse from 23 to 3 and a deliberately corrupted gloss then passed.
+        # The count is measured against what the file holds, not a number typed here.
+        declared = len(set(re.findall(r'"([a-z]+-\d+)"\s*,', text)))
+        if len(source) < declared - 2:
+            problems.wrong(
+                f"only {len(source)} strings were parsed out of "
+                f"06_type/review_bangla.py and it declares about {declared} — the "
+                f"parse broke, so this comparison did not really run")
     else:
         problems.wrong("06_type/review_bangla.py is missing, so the plugin's verified "
                        "strings cannot be checked against the document they cite")

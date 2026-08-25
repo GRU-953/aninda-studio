@@ -98,8 +98,12 @@ allowed. Seven refusals are implemented:
 7. The App Store master with a radius, or at any size other than 1024 px.
 
 **One honest note.** Against the token files shipped here, every one of the
-17 × 7 × 4 role-and-ground pairings passes, so refusal 6 cannot fire on a bad
-measurement today. That is the proof the token set is sound, not proof the check
+10 × 7 × 4 = 280 role-and-ground pairings the checker judges passes, so refusal 6
+cannot fire on a bad measurement today. Ten is the seven text roles plus the three
+non-text ones — the pairings that are contrast pairings. The token set holds 18
+roles in all, and putting a surface on a surface is not a question this checker
+asks, so those combinations are outside the claim rather than inside it and
+failing. That is the proof the token set is sound, not proof the check
 works. It fires today on a ground that is not a surface, and it will fire on a
 measurement if the skill is pointed at a different token set.
 
@@ -114,7 +118,7 @@ Exit `0` nothing failed, `1` something failed, `3` not equipped to check what it
 was given. **Treat `3` as a failure in continuous integration**: it means the
 check did not run, and a check that did not run must never read as a pass.
 
-It ends every run with what it cannot see — nine items, from "anything that needs
+It ends every run with what it cannot see — ten items, from "anything that needs
 a browser" to "whether the English is actually clear". Those are part of the
 result. Read them out.
 

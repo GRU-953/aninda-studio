@@ -1,6 +1,6 @@
 # Aninda Studio — sandbox and toolchain
 
-**Set up:** 14 August 2026 · Sandbox root: `/Users/gru953/Claude/Cowork/Aninda_Studio/`
+**Set up:** 14 August 2026 · Sandbox root: the repository folder itself
 
 Everything here is **project-local**. Nothing was installed on the Mac outside this folder, no
 Homebrew package was added, and no system setting was changed. Deleting this folder removes the
@@ -36,7 +36,6 @@ would silently change measured contrast figures between runs.
 | `brotli` | 1.2.0 | MIT | Compression used to make `.woff2` web fonts |
 | `playwright` | 1.62.0 | Apache-2.0 | Drives a real browser: renders pages, **measures** what actually appeared, exports PNG and PDF |
 | `Pillow` | 12.1.0 | MIT-CMU | Image work — PNG exports, and writing the multi-size `.ico` favicon |
-| `Jinja2` | 3.1.6 | BSD-3-Clause | Templating, for building the guidebook and the component cards |
 | `Markdown` | 3.10 | BSD-3-Clause | Turns the hand-written guidebook chapters into HTML |
 | `lxml` | 6.0.2 | BSD-3-Clause | Reads and edits SVG safely |
 
@@ -44,7 +43,6 @@ would silently change measured contrast figures between runs.
 
 | Package | Version | Licence | What it does |
 |---|---|---|---|
-| `svgo` | 4.0.2 | MIT | Shrinks SVG files without changing how they look |
 | `esbuild` | 0.25.12 | MIT | Bundles the Figma plugin into a single file, which is what Figma requires |
 | `typescript` | 5.9.3 | Apache-2.0 | Type-checks the Figma plugin before it is bundled |
 | `@figma/plugin-typings` | 1.133.0 | MIT | Figma's own type definitions. 1.133.0 was the current release on 6 August 2026 |
@@ -119,7 +117,7 @@ scopes `gist, read:org, repo, workflow`) · brotli.
 ## Running things
 
 ```
-cd /Users/gru953/Claude/Cowork/Aninda_Studio
+# from the repository root
 export PLAYWRIGHT_BROWSERS_PATH=./00_sandbox/browsers
 ./.venv/bin/python <script>
 ```
