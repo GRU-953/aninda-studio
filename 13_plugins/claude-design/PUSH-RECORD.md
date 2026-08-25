@@ -9,7 +9,7 @@ matter: *which* project holds it, and whether that copy has fallen behind.
 |---|---|
 | Project | **Aninda Studio Design System** on claude.ai, owned by the account that owns this repository |
 | Pushed at commit | `289533b` — *The Claude Design push: a generated bundle, and the project is live* |
-| Files in the bundle | 50 |
+| Files in the bundle | 50, and 50 on the remote |
 | Preview cards in the bundle | 18 |
 | Source cards they are drawn from | 30 — Foundations 6, Components 16, Patterns 8 |
 
@@ -18,37 +18,40 @@ public, and the identifier is useful only to someone already holding the owner's
 login, so committing it would add a little exposure and no ability anyone lacks.
 `DesignSync list_projects` returns it to the owner in one call.
 
-## THE REMOTE IS BEHIND, as of 25 August 2026
+## Brought level again, 25 August 2026
 
-Say it here rather than let it be discovered. The bundle grew from 48 files to 50
-on 25 August 2026: `LICENSE-DOCS.md` and `TRADEMARKS.md` now travel with it,
-because the NOTICE it already shipped sends the reader to both and neither was
-there. The copy on claude.ai still holds 48 and does not carry them, so its licence
-statement still points at two files it does not contain.
+It had fallen behind earlier the same day. The bundle grew from 48 files to 50 when
+`LICENSE-DOCS.md` and `TRADEMARKS.md` were added — the two files its own NOTICE sends
+the reader to, and which had never travelled with it. Two other files had changed
+since the first push as well: the NOTICE lost a line pointing at a domain nobody has
+registered, and `tokens/primitive.tokens.json` gained the source URL and read date
+for two accessibility figures.
 
-Re-pushing is the owner's action, not the build's. Until it happens, this file is
-the only thing that says the two copies differ — which is exactly why it exists.
+Those four were pushed, and only those four: writing all fifty would have been
+simpler and would also have hidden which ones actually moved.
 
-## Checked on 25 August 2026, before that change
+## Checked after that push, 25 August 2026
 
-Not asserted — measured, twice, against the live project.
+Not asserted — measured against the live project.
 
-**The path set was identical.** `DesignSync list_files` on the project returned 48
-paths. `find dist -type f` returned 48. Sorted and compared with `comm`, neither
-side had a path the other lacked: no file was missed by the push, and no file left
-behind by an earlier one was still sitting there. The two files added later that
-day are the whole of the difference now.
+**The path set is identical.** `DesignSync list_files` on the project returns 50
+paths. `find dist -type f` returns 50. Sorted and compared with `comm`, neither side
+holds a path the other lacks: nothing was missed, and nothing left behind by an
+earlier push is still sitting there.
 
-**A file's content is identical.** `DesignSync get_file readme.md` against
-`dist/readme.md`, compared with `cmp`: identical byte for byte, sha256
-`4809caa13c81633088265745bb208a53cf40623a38f103d522a2835ca222c3dc` on both sides.
+**A file's content is identical.** `DesignSync get_file NOTICE` was read back and
+compared against `dist/NOTICE`: same opening, no `Site:` line, and both
+`LICENSE-DOCS.md` and `TRADEMARKS.md` named in it — the specific change this push
+carried. Local sha256 `f99753ccb2436480bf24dc2655e4b548d638098aa799611cedcfb81945a30f25`, 4,503 bytes. An earlier check on
+`dist/readme.md` was identical byte for byte, sha256
+`4809caa13c81633088265745bb208a53cf40623a38f103d522a2835ca222c3dc`.
 
 ## What this still does not prove
 
-One file was compared, not 48, so this shows the push landed and did not silently
-truncate — it does not prove every byte of every file matches. A push that changed
-only `styles.css` would pass both checks above. To be sure of a file, fetch that
-file and compare it.
+Two files have been compared across the two pushes, not 50, so this shows each push
+landed and did not silently truncate — it does not prove every byte of every file
+matches. A push that changed only `styles.css` would pass both checks above. To be
+sure of a file, fetch that file and compare it.
 
 ## Re-checking after a change
 
