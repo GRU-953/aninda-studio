@@ -227,5 +227,14 @@ const report = inspectManifest(PLUGIN_DIR);
 if (!report.ok) failLoudly(report);
 
 say('');
-say(`manifest.json is adopted: id ${report.manifest.id}, api ${report.manifest.api}`);
+if (report.publishable) {
+  say(`manifest.json is adopted from Figma: id ${report.manifest.id}, ` +
+      `api ${report.manifest.api} — publishable.`);
+} else {
+  say(`manifest.json is adopted for DEVELOPMENT: id ${report.manifest.id}, ` +
+      `api ${report.manifest.api}.`);
+  say('That id was not issued by Figma, so this plugin loads through Import plugin');
+  say('from manifest and cannot be published. Run adopt-scaffold.mjs with a manifest');
+  say('Figma generated to make it publishable. See scripts/figma-api-version.txt.');
+}
 say('Build finished.');

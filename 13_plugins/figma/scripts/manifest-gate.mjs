@@ -1,9 +1,22 @@
 // Aninda Studio — the manifest gate.
 //
-// Figma generates two values that cannot be guessed: the plugin `id`, and the
-// `api` version it currently accepts. Neither is published anywhere I can read,
-// so this project never invents them. It copies them from a manifest Figma
-// itself wrote, and refuses to go further until that has happened.
+// Two manifest values do not come from this repository: the plugin `id` and the
+// `api` version. This gate refuses to let either be a placeholder.
+//
+// The header here used to say neither was published anywhere readable. Half of that
+// was wrong, and the wrong half blocked the build for weeks. `api` IS published: it
+// is documented in Figma's manifest guide, and all 32 manifests in Figma's own
+// official samples repository declare exactly "1.0.0" — swept 19 August 2026. So it
+// is adopted from those, not guessed. See scripts/adopt-headless.mjs.
+//
+// The `id` genuinely is not obtainable without Figma: it is issued when a plugin is
+// created or published. So there are two legitimate states, and this gate now tells
+// them apart rather than calling both "adopted":
+//
+//   a numeric id   issued by Figma. The plugin can be published.
+//   a slug id      a development id, the shape Figma's own samples use for
+//                  unpublished plugins. It loads through Import plugin from
+//                  manifest and cannot be published.
 //
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 Aninda Sundar Howlader
@@ -46,7 +59,20 @@ export function inspectManifest(pluginDir) {
       problems.push(`"${field}" is still the placeholder ${JSON.stringify(value)}.`);
     }
   }
-  return { ok: problems.length === 0, missingFile: false, problems, manifest, path };
+  // Loadable and publishable are different states, and the gate used to know only
+  // one of them. A slug id — the shape Figma's own samples use for unpublished
+  // plugins — loads perfectly through Import plugin from manifest and can never be
+  // published, because publishing needs an id Figma issued. Reporting that as simply
+  // "adopted" would let the build imply the plugin is ready to ship when it is not.
+  const publishable = /^\d+$/.test(String(manifest.id ?? ''));
+  return {
+    ok: problems.length === 0,
+    missingFile: false,
+    problems,
+    manifest,
+    path,
+    publishable,
+  };
 }
 
 /** The loud failure. Prints what to do, then exits with a non-zero status. */
@@ -66,11 +92,12 @@ export function failLoudly(report) {
   out.push('');
   out.push('  I will not guess these two values.');
   out.push('');
-  out.push('  The plugin "id" is issued by Figma when you create a plugin, and the');
-  out.push('  "api" version is whatever your Figma build currently accepts. Figma');
-  out.push('  does not publish either one, so a guess would be a number I made up.');
+  out.push('  The plugin "id" is issued by Figma when you create or publish a');
+  out.push('  plugin, so there is nothing here to copy it from. The "api" version');
+  out.push('  IS published — see adopt-headless.mjs, which reads it from Figma\'s own');
+  out.push('  manifest guide and from all 32 of its official sample manifests.');
   out.push('  A wrong id or api version makes Figma refuse the plugin with an error');
-  out.push('  that does not say why.');
+  out.push('  that does not say why, which is why neither is ever invented here.');
   out.push('');
   out.push('  What to do, one step at a time:');
   out.push('');
@@ -86,6 +113,15 @@ export function failLoudly(report) {
   out.push('        node scripts/adopt-scaffold.mjs /path/to/that/manifest.json');
   out.push('');
   out.push('   7. Run "node build.mjs" again.');
+  out.push('');
+  out.push('  OR, with no Figma app to hand:');
+  out.push('');
+  out.push('        node scripts/adopt-headless.mjs');
+  out.push('');
+  out.push('  That adopts the api version from Figma\'s published manifest guide and');
+  out.push('  from all 32 of its official sample manifests, and writes a development');
+  out.push('  id of the shape Figma\'s own samples use. The plugin then builds and');
+  out.push('  loads. It cannot be published until a Figma-issued id replaces that.');
   out.push('');
   out.push(line);
   out.push('');

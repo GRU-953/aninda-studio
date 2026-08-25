@@ -22,9 +22,13 @@ the styles, the marks, a small set of components, and one frame for each of the
 - **It cannot install fonts.** The three families have to be on your computer
   before you run it. It checks first and stops before making anything if one is
   missing, so a half-built library is not a state you can end up in.
-- **It cannot guess the plugin id or the api version.** Figma issues both and
-  publishes neither, so the build refuses to finish until you have copied them
-  from a manifest Figma itself wrote. Step 2 below is that copy.
+- **It will not invent the plugin id.** Figma issues that when a plugin is
+  created or published, so there is nothing here to copy it from. The build
+  already carries a development id, which is enough to load the plugin and not
+  enough to publish it. Step 2 below is how you replace it when you publish.
+  (The `api` version is a different matter: Figma does publish that, and the
+  build adopts it from Figma's own manifest guide and from all 32 of its
+  official sample manifests.)
 - **It does not know what your Figma plan allows.** Whether the Variables API
   works, and how many modes a collection may hold, are not documented facts I
   can look up. The plugin asks the file at run time and tells you the answer.
@@ -81,7 +85,15 @@ tell me — I would rather fix the instructions than have you guess.
 4. Read what it prints. The first time, it will stop and say the manifest has
    not been adopted yet. That is expected. Go to step 2.
 
-### 2. Copy the two values only Figma can give you
+### 2. The plugin id — only needed to publish
+
+**You can skip this step to begin with.** The plugin already has a development
+id and will load and run without doing anything here. `scripts/figma-api-version.txt`
+records what it is and where it came from.
+
+You need this step for one thing only: publishing to the Figma Community. Figma
+issues a real id at that point, and the plugin cannot be published with the
+development one.
 
 1. Open the Figma **desktop** app. The browser version cannot load a plugin from
    your computer.
@@ -102,7 +114,8 @@ tell me — I would rather fix the instructions than have you guess.
     drag the `manifest.json` file from that folder onto the Terminal window,
     which types its path for you. Press Return.
 15. It prints the `id` and the `api` it copied. Both are now recorded in
-    `scripts/figma-api-version.txt` with today's date.
+    `scripts/figma-api-version.txt` with today's date, and `node build.mjs` will
+    from then on say **publishable** rather than **DEVELOPMENT**.
 
 ### 3. Build again
 

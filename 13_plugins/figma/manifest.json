@@ -1,0 +1,34 @@
+{
+  "name": "Aninda Studio — build the library",
+  "id": "aninda-studio-build-the-library",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": [
+    "figma"
+  ],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "none"
+    ],
+    "reasoning": "The plugin never reaches the network. The tokens, the marks and the card list are compiled into dist/code.js at build time, so it works with no connection at all."
+  },
+  "menu": [
+    {
+      "name": "Build the library",
+      "command": "build"
+    },
+    {
+      "name": "Probe what this file allows",
+      "command": "probe"
+    },
+    {
+      "separator": true
+    },
+    {
+      "name": "Remove everything this plugin made",
+      "command": "wipe"
+    }
+  ]
+}

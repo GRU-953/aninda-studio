@@ -73,7 +73,7 @@ const header = existsSync(RECORD)
   : [
       'Aninda Studio — Figma plugin id and api version, as adopted.',
       '',
-      'Figma publishes neither of these. Each line below records what was copied',
+      'Each line below records what was copied out of a manifest Figma wrote,',
       'out of a manifest Figma itself generated, and on what date. Nothing here',
       'was chosen by me or by any script.',
       '',

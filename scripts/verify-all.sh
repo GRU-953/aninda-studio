@@ -133,12 +133,22 @@ fi
 printf '%-46s ' "figma plugin typechecks"
 if ( cd 13_plugins/figma && ../../00_sandbox/node_modules/.bin/tsc --noEmit -p tsconfig.json ) \
      >/dev/null 2>&1; then echo "ok"; else echo "FAILED"; fail=1; fi
+printf '%-46s ' "the full figma build completes"
+if out=$( cd 13_plugins/figma && node build.mjs 2>&1 ) \
+     && printf '%s' "$out" | grep -q "manifest.json is adopted"; then
+  echo "ok"
+else
+  echo "FAILED"; printf '%s\n' "$out" | tail -6 | sed 's/^/    /'; fail=1
+fi
 printf '%-46s ' "a placeholder manifest stops the figma build"
+( cd 13_plugins/figma && cp manifest.json /tmp/manifest.committed.json \
+  && printf '{"id":"x","api":"REPLACE_ME__FIGMA_GENERATES_THIS"}\n' > manifest.json )
 if ( cd 13_plugins/figma && node build.mjs >/dev/null 2>&1 ); then
   echo "FAILED — the manifest gate let a placeholder through"; fail=1
 else
   echo "ok"
 fi
+cp /tmp/manifest.committed.json 13_plugins/figma/manifest.json
 printf '%-46s ' "claude-code skill bundles are current"
 $PY 13_plugins/claude-code/scripts/build_skills.py >/dev/null 2>&1 || true
 if git diff --quiet 13_plugins/claude-code/dist; then

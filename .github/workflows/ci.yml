@@ -268,14 +268,31 @@ jobs:
             13_plugins/figma/RECEIPT-EXPECTED.json \
             || { echo "::error::The committed Figma plugin build differs from a
                  fresh one. Run 'node build.mjs --code-only' and commit dist/."; exit 1; }
-      - name: A placeholder manifest must stop the build
+      - name: The full build completes and the manifest is adopted
+        # Reachable for the first time since 19 August 2026. Before that the manifest
+        # was unadopted, so CI could only ever run --code-only and the gate itself was
+        # never exercised on the committed manifest.
         run: |
           cd 13_plugins/figma
+          out=$(node build.mjs) || { echo "::error::the full build failed"; exit 1; }
+          echo "$out" | tail -6
+          echo "$out" | grep -q "manifest.json is adopted" \
+            || { echo "::error::the build did not report an adopted manifest"; exit 1; }
+      - name: A placeholder manifest must stop the build
+        # Saves and restores the committed manifest. This step used to end in
+        # `rm -f manifest.json`, which was harmless while no manifest was committed
+        # and would now delete a real one out of the checkout.
+        run: |
+          cd 13_plugins/figma
+          cp manifest.json /tmp/manifest.committed.json
           printf '{"id":"x","api":"REPLACE_ME__FIGMA_GENERATES_THIS"}\n' > manifest.json
           if node build.mjs > /dev/null 2>&1; then
-            echo "::error::The manifest gate let a placeholder through"; rm -f manifest.json; exit 1
+            cp /tmp/manifest.committed.json manifest.json
+            echo "::error::The manifest gate let a placeholder through"; exit 1
           fi
-          rm -f manifest.json
+          cp /tmp/manifest.committed.json manifest.json
+          git diff --exit-code 13_plugins/figma/manifest.json \
+            || { echo "::error::the placeholder test did not restore the manifest"; exit 1; }
       - name: The Claude Design bundle must match the system
         # The only deliverable whose artefact lives on a remote service, so the
         # only one that can fall behind with nothing saying so. Generated from the

@@ -1,0 +1,25 @@
+Aninda Studio — Figma plugin id and api version, and where each came from.
+
+Two routes write to this file, and they are not equivalent:
+
+  adopt-scaffold.mjs  copies both values out of a manifest Figma generated.
+                      This is the route to a publishable plugin.
+  adopt-headless.mjs  adopts the api from Figma's published documentation
+                      and its official samples, and writes a DEVELOPMENT id
+                      because Figma issues the real one at publish time.
+
+Every entry below names its route and its sources. Nothing is guessed; where
+a value could not be obtained, that is stated rather than filled in.
+
+date adopted : 2026-08-19
+route        : adopt-headless.mjs (no Figma desktop app involved)
+api          : 1.0.0
+  source 1   : https://developers.figma.com/docs/plugins/manifest — documents the "api" field and shows 1.0.0; read 19 August 2026
+  source 2   : https://github.com/figma/plugin-samples — all 32 manifest.json files on main declare "api": "1.0.0"; swept 19 August 2026
+id           : aninda-studio-build-the-library
+  standing   : DEVELOPMENT ONLY. Not issued by Figma. Loads through Import
+               plugin from manifest; cannot be published. Figma issues a numeric
+               id at publish time, and adopt-scaffold.mjs replaces this with it.
+  precedent  : Figma's own samples ship slug ids for unpublished plugins —
+               png-crop, bar-chart-sample, pie-chart-sample,
+               document-statistics-sample.
