@@ -1,7 +1,7 @@
 {
   "key": "natural",
   "name": "Natural",
-  "name_bn": "প্রাকৃতিক",
+  "name_bn": "",
   "premise": "Six colours and no more: four natural hues, pure black and pure white. The four naturals are all primary — none is a supporting colour for the others. They are desaturated earth tones rather than screen colours, chosen so the same palette holds in print against Pantone solid coated stock as it does in sRGB. Pure black and pure white are the anchors: in the light theme the page is white and the text is black, which is the strongest pairing there is, and the surfaces between them carry a faint grey tint so depth stays visible without introducing a colour. This direction replaces Estuary, taken on 14 August 2026 and superseded on 26 August 2026 by the owner's decision to discard the old brand colours entirely.",
   "supersedes": {
     "direction": "estuary",
@@ -24,35 +24,35 @@
     "ink_light": "#000000",
     "ink_dark": "#FFFFFF",
     "label_black": "Pure Black",
-    "label_black_bn": "নিখাদ কালো",
+    "label_black_bn": "",
     "label_white": "Pure White",
-    "label_white_bn": "নিখাদ সাদা"
+    "label_white_bn": ""
   },
   "families": {
     "ground": {
       "label": "Natural Gray",
-      "label_bn": "প্রাকৃতিক ধূসর",
+      "label_bn": "",
       "kind": "brand",
       "anchor": "#84807C",
       "note": "Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text — so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor."
     },
     "accent": {
       "label": "Natural Blue",
-      "label_bn": "প্রাকৃতিক নীল",
+      "label_bn": "",
       "kind": "brand",
       "anchor": "#224959",
       "note": "Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA."
     },
     "success": {
       "label": "Natural Green",
-      "label_bn": "প্রাকৃতিক সবুজ",
+      "label_bn": "",
       "kind": "brand",
       "anchor": "#2C5A3A",
       "note": "Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA."
     },
     "danger": {
       "label": "Natural Red",
-      "label_bn": "প্রাকৃতিক লাল",
+      "label_bn": "",
       "kind": "brand",
       "anchor": "#A14F39",
       "note": "Primary. A warm terracotta. Measured 5.69:1 on white at its anchor — it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp."
@@ -79,5 +79,6 @@
       ],
       "why": "In the dark themes both resolve to Natural Gray at its own anchor, #84807C. That is the brand colour doing two jobs rather than an accident: quiet text and a border are the two places a neutral belongs, and the palette has one neutral by design. The light themes separate them — ink-muted takes a darker step there — so the collision is a property of the dark themes alone and is recorded as one."
     }
-  ]
+  ],
+  "bangla_names": "Not yet named in Bangla. The English names were supplied by the owner; the Bangla ones have not been. This repository's rule is that no Bangla is written for it — only strings verified against the Bangla Academy standard appear — so the field is empty rather than filled with a translation nobody has checked. The previous palette's Bangla names (মোহনা, জোয়ার, পলি, কাশ, লাল মাটি, বর্ষা) belong to colours that no longer exist and must not be reused for these."
 }

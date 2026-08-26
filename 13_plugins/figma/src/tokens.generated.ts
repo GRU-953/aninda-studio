@@ -9,10 +9,10 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "528fedcafcb720f4c19374da702852552465d9a99568647224e0edc4c86a85c7";
+export const BUNDLE_SHA256 = "e8cabc55f255419dab47c98db354d26fb2312abf8a2ac49ee19e3b3ad078417f";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
-  "07_tokens/build/primitive.tokens.json": "17a7b271b314fbf5423014b8fb2831e366fb68cea5e2f6800da9e860567cfb78",
+  "07_tokens/build/primitive.tokens.json": "ed3704900dbb4c968130313529ed7379eb004c5dffe28a8a43ef8473a59b62aa",
   "07_tokens/build/semantic.light.tokens.json": "1a71d9d53e38ba681117a1c4407a37aba85da9f40767c368de1e9ff809476e30",
   "07_tokens/build/semantic.dark.tokens.json": "d16e8ea901c4f3be6e2fb1eda7c1232373a8a7c2b29345df6d9e3026d555ef12",
   "07_tokens/build/semantic.hc-light.tokens.json": "54d314c37822a7b828e7089ea46e041a7a9e046c9433017f549e62344ff0afcf",
@@ -253,7 +253,7 @@ export const BUNDLED: RawInput = {
             }
           }
         },
-        "$description": "Natural Gray (প্রাকৃতিক ধূসর) — Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text — so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor.",
+        "$description": "Natural Gray () — Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text — so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 67.68,
@@ -462,7 +462,7 @@ export const BUNDLED: RawInput = {
             }
           }
         },
-        "$description": "Natural Blue (প্রাকৃতিক নীল) — Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA.",
+        "$description": "Natural Blue () — Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 227.242,
@@ -671,7 +671,7 @@ export const BUNDLED: RawInput = {
             }
           }
         },
-        "$description": "Natural Green (প্রাকৃতিক সবুজ) — Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA.",
+        "$description": "Natural Green () — Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 151.991,
@@ -880,7 +880,7 @@ export const BUNDLED: RawInput = {
             }
           }
         },
-        "$description": "Natural Red (প্রাকৃতিক লাল) — Primary. A warm terracotta. Measured 5.69:1 on white at its anchor — it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp.",
+        "$description": "Natural Red () — Primary. A warm terracotta. Measured 5.69:1 on white at its anchor — it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 36.01,

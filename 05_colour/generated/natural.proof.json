@@ -1,7 +1,7 @@
 {
   "key": "natural",
   "name": "Natural",
-  "name_bn": "\u09aa\u09cd\u09b0\u09be\u0995\u09c3\u09a4\u09bf\u0995",
+  "name_bn": "",
   "premise": "Six colours and no more: four natural hues, pure black and pure white. The four naturals are all primary \u2014 none is a supporting colour for the others. They are desaturated earth tones rather than screen colours, chosen so the same palette holds in print against Pantone solid coated stock as it does in sRGB. Pure black and pure white are the anchors: in the light theme the page is white and the text is black, which is the strongest pairing there is, and the surfaces between them carry a faint grey tint so depth stays visible without introducing a colour. This direction replaces Estuary, taken on 14 August 2026 and superseded on 26 August 2026 by the owner's decision to discard the old brand colours entirely.",
   "generated_by": "05_colour/engine.py",
   "warning": "Generated file. Do not hand-edit \u2014 change the direction spec and re-run.",
@@ -18,9 +18,9 @@
     "ink_light": "#000000",
     "ink_dark": "#FFFFFF",
     "label_black": "Pure Black",
-    "label_black_bn": "\u09a8\u09bf\u0996\u09be\u09a6 \u0995\u09be\u09b2\u09cb",
+    "label_black_bn": "",
     "label_white": "Pure White",
-    "label_white_bn": "\u09a8\u09bf\u0996\u09be\u09a6 \u09b8\u09be\u09a6\u09be"
+    "label_white_bn": ""
   },
   "role_sources": {
     "warning": {
@@ -76,7 +76,7 @@
   "families": {
     "ground": {
       "label": "Natural Gray",
-      "label_bn": "\u09aa\u09cd\u09b0\u09be\u0995\u09c3\u09a4\u09bf\u0995 \u09a7\u09c2\u09b8\u09b0",
+      "label_bn": "",
       "kind": "brand",
       "note": "Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text \u2014 so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor.",
       "hue_oklch": 67.68,
@@ -112,7 +112,7 @@
     },
     "accent": {
       "label": "Natural Blue",
-      "label_bn": "\u09aa\u09cd\u09b0\u09be\u0995\u09c3\u09a4\u09bf\u0995 \u09a8\u09c0\u09b2",
+      "label_bn": "",
       "kind": "brand",
       "note": "Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA.",
       "hue_oklch": 227.242,
@@ -148,7 +148,7 @@
     },
     "success": {
       "label": "Natural Green",
-      "label_bn": "\u09aa\u09cd\u09b0\u09be\u0995\u09c3\u09a4\u09bf\u0995 \u09b8\u09ac\u09c1\u099c",
+      "label_bn": "",
       "kind": "brand",
       "note": "Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA.",
       "hue_oklch": 151.991,
@@ -184,7 +184,7 @@
     },
     "danger": {
       "label": "Natural Red",
-      "label_bn": "\u09aa\u09cd\u09b0\u09be\u0995\u09c3\u09a4\u09bf\u0995 \u09b2\u09be\u09b2",
+      "label_bn": "",
       "kind": "brand",
       "note": "Primary. A warm terracotta. Measured 5.69:1 on white at its anchor \u2014 it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp.",
       "hue_oklch": 36.01,

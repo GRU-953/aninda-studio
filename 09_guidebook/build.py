@@ -1237,12 +1237,25 @@ def chapter_colour_en(tok: Tokens) -> str:
         "this book will describe it as one.</p>"))
 
     out.append("<h2>The direction</h2>")
-    out.append(
-        f'<p class="gb-lead">{e(proof["name"])} — {bn_span("col-1", large=True)}</p>'
-    )
+    # The direction's own Bangla name, and NOTHING if it has none.
+    #
+    # This printed bn_span("col-1"), a fixed key that resolved to মোহনা — the
+    # previous palette's name for its ground family, meaning "estuary". When the
+    # palette was replaced on 26 August 2026 the label stayed, so the book showed
+    # "Natural Gray — মোহনা": a new colour under an old colour's name, in a language
+    # the reader is being asked to trust.
+    out.append(f'<p class="gb-lead">{e(proof["name"])}</p>')
+    if not proof.get("name_bn"):
+        out.append(note(
+            "<p><strong>This palette has no Bangla names yet.</strong> The English "
+            "names were supplied by the owner; the Bangla ones have not been. No "
+            "Bangla is written for this book — only strings checked against the "
+            "Bangla Academy standard appear — so the names are absent rather than "
+            "translated. The previous palette's names belong to colours that no "
+            "longer exist and are not reused here.</p>"))
     out.append(f"<p>{e(proof['premise'])}</p>")
 
-    out.append("<h2>The six ramps</h2>")
+    out.append(f"<h2>The ramps</h2>")
     out.append(
         "<p>Each ramp is computed in OKLCH — a colour space where a fixed change "
         "in lightness looks like the same change to the eye at every hue — then "
@@ -1251,8 +1264,6 @@ def chapter_colour_en(tok: Tokens) -> str:
         "steps run 50 to 950.</p>"
     )
     steps = proof["steps"]
-    bn_for_family = {"ground": "col-1", "accent": "col-2", "success": "col-3",
-                     "warning": "col-4", "danger": "col-5", "info": "col-6"}
     for family, fam in proof["families"].items():
         ramp = tok.ramp(family)
         ext = ramp["$extensions"]["studio.aninda"]
@@ -1279,8 +1290,7 @@ def chapter_colour_en(tok: Tokens) -> str:
         )
         note_text = fam["note"] or ramp["$description"]
         out.append(
-            f'<section class="gb-ramp"><h3>{e(fam["label"])} — '
-            f'{bn_span(bn_for_family[family], large=True)} '
+            f'<section class="gb-ramp"><h3>{e(fam["label"])} '
             f'<span class="gb-muted">/ {e(family)}</span></h3>'
             f"<p>{e(note_text)}</p>"
             f'<div class="gb-swatches">{"".join(swatches)}</div>'
@@ -1457,27 +1467,25 @@ def chapter_colour_bn(tok: Tokens) -> str:
     the colour names and two of the four theme names are verified strings."""
     out = [block_gap_notice("gb-4")]
     proof = tok.proof
-    bn_for_family = {"ground": "col-1", "accent": "col-2", "success": "col-3",
-                     "warning": "col-4", "danger": "col-5", "info": "col-6"}
-    out.append("<h2>The six colour names</h2>")
+    out.append("<h2>The colour names</h2>")
     out.append(
-        "<p>All six are brand names. Rule 4 of the Bangla Academy's 2012 rules "
-        "exempts names from the spelling rules, and each is in any case spelled "
-        "correctly — পলি takes a short ই-কার under rule 2.1, and বর্ষা keeps its ষ "
-        "as an unchanged তৎসম under rule 1.1.</p>")
+        "<p>The palette was replaced on 26 August 2026 and its colours have English "
+        "names only. The previous six carried Bangla names, and those names belong "
+        "to colours that no longer exist — reusing one for a different colour would "
+        "be worse than leaving the column empty, so it is empty.</p>")
     rows = []
     for family, fam in proof["families"].items():
         ramp = tok.ramp(family)
         anchor = ramp["$extensions"]["studio.aninda"]["anchor"]
         rows.append([
-            bn_span(bn_for_family[family], large=True),
             e(fam["label"]),
             f"<code>{e(anchor)}</code>",
             e(family),
+            e(fam["label_bn"]) if fam.get("label_bn") else "<em>not yet named</em>",
         ])
-    out.append(table(["Bangla", "English", "Anchor", "Role"], rows,
-                     caption="The six colour family names in Bangla, each with "
-                             "the ramp it anchors."))
+    out.append(table(["English", "Anchor", "Role", "Bangla"], rows,
+                     caption="Each colour family, the anchor it is built from, and "
+                             "the role it fills."))
 
     out.append("<h2>The four themes</h2>")
     rows = []

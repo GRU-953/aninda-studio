@@ -210,7 +210,7 @@
             }
           }
         },
-        "$description": "Natural Gray (প্রাকৃতিক ধূসর) — Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text — so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor.",
+        "$description": "Natural Gray () — Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text — so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 67.68,
@@ -419,7 +419,7 @@
             }
           }
         },
-        "$description": "Natural Blue (প্রাকৃতিক নীল) — Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA.",
+        "$description": "Natural Blue () — Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 227.242,
@@ -628,7 +628,7 @@
             }
           }
         },
-        "$description": "Natural Green (প্রাকৃতিক সবুজ) — Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA.",
+        "$description": "Natural Green () — Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 151.991,
@@ -837,7 +837,7 @@
             }
           }
         },
-        "$description": "Natural Red (প্রাকৃতিক লাল) — Primary. A warm terracotta. Measured 5.69:1 on white at its anchor — it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp.",
+        "$description": "Natural Red () — Primary. A warm terracotta. Measured 5.69:1 on white at its anchor — it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 36.01,
