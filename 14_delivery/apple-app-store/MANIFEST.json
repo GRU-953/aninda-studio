@@ -1,0 +1,299 @@
+{
+ "_generator": "14_delivery/build.py",
+ "_warning": "GENERATED FILE. Written by 14_delivery/build.py. Do not hand-edit — the next build overwrites it.",
+ "store": "Apple App Store",
+ "assessed_on": "2026-08-26",
+ "state": "Complete as a set of assets and incomplete as a submission. No Aninda Studio app exists, so the screenshots are frames rather than captures and several required fields are forms rather than files. CHECKLIST.md separates the two.",
+ "source_artwork": "04_mark/svg/, written by 04_mark/build.py",
+ "renderer": "Chromium via Playwright, device_scale_factor 1",
+ "colour_space": "Every raster carries an sRGB chunk. That DECLARES which space its numbers are in. It does not claim the renderer produced sRGB values, and no Display P3 asset exists, so no P3 claim is made for any platform.",
+ "files": [
+  {
+   "path": "icon/icon-1024-dark.png",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 26093,
+   "alpha": "opaque",
+   "purpose": "Apple app icon, Dark appearance, 1024 x 1024 px.",
+   "spec": "Apple app icon layout size 1024 x 1024 px for iOS, iPadOS, macOS and visionOS, and 1088 x 1088 px for watchOS, unmasked",
+   "source": "https://developer.apple.com/design/human-interface-guidelines/app-icons",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "icon/icon-1024-mono.png",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 20624,
+   "alpha": "alpha",
+   "purpose": "Apple app icon, Mono appearance, 1024 x 1024 px.",
+   "spec": "Apple app icon layout size 1024 x 1024 px for iOS, iPadOS, macOS and visionOS, and 1088 x 1088 px for watchOS, unmasked",
+   "source": "https://developer.apple.com/design/human-interface-guidelines/app-icons",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "icon/icon-1024.png",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 25788,
+   "alpha": "opaque",
+   "purpose": "Apple app icon, Default appearance, 1024 x 1024 px.",
+   "spec": "Apple app icon layout size 1024 x 1024 px for iOS, iPadOS, macOS and visionOS, and 1088 x 1088 px for watchOS, unmasked",
+   "source": "https://developer.apple.com/design/human-interface-guidelines/app-icons",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "icon/icon-1088-watch.png",
+   "w": 1088,
+   "h": 1088,
+   "bytes": 27602,
+   "alpha": "opaque",
+   "purpose": "Apple app icon, Default appearance, 1088 x 1088 px.",
+   "spec": "Apple app icon layout size 1024 x 1024 px for iOS, iPadOS, macOS and visionOS, and 1088 x 1088 px for watchOS, unmasked",
+   "source": "https://developer.apple.com/design/human-interface-guidelines/app-icons",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "screenshots/frames/ipad-13-2064x2752-01.png",
+   "w": 2064,
+   "h": 2752,
+   "bytes": 263565,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 1 of 4, iPad 13 inch. A template.",
+   "spec": "App Store Connect screenshots: iPhone 6.9 inch 1290 x 2796 px, iPad 13 inch 2064 x 2752 px, 1 to 10 per device type, no alpha",
+   "source": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "screenshots/frames/ipad-13-2064x2752-02.png",
+   "w": 2064,
+   "h": 2752,
+   "bytes": 263869,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 2 of 4, iPad 13 inch. A template.",
+   "spec": "App Store Connect screenshots: iPhone 6.9 inch 1290 x 2796 px, iPad 13 inch 2064 x 2752 px, 1 to 10 per device type, no alpha",
+   "source": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "screenshots/frames/ipad-13-2064x2752-03.png",
+   "w": 2064,
+   "h": 2752,
+   "bytes": 263937,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 3 of 4, iPad 13 inch. A template.",
+   "spec": "App Store Connect screenshots: iPhone 6.9 inch 1290 x 2796 px, iPad 13 inch 2064 x 2752 px, 1 to 10 per device type, no alpha",
+   "source": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "screenshots/frames/ipad-13-2064x2752-04.png",
+   "w": 2064,
+   "h": 2752,
+   "bytes": 263717,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 4 of 4, iPad 13 inch. A template.",
+   "spec": "App Store Connect screenshots: iPhone 6.9 inch 1290 x 2796 px, iPad 13 inch 2064 x 2752 px, 1 to 10 per device type, no alpha",
+   "source": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "screenshots/frames/iphone-6.9-1290x2796-01.png",
+   "w": 1290,
+   "h": 2796,
+   "bytes": 155219,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 1 of 4, iPhone 6.9 inch. A template.",
+   "spec": "App Store Connect screenshots: iPhone 6.9 inch 1290 x 2796 px, iPad 13 inch 2064 x 2752 px, 1 to 10 per device type, no alpha",
+   "source": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "screenshots/frames/iphone-6.9-1290x2796-02.png",
+   "w": 1290,
+   "h": 2796,
+   "bytes": 154899,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 2 of 4, iPhone 6.9 inch. A template.",
+   "spec": "App Store Connect screenshots: iPhone 6.9 inch 1290 x 2796 px, iPad 13 inch 2064 x 2752 px, 1 to 10 per device type, no alpha",
+   "source": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "screenshots/frames/iphone-6.9-1290x2796-03.png",
+   "w": 1290,
+   "h": 2796,
+   "bytes": 155453,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 3 of 4, iPhone 6.9 inch. A template.",
+   "spec": "App Store Connect screenshots: iPhone 6.9 inch 1290 x 2796 px, iPad 13 inch 2064 x 2752 px, 1 to 10 per device type, no alpha",
+   "source": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "screenshots/frames/iphone-6.9-1290x2796-04.png",
+   "w": 1290,
+   "h": 2796,
+   "bytes": 155094,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 4 of 4, iPhone 6.9 inch. A template.",
+   "spec": "App Store Connect screenshots: iPhone 6.9 inch 1290 x 2796 px, iPad 13 inch 2064 x 2752 px, 1 to 10 per device type, no alpha",
+   "source": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "checked": "2026-08-26"
+  }
+ ],
+ "text": {
+  "en": [
+   {
+    "field": "description",
+    "limit": 4000,
+    "counted_in": "code_points",
+    "code_points": 648,
+    "utf8_bytes": 648,
+    "text": "Aninda Studio is one person making small, careful software.\n\nEverything here is built on a design system where the claims are measured rather than asserted. Every colour pairing was measured against every surface it can land on, in a real browser, and the published figure is the worst result rather than the flattering one. Where something has a limit, the limit is written down.\n\nThe system is bilingual. English and Bangla are both first-class, and the Bangla type was measured rather than scaled by eye: it carries its own size ramp, its own floor, and a weight step for small sizes.\n\nThis listing describes the studio. No app is published yet."
+   },
+   {
+    "field": "keywords",
+    "limit": 100,
+    "counted_in": "utf8_bytes",
+    "code_points": 74,
+    "utf8_bytes": 74,
+    "text": "design system,design tokens,accessibility,contrast,bangla,typography,brand"
+   },
+   {
+    "field": "name",
+    "limit": 30,
+    "counted_in": "code_points",
+    "code_points": 13,
+    "utf8_bytes": 13,
+    "text": "Aninda Studio"
+   },
+   {
+    "field": "promotional_text",
+    "limit": 170,
+    "counted_in": "code_points",
+    "code_points": 135,
+    "utf8_bytes": 135,
+    "text": "A design system where every colour pairing is measured against every surface it can land on, and the worst result is the one published."
+   },
+   {
+    "field": "subtitle",
+    "limit": 30,
+    "counted_in": "code_points",
+    "code_points": 23,
+    "utf8_bytes": 23,
+    "text": "Small, careful software"
+   }
+  ],
+  "bn": [
+   {
+    "field": "description",
+    "limit": 4000,
+    "counted_in": "code_points",
+    "code_points": 460,
+    "utf8_bytes": 1212,
+    "text": "অনিন্দ্য স্টুডিও — এক জন মানুষ, ছোটো আর যত্নে গড়া সফটওয়্যার।\n\nএখানের সব কিছু এমন একটি ডিজাইন পদ্ধতির উপর গড়া, যেখানে প্রতিটি দাবি মেপে দেখা হয়েছে, শুধু বলা হয়নি। প্রতিটি রঙের জোড়া যে যে পৃষ্ঠের উপর বসতে পারে, সবগুলোর সঙ্গে সত্যিকারের ব্রাউজারে মেপে দেখা হয়েছে — আর প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি, সবচেয়ে ভালোটি নয়।\n\nপদ্ধতিটি দুই ভাষার। বাংলা আর ইংরেজি — দুটোই সমান গুরুত্ব পায়।\n\nএই তালিকাটি স্টুডিওর পরিচয়। এখনো কোনো অ্যাপ প্রকাশ করা হয়নি।"
+   },
+   {
+    "field": "keywords",
+    "limit": 100,
+    "counted_in": "utf8_bytes",
+    "code_points": 32,
+    "utf8_bytes": 88,
+    "text": "ডিজাইন,টোকেন,বাংলা,হরফ,কনট্রাস্ট"
+   },
+   {
+    "field": "name",
+    "limit": 30,
+    "counted_in": "code_points",
+    "code_points": 16,
+    "utf8_bytes": 46,
+    "text": "অনিন্দ্য স্টুডিও"
+   },
+   {
+    "field": "promotional_text",
+    "limit": 170,
+    "counted_in": "code_points",
+    "code_points": 130,
+    "utf8_bytes": 348,
+    "text": "একটি ডিজাইন পদ্ধতি, যেখানে প্রতিটি রঙের জোড়া প্রতিটি পৃষ্ঠের সঙ্গে মেপে দেখা হয়েছে — আর প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি।"
+   },
+   {
+    "field": "subtitle",
+    "limit": 30,
+    "counted_in": "code_points",
+    "code_points": 23,
+    "utf8_bytes": 63,
+    "text": "ছোটো, যত্নের সফটওয়্যার"
+   }
+  ]
+ },
+ "sources": {
+  "apple-app-icon": {
+   "spec": "Apple app icon layout size 1024 x 1024 px for iOS, iPadOS, macOS and visionOS, and 1088 x 1088 px for watchOS, unmasked",
+   "url": "https://developer.apple.com/design/human-interface-guidelines/app-icons",
+   "quote": "Produce appropriately shaped, unmasked layers. The system masks all layer edges to produce an icon's final shape.",
+   "note": "Colour spaces supported are sRGB, Gray Gamma 2.2 and Display P3; Display P3 is not supported on visionOS. These masters are sRGB and declare it.",
+   "checked": "2026-08-26"
+  },
+  "apple-listing-text": {
+   "spec": "App Store text: name 30 characters, subtitle 30, promotional text 170, description 4000, keywords 100 bytes",
+   "url": "https://developer.apple.com/help/app-store-connect/reference/app-information",
+   "quote": "App names must be limited to 30 characters.",
+   "note": "Apple's own pages disagree on keywords: the App Store Connect reference says 100 bytes and the marketing page says 100 characters. The tighter reading is used here, because for a non-Latin script the two differ and bytes is the smaller budget.",
+   "checked": "2026-08-26"
+  },
+  "apple-screenshot-content": {
+   "spec": "Screenshots must show the app in use",
+   "url": "https://developer.apple.com/app-store/review/guidelines/",
+   "quote": "Screenshots should show the app in use, and not merely the title art, login page, or splash screen.",
+   "note": "App Review Guideline 2.3.3. It is the reason the frames here carry no mark: a template that resembles the rejected thing invites the mistake it exists to prevent.",
+   "checked": "2026-08-26"
+  },
+  "apple-screenshots": {
+   "spec": "App Store Connect screenshots: iPhone 6.9 inch 1290 x 2796 px, iPad 13 inch 2064 x 2752 px, 1 to 10 per device type, no alpha",
+   "url": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "quote": "No alpha channels or transparencies allowed.",
+   "note": "The iPad 13 inch set is required only if the app runs on iPad. The 6.5 inch iPhone set is required only when 6.9 inch is not provided, and 6.9 inch is provided here, so it is deliberately absent.",
+   "checked": "2026-08-26"
+  }
+ },
+ "recorded_conflicts": [
+  {
+   "conflict": "Apple's App Store Connect reference gives keywords a limit of 100 bytes; its marketing page says 100 characters.",
+   "reading": "100 bytes, the tighter of the two.",
+   "measured": "Every field is counted both ways and the larger count must fit."
+  },
+  {
+   "conflict": "Apple's material gives three different counts of icon appearances: the specification table lists six, the prose says four, and Icon Composer authors three.",
+   "reading": "All three are right in their own context. Three are authored here — Default, Dark and Mono.",
+   "measured": "Apple generates clear light, clear dark, tinted light and tinted dark from those three. This build cannot show them."
+  },
+  {
+   "conflict": "The widely repeated rule that an App Store icon may carry no alpha channel could not be found on any current Apple page.",
+   "reading": "Treated as a live risk rather than a citable specification. The only evidence is an upload validator error documented in third-party sources dated 2017 to 2023.",
+   "measured": "The Default, Dark and watchOS masters are fully opaque anyway, so the question does not arise for them."
+  }
+ ],
+ "not_shipped": [
+  {
+   "what": "tvOS icon, 800 x 480 px",
+   "why": "A layered parallax stack. It cannot be derived from one mark without inventing layer separations, so nothing is shipped rather than something guessed."
+  },
+  {
+   "what": "visionOS asset-catalogue stack",
+   "why": "An image stack of up to three layers. The square 1024 master is the input it would be built from."
+  },
+  {
+   "what": "An Icon Composer .icon file",
+   "why": "Icon Composer's document format is an Xcode artefact this repository cannot author. The guide's step is to open Icon Composer and place these layers."
+  },
+  {
+   "what": "App previews",
+   "why": "Video of an app that does not exist."
+  },
+  {
+   "what": "iPhone 6.5 inch screenshots",
+   "why": "Required only when 6.9 inch is not provided, and 6.9 inch is provided."
+  }
+ ]
+}

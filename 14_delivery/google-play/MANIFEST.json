@@ -1,0 +1,374 @@
+{
+ "_generator": "14_delivery/build.py",
+ "_warning": "GENERATED FILE. Written by 14_delivery/build.py. Do not hand-edit — the next build overwrites it.",
+ "store": "Google Play",
+ "assessed_on": "2026-08-26",
+ "state": "Complete as a set of assets and incomplete as a submission. No Aninda Studio app exists, so the screenshots are frames rather than captures and several required fields are forms rather than files. CHECKLIST.md separates the two.",
+ "source_artwork": "04_mark/svg/, written by 04_mark/build.py",
+ "renderer": "Chromium via Playwright, device_scale_factor 1",
+ "colour_space": "Every raster carries an sRGB chunk. That DECLARES which space its numbers are in. It does not claim the renderer produced sRGB values, and no Display P3 asset exists, so no P3 claim is made for any platform.",
+ "files": [
+  {
+   "path": "app-res/mipmap-hdpi/ic_launcher_background.png",
+   "w": 162,
+   "h": 162,
+   "bytes": 474,
+   "alpha": "opaque",
+   "purpose": "Android adaptive icon background layer at hdpi, 162 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-hdpi/ic_launcher_foreground.png",
+   "w": 162,
+   "h": 162,
+   "bytes": 1825,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon foreground layer at hdpi, 162 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-hdpi/ic_launcher_monochrome.png",
+   "w": 162,
+   "h": 162,
+   "bytes": 1825,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon monochrome layer at hdpi, 162 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-mdpi/ic_launcher_background.png",
+   "w": 108,
+   "h": 108,
+   "bytes": 366,
+   "alpha": "opaque",
+   "purpose": "Android adaptive icon background layer at mdpi, 108 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-mdpi/ic_launcher_foreground.png",
+   "w": 108,
+   "h": 108,
+   "bytes": 1249,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon foreground layer at mdpi, 108 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-mdpi/ic_launcher_monochrome.png",
+   "w": 108,
+   "h": 108,
+   "bytes": 1249,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon monochrome layer at mdpi, 108 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-xhdpi/ic_launcher_background.png",
+   "w": 216,
+   "h": 216,
+   "bytes": 618,
+   "alpha": "opaque",
+   "purpose": "Android adaptive icon background layer at xhdpi, 216 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-xhdpi/ic_launcher_foreground.png",
+   "w": 216,
+   "h": 216,
+   "bytes": 2482,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon foreground layer at xhdpi, 216 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-xhdpi/ic_launcher_monochrome.png",
+   "w": 216,
+   "h": 216,
+   "bytes": 2482,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon monochrome layer at xhdpi, 216 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-xxhdpi/ic_launcher_background.png",
+   "w": 324,
+   "h": 324,
+   "bytes": 912,
+   "alpha": "opaque",
+   "purpose": "Android adaptive icon background layer at xxhdpi, 324 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-xxhdpi/ic_launcher_foreground.png",
+   "w": 324,
+   "h": 324,
+   "bytes": 4070,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon foreground layer at xxhdpi, 324 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-xxhdpi/ic_launcher_monochrome.png",
+   "w": 324,
+   "h": 324,
+   "bytes": 4070,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon monochrome layer at xxhdpi, 324 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-xxxhdpi/ic_launcher_background.png",
+   "w": 432,
+   "h": 432,
+   "bytes": 1325,
+   "alpha": "opaque",
+   "purpose": "Android adaptive icon background layer at xxxhdpi, 432 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+   "w": 432,
+   "h": 432,
+   "bytes": 5713,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon foreground layer at xxxhdpi, 432 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "app-res/mipmap-xxxhdpi/ic_launcher_monochrome.png",
+   "w": 432,
+   "h": 432,
+   "bytes": 5713,
+   "alpha": "alpha",
+   "purpose": "Android adaptive icon monochrome layer at xxxhdpi, 432 px for a 108 dp canvas.",
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "source": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "store-listing/feature-graphic-1024x500.png",
+   "w": 1024,
+   "h": 500,
+   "bytes": 29329,
+   "alpha": "no-alpha-channel",
+   "purpose": "Google Play feature graphic. Mandatory to publish a listing.",
+   "spec": "Google Play feature graphic, 1024 x 500 px, JPEG or 24-bit PNG, no alpha. Mandatory to publish",
+   "source": "https://support.google.com/googleplay/android-developer/answer/9866151",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "store-listing/icon-512.png",
+   "w": 512,
+   "h": 512,
+   "bytes": 13037,
+   "alpha": "opaque-with-band",
+   "purpose": "Google Play store icon. Full square; Play applies its own 30 per cent corner mask and its own drop shadow.",
+   "spec": "Google Play app icon, 512 x 512 px, 32-bit PNG, sRGB, under 1024 KB, full square",
+   "source": "https://developer.android.com/distribute/google-play/resources/icon-design-specifications",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "store-listing/screenshots/frames/phone-1080x1920-01.png",
+   "w": 1080,
+   "h": 1920,
+   "bytes": 110359,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 1 of 4, Android phone. A template.",
+   "spec": "Google Play phone screenshot, JPEG or 24-bit PNG, no alpha, minimum side 320 px, maximum 3840 px, longer side no more than twice the shorter. At least two are mandatory to publish",
+   "source": "https://support.google.com/googleplay/android-developer/answer/9866151",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "store-listing/screenshots/frames/phone-1080x1920-02.png",
+   "w": 1080,
+   "h": 1920,
+   "bytes": 110539,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 2 of 4, Android phone. A template.",
+   "spec": "Google Play phone screenshot, JPEG or 24-bit PNG, no alpha, minimum side 320 px, maximum 3840 px, longer side no more than twice the shorter. At least two are mandatory to publish",
+   "source": "https://support.google.com/googleplay/android-developer/answer/9866151",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "store-listing/screenshots/frames/phone-1080x1920-03.png",
+   "w": 1080,
+   "h": 1920,
+   "bytes": 110512,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 3 of 4, Android phone. A template.",
+   "spec": "Google Play phone screenshot, JPEG or 24-bit PNG, no alpha, minimum side 320 px, maximum 3840 px, longer side no more than twice the shorter. At least two are mandatory to publish",
+   "source": "https://support.google.com/googleplay/android-developer/answer/9866151",
+   "checked": "2026-08-26"
+  },
+  {
+   "path": "store-listing/screenshots/frames/phone-1080x1920-04.png",
+   "w": 1080,
+   "h": 1920,
+   "bytes": 110204,
+   "alpha": "no-alpha-channel",
+   "purpose": "Screenshot frame 4 of 4, Android phone. A template.",
+   "spec": "Google Play phone screenshot, JPEG or 24-bit PNG, no alpha, minimum side 320 px, maximum 3840 px, longer side no more than twice the shorter. At least two are mandatory to publish",
+   "source": "https://support.google.com/googleplay/android-developer/answer/9866151",
+   "checked": "2026-08-26"
+  }
+ ],
+ "text": {
+  "en": [
+   {
+    "field": "full_description",
+    "limit": 4000,
+    "counted_in": "code_points",
+    "code_points": 648,
+    "utf8_bytes": 648,
+    "text": "Aninda Studio is one person making small, careful software.\n\nEverything here is built on a design system where the claims are measured rather than asserted. Every colour pairing was measured against every surface it can land on, in a real browser, and the published figure is the worst result rather than the flattering one. Where something has a limit, the limit is written down.\n\nThe system is bilingual. English and Bangla are both first-class, and the Bangla type was measured rather than scaled by eye: it carries its own size ramp, its own floor, and a weight step for small sizes.\n\nThis listing describes the studio. No app is published yet."
+   },
+   {
+    "field": "short_description",
+    "limit": 80,
+    "counted_in": "code_points",
+    "code_points": 49,
+    "utf8_bytes": 49,
+    "text": "Small, careful software from a one-person studio."
+   },
+   {
+    "field": "title",
+    "limit": 30,
+    "counted_in": "code_points",
+    "code_points": 13,
+    "utf8_bytes": 13,
+    "text": "Aninda Studio"
+   }
+  ],
+  "bn": [
+   {
+    "field": "full_description",
+    "limit": 4000,
+    "counted_in": "code_points",
+    "code_points": 642,
+    "utf8_bytes": 1684,
+    "text": "অনিন্দ্য স্টুডিও — এক জন মানুষ, ছোটো আর যত্নে গড়া সফটওয়্যার।\n\nএখানের সব কিছু এমন একটি ডিজাইন পদ্ধতির উপর গড়া, যেখানে প্রতিটি দাবি মেপে দেখা হয়েছে, শুধু বলা হয়নি। প্রতিটি রঙের জোড়া যে যে পৃষ্ঠের উপর বসতে পারে, সবগুলোর সঙ্গে সত্যিকারের ব্রাউজারে মেপে দেখা হয়েছে — আর প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি, সবচেয়ে ভালোটি নয়। কোনো কিছুর সীমা থাকলে সেটাও লেখা আছে।\n\nপদ্ধতিটি দুই ভাষার। বাংলা আর ইংরেজি — দুটোই সমান গুরুত্ব পায়। বাংলা হরফের মাপ চোখে দেখে বসানো হয়নি, মেপে নেওয়া হয়েছে: তার নিজের মাপের ধাপ আছে, নিজের সর্বনিম্ন সীমা আছে, আর ছোটো মাপে একটি ওজনের ধাপও আছে।\n\nএই তালিকাটি স্টুডিওর পরিচয়। এখনো কোনো অ্যাপ প্রকাশ করা হয়নি।"
+   },
+   {
+    "field": "short_description",
+    "limit": 80,
+    "counted_in": "code_points",
+    "code_points": 37,
+    "utf8_bytes": 99,
+    "text": "এক জনের গড়া ছোটো, যত্নের সফটওয়্যার।"
+   },
+   {
+    "field": "title",
+    "limit": 30,
+    "counted_in": "code_points",
+    "code_points": 16,
+    "utf8_bytes": 46,
+    "text": "অনিন্দ্য স্টুডিও"
+   }
+  ]
+ },
+ "sources": {
+  "play-adaptive-icon": {
+   "spec": "Android adaptive icon, three layers at 108 x 108 dp, safe zone 66 x 66 dp centred, 18 dp per side reserved",
+   "url": "https://developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "quote": "The outer 18 dp on each of the four sides of the layers is reserved for masking and to create visual effects such as parallax or pulsing.",
+   "note": "Declared at res/mipmap-anydpi-v26/ic_launcher.xml. The monochrome layer supports user theming from Android 13, API level 33.",
+   "checked": "2026-08-26"
+  },
+  "play-feature-graphic": {
+   "spec": "Google Play feature graphic, 1024 x 500 px, JPEG or 24-bit PNG, no alpha. Mandatory to publish",
+   "url": "https://support.google.com/googleplay/android-developer/answer/9866151",
+   "quote": "You must provide a feature graphic to publish your store listing. JPEG or 24-bit PNG (no alpha). Dimensions: 1024 px by 500 px.",
+   "note": "Android's core app quality criterion Play_Feature_Graphic adds that it must not contain device images or screenshots, must not carry small text that becomes illegible when scaled down, and must not resemble an advertisement.",
+   "checked": "2026-08-26"
+  },
+  "play-icon": {
+   "spec": "Google Play app icon, 512 x 512 px, 32-bit PNG, sRGB, under 1024 KB, full square",
+   "url": "https://developer.android.com/distribute/google-play/resources/icon-design-specifications",
+   "quote": "Final size: 512 px by 512 px. Format: 32-bit PNG. Color space: sRGB. Max file size: 1024 KB. Shape: Full square — Google Play dynamically handles masking.",
+   "note": "Google Play applies a corner radius equivalent to 30 per cent of the icon size, which is 153.6 px on a 512 px asset, and adds the drop shadow itself. Neither is baked in here.",
+   "checked": "2026-08-26"
+  },
+  "play-listing-text": {
+   "spec": "Google Play listing text: title 30 characters, short description 80, full description 4000",
+   "url": "https://support.google.com/googleplay/android-developer/answer/9859152",
+   "quote": "Character limits apply to both full-width and half-width characters.",
+   "note": "The Metadata policy bans ranking or price claims, Play programme labels, emoji and repeated special characters in the title, and capitals other than a brand name.",
+   "checked": "2026-08-26"
+  },
+  "play-screenshot-phone": {
+   "spec": "Google Play phone screenshot, JPEG or 24-bit PNG, no alpha, minimum side 320 px, maximum 3840 px, longer side no more than twice the shorter. At least two are mandatory to publish",
+   "url": "https://support.google.com/googleplay/android-developer/answer/9866151",
+   "quote": "You must provide a minimum of two screenshots across different device types to publish your store listing.",
+   "note": "Google recommends at least four at 1080 px minimum, either 16:9 landscape or 9:16 portrait. 1080 x 1920 is the portrait figure and is what the frames here are drawn at.",
+   "checked": "2026-08-26"
+  }
+ },
+ "recorded_conflicts": [
+  {
+   "conflict": "Play Console asks for a 32-bit PNG with alpha; the icon design specification says to avoid transparency and use a brand background colour.",
+   "reading": "A 32-bit PNG whose artwork is opaque edge to edge.",
+   "measured": "Four bands present, and every corner alpha 255."
+  },
+  {
+   "conflict": "The 18 dp reserve on each side leaves 72 dp, yet the safe zone is published as 66 dp.",
+   "reading": "Both are published and they describe different things. 108 minus twice 18 is the 72 dp viewport the system displays; the 66 dp safe zone sits inside that, inset a further 3 dp per side.",
+   "measured": "The guard enforces 66 dp, the stricter of the two."
+  },
+  {
+   "conflict": "\"1024 KB\" does not say whether KB is 1000 or 1024 bytes.",
+   "reading": "1 024 000 bytes, the smaller of the two readings.",
+   "measured": "The actual byte count of every file is recorded, so the other reading can be checked without rebuilding."
+  },
+  {
+   "conflict": "Google asks for a logo of at least 48 dp and does not say whether that is height, width or the longest dimension.",
+   "reading": "This mark is taller than it is wide, so the reading decides the answer. At the scale that keeps every inked pixel inside the safe circle it measures 43.89 x 49.29 dp: it meets 48 dp on its long axis and not on its short one.",
+   "measured": "Recorded rather than designed away. Fitting the 66 dp square instead would meet both and would put ink outside the circle a round launcher mask leaves."
+  }
+ ],
+ "not_shipped": [
+  {
+   "what": "Tablet and Chromebook screenshots",
+   "why": "Recommended rather than mandatory, and there is no app to photograph."
+  },
+  {
+   "what": "Wear OS, Android TV, Automotive and XR assets",
+   "why": "Each is required only for distribution to that form factor."
+  },
+  {
+   "what": "A promotional video",
+   "why": "Optional, and needs an app."
+  },
+  {
+   "what": "Notification icon",
+   "why": "Not required to publish, and no app exists to notify. The answer is already computed: at 24 dp the regular stroke renders at 1.99 px, below the 2.4 px the mark floor is written against, so it would be the heavy artwork."
+  }
+ ]
+}

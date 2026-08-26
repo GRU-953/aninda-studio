@@ -64,6 +64,7 @@ and their alert both say the figures are examples rather than readings.
 | `11_site/` | The website, generated from the tokens |
 | `12_packages/` | The tokens as an npm package and a Python package |
 | `13_plugins/` | A Figma plugin, a Claude Code plugin, and the Claude Design bundle |
+| `14_delivery/` | The two store asset packages — 46 files for the Apple App Store and Google Play, each citing the page its size came from |
 | `01_research/` | What was checked, when, and against which source — including what could not be verified |
 
 ## Try it in one minute
@@ -96,7 +97,7 @@ README could not be written.
 
 ## Rebuild everything
 
-17 generators, in dependency order. Each step reads the output of
+18 generators, in dependency order. Each step reads the output of
 the ones above it, so the order is not interchangeable.
 
 ```bash
@@ -106,6 +107,7 @@ the ones above it, so the order is not interchangeable.
   ./.venv/bin/python 04_mark/build.py && \
   ./.venv/bin/python 08_components/build.py && \
   ./.venv/bin/python 10_assets/build.py && \
+  ./.venv/bin/python 14_delivery/build.py && \
   ./.venv/bin/python 12_packages/build.py && \
   ./.venv/bin/python 11_site/build.py && \
   ./.venv/bin/python scripts/benchmark.py && \

@@ -111,6 +111,9 @@ def render(data: dict) -> str:
     counts = {s: sum(1 for g in gaps if g["severity"] == s) for s in SEVERITY_ORDER}
     open_n = sum(1 for g in gaps if g["status"] == "open")
     deferred_n = sum(1 for g in gaps if g["status"] == "deferred")
+    closed_n = sum(1 for g in gaps if g["status"] == "closed")
+    open_blockers = sum(1 for g in gaps
+                        if g["severity"] == "blocker" and g["status"] == "open")
     sourced = sum(1 for g in gaps if g.get("sources"))
     urls = {s["url"] for g in gaps for s in g.get("sources", [])}
 
@@ -126,11 +129,17 @@ def render(data: dict) -> str:
     add("")
     add(data["against"])
     add("")
-    add(f"{len(gaps)} gaps: **{counts['blocker']} blockers**, {counts['major']} major, "
-        f"{counts['minor']} minor. {open_n} open, {deferred_n} deferred with the reason "
-        f"recorded. {sourced} of {len(gaps)} cite a published requirement, across "
-        f"{len(urls)} distinct sources; the rest are rules this kit sets for itself "
-        f"and are marked as such.")
+    add(f"{len(gaps)} gaps found: **{counts['blocker']} blockers**, {counts['major']} "
+        f"major, {counts['minor']} minor.")
+    add("")
+    add(f"**{closed_n} are now closed**, {open_n} are open and {deferred_n} are "
+        f"deferred with the reason recorded. Of the {counts['blocker']} blockers, "
+        f"**{open_blockers} remain open**.")
+    add("")
+    add(f"{sourced} of {len(gaps)} cite a published requirement, across {len(urls)} "
+        f"distinct sources; the rest are rules this kit sets for itself and are "
+        f"marked as such. A closed gap keeps its entry, because the record of what "
+        f"was wrong is the useful part.")
     add("")
     add("A **blocker** means a store would refuse the listing, or a platform's own "
         "component set cannot be built. It does not mean the work is poor. Every one "
@@ -141,14 +150,14 @@ def render(data: dict) -> str:
 
     add("## The short answer")
     add("")
-    add("| # | Gap | Platform | Severity |")
-    add("|---|---|---|---|")
+    add("| # | Gap | Platform | Severity | Status |")
+    add("|---|---|---|---|---|")
+    MARK = {"closed": "**closed**", "open": "open", "deferred": "deferred"}
     for s in SEVERITY_ORDER:
-        for g in gaps:
-            if g["severity"] != s:
-                continue
+        for g in sorted((x for x in gaps if x["severity"] == s),
+                        key=lambda x: (x["status"] != "open", x["id"])):
             add(f"| `{g['id']}` | {g['title']} | {PLATFORM_LABEL[g['platform']]} "
-                f"| {SEVERITY_LABEL[s]} |")
+                f"| {SEVERITY_LABEL[s]} | {MARK[g['status']]} |")
     add("")
     add("---")
     add("")

@@ -1,0 +1,63 @@
+{
+ "_generator": "14_delivery/build.py",
+ "_warning": "GENERATED FILE. Written by 14_delivery/build.py. Do not hand-edit — the next build overwrites it.",
+ "limits_source": {
+  "spec": "Google Play listing text: title 30 characters, short description 80, full description 4000",
+  "url": "https://support.google.com/googleplay/android-developer/answer/9859152",
+  "quote": "Character limits apply to both full-width and half-width characters.",
+  "note": "The Metadata policy bans ranking or price claims, Play programme labels, emoji and repeated special characters in the title, and capitals other than a brand name.",
+  "checked": "2026-08-26"
+ },
+ "en": [
+  {
+   "field": "full_description",
+   "limit": 4000,
+   "counted_in": "code_points",
+   "code_points": 648,
+   "utf8_bytes": 648,
+   "text": "Aninda Studio is one person making small, careful software.\n\nEverything here is built on a design system where the claims are measured rather than asserted. Every colour pairing was measured against every surface it can land on, in a real browser, and the published figure is the worst result rather than the flattering one. Where something has a limit, the limit is written down.\n\nThe system is bilingual. English and Bangla are both first-class, and the Bangla type was measured rather than scaled by eye: it carries its own size ramp, its own floor, and a weight step for small sizes.\n\nThis listing describes the studio. No app is published yet."
+  },
+  {
+   "field": "short_description",
+   "limit": 80,
+   "counted_in": "code_points",
+   "code_points": 49,
+   "utf8_bytes": 49,
+   "text": "Small, careful software from a one-person studio."
+  },
+  {
+   "field": "title",
+   "limit": 30,
+   "counted_in": "code_points",
+   "code_points": 13,
+   "utf8_bytes": 13,
+   "text": "Aninda Studio"
+  }
+ ],
+ "bn": [
+  {
+   "field": "full_description",
+   "limit": 4000,
+   "counted_in": "code_points",
+   "code_points": 642,
+   "utf8_bytes": 1684,
+   "text": "অনিন্দ্য স্টুডিও — এক জন মানুষ, ছোটো আর যত্নে গড়া সফটওয়্যার।\n\nএখানের সব কিছু এমন একটি ডিজাইন পদ্ধতির উপর গড়া, যেখানে প্রতিটি দাবি মেপে দেখা হয়েছে, শুধু বলা হয়নি। প্রতিটি রঙের জোড়া যে যে পৃষ্ঠের উপর বসতে পারে, সবগুলোর সঙ্গে সত্যিকারের ব্রাউজারে মেপে দেখা হয়েছে — আর প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি, সবচেয়ে ভালোটি নয়। কোনো কিছুর সীমা থাকলে সেটাও লেখা আছে।\n\nপদ্ধতিটি দুই ভাষার। বাংলা আর ইংরেজি — দুটোই সমান গুরুত্ব পায়। বাংলা হরফের মাপ চোখে দেখে বসানো হয়নি, মেপে নেওয়া হয়েছে: তার নিজের মাপের ধাপ আছে, নিজের সর্বনিম্ন সীমা আছে, আর ছোটো মাপে একটি ওজনের ধাপও আছে।\n\nএই তালিকাটি স্টুডিওর পরিচয়। এখনো কোনো অ্যাপ প্রকাশ করা হয়নি।"
+  },
+  {
+   "field": "short_description",
+   "limit": 80,
+   "counted_in": "code_points",
+   "code_points": 37,
+   "utf8_bytes": 99,
+   "text": "এক জনের গড়া ছোটো, যত্নের সফটওয়্যার।"
+  },
+  {
+   "field": "title",
+   "limit": 30,
+   "counted_in": "code_points",
+   "code_points": 16,
+   "utf8_bytes": 46,
+   "text": "অনিন্দ্য স্টুডিও"
+  }
+ ]
+}

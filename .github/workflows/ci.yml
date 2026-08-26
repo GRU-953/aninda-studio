@@ -70,7 +70,7 @@ jobs:
         # which read this prose rather than writing their own.
         run: |
           fail=0
-          for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md                       00_sandbox/TOOLCHAIN.md 01_research 02_strategy                       09_guidebook/chapters 13_plugins/claude-code/README.md                       13_plugins/claude-code/skills 13_plugins/figma/README.md 13_plugins/claude-design/PUSH-RECORD.md                       06_type/BANGLA-STANDARD.md 06_type/BANGLA-STRINGS.md                       06_type/SHORTLIST.md 06_type/RECOMMENDATION.md                       06_type/MEASUREMENTS.md 06_type/pairings.md ; do
+          for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md                       00_sandbox/TOOLCHAIN.md 01_research 02_strategy                       09_guidebook/chapters 13_plugins/claude-code/README.md                       13_plugins/claude-code/skills 13_plugins/figma/README.md 13_plugins/claude-design/PUSH-RECORD.md                       06_type/BANGLA-STANDARD.md 06_type/BANGLA-STRINGS.md                       06_type/SHORTLIST.md 06_type/RECOMMENDATION.md                       06_type/MEASUREMENTS.md 06_type/pairings.md 14_delivery/apple-app-store/README.md 14_delivery/google-play/README.md 14_delivery/apple-app-store/CHECKLIST.md 14_delivery/google-play/CHECKLIST.md ; do
             python 13_plugins/claude-code/skills/aninda-review/scripts/check.py "$path"               || { echo "::error::$path fails the English standard"; fail=1; }
           done
           exit $fail
@@ -175,6 +175,12 @@ jobs:
         run: |
           git add -N -- 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
           git diff --exit-code 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
+      - name: The two store packages must match the marks
+        # 14_delivery is what is handed to a developer account. It renders every
+        # store asset through the same Chromium harness 10_assets uses and measures
+        # each one against the published figure it cites, so it belongs in this job
+        # rather than in build — only marks and render install a browser.
+        run: python 14_delivery/build.py --check
       - name: The icon and social assets must match the marks
         # In THIS job, not `build`, because the check re-renders twenty rasters with
         # Playwright and only marks and render install Chromium. It first went into

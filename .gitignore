@@ -9,6 +9,13 @@
 .venv/
 node_modules/
 00_sandbox/browsers/
+# ── The owner's own store screenshots ────────────────────────────────────────
+# 14_delivery holds generated frames, and a generated file that gets overwritten
+# fails the drift gate. Real captures therefore live here instead, outside the two
+# package folders the build owns, so no build can delete them and no gate can be
+# reddened by them.
+14_delivery/_captures/
+
 __pycache__/
 *.py[cod]
 

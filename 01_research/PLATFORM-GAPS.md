@@ -6,7 +6,11 @@ GENERATED FILE. Written by `scripts/gaps.py` from `01_research/_data/platform-ga
 
 Apple Human Interface Guidelines and App Store Connect, and Google Material 3, Android developer documentation and Google Play Console, all read on 26 August 2026.
 
-23 gaps: **8 blockers**, 8 major, 7 minor. 21 open, 2 deferred with the reason recorded. 20 of 23 cite a published requirement, across 14 distinct sources; the rest are rules this kit sets for itself and are marked as such.
+23 gaps found: **8 blockers**, 8 major, 7 minor.
+
+**9 are now closed**, 12 are open and 2 are deferred with the reason recorded. Of the 8 blockers, **2 remain open**.
+
+20 of 23 cite a published requirement, across 14 distinct sources; the rest are rules this kit sets for itself and are marked as such. A closed gap keeps its entry, because the record of what was wrong is the useful part.
 
 A **blocker** means a store would refuse the listing, or a platform's own component set cannot be built. It does not mean the work is poor. Every one of them is a thing this kit never claimed to do, being claimed now.
 
@@ -14,31 +18,31 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ## The short answer
 
-| # | Gap | Platform | Severity |
-|---|---|---|---|
-| `G-ICON-1` | The app icon is pre-rounded, and both platforms ask for it not to be | Both | Blocker |
-| `G-ICON-2` | No 1024 px raster exists, only a vector that is never rendered | Apple | Blocker |
-| `G-ICON-3` | The watchOS master is pre-rounded and no unmasked 1088 exists | Apple | Blocker |
-| `G-ICON-4` | No adaptive icon exists at all | Google | Blocker |
-| `G-ICON-6` | No Play Store icon | Google | Blocker |
-| `G-STORE-1` | No feature graphic | Google | Blocker |
-| `G-STORE-2` | No store screenshots, and none can honestly be made yet | Both | Blocker |
-| `G-COLOUR-1` | No token is named for the colour that sits on the accent | Google | Blocker |
-| `G-ICON-5` | No monochrome layer, so themed icons fall back or are machine-generated | Google | Major |
-| `G-COLOUR-2` | No Material 3 role mapping exists | Google | Major |
-| `G-COLOUR-3` | Material needs secondary and tertiary groups; the brand premise forbids a second expressive colour | Google | Major |
-| `G-NATIVE-1` | Tokens reach no Apple or Android surface | Both | Major |
-| `G-NATIVE-2` | No component maps to either platform | Both | Major |
-| `G-ICON-7` | No artefact is designated the Mono appearance layer | Apple | Major |
-| `G-REC-1` | The type recommendation names a stack that did not ship | This kit's own record | Major |
-| `G-REC-4` | The benchmark missed an announcement nine days older than its own check date | This kit's own record | Major |
-| `G-STORE-3` | No raster declares its colour space | Both | Minor |
-| `G-STORE-4` | No notification icon | Google | Minor |
-| `G-MOTION-1` | Reduced motion removes transitions rather than substituting a fade | Both | Minor |
-| `G-A11Y-1` | Contrast is measured by WCAG relative luminance only; Apple now names APCA as well | Apple | Minor |
-| `G-A11Y-2` | Accessibility Nutrition Labels are unaddressed | Apple | Minor |
-| `G-REC-2` | A third, stale type answer survives in the directions build | This kit's own record | Minor |
-| `G-REC-3` | The mark's minimum size is not in the mark's own manifest | This kit's own record | Minor |
+| # | Gap | Platform | Severity | Status |
+|---|---|---|---|---|
+| `G-COLOUR-1` | No token is named for the colour that sits on the accent | Google | Blocker | open |
+| `G-STORE-2` | No store screenshots, and none can honestly be made yet | Both | Blocker | open |
+| `G-ICON-1` | The app icon is pre-rounded, and both platforms ask for it not to be | Both | Blocker | **closed** |
+| `G-ICON-2` | No 1024 px raster exists, only a vector that is never rendered | Apple | Blocker | **closed** |
+| `G-ICON-3` | The watchOS master is pre-rounded and no unmasked 1088 exists | Apple | Blocker | **closed** |
+| `G-ICON-4` | No adaptive icon exists at all | Google | Blocker | **closed** |
+| `G-ICON-6` | No Play Store icon | Google | Blocker | **closed** |
+| `G-STORE-1` | No feature graphic | Google | Blocker | **closed** |
+| `G-COLOUR-2` | No Material 3 role mapping exists | Google | Major | open |
+| `G-COLOUR-3` | Material needs secondary and tertiary groups; the brand premise forbids a second expressive colour | Google | Major | open |
+| `G-NATIVE-1` | Tokens reach no Apple or Android surface | Both | Major | open |
+| `G-NATIVE-2` | No component maps to either platform | Both | Major | open |
+| `G-REC-1` | The type recommendation names a stack that did not ship | This kit's own record | Major | open |
+| `G-REC-4` | The benchmark missed an announcement nine days older than its own check date | This kit's own record | Major | open |
+| `G-ICON-5` | No monochrome layer, so themed icons fall back or are machine-generated | Google | Major | **closed** |
+| `G-ICON-7` | No artefact is designated the Mono appearance layer | Apple | Major | **closed** |
+| `G-A11Y-1` | Contrast is measured by WCAG relative luminance only; Apple now names APCA as well | Apple | Minor | open |
+| `G-MOTION-1` | Reduced motion removes transitions rather than substituting a fade | Both | Minor | open |
+| `G-REC-2` | A third, stale type answer survives in the directions build | This kit's own record | Minor | open |
+| `G-REC-3` | The mark's minimum size is not in the mark's own manifest | This kit's own record | Minor | open |
+| `G-A11Y-2` | Accessibility Nutrition Labels are unaddressed | Apple | Minor | deferred |
+| `G-STORE-3` | No raster declares its colour space | Both | Minor | **closed** |
+| `G-STORE-4` | No notification icon | Google | Minor | deferred |
 
 ---
 
@@ -46,13 +50,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-ICON-1` — The app icon is pre-rounded, and both platforms ask for it not to be
 
-**Blocker** · Both · open
+**Blocker** · Both · closed
 
 **What is required.** Apple: "Produce appropriately shaped, unmasked layers. The system masks all layer edges… Providing layers with pre-defined masking negatively impacts specular highlight effects and makes edges look jagged." Google: the Play icon is a full square and Play applies a corner mask equivalent to 30 % of the icon size, plus the drop shadow.
 
 **What is here.** Every shipped icon carries rx=24 ry=24 on the 100-unit grid and measures 4.7 % background showing. 04_mark/manifest.json records the decision behind it: "One rounded icon is used on every surface, Apple included. Owner's decision, 14 August 2026."
 
-**The fix.** Reversed by the owner on 26 August 2026: follow each platform's own geometry. Square unmasked masters for Apple, a full square for Play, layered adaptive icons for Android, and the rounded tile kept for the web, because a browser will not round a favicon for you.
+**The fix.** Closed 26 August 2026. The owner reversed the policy and 04_mark/build.py now writes square unmasked masters for Apple and three 108 dp layers for Android, with the rounded tile kept for the web. Measured: the Apple masters and the Android background show 0.0 per cent background, and the mark reads at the same size on both platforms to within 1.24 percentage points.
 
 **Sources.**
 
@@ -61,13 +65,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-ICON-2` — No 1024 px raster exists, only a vector that is never rendered
 
-**Blocker** · Apple · open
+**Blocker** · Apple · closed
 
 **What is required.** App icon layout size is 1024×1024 px for iOS, iPadOS and macOS.
 
 **What is here.** 04_mark/svg/icon-appstore-square-1024.svg exists and is square, fully opaque, 0.0 % background showing. 10_assets/MANIFEST.json states plainly that it "is not rendered by this build". The largest raster in the tree is 512×512.
 
-**The fix.** Render it, and its watchOS sibling, through the existing Chromium harness with the existing measured guards.
+**The fix.** Closed 26 August 2026. 14_delivery/build.py renders icon-1024.png, -dark, -mono and the 1088 watchOS master, each measured for opaque corners and each declaring sRGB.
 
 **Sources.**
 
@@ -75,13 +79,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-ICON-3` — The watchOS master is pre-rounded and no unmasked 1088 exists
 
-**Blocker** · Apple · open
+**Blocker** · Apple · closed
 
 **What is required.** watchOS app icon layout size is 1088×1088 px, unmasked; the system masks it to a circle.
 
 **What is here.** icon-1088-watch.svg is the correct 1088×1088 but carries rx=24 ry=24 and all four corners read (0,0,0,0). Benchmark criterion 1 already records this as part met.
 
-**The fix.** Replace with a square unmasked 1088 whose body is provably the same artwork as the 1024.
+**The fix.** Closed 26 August 2026. icon-apple-1088-watch.svg is square and unmasked, and its rendered master measures 0.0 per cent background showing.
 
 **Sources.**
 
@@ -89,13 +93,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-ICON-4` — No adaptive icon exists at all
 
-**Blocker** · Google · open
+**Blocker** · Google · closed
 
 **What is required.** Each layer is 108×108 dp; the safe zone never clipped by any mask is 66×66 dp centred; the outer 18 dp per side is reserved for masking and motion effects.
 
 **What is here.** No ic_launcher, no mipmap directory, no foreground or background layer anywhere in the repository. The string "adaptive icon" does not appear in any file.
 
-**The fix.** Draw background, foreground and monochrome layers on a 108-unit grid. The placement rule already in 04_mark/build.py generalises: scale is safe_radius / mark_half_diagonal, so 33 / 48.87228 = 0.675229 at stroke 9.
+**The fix.** Closed 26 August 2026. Background, foreground and monochrome layers exist on the 108 dp canvas, rendered at all five densities, with ic_launcher.xml. Every foreground pixel is measured against the 66 dp safe circle, in both directions, so a mark that shrank would fail as loudly as one that overflowed.
 
 **Sources.**
 
@@ -103,13 +107,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-ICON-5` — No monochrome layer, so themed icons fall back or are machine-generated
 
-**Major** · Google · open
+**Major** · Google · closed
 
 **What is required.** A single monochrome layer supports user theming from Android 13 (API 33). From Android 16 QPR 2 the system themes icons automatically for apps that supply none.
 
 **What is here.** 11_site/site.webmanifest declares only "any" and "maskable". No monochrome purpose and no monochrome drawable exists.
 
-**The fix.** Emit a monochrome layer with geometry provably identical to the foreground, and gate that identity by comparing rendered alpha channels.
+**The fix.** Closed 26 August 2026. The monochrome layer is byte-identical to the foreground apart from its title, is measured for a single grey value, and is declared unconditionally in ic_launcher.xml.
 
 **Sources.**
 
@@ -117,13 +121,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-ICON-7` — No artefact is designated the Mono appearance layer
 
-**Major** · Apple · open
+**Major** · Apple · closed
 
 **What is required.** Apple's specification table lists six appearances for iOS, iPadOS and macOS; the prose says four; Icon Composer has you author three, of which Mono is one, and previews clear and tinted from it.
 
 **What is here.** Benchmark criterion 6, part met: single-colour recolourable marks render legibly at 1024 px and at the documented 16 px floor, counter open in both, but no artefact is designated a Mono appearance layer.
 
-**The fix.** Author Default, Dark and Mono, and record that the other four appearances are generated by Apple's renderer and cannot be shown by this build.
+**The fix.** Closed 26 August 2026. icon-apple-1024-mono.svg is designated the Mono appearance, carries no ground, and is refused by check_transparent_layer if one is ever baked in.
 
 **Sources.**
 
@@ -135,13 +139,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-ICON-6` — No Play Store icon
 
-**Blocker** · Google · open
+**Blocker** · Google · closed
 
 **What is required.** 512×512 px, 32-bit PNG, sRGB, maximum 1024 KB, full square. Mandatory to publish a listing.
 
 **What is here.** Nothing of that size or purpose exists.
 
-**The fix.** Render from the square Apple master, which already clears Play's mask: the furthest inked pixel sits 221.7 px from centre against a nearest mask boundary of 256 px, 34.3 px of clearance.
+**The fix.** Closed 26 August 2026. 512 x 512, 32-bit PNG with a fully opaque alpha band, sRGB declared, 13,037 bytes against Google's 1,024,000 limit, and every pixel outside Play's 30 per cent corner arc is measured as ground.
 
 **Sources.**
 
@@ -150,13 +154,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-STORE-1` — No feature graphic
 
-**Blocker** · Google · open
+**Blocker** · Google · closed
 
 **What is required.** 1024×500 px, JPEG or 24-bit PNG, no alpha. "You must provide a feature graphic to publish your store listing." It must not contain device images, screenshots, or small text illegible when scaled down, and must not resemble an advertisement.
 
 **What is here.** No file of that dimension exists and the term appears nowhere in the repository.
 
-**The fix.** Draw it from the existing banner harness, which already produces seven social banners from tokens, and gate it for the absent alpha band.
+**The fix.** Closed 26 August 2026. 1024 x 500, 24-bit, no alpha band, sRGB declared. It carries the mark, the name and one line — no device image, no screenshot, and no small text, per Play_Feature_Graphic.
 
 **Sources.**
 
@@ -171,7 +175,7 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 **What is here.** No screenshot assets exist. No Aninda Studio app exists either, so there is nothing truthful to photograph.
 
-**The fix.** Ship correctly sized frames that could not be mistaken for real captures, plus a step-by-step guide for replacing them. Owner's decision, 26 August 2026. The frames carry no mark, because a frame carrying only the logo is precisely what guideline 2.3.3 rejects.
+**The fix.** Part met 26 August 2026. Correctly sized frames exist for iPhone 6.9 inch, iPad 13 inch and Android phone, drawn with a 45-degree hatch and labelled so they could not be mistaken for a capture, and each names the file that should replace it. A read-only --check-captures mode measures the owner's own screenshots. What cannot be closed without an app is the screenshots themselves.
 
 **Sources.**
 
@@ -181,13 +185,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-STORE-3` — No raster declares its colour space
 
-**Minor** · Both · open
+**Minor** · Both · closed
 
 **What is required.** Play requires sRGB for the store icon. Apple supports sRGB, Gray Gamma 2.2 and Display P3.
 
 **What is here.** Benchmark criterion 7, scored 19 August 2026: no P3 asset exists anywhere, but none of the 19 exported rasters carries an embedded profile, so sRGB is implicit rather than declared.
 
-**The fix.** Write an sRGB chunk in the PNG stamping step and gate it by reading the chunk back. This declares which space the numbers are in; it does not claim the renderer produced them.
+**The fix.** Closed 26 August 2026 for the store packages: every raster written by 14_delivery/build.py carries an sRGB chunk, read back off the file by guard_srgb_declared. The 20 rasters in 10_assets still carry none, so criterion 7 is closed for the store assets and open for the web set.
 
 **Sources.**
 

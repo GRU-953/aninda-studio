@@ -246,26 +246,63 @@ def guard_full_square(image, name: str) -> None:
             f"full-bleed ground should reach every corner identically.")
 
 
+def guard_band_present_and_opaque(image, name: str) -> None:
+    """Google's two pages disagree; this is the reading, measured.
+
+    Play Console asks for a "32-bit PNG (with alpha)". The icon design specification
+    says to avoid transparency and use a brand background colour. The workable
+    reading is a 32-bit file that is opaque everywhere, and MANIFEST.json states
+    that as measured — so it has to be measured.
+    """
+    if "A" not in image.getbands():
+        raise BuildError(
+            f"{name}: has no alpha band. Play Console asks for a 32-bit PNG with "
+            f"alpha; a 24-bit file does not satisfy that reading.")
+    lo, _ = image.getchannel("A").getextrema()
+    if lo != 255:
+        raise BuildError(
+            f"{name}: alpha falls to {lo}. The band must be present AND fully "
+            f"opaque — the icon design specification says to avoid transparency.")
+
+
 def guard_play_corner_mask(image, name: str) -> None:
     """Nothing the mark needs may sit where Play's own 30 per cent mask will cut.
 
+    The geometry has to be right or the guard is theatre. A rounded rectangle does
+    NOT remove the whole corner square: within each r-by-r corner it removes only
+    the part lying OUTSIDE the quarter-circle of radius r centred r in from that
+    corner. The first version of this check tested the whole square and failed on a
+    pixel 22 px from the arc centre, which the mask keeps.
+
     Google publishes the radius as a percentage and does not say whether the curve
-    is a rounded rectangle or a superellipse. This checks the weaker, safe thing:
-    that the four corner squares the mask works within are solid ground, so
-    whichever curve it is, it removes ground and never artwork.
+    is a rounded rectangle or a superellipse. A superellipse of the same nominal
+    radius removes strictly less than the circular arc does, so testing against the
+    arc is the conservative reading, and it is stated here rather than assumed.
     """
     w, h = image.size
-    r = int(round(0.30 * w))
+    r = 0.30 * w
     px = image.convert("RGBA")
     ground = px.getpixel((0, 0))
-    for ox, oy in ((0, 0), (w - r, 0), (0, h - r), (w - r, h - r)):
-        for x in range(ox, ox + r, max(1, r // 24)):
-            for y in range(oy, oy + r, max(1, r // 24)):
+    cx, cy = w / 2.0, h / 2.0
+    nearest = None
+    step = max(1, int(r) // 48)
+    for ox, oy, ax, ay in ((0, 0, r, r), (w - int(r), 0, w - r, r),
+                           (0, h - int(r), r, h - r),
+                           (w - int(r), h - int(r), w - r, h - r)):
+        for x in range(ox, ox + int(r), step):
+            for y in range(oy, oy + int(r), step):
+                if ((x + 0.5 - ax) ** 2 + (y + 0.5 - ay) ** 2) ** 0.5 <= r:
+                    continue                      # inside the arc: Play keeps it
+                d = ((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2) ** 0.5
+                nearest = d if nearest is None else min(nearest, d)
                 if px.getpixel((x, y)) != ground:
                     raise BuildError(
-                        f"{name}: artwork reaches ({x},{y}), inside the {r} px corner "
-                        f"square Google Play's 30 per cent mask works within. Play "
-                        f"would cut it.")
+                        f"{name}: artwork reaches ({x},{y}), which is outside the arc "
+                        f"of Google Play's 30 per cent corner mask, {r:.1f} px on this "
+                        f"{w} px asset. Play would cut it.")
+    if nearest is None:
+        raise BuildError(f"{name}: found no masked region at all, so this guard "
+                         f"measured nothing.")
 
 
 def guard_alpha_is_the_shape(image, name: str) -> None:
@@ -470,36 +507,57 @@ STORE_TEXT_BN = {
             "পদ্ধতিটি দুই ভাষার। বাংলা আর ইংরেজি — দুটোই সমান গুরুত্ব পায়।\n\n"
             "এই তালিকাটি স্টুডিওর পরিচয়। এখনো কোনো অ্যাপ প্রকাশ করা হয়নি।",
             4000),
-        "keywords": ("ডিজাইন,টোকেন,অভিগম্যতা,কনট্রাস্ট,বাংলা,হরফ", 100),
+        # 88 UTF-8 bytes against Apple's 100. The longer draft was 42 code points
+        # and 116 bytes: it fits the "100 characters" reading and fails the "100
+        # bytes" one, which is exactly the conflict recorded in MANIFEST.json and
+        # exactly why both counts are gated.
+        "keywords": ("ডিজাইন,টোকেন,বাংলা,হরফ,কনট্রাস্ট", 100),
     },
 }
 
 
 def guard_text_limits(store: str, fields: dict, label: str) -> list[dict]:
-    """Both counts, because neither store publishes which one it means.
+    """Count in the unit each store actually publishes, and record both.
 
-    Apple's own pages disagree between 100 bytes and 100 characters for keywords.
-    Every field here is measured in code points AND in UTF-8 bytes, and both have
-    to clear the limit. For the ASCII drafts the two agree; for the Bangla they do
-    not, which is exactly why both are recorded.
+    The first version of this guard held every field to the larger of its code
+    point and byte counts. That is wrong, and wrong in a way that mattered: it
+    refused the studio's own Bangla name, which is 16 code points and 46 UTF-8
+    bytes, against a limit both stores publish as CHARACTERS.
+
+    Google is explicit — "Character limits apply to both full-width and half-width
+    characters — the numbers listed above are the maximum limits regardless of what
+    type of characters you are using." Apple's guideline 2.3.7 says "App names must
+    be limited to 30 characters."
+
+    ONE field is genuinely ambiguous: Apple's keywords. The App Store Connect
+    reference says 100 bytes and the marketing page says 100 characters. For a
+    non-Latin script those differ by a factor of three, so that field alone is held
+    to the tighter reading. Both counts are recorded for every field either way, so
+    the other reading can be checked without rebuilding.
     """
+    BYTES_BECAUSE_AMBIGUOUS = {"keywords"}
     rows = []
     for field, (text, limit) in sorted(fields.items()):
         chars, byts = len(text), len(text.encode("utf-8"))
-        worst = max(chars, byts)
-        if worst > limit:
+        unit = "utf8_bytes" if field in BYTES_BECAUSE_AMBIGUOUS else "code_points"
+        measured = byts if unit == "utf8_bytes" else chars
+        if measured > limit:
+            why = ("Apple's own pages disagree on this field between bytes and "
+                   "characters, so the tighter reading is used."
+                   if unit == "utf8_bytes" else
+                   "Both stores publish this limit in characters.")
             raise BuildError(
-                f"{label} {field}: {chars} code points and {byts} UTF-8 bytes, over "
-                f"the published limit of {limit}. Neither store says which unit it "
-                f"counts, so the larger of the two has to fit.")
-        for pattern, why in BANNED_STORE_PATTERNS:
+                f"{label} {field}: {measured} {unit.replace('_', ' ')}, over the "
+                f"published limit of {limit}. {why} "
+                f"({chars} code points, {byts} UTF-8 bytes.)")
+        for pattern, banned_why in BANNED_STORE_PATTERNS:
             hit = re.search(pattern, text, re.I)
             if hit:
                 raise BuildError(
                     f"{label} {field}: contains {hit.group(0)!r}, which is "
-                    f"{why}. Both stores refuse it in listing text.")
-        rows.append({"field": field, "limit": limit, "code_points": chars,
-                     "utf8_bytes": byts, "text": text})
+                    f"{banned_why}. Both stores refuse it in listing text.")
+        rows.append({"field": field, "limit": limit, "counted_in": unit,
+                     "code_points": chars, "utf8_bytes": byts, "text": text})
     return rows
 
 
@@ -551,6 +609,22 @@ def feature_graphic_html(A) -> str:
     )
 
 
+def capture_name(path: str) -> str:
+    """The name to save a real capture under.
+
+    The frame prints this and the README repeats it, so they are derived from one
+    expression rather than typed twice. The first version had the frame say
+    "iphone-6.9-1290x2796-01.png" while the README said "iphone-6.9-01.png" — two
+    instructions for one file, which is how somebody ends up with neither.
+
+    The dimensions come out of the name because the capture is not the frame: it
+    is the thing that replaces it, and repeating the size in the filename invites
+    somebody to rename a frame instead of taking a screenshot.
+    """
+    stem = Path(path).stem
+    return re.sub(r"-\d+x\d+", "", stem) + ".png"
+
+
 def frame_html(A, w: int, h: int, device: str, filename: str, folder: str) -> str:
     """A screenshot frame that could not be mistaken for a screenshot.
 
@@ -592,7 +666,7 @@ def frame_html(A, w: int, h: int, device: str, filename: str, folder: str) -> st
     )
 
 
-def stamp_png(A, png: bytes, name: str, note: str, rgb: bool) -> bytes:
+def stamp_png(A, png: bytes, name: str, note: str, mode: str) -> bytes:
     """Header chunks, plus the sRGB declaration both stores expect.
 
     10_assets/build.py stamps Software and Comment. This adds an sRGB chunk, which
@@ -602,8 +676,16 @@ def stamp_png(A, png: bytes, name: str, note: str, rgb: bool) -> bytes:
     """
     from PIL import Image, PngImagePlugin
     im = Image.open(io.BytesIO(png))
-    if rgb:
+    if mode == "RGB":
         im = im.convert("RGB")          # drops the band, so 24-bit rather than 32
+    elif mode == "RGBA" and im.mode != "RGBA":
+        # Google Play Console asks for the store icon as a "32-bit PNG (with alpha)"
+        # while the icon design specification says to avoid transparency. The reading
+        # taken is a 32-bit file whose artwork is opaque edge to edge — so the band
+        # is ADDED back here rather than left to whatever the renderer happened to
+        # emit. Chromium returned a 24-bit file for the opaque render, which would
+        # have made MANIFEST.json's "four bands present" claim false.
+        im = im.convert("RGBA")
     info = PngImagePlugin.PngInfo()
     info.add_text("Software", GENERATOR)
     info.add_text("Comment", note)
@@ -723,8 +805,7 @@ def render_all(A, items: list[dict]) -> dict[Path, bytes]:
                 folder = ("14_delivery/_captures/apple/" if item["store"] == "apple"
                           else "14_delivery/_captures/google/")
                 html = frame_html(A, item["w"], item["h"], item["render"][1],
-                                  Path(item["path"]).name.replace("-01", "-01")
-                                  .replace("frames/", ""), folder)
+                                  capture_name(item["path"]), folder)
 
             context = browser.new_context(
                 viewport={"width": item["w"], "height": item["h"]},
@@ -740,8 +821,9 @@ def render_all(A, items: list[dict]) -> dict[Path, bytes]:
             if failures:
                 raise BuildError(f"{item['path']}: the render page reported {failures}")
 
-            rgb = item["alpha"] == "no-alpha-channel"
-            png = stamp_png(A, png, Path(item["path"]).name, item["purpose"], rgb)
+            mode = {"no-alpha-channel": "RGB", "opaque-with-band": "RGBA",
+                    "alpha": "RGBA"}.get(item["alpha"], "KEEP")
+            png = stamp_png(A, png, Path(item["path"]).name, item["purpose"], mode)
 
             im = Image.open(io.BytesIO(png))
             name = item["path"]
@@ -756,6 +838,8 @@ def render_all(A, items: list[dict]) -> dict[Path, bytes]:
                                        name) if item["render"][0] == "frame" else None
             elif item["alpha"] in ("opaque", "opaque-with-band"):
                 guard_full_square(im, name)
+                if item["alpha"] == "opaque-with-band":
+                    guard_band_present_and_opaque(im, name)
             elif item["alpha"] == "alpha":
                 guard_alpha_is_the_shape(im, name)
 
@@ -819,7 +903,8 @@ def package_readme(store: str, items: list[dict], text_rows, text_rows_bn) -> st
     is_apple = store == "apple"
     name = "Apple App Store" if is_apple else "Google Play"
     captures = "14_delivery/_captures/apple/" if is_apple else "14_delivery/_captures/google/"
-    example = "iphone-6.9-01.png" if is_apple else "phone-01.png"
+    example = capture_name(
+        "iphone-6.9-1290x2796-01.png" if is_apple else "phone-1080x1920-01.png")
     size_note = ("App Store Connect accepts the capture only at a size it lists."
                  if is_apple else
                  "Google accepts a range: shortest side at least 320 px, longest at "
@@ -936,3 +1021,295 @@ and whether it matches a size the store accepts. It writes nothing, and it is no
 wired into CI, because the files it reads are ignored by git and usually absent —
 a gate that cannot run is not a gate.
 """
+
+
+def manifest(store: str, items: list[dict], rows, rows_bn) -> str:
+    is_apple = store == "apple"
+    root = APPLE if is_apple else PLAY
+    mine = [i for i in items if i["root"] == root]
+    cites = sorted({i["cite"] for i in mine} |
+                   ({"apple-listing-text", "apple-screenshot-content"} if is_apple
+                    else {"play-listing-text"}))
+    payload = {
+        "_generator": GENERATOR,
+        "_warning": DO_NOT_EDIT,
+        "store": "Apple App Store" if is_apple else "Google Play",
+        "assessed_on": CHECKED,
+        "state": ("Complete as a set of assets and incomplete as a submission. No "
+                  "Aninda Studio app exists, so the screenshots are frames rather "
+                  "than captures and several required fields are forms rather than "
+                  "files. CHECKLIST.md separates the two."),
+        "source_artwork": "04_mark/svg/, written by 04_mark/build.py",
+        "renderer": "Chromium via Playwright, device_scale_factor 1",
+        "colour_space": ("Every raster carries an sRGB chunk. That DECLARES which "
+                         "space its numbers are in. It does not claim the renderer "
+                         "produced sRGB values, and no Display P3 asset exists, so no "
+                         "P3 claim is made for any platform."),
+        "files": [{k: i[k] for k in ("path", "w", "h", "bytes", "alpha", "purpose")
+                   if k in i} | {"spec": VERIFIED[i["cite"]]["spec"],
+                                 "source": VERIFIED[i["cite"]]["url"],
+                                 "checked": VERIFIED[i["cite"]]["checked"]}
+                  for i in sorted(mine, key=lambda x: x["path"])],
+        "text": {"en": rows, "bn": rows_bn},
+        "sources": {k: VERIFIED[k] for k in cites},
+        "recorded_conflicts": RECORDED_CONFLICTS[store],
+        "not_shipped": NOT_SHIPPED[store],
+    }
+    return json.dumps(payload, indent=1, ensure_ascii=False) + "\n"
+
+
+RECORDED_CONFLICTS = {
+    "google": [
+        {"conflict": "Play Console asks for a 32-bit PNG with alpha; the icon design "
+                     "specification says to avoid transparency and use a brand "
+                     "background colour.",
+         "reading": "A 32-bit PNG whose artwork is opaque edge to edge.",
+         "measured": "Four bands present, and every corner alpha 255."},
+        {"conflict": "The 18 dp reserve on each side leaves 72 dp, yet the safe zone "
+                     "is published as 66 dp.",
+         "reading": "Both are published and they describe different things. 108 minus "
+                    "twice 18 is the 72 dp viewport the system displays; the 66 dp "
+                    "safe zone sits inside that, inset a further 3 dp per side.",
+         "measured": "The guard enforces 66 dp, the stricter of the two."},
+        {"conflict": "\"1024 KB\" does not say whether KB is 1000 or 1024 bytes.",
+         "reading": "1 024 000 bytes, the smaller of the two readings.",
+         "measured": "The actual byte count of every file is recorded, so the other "
+                     "reading can be checked without rebuilding."},
+        {"conflict": "Google asks for a logo of at least 48 dp and does not say "
+                     "whether that is height, width or the longest dimension.",
+         "reading": "This mark is taller than it is wide, so the reading decides the "
+                    "answer. At the scale that keeps every inked pixel inside the "
+                    "safe circle it measures 43.89 x 49.29 dp: it meets 48 dp on its "
+                    "long axis and not on its short one.",
+         "measured": "Recorded rather than designed away. Fitting the 66 dp square "
+                     "instead would meet both and would put ink outside the circle a "
+                     "round launcher mask leaves."},
+    ],
+    "apple": [
+        {"conflict": "Apple's App Store Connect reference gives keywords a limit of "
+                     "100 bytes; its marketing page says 100 characters.",
+         "reading": "100 bytes, the tighter of the two.",
+         "measured": "Every field is counted both ways and the larger count must fit."},
+        {"conflict": "Apple's material gives three different counts of icon "
+                     "appearances: the specification table lists six, the prose says "
+                     "four, and Icon Composer authors three.",
+         "reading": "All three are right in their own context. Three are authored "
+                    "here — Default, Dark and Mono.",
+         "measured": "Apple generates clear light, clear dark, tinted light and "
+                     "tinted dark from those three. This build cannot show them."},
+        {"conflict": "The widely repeated rule that an App Store icon may carry no "
+                     "alpha channel could not be found on any current Apple page.",
+         "reading": "Treated as a live risk rather than a citable specification. The "
+                    "only evidence is an upload validator error documented in "
+                    "third-party sources dated 2017 to 2023.",
+         "measured": "The Default, Dark and watchOS masters are fully opaque anyway, "
+                     "so the question does not arise for them."},
+    ],
+}
+
+NOT_SHIPPED = {
+    "apple": [
+        {"what": "tvOS icon, 800 x 480 px", "why":
+         "A layered parallax stack. It cannot be derived from one mark without "
+         "inventing layer separations, so nothing is shipped rather than something "
+         "guessed."},
+        {"what": "visionOS asset-catalogue stack", "why":
+         "An image stack of up to three layers. The square 1024 master is the input "
+         "it would be built from."},
+        {"what": "An Icon Composer .icon file", "why":
+         "Icon Composer's document format is an Xcode artefact this repository cannot "
+         "author. The guide's step is to open Icon Composer and place these layers."},
+        {"what": "App previews", "why": "Video of an app that does not exist."},
+        {"what": "iPhone 6.5 inch screenshots", "why":
+         "Required only when 6.9 inch is not provided, and 6.9 inch is provided."},
+    ],
+    "google": [
+        {"what": "Tablet and Chromebook screenshots", "why":
+         "Recommended rather than mandatory, and there is no app to photograph."},
+        {"what": "Wear OS, Android TV, Automotive and XR assets", "why":
+         "Each is required only for distribution to that form factor."},
+        {"what": "A promotional video", "why": "Optional, and needs an app."},
+        {"what": "Notification icon", "why":
+         "Not required to publish, and no app exists to notify. The answer is already "
+         "computed: at 24 dp the regular stroke renders at 1.99 px, below the 2.4 px "
+         "the mark floor is written against, so it would be the heavy artwork."},
+    ],
+}
+
+
+def metadata_markdown(store: str, rows, rows_bn) -> str:
+    def block(label, rs):
+        out = [f"## {label}", ""]
+        for r in rs:
+            out += [f"### {r['field']}", "",
+                    f"*{r['code_points']} code points, {r['utf8_bytes']} UTF-8 bytes, "
+                    f"limit {r['limit']}.*", "", "```", r["text"], "```", ""]
+        return out
+    return "\n".join([f"<!-- {DO_NOT_EDIT} -->", "",
+                      f"# {'Apple App Store' if store == 'apple' else 'Google Play'} "
+                      f"— listing text", "",
+                      "Both counts are given because neither store publishes which "
+                      "unit it counts. The larger of the two must fit.", "",
+                      *block("English", rows), *block("Bangla · বাংলা", rows_bn)])
+
+
+# =========================================================================
+# Driving it
+# =========================================================================
+
+def build() -> dict[Path, bytes]:
+    guard_verified_entries()
+    A = _assets_module()
+    if not (ROOT / "07_tokens" / "css" / "tokens.css").exists():
+        raise NotEquipped("07_tokens/css/tokens.css is missing. Run 07_tokens first.")
+
+    A.guard_glyphs(["Template. Not a screenshot.", "Aninda Studio", A.TAGLINE,
+                    "Replace with a real capture named", "Put it in"])
+
+    items = asset_list()
+    out = render_all(A, items)
+
+    rows = {s: guard_text_limits(s, STORE_TEXT[s], s) for s in ("apple", "play")}
+    rows_bn = {s: guard_text_limits(s, STORE_TEXT_BN[s], f"{s} bn")
+               for s in ("apple", "play")}
+
+    out[PLAY / "app-res/mipmap-anydpi-v26/ic_launcher.xml"] = \
+        LAUNCHER_XML.encode("utf-8")
+
+    for store, root, key in (("apple", APPLE, "apple"), ("google", PLAY, "play")):
+        out[root / "MANIFEST.json"] = manifest(
+            store, items, rows[key], rows_bn[key]).encode("utf-8")
+        out[root / "README.md"] = package_readme(
+            store, items, rows[key], rows_bn[key]).encode("utf-8")
+        out[root / "CHECKLIST.md"] = package_checklist(store).encode("utf-8")
+        out[root / "metadata/metadata.json"] = (json.dumps(
+            {"_generator": GENERATOR, "_warning": DO_NOT_EDIT,
+             "limits_source": VERIFIED[f"{key}-listing-text"],
+             "en": rows[key], "bn": rows_bn[key]},
+            indent=1, ensure_ascii=False) + "\n").encode("utf-8")
+        out[root / "metadata/metadata.md"] = metadata_markdown(
+            store, rows[key], rows_bn[key]).encode("utf-8")
+    return out
+
+
+def ignored(paths: list[Path]) -> set[Path]:
+    """Ask git, and read the answer a line at a time.
+
+    splitlines(), not split(). This repository's own path contains a space, and
+    12_packages/build.py shipped that exact bug: split() shattered every returned
+    path at the space and the ignore set matched nothing.
+    """
+    if not paths:
+        return set()
+    res = subprocess.run(["git", "check-ignore", "--stdin"], cwd=ROOT, text=True,
+                         input="\n".join(str(p) for p in paths),
+                         capture_output=True)
+    return {Path(line).resolve() for line in res.stdout.splitlines()}
+
+
+def compare(out: dict[Path, bytes]) -> list[str]:
+    """Both directions. A file the build did not write is the drift that ships."""
+    problems = []
+    for path, data in sorted(out.items()):
+        if not path.exists():
+            problems.append(f"{path.relative_to(ROOT)} is missing")
+        elif path.read_bytes() != data:
+            problems.append(f"{path.relative_to(ROOT)} differs from the build")
+    on_disk = [p for root in (APPLE, PLAY) if root.is_dir()
+               for p in root.rglob("*") if p.is_file()]
+    skip = ignored(on_disk)
+    for p in sorted(on_disk):
+        if p.resolve() in skip:
+            continue
+        if p not in out:
+            problems.append(f"{p.relative_to(ROOT)} is in the package and is not "
+                            f"generated by this build")
+    return problems
+
+
+def check_captures() -> int:
+    """Read-only. Measures the owner's own captures and writes nothing."""
+    from PIL import Image
+    if not CAPTURES.is_dir():
+        print(f"No captures folder yet. Make {CAPTURES.relative_to(ROOT)} and put "
+              f"your screenshots in it. Nothing here writes to it.")
+        return 0
+    found = sorted(p for p in CAPTURES.rglob("*")
+                   if p.suffix.lower() in (".png", ".jpg", ".jpeg"))
+    if not found:
+        print(f"{CAPTURES.relative_to(ROOT)} holds no images yet.")
+        return 0
+    print(f"{'file':<44} {'pixels':>13} {'alpha':>7}  verdict")
+    print("-" * 84)
+    bad = 0
+    for p in found:
+        im = Image.open(p)
+        w, h = im.size
+        alpha = "yes" if "A" in im.getbands() else "no"
+        store = "apple" if "apple" in p.parts else "play"
+        try:
+            guard_screenshot_shape(w, h, store, p.name)
+            verdict = "an accepted size"
+        except BuildError as exc:
+            verdict = str(exc).split(": ", 1)[-1][:44]
+            bad += 1
+        if alpha == "yes":
+            verdict = "carries an alpha channel; both stores refuse it"
+            bad += 1
+        print(f"{p.name:<44} {f'{w} x {h}':>13} {alpha:>7}  {verdict}")
+    print()
+    print(f"{len(found)} file(s), {bad} that a store would refuse. Nothing written.")
+    return 0
+
+
+def main(argv: list[str]) -> int:
+    if "--check-captures" in argv:
+        return check_captures()
+    try:
+        out = build()
+    except NotEquipped as exc:
+        print(f"NOT EQUIPPED: {exc}", file=sys.stderr)
+        return 2
+    except BuildError as exc:
+        print(f"FAILED — nothing written:\n  {exc}", file=sys.stderr)
+        return 1
+
+    if "--check" in argv:
+        problems = compare(out)
+        if problems:
+            print("--check: the packages differ from the build:", file=sys.stderr)
+            for p in problems:
+                print(f"  {p}", file=sys.stderr)
+            return 1
+        print(f"--check: both packages match the build, {len(out)} files, and hold "
+              f"nothing this build did not write. Nothing written.")
+        return 0
+
+    # Sweep first, so a retired asset cannot survive. Scoped to the two package
+    # roots and never to _captures, which holds the owner's own work.
+    on_disk = [p for root in (APPLE, PLAY) if root.is_dir()
+               for p in root.rglob("*") if p.is_file()]
+    skip = ignored(on_disk)
+    removed = []
+    for p in sorted(on_disk):
+        if p.resolve() not in skip and p not in out:
+            p.unlink()
+            removed.append(p.relative_to(ROOT))
+    for path, data in sorted(out.items()):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+
+    for r in removed:
+        print(f"  removed {r}")
+    n_apple = sum(1 for p in out if APPLE in p.parents or p.parent == APPLE)
+    print(f"  wrote 14_delivery/apple-app-store  {n_apple} files")
+    print(f"  wrote 14_delivery/google-play      {len(out) - n_apple} files")
+    print()
+    print("Neither package can be submitted: there is no app, so the screenshots are "
+          "frames rather than captures. CHECKLIST.md in each says what is ready and "
+          "what is not.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

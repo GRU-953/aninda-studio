@@ -83,6 +83,10 @@ REBUILD_CHAIN = [
     "04_mark/build.py",
     "08_components/build.py",
     "10_assets/build.py",
+    # The store packages read 04_mark/svg and reuse 10_assets/build.py's render
+    # harness, so they come after both. They are what is handed to somebody else,
+    # which is what 14_delivery is for.
+    "14_delivery/build.py",
     "12_packages/build.py",
     "11_site/build.py",
     "09_guidebook/build.py",
@@ -271,6 +275,8 @@ def count() -> dict:
                   len(list((ROOT / "10_assets").glob("*.ico"))) + \
                   len(list((ROOT / "10_assets").glob("*.svg")))
     f["marks"] = len(list((ROOT / "04_mark" / "svg").glob("*.svg")))
+    f["delivery"] = sum(1 for p in (ROOT / "14_delivery").rglob("*")
+                        if p.is_file() and "_captures" not in p.parts)
     f["files"] = sum(1 for p in ROOT.rglob("*") if p.is_file()
                      and not any(x in p.parts for x in
                                  (".venv", "node_modules", "browsers", ".git", "candidates")))
@@ -355,6 +361,7 @@ and their alert both say the figures are examples rather than readings.
 | `11_site/` | The website, generated from the tokens |
 | `12_packages/` | The tokens as an npm package and a Python package |
 | `13_plugins/` | A Figma plugin, a Claude Code plugin, and the Claude Design bundle |
+| `14_delivery/` | The two store asset packages — {f['delivery']} files for the Apple App Store and Google Play, each citing the page its size came from |
 | `01_research/` | What was checked, when, and against which source — including what could not be verified |
 
 ## Try it in one minute

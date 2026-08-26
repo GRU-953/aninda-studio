@@ -110,7 +110,9 @@ for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md \
             13_plugins/figma/README.md 13_plugins/claude-design/PUSH-RECORD.md \
             06_type/BANGLA-STANDARD.md \
             06_type/BANGLA-STRINGS.md 06_type/SHORTLIST.md 06_type/RECOMMENDATION.md \
-            06_type/MEASUREMENTS.md 06_type/pairings.md; do
+            06_type/MEASUREMENTS.md 06_type/pairings.md \
+            14_delivery/apple-app-store/README.md 14_delivery/google-play/README.md \
+            14_delivery/apple-app-store/CHECKLIST.md 14_delivery/google-play/CHECKLIST.md; do
   n_prose=$((n_prose + 1))
   $PY 13_plugins/claude-code/skills/aninda-review/scripts/check.py "$path" >/dev/null 2>&1 \
     || { echo "  english standard FAILED: $path"; fail=1; }
@@ -141,6 +143,7 @@ else
   drift "the committed marks" 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
 fi
 run "scripts/readme.py"       $PY scripts/readme.py --check
+run "14_delivery/build.py"    $PY 14_delivery/build.py --check
 run "10_assets/build.py"      $PY 10_assets/build.py --check
 run "guidebook PDF vs the book" $PY 09_guidebook/scripts/pdf.py --check
 run "claude-design bundle"    $PY 13_plugins/claude-design/build.py --check

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GENERATED FILE. Written by 14_delivery/build.py. Do not hand-edit — the next
+     build overwrites it.
+     The monochrome element is declared unconditionally. It is read from Android 13
+     (API level 33), and from Android 16 QPR 2 the system generates one for any app
+     that does not supply it — having the shape inferred is worse than supplying it. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_background"/>
+    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+    <monochrome android:drawable="@mipmap/ic_launcher_monochrome"/>
+</adaptive-icon>

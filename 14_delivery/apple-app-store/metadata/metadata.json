@@ -1,0 +1,95 @@
+{
+ "_generator": "14_delivery/build.py",
+ "_warning": "GENERATED FILE. Written by 14_delivery/build.py. Do not hand-edit — the next build overwrites it.",
+ "limits_source": {
+  "spec": "App Store text: name 30 characters, subtitle 30, promotional text 170, description 4000, keywords 100 bytes",
+  "url": "https://developer.apple.com/help/app-store-connect/reference/app-information",
+  "quote": "App names must be limited to 30 characters.",
+  "note": "Apple's own pages disagree on keywords: the App Store Connect reference says 100 bytes and the marketing page says 100 characters. The tighter reading is used here, because for a non-Latin script the two differ and bytes is the smaller budget.",
+  "checked": "2026-08-26"
+ },
+ "en": [
+  {
+   "field": "description",
+   "limit": 4000,
+   "counted_in": "code_points",
+   "code_points": 648,
+   "utf8_bytes": 648,
+   "text": "Aninda Studio is one person making small, careful software.\n\nEverything here is built on a design system where the claims are measured rather than asserted. Every colour pairing was measured against every surface it can land on, in a real browser, and the published figure is the worst result rather than the flattering one. Where something has a limit, the limit is written down.\n\nThe system is bilingual. English and Bangla are both first-class, and the Bangla type was measured rather than scaled by eye: it carries its own size ramp, its own floor, and a weight step for small sizes.\n\nThis listing describes the studio. No app is published yet."
+  },
+  {
+   "field": "keywords",
+   "limit": 100,
+   "counted_in": "utf8_bytes",
+   "code_points": 74,
+   "utf8_bytes": 74,
+   "text": "design system,design tokens,accessibility,contrast,bangla,typography,brand"
+  },
+  {
+   "field": "name",
+   "limit": 30,
+   "counted_in": "code_points",
+   "code_points": 13,
+   "utf8_bytes": 13,
+   "text": "Aninda Studio"
+  },
+  {
+   "field": "promotional_text",
+   "limit": 170,
+   "counted_in": "code_points",
+   "code_points": 135,
+   "utf8_bytes": 135,
+   "text": "A design system where every colour pairing is measured against every surface it can land on, and the worst result is the one published."
+  },
+  {
+   "field": "subtitle",
+   "limit": 30,
+   "counted_in": "code_points",
+   "code_points": 23,
+   "utf8_bytes": 23,
+   "text": "Small, careful software"
+  }
+ ],
+ "bn": [
+  {
+   "field": "description",
+   "limit": 4000,
+   "counted_in": "code_points",
+   "code_points": 460,
+   "utf8_bytes": 1212,
+   "text": "অনিন্দ্য স্টুডিও — এক জন মানুষ, ছোটো আর যত্নে গড়া সফটওয়্যার।\n\nএখানের সব কিছু এমন একটি ডিজাইন পদ্ধতির উপর গড়া, যেখানে প্রতিটি দাবি মেপে দেখা হয়েছে, শুধু বলা হয়নি। প্রতিটি রঙের জোড়া যে যে পৃষ্ঠের উপর বসতে পারে, সবগুলোর সঙ্গে সত্যিকারের ব্রাউজারে মেপে দেখা হয়েছে — আর প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি, সবচেয়ে ভালোটি নয়।\n\nপদ্ধতিটি দুই ভাষার। বাংলা আর ইংরেজি — দুটোই সমান গুরুত্ব পায়।\n\nএই তালিকাটি স্টুডিওর পরিচয়। এখনো কোনো অ্যাপ প্রকাশ করা হয়নি।"
+  },
+  {
+   "field": "keywords",
+   "limit": 100,
+   "counted_in": "utf8_bytes",
+   "code_points": 32,
+   "utf8_bytes": 88,
+   "text": "ডিজাইন,টোকেন,বাংলা,হরফ,কনট্রাস্ট"
+  },
+  {
+   "field": "name",
+   "limit": 30,
+   "counted_in": "code_points",
+   "code_points": 16,
+   "utf8_bytes": 46,
+   "text": "অনিন্দ্য স্টুডিও"
+  },
+  {
+   "field": "promotional_text",
+   "limit": 170,
+   "counted_in": "code_points",
+   "code_points": 130,
+   "utf8_bytes": 348,
+   "text": "একটি ডিজাইন পদ্ধতি, যেখানে প্রতিটি রঙের জোড়া প্রতিটি পৃষ্ঠের সঙ্গে মেপে দেখা হয়েছে — আর প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি।"
+  },
+  {
+   "field": "subtitle",
+   "limit": 30,
+   "counted_in": "code_points",
+   "code_points": 23,
+   "utf8_bytes": 63,
+   "text": "ছোটো, যত্নের সফটওয়্যার"
+  }
+ ]
+}

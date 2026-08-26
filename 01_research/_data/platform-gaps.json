@@ -21,8 +21,8 @@
     }
    ],
    "measured": "Every shipped icon carries rx=24 ry=24 on the 100-unit grid and measures 4.7 % background showing. 04_mark/manifest.json records the decision behind it: \"One rounded icon is used on every surface, Apple included. Owner's decision, 14 August 2026.\"",
-   "fix": "Reversed by the owner on 26 August 2026: follow each platform's own geometry. Square unmasked masters for Apple, a full square for Play, layered adaptive icons for Android, and the rounded tile kept for the web, because a browser will not round a favicon for you.",
-   "status": "open"
+   "fix": "Closed 26 August 2026. The owner reversed the policy and 04_mark/build.py now writes square unmasked masters for Apple and three 108 dp layers for Android, with the rounded tile kept for the web. Measured: the Apple masters and the Android background show 0.0 per cent background, and the mark reads at the same size on both platforms to within 1.24 percentage points.",
+   "status": "closed"
   },
   {
    "id": "G-ICON-2",
@@ -38,8 +38,8 @@
     }
    ],
    "measured": "04_mark/svg/icon-appstore-square-1024.svg exists and is square, fully opaque, 0.0 % background showing. 10_assets/MANIFEST.json states plainly that it \"is not rendered by this build\". The largest raster in the tree is 512×512.",
-   "fix": "Render it, and its watchOS sibling, through the existing Chromium harness with the existing measured guards.",
-   "status": "open"
+   "fix": "Closed 26 August 2026. 14_delivery/build.py renders icon-1024.png, -dark, -mono and the 1088 watchOS master, each measured for opaque corners and each declaring sRGB.",
+   "status": "closed"
   },
   {
    "id": "G-ICON-3",
@@ -55,8 +55,8 @@
     }
    ],
    "measured": "icon-1088-watch.svg is the correct 1088×1088 but carries rx=24 ry=24 and all four corners read (0,0,0,0). Benchmark criterion 1 already records this as part met.",
-   "fix": "Replace with a square unmasked 1088 whose body is provably the same artwork as the 1024.",
-   "status": "open"
+   "fix": "Closed 26 August 2026. icon-apple-1088-watch.svg is square and unmasked, and its rendered master measures 0.0 per cent background showing.",
+   "status": "closed"
   },
   {
    "id": "G-ICON-4",
@@ -72,8 +72,8 @@
     }
    ],
    "measured": "No ic_launcher, no mipmap directory, no foreground or background layer anywhere in the repository. The string \"adaptive icon\" does not appear in any file.",
-   "fix": "Draw background, foreground and monochrome layers on a 108-unit grid. The placement rule already in 04_mark/build.py generalises: scale is safe_radius / mark_half_diagonal, so 33 / 48.87228 = 0.675229 at stroke 9.",
-   "status": "open"
+   "fix": "Closed 26 August 2026. Background, foreground and monochrome layers exist on the 108 dp canvas, rendered at all five densities, with ic_launcher.xml. Every foreground pixel is measured against the 66 dp safe circle, in both directions, so a mark that shrank would fail as loudly as one that overflowed.",
+   "status": "closed"
   },
   {
    "id": "G-ICON-5",
@@ -89,8 +89,8 @@
     }
    ],
    "measured": "11_site/site.webmanifest declares only \"any\" and \"maskable\". No monochrome purpose and no monochrome drawable exists.",
-   "fix": "Emit a monochrome layer with geometry provably identical to the foreground, and gate that identity by comparing rendered alpha channels.",
-   "status": "open"
+   "fix": "Closed 26 August 2026. The monochrome layer is byte-identical to the foreground apart from its title, is measured for a single grey value, and is declared unconditionally in ic_launcher.xml.",
+   "status": "closed"
   },
   {
    "id": "G-ICON-6",
@@ -110,8 +110,8 @@
     }
    ],
    "measured": "Nothing of that size or purpose exists.",
-   "fix": "Render from the square Apple master, which already clears Play's mask: the furthest inked pixel sits 221.7 px from centre against a nearest mask boundary of 256 px, 34.3 px of clearance.",
-   "status": "open"
+   "fix": "Closed 26 August 2026. 512 x 512, 32-bit PNG with a fully opaque alpha band, sRGB declared, 13,037 bytes against Google's 1,024,000 limit, and every pixel outside Play's 30 per cent corner arc is measured as ground.",
+   "status": "closed"
   },
   {
    "id": "G-STORE-1",
@@ -131,8 +131,8 @@
     }
    ],
    "measured": "No file of that dimension exists and the term appears nowhere in the repository.",
-   "fix": "Draw it from the existing banner harness, which already produces seven social banners from tokens, and gate it for the absent alpha band.",
-   "status": "open"
+   "fix": "Closed 26 August 2026. 1024 x 500, 24-bit, no alpha band, sRGB declared. It carries the mark, the name and one line — no device image, no screenshot, and no small text, per Play_Feature_Graphic.",
+   "status": "closed"
   },
   {
    "id": "G-STORE-2",
@@ -156,7 +156,7 @@
     }
    ],
    "measured": "No screenshot assets exist. No Aninda Studio app exists either, so there is nothing truthful to photograph.",
-   "fix": "Ship correctly sized frames that could not be mistaken for real captures, plus a step-by-step guide for replacing them. Owner's decision, 26 August 2026. The frames carry no mark, because a frame carrying only the logo is precisely what guideline 2.3.3 rejects.",
+   "fix": "Part met 26 August 2026. Correctly sized frames exist for iPhone 6.9 inch, iPad 13 inch and Android phone, drawn with a 45-degree hatch and labelled so they could not be mistaken for a capture, and each names the file that should replace it. A read-only --check-captures mode measures the owner's own screenshots. What cannot be closed without an app is the screenshots themselves.",
    "status": "open"
   },
   {
@@ -173,8 +173,8 @@
     }
    ],
    "measured": "Benchmark criterion 7, scored 19 August 2026: no P3 asset exists anywhere, but none of the 19 exported rasters carries an embedded profile, so sRGB is implicit rather than declared.",
-   "fix": "Write an sRGB chunk in the PNG stamping step and gate it by reading the chunk back. This declares which space the numbers are in; it does not claim the renderer produced them.",
-   "status": "open"
+   "fix": "Closed 26 August 2026 for the store packages: every raster written by 14_delivery/build.py carries an sRGB chunk, read back off the file by guard_srgb_declared. The 20 rasters in 10_assets still carry none, so criterion 7 is closed for the store assets and open for the web set.",
+   "status": "closed"
   },
   {
    "id": "G-STORE-4",
@@ -321,8 +321,8 @@
     }
    ],
    "measured": "Benchmark criterion 6, part met: single-colour recolourable marks render legibly at 1024 px and at the documented 16 px floor, counter open in both, but no artefact is designated a Mono appearance layer.",
-   "fix": "Author Default, Dark and Mono, and record that the other four appearances are generated by Apple's renderer and cannot be shown by this build.",
-   "status": "open"
+   "fix": "Closed 26 August 2026. icon-apple-1024-mono.svg is designated the Mono appearance, carries no ground, and is refused by check_transparent_layer if one is ever baked in.",
+   "status": "closed"
   },
   {
    "id": "G-A11Y-1",
