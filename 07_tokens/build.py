@@ -371,6 +371,14 @@ def semantic(proof: dict, theme_key: str) -> dict:
     fams = proof["families"]
 
     def step_of(hexv: str, fam_key: str) -> str | None:
+        # A role whose family is not one of the six ramps has no primitive to alias.
+        # `on-accent` is the case: its value is a tonal SURFACE, which is computed
+        # per theme rather than taken from a ramp. Returning None here is the right
+        # answer and not a fallback — it makes the token a literal carrying its
+        # derivation, which is exactly what the aliasing rule asks for. Without this
+        # the lookup raised KeyError: 'surface'.
+        if fam_key not in fams:
+            return None
         for step, h in fams[fam_key]["ramp"].items():
             if h == hexv:
                 return step
@@ -444,8 +452,15 @@ def semantic(proof: dict, theme_key: str) -> dict:
             "surface": surfaces,
             "ink": {"default": role("ink"), "muted": role("ink-muted")},
             "line": {"default": role("line")},
+            # `on` is the colour a filled control puts on top of itself. Its value
+            # is surface.lowest, and it is a LITERAL rather than an alias because
+            # what makes it a token is the proof attached to it: it is measured
+            # against every fill that carries it, and the published figure is the
+            # worst of those. In the dark themes the hardest ground is `danger`
+            # rather than `accent`, so a role proven only against the accent would
+            # publish a figure that is not the worst one.
             "accent": {"default": role("accent"), "edge": role("accent-edge"),
-                       "hover": role("accent-hover")},
+                       "hover": role("accent-hover"), "on": role("on-accent")},
             "focus": {"ring": role("focus")},
             "status": {k: role(k) for k in ("success", "warning", "danger", "info")
                        if k in t["roles"]},
@@ -489,6 +504,24 @@ FORCED_COLORS = {
         # what makes the hovered label readable without this file choosing a
         # contrast for it.
         "color.accent.hover": "ButtonFace",
+        # Canvas, and NOT ButtonText, which is what this was first mapped to.
+        #
+        # The reasoning that produced ButtonText was about the wrong pair. This role
+        # is the label on a FILL, and the fill it sits on is `accent.default`, three
+        # lines above, which maps to LinkText. ButtonText is guaranteed to contrast
+        # with ButtonFace, not with LinkText, and 08_components/check.py measured the
+        # result in a real browser at 1.5:1 against a 4.5 floor, in both
+        # high-contrast themes:
+        #
+        #   form-with-validation forced-colors [hc-light]: contrast 1.5:1 in the
+        #   system palette, needs 4.5:1 — button.as-btn.as-btn--primary
+        #
+        # Canvas is the ground LinkText is defined to be legible against, and
+        # contrast is symmetric, so a Canvas label on a LinkText fill is the same
+        # measured pair the operating system already guarantees. It is also what
+        # surface.lowest mapped to before this role had a name, which is why nothing
+        # regressed until the name arrived.
+        "color.accent.on": "Canvas",
         "color.focus.ring": "Highlight",
         "color.status.success": "CanvasText",
         "color.status.warning": "CanvasText",

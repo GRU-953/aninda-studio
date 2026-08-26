@@ -9,15 +9,15 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "42a6abc3c3f677c27c0f4f04119671f0fdcd52b37e63e1c62a7d6b06eb4de5a6";
+export const BUNDLE_SHA256 = "657b9e1d47cd3af058676e96ec4c2bb12434b26ba9d734aa9bfbb31b416810d9";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
   "07_tokens/build/primitive.tokens.json": "7be43f00f028eb56f3ac4b853b6ca043aec4cea5ad680a68065f8415725186a3",
-  "07_tokens/build/semantic.light.tokens.json": "bcf15346d37fa2566444a2e104355b8d63193219083be5e248e42c62ecddd3f7",
-  "07_tokens/build/semantic.dark.tokens.json": "2e76f39e6583772b465e4e346a4fc4682d60f91014bfd22e5bc88179e383159f",
-  "07_tokens/build/semantic.hc-light.tokens.json": "46ccb577f108f8d2e4d50e05325ae669ea0fdd2da8304ae11c1b11a1ab6022a2",
-  "07_tokens/build/semantic.hc-dark.tokens.json": "92c7347bb61a429b47786e652d0b3e4582fa56ad26dc740d2cd6c00042037ad2",
-  "07_tokens/build/forced-colors.map.json": "58560c18bc09567071160cfea947402ab7f1ad44a9eb128c0ce6d6ae0e10f641",
+  "07_tokens/build/semantic.light.tokens.json": "0be74925c8c214423752db0279c592cadbb9e8be773a0c763900cb08ccd5bbc3",
+  "07_tokens/build/semantic.dark.tokens.json": "9a9ba5b536011906b55060449f9f87ee9477ed7a03bfdeb5667e061319c5e274",
+  "07_tokens/build/semantic.hc-light.tokens.json": "0738f8679c709efe743668594a4bad90bacc35bfe89e30949363f8a95651eff5",
+  "07_tokens/build/semantic.hc-dark.tokens.json": "ebe8f99ab8cc6ed290e0908d1f83328d5988bdae9543da15a5390b31c42c7b3e",
+  "07_tokens/build/forced-colors.map.json": "027a9b4ba422a50e4a6ab891bdf866c31aba500ab4f7e2382b2f647df21a9851",
   "04_mark/svg/icon-1024.svg": "e43a353d8b44b94994094bfbce5dbafb90e6ae7f1b356c080601421e17687779",
   "04_mark/svg/icon-192.svg": "58b7f359ff0841f399214b16ec5790932106dc66854b6c87c7dee88dc20eadb7",
   "04_mark/svg/icon-512.svg": "3b00945f46b41e8017622d73e3eafb49c63209f2a2e8ac9342b91fd0de5caac1",
@@ -1995,6 +1995,38 @@ export const BUNDLED: RawInput = {
           }
         },
         "$value": "{color.ramp.accent.800}"
+      },
+      "on": {
+        "$description": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'accent'",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "surface",
+            "step": "lowest",
+            "kind": "on-fill",
+            "proof": {
+              "required": 4.5,
+              "measured": 6.3399,
+              "worstCaseLsb": 6.1966,
+              "hardestGround": "accent",
+              "level": "AA",
+              "criterion": "WCAG 2.2 1.4.3",
+              "againstEverySurface": {
+                "accent": 6.3399,
+                "accent-hover": 9.4953,
+                "danger": 7.0385
+              }
+            }
+          }
+        },
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.992157,
+            1.0,
+            0.996078
+          ],
+          "hex": "#FDFFFE"
+        }
       }
     },
     "focus": {
@@ -2454,6 +2486,38 @@ export const BUNDLED: RawInput = {
           }
         },
         "$value": "{color.ramp.accent.400}"
+      },
+      "on": {
+        "$description": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'danger'",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "surface",
+            "step": "lowest",
+            "kind": "on-fill",
+            "proof": {
+              "required": 4.5,
+              "measured": 5.7689,
+              "worstCaseLsb": 5.664,
+              "hardestGround": "danger",
+              "level": "AA",
+              "criterion": "WCAG 2.2 1.4.3",
+              "againstEverySurface": {
+                "accent": 6.4115,
+                "accent-hover": 8.7727,
+                "danger": 5.7689
+              }
+            }
+          }
+        },
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.043137,
+            0.047059,
+            0.043137
+          ],
+          "hex": "#0B0C0B"
+        }
       }
     },
     "focus": {
@@ -2913,6 +2977,38 @@ export const BUNDLED: RawInput = {
           }
         },
         "$value": "{color.ramp.accent.900}"
+      },
+      "on": {
+        "$description": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'accent'",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "surface",
+            "step": "lowest",
+            "kind": "on-fill",
+            "proof": {
+              "required": 7.0,
+              "measured": 9.3514,
+              "worstCaseLsb": 9.1358,
+              "hardestGround": "accent",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "accent": 9.3514,
+                "accent-hover": 13.7688,
+                "danger": 10.1195
+              }
+            }
+          }
+        },
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.988235,
+            0.992157,
+            0.988235
+          ],
+          "hex": "#FCFDFC"
+        }
       }
     },
     "focus": {
@@ -3372,6 +3468,38 @@ export const BUNDLED: RawInput = {
           }
         },
         "$value": "{color.ramp.accent.300}"
+      },
+      "on": {
+        "$description": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'danger'",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "surface",
+            "step": "lowest",
+            "kind": "on-fill",
+            "proof": {
+              "required": 7.0,
+              "measured": 8.1947,
+              "worstCaseLsb": 8.0573,
+              "hardestGround": "danger",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "accent": 8.9807,
+                "accent-hover": 11.8572,
+                "danger": 8.1947
+              }
+            }
+          }
+        },
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.027451,
+            0.031373,
+            0.027451
+          ],
+          "hex": "#070807"
+        }
       }
     },
     "focus": {
@@ -3539,6 +3667,7 @@ export const BUNDLED: RawInput = {
     "color.accent.default": "LinkText",
     "color.accent.edge": "CanvasText",
     "color.accent.hover": "ButtonFace",
+    "color.accent.on": "Canvas",
     "color.focus.ring": "Highlight",
     "color.status.success": "CanvasText",
     "color.status.warning": "CanvasText",

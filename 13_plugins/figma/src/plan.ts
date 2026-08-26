@@ -597,15 +597,15 @@ export function buildPlan(input: RawInput): Plan {
       paddingX: space4,
       paddingY: space2,
       cornerRadius: controlRadius,
-      fillRole: 'color/surface/bright',
-      strokeRole: v.tone === 'Danger' ? 'color/status/danger' : 'color/accent/edge',
+      fillRole: v.role,
+      strokeRole: v.role,
       strokeWeight: 1,
       focusRing: false,
       lines: [
         {
           text: v.label,
           textStyle: v.script === 'Bangla' ? 'Bangla/Body' : 'Latin/Body',
-          colourRole: v.role,
+          colourRole: 'color/accent/on',
           source: v.source,
         },
       ],
@@ -613,11 +613,13 @@ export function buildPlan(input: RawInput): Plan {
   }
 
   decisions.push({
-    what: 'Buttons are outlined, not filled.',
+    what: 'Buttons are filled, and were outlined until 26 August 2026.',
     why:
-      'The semantic roles include no "on accent" or "on danger" text colour, so the label colour on a ' +
-      'filled button is not defined anywhere in the system. An outlined button uses only roles that were measured: ' +
-      'the label sits on a surface, which is exactly the pairing the colour engine checked.',
+      'The reason they were outlined was that the semantic roles included no "on accent" text colour, so the ' +
+      'label on a filled button was not defined anywhere in the system. That role now exists. color/accent/on is ' +
+      'surface.lowest, measured as ink against every fill that carries it — accent, accent-hover and danger — with ' +
+      'the worst of those published rather than the flattering one. So a filled button now uses only roles that ' +
+      'were measured, which is what the outlined one was standing in for, and it matches what components.css ships.',
   });
   decisions.push({
     what: 'Component borders are 1 px.',

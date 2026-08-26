@@ -44,6 +44,7 @@ rules: মোহনা (ground, "estuary"), জোয়ার (accent, "tidewat
 | `color.accent.default` | #126974 | #42A0AE | #054D56 | #65BAC7 |
 | `color.accent.edge` | #278492 | #278492 | #126974 | #42A0AE |
 | `color.accent.hover` | #054D56 | #65BAC7 | #013137 | #8ED2DD |
+| `color.accent.on` | #FDFFFE | #0B0C0B | #FCFDFC | #070807 |
 | `color.focus.ring` | #278492 | #278492 | #126974 | #42A0AE |
 | `color.status.success` | #2D6C42 | #59A46F | #1D502E | #77BE8B |
 | `color.status.warning` | #7C5414 | #B8863E | #5D3C07 | #D2A15F |
@@ -99,15 +100,29 @@ It prints the measured ratio, the target, and every ground that role does pass o
 
 ---
 
+## The colour that sits on a fill
+
+`color.accent.on` is the label colour for a filled control. It was added on
+26 August 2026; until then there was none, and this page told you to outline the
+button instead.
+
+Its value is `surface.lowest`, which is not a new colour — it is what
+`components.css` was already painting those labels with. What is new is that it
+carries a proof. It is measured as ink against **every** fill that carries it —
+`accent`, `accent-hover` and `danger` — and the published figure is the worst of
+those, not the flattering one.
+
+That distinction is not academic. In both dark themes the hardest ground turns out
+to be `danger` rather than `accent`, so a role proven only against the accent would
+publish 6.2931:1 where the true worst is 5.6640:1.
+
+Use it for the label on a filled button and for nothing else. It is not a general
+light-on-dark text colour: it is proven against three specific fills, and adding a
+fourth fill without measuring it here would leave that fill's label unproven.
+
 ## Roles that are not in this system
 
-There is **no "on accent" or "on danger" text colour**. Nothing in the system
-defines what colour a label should be on top of a filled accent button, so a
-filled button is not something you can build correctly from these tokens alone.
-Outline it instead: the label sits on a surface, which is the pairing that was
-measured.
-
-There are also no elevation or shadow tokens. If a design needs a shadow,
+There are no elevation or shadow tokens. If a design needs a shadow,
 that is a gap in the system, not something to fill in by eye.
 
 ---

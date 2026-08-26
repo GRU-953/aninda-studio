@@ -1382,12 +1382,16 @@ def theme_section(tok: Tokens, theme: str) -> str:
             e(p["level"]),
             e(p["criterion"]),
         ])
-        # A role of kind "fill" is a GROUND that carries text, so it is measured
-        # against the label it carries and not against the seven surfaces. Putting
-        # it in this matrix would mean inventing seven ratios that were never
-        # taken. Any other role missing a surface is a real fault and must stop the
-        # build rather than be quietly dropped from the table.
-        if x["kind"] == "fill":
+        # Two kinds are measured against a named partner rather than against the
+        # seven surfaces, and both are legitimately absent from this matrix for the
+        # same reason: putting them in it would mean inventing seven ratios that
+        # were never taken.
+        #   "fill"    — a GROUND that carries text, measured against the label.
+        #   "on-fill" — the INK on such a ground, measured against every fill that
+        #               carries it. Added 26 August 2026 with color/accent/on.
+        # Any other role missing a surface is a real fault and must stop the build
+        # rather than be quietly dropped from the table.
+        if x["kind"] in ("fill", "on-fill"):
             fills.append(role)
             continue
         missing = [n for n in surface_names if n not in p["againstEverySurface"]]

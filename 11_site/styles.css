@@ -78,6 +78,7 @@
   --as-accent: #126974;
   --as-accent-edge: #278492;
   --as-accent-hover: #054D56;
+  --as-accent-on: #FDFFFE;
   --as-focus-ring: #278492;
   --as-success: #2D6C42;
   --as-warning: #7C5414;
@@ -106,6 +107,7 @@
       --as-accent: #42A0AE;
       --as-accent-edge: #278492;
       --as-accent-hover: #65BAC7;
+      --as-accent-on: #0B0C0B;
       --as-focus-ring: #278492;
       --as-success: #59A46F;
       --as-warning: #B8863E;
@@ -132,6 +134,7 @@
       --as-accent: #054D56;
       --as-accent-edge: #126974;
       --as-accent-hover: #013137;
+      --as-accent-on: #FCFDFC;
       --as-focus-ring: #126974;
       --as-success: #1D502E;
       --as-warning: #5D3C07;
@@ -156,6 +159,7 @@
       --as-accent: #65BAC7;
       --as-accent-edge: #42A0AE;
       --as-accent-hover: #8ED2DD;
+      --as-accent-on: #070807;
       --as-focus-ring: #42A0AE;
       --as-success: #77BE8B;
       --as-warning: #D2A15F;
@@ -182,6 +186,7 @@
   --as-accent: #126974;
   --as-accent-edge: #278492;
   --as-accent-hover: #054D56;
+  --as-accent-on: #FDFFFE;
   --as-focus-ring: #278492;
   --as-success: #2D6C42;
   --as-warning: #7C5414;
@@ -204,6 +209,7 @@
   --as-accent: #42A0AE;
   --as-accent-edge: #278492;
   --as-accent-hover: #65BAC7;
+  --as-accent-on: #0B0C0B;
   --as-focus-ring: #278492;
   --as-success: #59A46F;
   --as-warning: #B8863E;
@@ -226,6 +232,7 @@
   --as-accent: #054D56;
   --as-accent-edge: #126974;
   --as-accent-hover: #013137;
+  --as-accent-on: #FCFDFC;
   --as-focus-ring: #126974;
   --as-success: #1D502E;
   --as-warning: #5D3C07;
@@ -248,6 +255,7 @@
   --as-accent: #65BAC7;
   --as-accent-edge: #42A0AE;
   --as-accent-hover: #8ED2DD;
+  --as-accent-on: #070807;
   --as-focus-ring: #42A0AE;
   --as-success: #77BE8B;
   --as-warning: #D2A15F;
@@ -276,6 +284,7 @@
       --as-accent: LinkText;
       --as-accent-edge: CanvasText;
       --as-accent-hover: ButtonFace;
+      --as-accent-on: Canvas;
       --as-focus-ring: Highlight;
       --as-success: CanvasText;
       --as-warning: CanvasText;
@@ -560,7 +569,7 @@
 .as-btn--primary {
   background-color: var(--as-accent);
   border-color: var(--as-accent);
-  color: var(--as-surface-lowest);
+  color: var(--as-accent-on);
 }
 
 /* --as-accent-hover, not --as-accent-edge. accent-edge is proven at 3:1 as a
@@ -576,13 +585,13 @@
 .as-btn--primary:active {
   background-color: var(--as-accent);
   border-color: var(--as-ink);
-  box-shadow: inset 0 0 0 1px var(--as-surface-lowest);
+  box-shadow: inset 0 0 0 1px var(--as-accent-on);
 }
 
 .as-btn--danger {
   background-color: var(--as-danger);
   border-color: var(--as-danger);
-  color: var(--as-surface-lowest);
+  color: var(--as-accent-on);
 }
 
 .as-btn--danger:hover {

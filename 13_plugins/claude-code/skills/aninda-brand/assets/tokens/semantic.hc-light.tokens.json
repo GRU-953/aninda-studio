@@ -309,6 +309,38 @@
           }
         },
         "$value": "{color.ramp.accent.900}"
+      },
+      "on": {
+        "$description": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'accent'",
+        "$extensions": {
+          "studio.aninda": {
+            "family": "surface",
+            "step": "lowest",
+            "kind": "on-fill",
+            "proof": {
+              "required": 7.0,
+              "measured": 9.3514,
+              "worstCaseLsb": 9.1358,
+              "hardestGround": "accent",
+              "level": "AAA",
+              "criterion": "WCAG 2.2 1.4.6",
+              "againstEverySurface": {
+                "accent": 9.3514,
+                "accent-hover": 13.7688,
+                "danger": 10.1195
+              }
+            }
+          }
+        },
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.988235,
+            0.992157,
+            0.988235
+          ],
+          "hex": "#FCFDFC"
+        }
       }
     },
     "focus": {

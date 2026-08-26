@@ -533,6 +533,60 @@ def pick_fill(fam: Family, label: str, target: float, polarity: str,
     )
 
 
+def pick_on_fill(label: str, grounds: dict[str, str], target: float,
+                 what: str) -> dict:
+    """The colour that sits ON a fill, named at last, and proven on every fill.
+
+    This role already existed and had no name. components.css paints
+    .as-btn--primary and .as-btn--danger with `color: var(--as-surface-lowest)`,
+    and 08_components/check.py measures those composited pairs in a real browser —
+    so the relationship was proven while nothing in the token set expressed it.
+
+    Two things went wrong for want of a name. The Figma plugin draws OUTLINED
+    rather than filled buttons, and its own receipt records the reason: "no 'on
+    accent' text colour is defined". And Material 3 cannot construct a ColorScheme
+    at all without onPrimary — its primary constructor has no defaults, so a
+    missing role silently ships Material's baseline purple.
+
+    No new colour is invented here. The value IS surface.lowest. What is new is
+    that it is measured against EVERY fill that carries it rather than one, and
+    the published figure is the worst of those.
+    """
+    measured = {name: ratio(label, g) for name, g in grounds.items()}
+    worst_name = min(measured, key=measured.get)
+    worst = min(worst_case_ratio(label, g) for g in grounds.values())
+    if worst < target:
+        raise Fail(
+            f"{what}: {label} measures {worst:.4f}:1 on '{worst_name}' against a "
+            f"target of {target}:1. This is the colour every filled control puts on "
+            f"top of itself, so a fill it cannot clear is a fill that must not carry "
+            f"a label."
+        )
+    return {
+        "value": label,
+        "family": "surface",
+        "step": "lowest",
+        "target": target,
+        "measured": measured,
+        "hardest_ground": worst_name,
+        "ratio": measured[worst_name],
+        "worst_case_lsb": worst,
+        # "on-fill", not "text". A text role is measured against the seven
+        # surfaces; this one is measured against the fills it lands on, and calling
+        # it text would put it in a matrix whose seven columns it does not have.
+        # The contrast standard applied to it is still the text one — it is ink.
+        "kind": "on-fill",
+        "level": level(worst, "text", target),
+        "criterion": "WCAG 2.2 1.4.6" if target == AAA_TEXT else "WCAG 2.2 1.4.3",
+        "carries": ", ".join(sorted(grounds)),
+        "rationale": (
+            f"surface.lowest, measured as ink against every fill that carries it "
+            f"({', '.join(sorted(grounds))}); the published figure is the worst of "
+            f"them, which is '{worst_name}'"
+        ),
+    }
+
+
 def build_theme(theme: Theme, fams: dict[str, Family]) -> dict:
     ground = fams["ground"]
     surfaces = build_surfaces(theme, ground)
@@ -564,6 +618,18 @@ def build_theme(theme: Theme, fams: dict[str, Family]) -> dict:
     for sem in ("success", "warning", "danger", "info"):
         if sem in fams:
             add(sem, sem, theme.text_target)
+
+    # The colour every filled control puts on top of itself. It is measured against
+    # each fill that actually carries it, read from components.css: the primary
+    # button uses accent and its hover uses accent-hover, and the danger button uses
+    # danger. Adding a fill without adding it here would leave that fill's label
+    # unproven, which is the defect pick_fill was written to repair.
+    roles["on-accent"] = pick_on_fill(
+        surfaces["lowest"],
+        {"accent": roles["accent"]["value"],
+         "accent-hover": roles["accent-hover"]["value"],
+         "danger": roles["danger"]["value"]},
+        theme.text_target, f"{theme.key}/on-accent")
 
     # Two names for one colour is a lie about the system's depth. If the theme's
     # target leaves no room for a quieter text role, say so rather than ship it.

@@ -207,8 +207,8 @@
     }
    ],
    "measured": "08_components/src/components.css:225 paints .as-btn--primary with background-color: var(--as-accent) and color: var(--as-surface-lowest), and 08_components/check.py already measures that composited pair in a real browser at rest, hover and active. So the pair is proven. What is missing is the name: no token carries it, so nothing downstream can reference it. The Figma plugin's own receipt records the consequence — it draws outlined rather than filled buttons \"because no 'on accent' text colour is defined\".",
-   "fix": "Promote the existing, already-measured relationship to a named token. This invents no colour.",
-   "status": "open"
+   "fix": "Closed 26 August 2026. color.accent.on is emitted as --as-accent-on in all four themes. No colour was invented: the value is surface.lowest, which components.css was already using. What is new is the name and the proof — it is measured as ink against EVERY fill that carries it (accent, accent-hover and danger) and the published figure is the worst of those. In the dark themes the hardest ground turned out to be danger rather than accent, so a role proven only against the accent would have published 6.2931 instead of the true worst of 5.6640. The Figma library now draws filled buttons, which is what it recorded the missing role as the reason for not doing.",
+   "status": "closed"
   },
   {
    "id": "G-COLOUR-2",

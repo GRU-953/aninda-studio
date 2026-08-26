@@ -8,7 +8,7 @@ Apple Human Interface Guidelines and App Store Connect, and Google Material 3, A
 
 23 gaps found: **8 blockers**, 8 major, 7 minor.
 
-**9 are now closed**, 12 are open and 2 are deferred with the reason recorded. Of the 8 blockers, **2 remain open**.
+**10 are now closed**, 11 are open and 2 are deferred with the reason recorded. Of the 8 blockers, **1 remain open**.
 
 20 of 23 cite a published requirement, across 14 distinct sources; the rest are rules this kit sets for itself and are marked as such. A closed gap keeps its entry, because the record of what was wrong is the useful part.
 
@@ -20,8 +20,8 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 | # | Gap | Platform | Severity | Status |
 |---|---|---|---|---|
-| `G-COLOUR-1` | No token is named for the colour that sits on the accent | Google | Blocker | open |
 | `G-STORE-2` | No store screenshots, and none can honestly be made yet | Both | Blocker | open |
+| `G-COLOUR-1` | No token is named for the colour that sits on the accent | Google | Blocker | **closed** |
 | `G-ICON-1` | The app icon is pre-rounded, and both platforms ask for it not to be | Both | Blocker | **closed** |
 | `G-ICON-2` | No 1024 px raster exists, only a vector that is never rendered | Apple | Blocker | **closed** |
 | `G-ICON-3` | The watchOS master is pre-rounded and no unmasked 1088 exists | Apple | Blocker | **closed** |
@@ -217,13 +217,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-COLOUR-1` — No token is named for the colour that sits on the accent
 
-**Blocker** · Google · open
+**Blocker** · Google · closed
 
 **What is required.** Material 3 cannot construct a ColorScheme without onPrimary, and every on-role and on-container role has the same requirement. The Compose primary constructor takes 48 named parameters and has no defaults.
 
 **What is here.** 08_components/src/components.css:225 paints .as-btn--primary with background-color: var(--as-accent) and color: var(--as-surface-lowest), and 08_components/check.py already measures that composited pair in a real browser at rest, hover and active. So the pair is proven. What is missing is the name: no token carries it, so nothing downstream can reference it. The Figma plugin's own receipt records the consequence — it draws outlined rather than filled buttons "because no 'on accent' text colour is defined".
 
-**The fix.** Promote the existing, already-measured relationship to a named token. This invents no colour.
+**The fix.** Closed 26 August 2026. color.accent.on is emitted as --as-accent-on in all four themes. No colour was invented: the value is surface.lowest, which components.css was already using. What is new is the name and the proof — it is measured as ink against EVERY fill that carries it (accent, accent-hover and danger) and the published figure is the worst of those. In the dark themes the hardest ground turned out to be danger rather than accent, so a role proven only against the accent would have published 6.2931 instead of the true worst of 5.6640. The Figma library now draws filled buttons, which is what it recorded the missing role as the reason for not doing.
 
 **Sources.**
 

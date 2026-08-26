@@ -510,6 +510,25 @@
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
           "rationale": "lightest info step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+        },
+        "on-accent": {
+          "value": "#FDFFFE",
+          "family": "surface",
+          "step": "lowest",
+          "target": 4.5,
+          "measured": {
+            "accent": 6.3399,
+            "accent-hover": 9.4953,
+            "danger": 7.0385
+          },
+          "hardest_ground": "accent",
+          "ratio": 6.3399,
+          "worst_case_lsb": 6.1966,
+          "kind": "on-fill",
+          "level": "AA",
+          "criterion": "WCAG 2.2 1.4.3",
+          "carries": "accent, accent-hover, danger",
+          "rationale": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'accent'"
         }
       }
     },
@@ -778,6 +797,25 @@
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
           "rationale": "darkest info step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+        },
+        "on-accent": {
+          "value": "#0B0C0B",
+          "family": "surface",
+          "step": "lowest",
+          "target": 4.5,
+          "measured": {
+            "accent": 6.4115,
+            "accent-hover": 8.7727,
+            "danger": 5.7689
+          },
+          "hardest_ground": "danger",
+          "ratio": 5.7689,
+          "worst_case_lsb": 5.664,
+          "kind": "on-fill",
+          "level": "AA",
+          "criterion": "WCAG 2.2 1.4.3",
+          "carries": "accent, accent-hover, danger",
+          "rationale": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'danger'"
         }
       }
     },
@@ -1046,6 +1084,25 @@
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
           "rationale": "lightest info step clearing 7.0:1 against all 7 surfaces, hardest being dim"
+        },
+        "on-accent": {
+          "value": "#FCFDFC",
+          "family": "surface",
+          "step": "lowest",
+          "target": 7.0,
+          "measured": {
+            "accent": 9.3514,
+            "accent-hover": 13.7688,
+            "danger": 10.1195
+          },
+          "hardest_ground": "accent",
+          "ratio": 9.3514,
+          "worst_case_lsb": 9.1358,
+          "kind": "on-fill",
+          "level": "AAA",
+          "criterion": "WCAG 2.2 1.4.6",
+          "carries": "accent, accent-hover, danger",
+          "rationale": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'accent'"
         }
       }
     },
@@ -1314,6 +1371,25 @@
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
           "rationale": "darkest info step clearing 7.0:1 against all 7 surfaces, hardest being bright"
+        },
+        "on-accent": {
+          "value": "#070807",
+          "family": "surface",
+          "step": "lowest",
+          "target": 7.0,
+          "measured": {
+            "accent": 8.9807,
+            "accent-hover": 11.8572,
+            "danger": 8.1947
+          },
+          "hardest_ground": "danger",
+          "ratio": 8.1947,
+          "worst_case_lsb": 8.0573,
+          "kind": "on-fill",
+          "level": "AAA",
+          "criterion": "WCAG 2.2 1.4.6",
+          "carries": "accent, accent-hover, danger",
+          "rationale": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'danger'"
         }
       }
     }
