@@ -9,6 +9,19 @@
 .venv/
 node_modules/
 00_sandbox/browsers/
+# ── Native build output ──────────────────────────────────────────────────────
+# 15_native/ commits its emitted SOURCES, like every other generated tree here.
+# Build PRODUCTS are different: neither SwiftPM's .build nor Gradle's build is
+# reproducible byte for byte across machines, so committing them would turn the
+# drift gate into a machine-identity check. The gate builds in a temporary copy
+# for exactly this reason; these entries cover a build run by hand in place.
+15_native/apple/.build/
+15_native/apple/.swiftpm/
+15_native/android/build/
+15_native/android/*/build/
+15_native/android/.gradle/
+15_native/android/local.properties
+
 # ── The owner's own store screenshots ────────────────────────────────────────
 # 14_delivery holds generated frames, and a generated file that gets overwritten
 # fails the drift gate. Real captures therefore live here instead, outside the two

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GENERATED FILE. Written by 15_native/build.py. Do not hand-edit — the next build overwrites it. -->
+<resources>
+    <dimen name="aninda_space_0">4dp</dimen>
+    <dimen name="aninda_space_1">8dp</dimen>
+    <dimen name="aninda_space_2">12dp</dimen>
+    <dimen name="aninda_space_3">16dp</dimen>
+    <dimen name="aninda_space_4">24dp</dimen>
+    <dimen name="aninda_space_5">32dp</dimen>
+    <dimen name="aninda_space_6">48dp</dimen>
+    <dimen name="aninda_space_7">64dp</dimen>
+    <dimen name="aninda_space_8">96dp</dimen>
+    <dimen name="aninda_space_9">128dp</dimen>
+    <dimen name="aninda_radius_badge">4dp</dimen>
+    <dimen name="aninda_radius_control">8dp</dimen>
+    <dimen name="aninda_radius_card">14dp</dimen>
+    <dimen name="aninda_radius_hero">24dp</dimen>
+    <dimen name="aninda_target_min">24dp</dimen>
+    <dimen name="aninda_target_apple_min">28dp</dimen>
+    <dimen name="aninda_target_comfortable">44dp</dimen>
+    <dimen name="aninda_target_android_min">48dp</dimen>
+    <dimen name="aninda_focus_ring_width">3dp</dimen>
+    <dimen name="aninda_focus_ring_offset">2dp</dimen>
+    <dimen name="aninda_text_caption">12.00sp</dimen>
+    <dimen name="aninda_text_body">16.00sp</dimen>
+    <dimen name="aninda_text_lead">21.33sp</dimen>
+    <dimen name="aninda_text_h3">28.43sp</dimen>
+    <dimen name="aninda_text_h2">37.90sp</dimen>
+    <dimen name="aninda_text_h1">50.52sp</dimen>
+    <dimen name="aninda_text_display">67.34sp</dimen>
+</resources>

@@ -87,6 +87,11 @@ REBUILD_CHAIN = [
     # harness, so they come after both. They are what is handed to somebody else,
     # which is what 14_delivery is for.
     "14_delivery/build.py",
+    # The native layer reads the token files and the Material derivation, so it
+    # comes after 07_tokens and after material3.py. It is the last producing stage
+    # before the packages, which is why it sits here rather than at the end.
+    "15_native/material3.py",
+    "15_native/build.py",
     "12_packages/build.py",
     "11_site/build.py",
     "09_guidebook/build.py",
@@ -186,7 +191,7 @@ def check_rebuild_chain() -> dict:
     """
     names = ("build.py", "build.mjs", "emit_css.py", "engine.py", "readme.py",
              "pdf.py", "specimen.py", "review_bangla.py", "build_skills.py",
-             "findings.py", "benchmark.py", "gaps.py")
+             "findings.py", "benchmark.py", "gaps.py", "material3.py")
     # `git ls-files` rather than rglob, because rglob also walks ignored trees —
     # a stray git worktree under .claude/ made the first version of this guard
     # report eleven generators that are not part of the repository at all.
@@ -275,8 +280,23 @@ def count() -> dict:
                   len(list((ROOT / "10_assets").glob("*.ico"))) + \
                   len(list((ROOT / "10_assets").glob("*.svg")))
     f["marks"] = len(list((ROOT / "04_mark" / "svg").glob("*.svg")))
-    f["delivery"] = sum(1 for p in (ROOT / "14_delivery").rglob("*")
-                        if p.is_file() and "_captures" not in p.parts)
+    # Counted from what git TRACKS, not from what happens to be on disk.
+    #
+    # The first version walked the directory and counted every file. That made both
+    # figures depend on whether an interpreter had run recently, because a
+    # __pycache__ counts as a file: the delivery figure read 46 one minute and 45
+    # the next, and --check failed on a README that had been correct when written.
+    # A number that moves without the thing it describes moving is exactly what
+    # this file exists to prevent.
+    def tracked_under(folder: str) -> int:
+        out = subprocess.run(["git", "ls-files", "-z", "--", folder],
+                             cwd=ROOT, capture_output=True, text=True)
+        if out.returncode != 0:
+            raise BuildError(f"could not list tracked files under {folder}")
+        return sum(1 for rel in out.stdout.split("\0") if rel)
+
+    f["native"] = tracked_under("15_native")
+    f["delivery"] = tracked_under("14_delivery")
     f["files"] = sum(1 for p in ROOT.rglob("*") if p.is_file()
                      and not any(x in p.parts for x in
                                  (".venv", "node_modules", "browsers", ".git", "candidates")))
@@ -361,6 +381,7 @@ and their alert both say the figures are examples rather than readings.
 | `11_site/` | The website, generated from the tokens |
 | `12_packages/` | The tokens as an npm package and a Python package |
 | `13_plugins/` | A Figma plugin, a Claude Code plugin, and the Claude Design bundle |
+| `15_native/` | The tokens as Swift and Kotlin — {f['native']} files, compiled by the build that writes them |
 | `14_delivery/` | The two store asset packages — {f['delivery']} files for the Apple App Store and Google Play, each citing the page its size came from |
 | `01_research/` | What was checked, when, and against which source — including what could not be verified |
 

@@ -59,12 +59,28 @@ def render(data: dict) -> str:
     ran = data["ran_on"]
 
     parts: list[str] = [START, ""]
+    # Rows re-scored after the first pass, grouped by the date they were re-run.
+    # Without this the prose says every verdict dates from the original pass while
+    # some do not, which is the same drift this file was written to stop — the
+    # difference being that here it would be the DATE that had gone stale rather
+    # than the verdict.
+    rescored: dict[str, list[int]] = {}
+    for row in rows:
+        when = row.get("rescored")
+        if when:
+            rescored.setdefault(when, []).append(row["n"])
+    rescore_note = ""
+    for when, ns in sorted(rescored.items()):
+        ns_text = ", ".join(str(n) for n in sorted(ns))
+        rescore_note += (f" Criteria {ns_text} were re-scored on {when}, against the "
+                         f"same tests, after the work they named was done.")
+
     parts.append(
         f"{len(rows)} testable criteria, each naming the test that decides it. "
         f"**The verdicts were run against the finished kit on {ran}**, one agent per "
         f"batch, each executing the named test rather than forming an opinion. The "
         f"evidence for every row — the commands and what they returned — is in "
-        f"`_data/benchmark-verdicts.json`.")
+        f"`_data/benchmark-verdicts.json`." + rescore_note)
     parts.append("")
     order = ["pass", "partial", "fail", "not-applicable", "cannot-test"]
     line = " · ".join(f"{tally[k]} {LABEL[k].strip('*').lower()}"

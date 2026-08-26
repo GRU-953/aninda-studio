@@ -143,6 +143,10 @@ else
   drift "the committed marks" 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
 fi
 run "scripts/readme.py"       $PY scripts/readme.py --check
+run "15_native/material3.py" $PY 15_native/material3.py --check
+# Both compilers, because this machine has both. Each CI job can only prove one,
+# so a local pass here is stronger than either of them on its own.
+run "15_native/build.py"      $PY 15_native/build.py --check --require swift,kotlin
 run "14_delivery/build.py"    $PY 14_delivery/build.py --check
 run "10_assets/build.py"      $PY 10_assets/build.py --check
 run "guidebook PDF vs the book" $PY 09_guidebook/scripts/pdf.py --check

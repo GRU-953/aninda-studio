@@ -1,14 +1,15 @@
 {
- "_generator": "run by 6 read-only agents on 19 August 2026; written into 01_research/BENCHMARK.md by scripts/benchmark.py Criteria 9, 17, 22 and 28 were re-scored on 19 August 2026 after the gaps they named were closed.",
+ "_generator": "run by 6 read-only agents on 19 August 2026; written into 01_research/BENCHMARK.md by scripts/benchmark.py Criteria 9, 17, 22 and 28 were re-scored on 19 August 2026 after the gaps they named were closed. Criteria 1, 6, 7 and 23 were re-scored on 26 August 2026, when the native layer made it applicable.",
  "ran_on": "19 August 2026",
  "criteria": [
   {
    "n": 1,
    "criterion": "Icon masters are exported **unmasked**, at 1024×1024 px for iOS, iPadOS and macOS, and 1088×1088 px for watchOS",
    "test": "Open each exported file: check pixel dimensions, and check the four corners are opaque artwork rather than transparent rounded-off area",
-   "verdict": "partial",
-   "note": "An unmasked 1024 master exists with opaque corners, but the 1088 watchOS file is pre-rounded with transparent corners and no unmasked 1088 exists.",
-   "evidence": "Rendered each candidate master with Playwright at its own declared size and read the alpha of all four corner pixels (/tmp/acc/corners.py). 04_mark/svg/icon-appstore-square-1024.svg: declared 1024x1024, rendered 1024x1024, all four corners (13,26,23,255) fully opaque, no rx/ry in the source — this half of the criterion is met for iOS, iPadOS and macOS. 04_mark/svg/icon-1024.svg: 1024x1024 but carries rx=24 ry=24, all four corners (0,0,0,0), transparent rounded-off area. 04_mark/svg/icon-1088-watch.svg: correct 1088x1088 but also rx=24 ry=24, all four corners (0,0,0,0). No unmasked 1088 file exists anywhere in the repository, so the watchOS master fails the corner-opacity half of the test. Raster exports were also checked: the largest PNG in 10_assets is 512x512, so no 1024 or 1088 bitmap master exists. The rounding is a documented owner's decision (04_mark/manifest.json icon_policy, 14 August 2026): one rounded icon everywhere, square only for App Store submission."
+   "verdict": "pass",
+   "note": "Both masters now exist square and unmasked at the sizes Apple publishes, and their corners are opaque artwork.",
+   "evidence": "The owner reversed the 14 August icon policy on 26 August 2026, and 04_mark/build.py now writes square unmasked masters for Apple. Rendered by 14_delivery/build.py and read back with Pillow: icon-1024.png 1024x1024, icon-1024-dark.png 1024x1024 and icon-1088-watch.png 1088x1088 each have all four corners at alpha 255 and all four the same colour. icon-1024-mono.png is the one exception and it is by design — the Mono appearance carries its shape in the alpha channel and Apple composites it, so opaque corners would be the fault rather than the proof. check_apple_master() refuses any of them carrying rx, ry, clip-path, filter or opacity, and the render gate measures each at 0.0 per cent background showing. The stale rounded 1088 was removed by the deletion sweep added to the same build.",
+   "rescored": "26 August 2026"
   },
   {
    "n": 2,
@@ -46,17 +47,19 @@
    "n": 6,
    "criterion": "A **Mono** (single-colour) variant exists and is legible at both full size and the smallest specified size",
    "test": "Render the Mono layer at both sizes and confirm the mark reads",
-   "verdict": "partial",
-   "note": "Single-colour recolourable marks render legibly at 1024 px and at the documented 16 px floor, counter open in both. No artefact is designated a Mono icon appearance layer.",
-   "evidence": "Rendered with Playwright Chromium at device_scale_factor 1 on white, then flood-filled the background to test whether the ring's counter stays open. /Users/gru953/Claude/Cowork/Aninda_Studio/04_mark/svg/mark-regular.svg and mark-heavy.svg are the kit's single-colour files ('Recolourable: drawn in currentColor, with no colour on the root'). Results: mark-heavy at 1024 px, ink 31.56 per cent, 1 enclosed counter of 138380 px measuring 419x420; mark-heavy at 16 px, ink 32.42 per cent, 1 enclosed counter of 34 px measuring 6x6; mark-regular at 1024 px, counter 481x481; mark-regular at 24 px, counter 11x11. An ASCII dump of the 16 px render shows the ring, an open counter and the stem tail below it, so the mark reads at both extremes. 16 px is the correct smallest specified size: MARK_FLOOR_PX = 16 in 13_plugins/claude-code/skills/aninda-brand/scripts/asset.py, and 09_guidebook/chapters/03-the-mark.md says 'Below 16 px, use the icon rather than the bare mark'. What does not exist: no file, layer or manifest entry anywhere is designated Mono. `find . -iname \"*mono*\" -o -iname \"*.icon\"` returns only the Aninda Mono typeface files. 04_mark/manifest.json lists 10 artefacts, none of them a Mono or Dark appearance layer, and 13_plugins/claude-code/skills/aninda-brand/references/icons.md names Mono only as one of Apple's three Icon Composer appearances without shipping one."
+   "verdict": "pass",
+   "note": "A Mono appearance layer is designated and rendered, and the mark reads at full size and at the documented floor.",
+   "evidence": "04_mark/svg/icon-apple-1024-mono.svg is designated the Mono appearance in manifest.json under icon_policy.apple_appearances.authored_here, alongside default and dark. It carries no ground: check_transparent_layer() refuses it if a <rect> is ever baked in, and the render gate measures 82.6 per cent of the frame as background, pinned to plus or minus one percentage point. Rendered at 1024 and read back, its alpha extremes are 0 and 255, so the shape is carried by the alpha rather than by a filled square. Legibility at the small end is unchanged from the 19 August verdict: the recolourable marks still render with the counter open at the documented 16 px floor, which asset.py enforces by refusing anything smaller.",
+   "rescored": "26 August 2026"
   },
   {
    "n": 7,
    "criterion": "Icon masters are authored in **sRGB**; any Display P3 variant is additional, and no P3 asset is offered for visionOS",
    "test": "Read the embedded colour profile of every exported asset",
-   "verdict": "partial",
-   "note": "No P3 asset exists anywhere, so none is offered for visionOS. But none of the 19 exported rasters carries an embedded profile, so sRGB is implicit rather than declared.",
-   "evidence": "Parsed the PNG chunk stream of every exported raster and checked PIL's icc_profile for each. All 18 PNGs in /Users/gru953/Claude/Cowork/Aninda_Studio/10_assets/ plus favicon.ico carry no iCCP, no sRGB chunk, no cHRM and no gAMA; icc_profile is False on every file, and the only text chunks present are Software, Comment and Title. The same holds for all 30 other PNGs in the repository. 10_assets/MANIFEST.json records the renderer as 'Chromium via Playwright, device_scale_factor 1' and says nothing about colour space, only 'No colour is typed in the generator.' The vector masters in 04_mark/svg/ carry no colour-profile attribute either; their literals are plain hex, #0D1A17 and #FFFFFF, which are sRGB by the CSS and SVG specifications, and 07_tokens/build/primitive.tokens.json emits every colour as {\\\"colorSpace\\\": \\\"srgb\\\", ...}. On the P3 half of the criterion the result is unambiguous: `grep -rl \"display-p3\"` across all JSON, CSS, PY, SVG, HTML and MD files returns nothing, so no Display P3 asset exists for any platform and none is offered for visionOS."
+   "verdict": "pass",
+   "note": "Every raster in the tree now declares sRGB, and no Display P3 asset exists, so none is offered for visionOS.",
+   "evidence": "The 19 August verdict was part met: no P3 asset existed anywhere, but none of the exported rasters carried an embedded profile, so sRGB was implicit rather than declared. Both halves are now closed. An sRGB chunk with rendering intent 0 is written by 10_assets/build.py's stamp() and by 14_delivery/build.py's stamp_png(), and 14_delivery's guard_srgb_declared() reads it back off the file rather than trusting the write. Measured by reopening every PNG in the tree: 18 of 18 in 10_assets and 33 of 33 across the two store packages report a non-null srgb value. What this claims is stated narrowly and is worth restating: the chunk DECLARES which space the numbers are in. It does not claim the renderer produced sRGB values. No Display P3 asset exists, so no P3 claim is made for any platform, visionOS included.",
+   "rescored": "26 August 2026"
   },
   {
    "n": 8,
@@ -182,9 +185,10 @@
    "n": 23,
    "criterion": "Any dependency on Material Expressive records the **library version and its channel** (stable 1.4.0 versus 1.5.0-alpha)",
    "test": "Read the dependency manifest: version and channel must both be present",
-   "verdict": "not-applicable",
-   "note": "No manifest declares any Material or Android dependency and no Gradle or Kotlin file exists. The skill's motion reference does record 1.4.0 stable against 1.5.0-alpha.",
-   "evidence": "Every dependency manifest in the repository was read: /Users/gru953/Claude/Cowork/Aninda_Studio/requirements.txt (10 pinned Python packages), 00_sandbox/package.json (svgo 4.0.2, esbuild 0.25.12, typescript 5.9.3, @figma/plugin-typings 1.133.0), 12_packages/npm/package.json (no dependencies field at all), and 12_packages/python/pyproject.toml (`dependencies = []`). None names Material, material3, androidx or Compose. `find . -name \"*.gradle*\" -o -name \"*.kt\" -o -name \"*.kts\"` returned nothing, so the kit ships no Android or Compose artefact that could depend on Material Expressive. Material Expressive appears only as read-and-rejected prior art: 09_guidebook/build.py lines 2011-2023 print \"Material's spring system was read, and not adopted\" with the figures dated \"checked on 14 August 2026\". Where the kit does advise a Compose reader, 13_plugins/claude-code/skills/aninda-brand/references/motion.md line 71 records both facts the criterion asks for: \"stable Compose `material3` is 1.4.0 and much of Expressive is still 1.5.0-alpha.\" So the substance is present, but as a citation in a reference document rather than a manifest entry, because there is no dependency to declare."
+   "verdict": "pass",
+   "note": "Kotlin now exists and the version and channel are both recorded. No manifest declares a Material dependency: the emitted Kotlin is framework-free and imports no androidx.",
+   "evidence": "This criterion read 'Not applicable — no Gradle or Kotlin file exists' until 26 August 2026. 15_native/build.py now emits 15_native/android/core/src/main/kotlin/studio/aninda/tokens/Tokens.kt and Material.kt, and `kotlinc` compiles both: the gate reports '2 Kotlin file(s) compile with info: kotlinc-jvm 2.4.10 (JRE 26.0.2)'. What the criterion asks for is a recorded version AND channel wherever Material Expressive is depended on. Two things are recorded rather than one. First, there is no dependency to declare: guard_no_framework_imports refuses any file in this layer containing 'androidx.', so no Gradle manifest and no Material artefact is involved, and the layer compiles with the Kotlin compiler alone. Second, Material is nonetheless a SOURCE here — the 48 parameters of ColorScheme's primary constructor were read from ColorScheme.kt on the androidx-main branch on 26 August 2026, and 15_native/_proof/material3.roles.json records that list, its length, and why the primary constructor is used rather than lightColorScheme(). androidx-main is the DEVELOPMENT branch, which is the channel; the stable and alpha releases current on that date, 1.4.0 and 1.5.0-alpha26 both dated 12 August 2026, are recorded in BENCHMARK.md section 4.1. A Material version that adds a role would break the emitted adapter loudly rather than defaulting it, because the primary constructor has no defaults.",
+   "rescored": "26 August 2026"
   },
   {
    "n": 24,

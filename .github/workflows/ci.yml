@@ -346,6 +346,48 @@ jobs:
           git diff --exit-code 13_plugins/claude-code/dist
 
   # 6 ── slowest, and last. Its failures are usually symptoms of jobs 1 to 5.
+  # ── The native layer ────────────────────────────────────────────────────────
+  # Two jobs rather than one, because the two compilers live on different runners:
+  # Swift ships on the macOS images and Kotlin on the Ubuntu ones. Each job names
+  # what it is responsible for with --require and fails if that compiler is
+  # missing, rather than skipping quietly. Neither job proves both; scripts/
+  # verify-all.sh asks for both, so a local pass is the stronger check.
+  #
+  # macos-15 is pinned rather than macos-latest: the label moves, and a gate whose
+  # toolchain changes underneath it is the kind of dependency criterion 25 exists
+  # to catch. GitHub-hosted runners are free on public repositories.
+  #
+  # Neither job records the compiler version separately, because the gate already
+  # does: 15_native/build.py prints the exact swift and kotlinc it used in the line
+  # that reports the compile. A second step doing the same thing is a second thing
+  # to keep in step with scripts/verify-all.sh, for no extra proof.
+  native-apple:
+    needs: tokens
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: The emitted Swift package must build and its tests must pass
+        # The package is laid out in a temporary copy and built there, so no
+        # .build directory lands in the generated tree for the drift gate to find.
+        run: python 15_native/build.py --check --require swift
+
+  native-android:
+    needs: tokens
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: The emitted Kotlin must compile
+        # Framework-free by design: no androidx import, so kotlinc alone compiles
+        # it. A Compose layer would need the Android SDK and a weaker gate, and
+        # 15_native/LIMITS.md says so rather than letting this one imply cover.
+        run: python 15_native/build.py --check --require kotlin
+
   render:
     runs-on: ubuntu-latest
     timeout-minutes: 25

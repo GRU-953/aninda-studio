@@ -607,6 +607,16 @@ def stamp(png: bytes, name: str) -> bytes:
     info.add_text("Software", GENERATOR)
     info.add_text("Comment", DO_NOT_EDIT)
     info.add_text("Title", f"Aninda Studio — {name}")
+    # The sRGB chunk, added 26 August 2026. Benchmark criterion 7 asks that icon
+    # masters be authored in sRGB, and its 19 August verdict was "no P3 asset exists
+    # anywhere, so none is offered for visionOS — but none of the exported rasters
+    # carries an embedded profile, so sRGB is implicit rather than declared".
+    #
+    # This declares it. Be precise about what that means: it states which colour
+    # space these numbers are in. It does not claim the renderer produced sRGB
+    # values, and no Display P3 asset exists here, so no P3 claim is made for any
+    # platform. 0 is the perceptual rendering intent.
+    info.add(b"sRGB", b"\x00")
     out = io.BytesIO()
     image.save(out, format="PNG", optimize=True, pnginfo=info)
     return out.getvalue()

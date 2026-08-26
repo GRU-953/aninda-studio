@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GENERATED FILE. Written by 15_native/build.py. Do not hand-edit — the next build overwrites it. -->
+<resources>
+    <color name="aninda_accent">#126974</color>
+    <color name="aninda_accent_edge">#278492</color>
+    <color name="aninda_accent_hover">#054D56</color>
+    <color name="aninda_accent_on">#FDFFFE</color>
+    <color name="aninda_danger">#9B3728</color>
+    <color name="aninda_focus_ring">#278492</color>
+    <color name="aninda_info">#316189</color>
+    <color name="aninda_ink">#0D1A17</color>
+    <color name="aninda_ink_muted">#41655C</color>
+    <color name="aninda_line">#578076</color>
+    <color name="aninda_success">#2D6C42</color>
+    <color name="aninda_surface_base">#F8FAF9</color>
+    <color name="aninda_surface_bright">#FFFFFF</color>
+    <color name="aninda_surface_dim">#F1F2F2</color>
+    <color name="aninda_surface_high">#F6F7F7</color>
+    <color name="aninda_surface_highest">#F3F5F4</color>
+    <color name="aninda_surface_low">#FBFCFC</color>
+    <color name="aninda_surface_lowest">#FDFFFE</color>
+    <color name="aninda_warning">#7C5414</color>
+</resources>
