@@ -2,13 +2,13 @@
 
 **Every entry below was re-verified against the tree, and each says on what date.** Each also carries the command that was run and what it returned. Nothing here is asserted from memory, and nothing was marked fixed because it looked like the sort of thing that had probably been fixed — a claim was either reproduced or it was not.
 
-64 entries were checked in the pass of 19 August 2026. 39 more were raised later, and 4 of the original entries were re-checked — 25 August 2026, 26 August 2026. That first pass was needed because this document had drifted. It was written across three review rounds and never re-checked, and of the 64 entries it covered, **18 were already fixed** and **12 were half right** — what that pass found, on the day, kept as it was reported. A register that is wrong in either direction is worse than a short accurate one.
+64 entries were checked in the pass of 19 August 2026. 40 more were raised later, and 4 of the original entries were re-checked — 25 August 2026, 26 August 2026, 27 August 2026. That first pass was needed because this document had drifted. It was written across three review rounds and never re-checked, and of the 64 entries it covered, **18 were already fixed** and **12 were half right** — what that pass found, on the day, kept as it was reported. A register that is wrong in either direction is worse than a short accurate one.
 
 ## Where it stands
 
 | | |
 |---|---|
-| Entries re-verified | **103** |
+| Entries re-verified | **104** |
 | Still open | 31 |
 | Half stale — part reproduced, part not | 12 |
 | Already fixed, kept as a record | 59 |

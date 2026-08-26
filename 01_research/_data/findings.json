@@ -24,6 +24,14 @@
    "half_right": 0,
    "by": "the platform-conformance pass",
    "note": "A single entry, raised and fixed the same day while establishing that the tree was green before the conformance work began. It is recorded because it is the kind of defect this register exists for: a guard that was written correctly, tested in the one environment where it cannot fail, and wrong everywhere the work is actually done."
+  },
+  {
+   "date": "27 August 2026",
+   "covered": 1,
+   "already_fixed": 0,
+   "half_right": 0,
+   "by": "the palette-replacement pass",
+   "note": "One entry, raised while replacing the brand palette. The instance was removed in the same commit; the gate that would have caught it does not exist and the entry stays open for that reason."
   }
  ],
  "_preamble": "# Open findings — carried forward\n\n<!-- This file ships, so it is held to 02_strategy/ENGLISH-STANDARD.md like any\n other prose here — including the banned-word list. Four banned words arrived\n in it when the findings were copied in verbatim from the reviewers' own\n wording, and CI's lint job caught them. If you paste a finding in, reword it.\n A findings record that breaks the rule it records findings about is a poor\n advertisement for the rule. -->\n\nRound 1 of the convergence review raised 59 findings across six independent\nlenses, each adversarially verified before it counted. The blockers and majors\nwere fixed. These minors were judged not worth the change at the time, and are\nrecorded here rather than dropped, because an unwritten known fault becomes an\nunknown one within a week.\n\nEach is real and reproducible. None affects correctness of the design system's\noutput. If you disagree with a judgement, the finding is here to be picked up.\n",
@@ -1683,6 +1691,23 @@
      "26 August 2026"
     ],
     "note": "Measured before the fix: `git check-ignore --stdin` returned the single line `/Volumes/Aninda Studio/Aninda_Studio/12_packages/python/src/aninda_studio_tokens/__pycache__/__init__.cpython-313.pyc`; `.split()` turned that one path into two entries, `/Volumes/Aninda` and `/Volumes/Aninda Studio/Aninda_Studio/Studio/Aninda_Studio/12_packages/.../__init__.cpython-313.pyc`, and the real path was in neither. `.splitlines()` returns the one correct entry. After the fix, `./.venv/bin/python 12_packages/build.py --check` passes with the .pyc still present on disk: \"both packages match the source, 39 files, and hold nothing this build did not write.\" Before the fix the same command with the same file present exited 1. The tree holds one `check-ignore` call and one `.stdout.split()`, both in this file, so the fix is complete rather than a first instance."
+   }
+  },
+  {
+   "id": "R7-1",
+   "round": 7,
+   "heading": "The Bangla rule is enforced on the book and the cards and not on a direction spec, so unverified Bangla entered through the one door nothing watches",
+   "file": "05_colour/directions/natural.json",
+   "body": "This repository's rule is that no Bangla is written for it: only strings checked against the Bangla Academy standard appear, and where none exists the English stands with the gap named. 09_guidebook/build.py enforces it — it hard-fails on any unverified Bangla run — and 08_components/build.py records its gaps in _cards.json.\n\nA colour direction spec carries label_bn for every family and for the direction itself, and nothing checks those. When the palette was replaced on 26 August 2026 the new spec was written with Bangla names that had never been verified — প্রাকৃতিক নীল, প্রাকৃতিক ধূসর and the rest. They reached the palette proof and would have reached the guidebook had a second fault not been masking them.\n\nThe instance is removed: natural.json now carries empty Bangla labels and a note saying the colours are not yet named in Bangla. The DOOR is still open. Any future direction can carry unverified Bangla and no gate will notice.\n\nSmallest fix: have 05_colour/engine.py check every label_bn in a spec against 06_type/bangla-strings.json, and refuse a string that is not on the list. That puts the rule where the value enters rather than where it is displayed.",
+   "verdict": {
+    "id": "R7-1",
+    "status": "open",
+    "severity_now": "major",
+    "verified_on": "27 August 2026",
+    "passes": [
+     "27 August 2026"
+    ],
+    "note": "Measured: `grep -c 'label_bn' 05_colour/directions/natural.json` returns four family labels plus the direction's own name_bn, and `grep -rn 'label_bn' 05_colour/engine.py` shows the value is read and carried into the proof with no check against the verified list. The guidebook's own guard runs on rendered prose, which is downstream of this and cannot see a label that never reaches a page."
    }
   }
  ]
