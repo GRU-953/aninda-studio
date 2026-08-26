@@ -19,9 +19,38 @@
       "anchor": "#1F5FBF",
       "note": "The one colour in the system. If something is this blue, it does something."
     },
-    "success": { "label": "Pass", "label_bn": "উত্তীর্ণ", "kind": "semantic", "anchor": "#16704A" },
-    "warning": { "label": "Check", "label_bn": "সতর্ক", "kind": "semantic", "anchor": "#7E5A08" },
-    "danger":  { "label": "Fail", "label_bn": "ব্যর্থ", "kind": "semantic", "anchor": "#A32B22" },
-    "info":    { "label": "Note", "label_bn": "টীকা", "kind": "semantic", "anchor": "#2A6E9E" }
-  }
+    "success": {
+      "label": "Pass",
+      "label_bn": "উত্তীর্ণ",
+      "kind": "semantic",
+      "anchor": "#16704A"
+    },
+    "warning": {
+      "label": "Check",
+      "label_bn": "সতর্ক",
+      "kind": "semantic",
+      "anchor": "#7E5A08"
+    },
+    "danger": {
+      "label": "Fail",
+      "label_bn": "ব্যর্থ",
+      "kind": "semantic",
+      "anchor": "#A32B22"
+    },
+    "info": {
+      "label": "Note",
+      "label_bn": "টীকা",
+      "kind": "semantic",
+      "anchor": "#2A6E9E"
+    }
+  },
+  "declared_duplicates": [
+    {
+      "roles": [
+        "ink",
+        "line"
+      ],
+      "why": "A rejected direction, kept as a record. Its line colour resolves to its body text colour in the light themes, which means a border carries the same weight as prose. Recorded rather than repaired: this is a property of the palette that was not chosen, and repairing it would misrepresent what was rejected."
+    }
+  ]
 }

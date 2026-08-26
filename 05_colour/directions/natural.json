@@ -1,0 +1,83 @@
+{
+  "key": "natural",
+  "name": "Natural",
+  "name_bn": "প্রাকৃতিক",
+  "premise": "Six colours and no more: four natural hues, pure black and pure white. The four naturals are all primary — none is a supporting colour for the others. They are desaturated earth tones rather than screen colours, chosen so the same palette holds in print against Pantone solid coated stock as it does in sRGB. Pure black and pure white are the anchors: in the light theme the page is white and the text is black, which is the strongest pairing there is, and the surfaces between them carry a faint grey tint so depth stays visible without introducing a colour. This direction replaces Estuary, taken on 14 August 2026 and superseded on 26 August 2026 by the owner's decision to discard the old brand colours entirely.",
+  "supersedes": {
+    "direction": "estuary",
+    "taken": "14 August 2026",
+    "superseded": "26 August 2026",
+    "why": "Owner's decision: discard and replace all old brand colours with six named colours only, and make the four natural hues primary.",
+    "note": "The Estuary specification is kept in this folder as a record of what was replaced. It is no longer built into any shipped artefact — 07_tokens/build.py reads this file."
+  },
+  "pantone": {
+    "note": "Pantone solid coated equivalents, supplied by the owner with the palette. They are recorded because print is a real surface for a brand and the HEX values alone say nothing about ink. Nothing in this repository measures them: no print proof was made, and a Pantone match is a physical claim this build cannot verify.",
+    "Natural Blue": "PANTONE 2160 C",
+    "Natural Green": "PANTONE 343 C",
+    "Natural Red": "PANTONE 7524 C",
+    "Natural Gray": "PANTONE 7531 C",
+    "Pure Black": "PANTONE Black C",
+    "Pure White": "PANTONE Process White"
+  },
+  "fixed": {
+    "note": "Pure black and pure white are anchors, not ramps. A ramp needs eleven visibly distinct steps and neither of these has anywhere to go: black is the floor of the lightness axis and white is its ceiling. They are used directly as ink and as the brightest surface, which is what makes the light theme's body text a measured 21:1.",
+    "ink_light": "#000000",
+    "ink_dark": "#FFFFFF",
+    "label_black": "Pure Black",
+    "label_black_bn": "নিখাদ কালো",
+    "label_white": "Pure White",
+    "label_white_bn": "নিখাদ সাদা"
+  },
+  "families": {
+    "ground": {
+      "label": "Natural Gray",
+      "label_bn": "প্রাকৃতিক ধূসর",
+      "kind": "brand",
+      "anchor": "#84807C",
+      "note": "Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text — so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor."
+    },
+    "accent": {
+      "label": "Natural Blue",
+      "label_bn": "প্রাকৃতিক নীল",
+      "kind": "brand",
+      "anchor": "#224959",
+      "note": "Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA."
+    },
+    "success": {
+      "label": "Natural Green",
+      "label_bn": "প্রাকৃতিক সবুজ",
+      "kind": "brand",
+      "anchor": "#2C5A3A",
+      "note": "Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA."
+    },
+    "danger": {
+      "label": "Natural Red",
+      "label_bn": "প্রাকৃতিক লাল",
+      "kind": "brand",
+      "anchor": "#A14F39",
+      "note": "Primary. A warm terracotta. Measured 5.69:1 on white at its anchor — it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp."
+    }
+  },
+  "role_sources": {
+    "warning": {
+      "mode": "beyond",
+      "family": "ground",
+      "beyond": "ink-muted",
+      "why": "The palette has no amber. Warning is Natural Gray, taken one step beyond the muted text colour so a caution is visibly heavier than quiet prose without becoming the body text colour. Owner's decision, 26 August 2026."
+    },
+    "info": {
+      "mode": "same-as",
+      "same_as": "accent",
+      "why": "Natural Blue carries links, focus, the primary action and information. With four hues there is no fifth colour to distinguish a note from a link, and inventing a near-identical second blue to avoid saying so would be worse than saying so. Owner's decision, 26 August 2026."
+    }
+  },
+  "declared_duplicates": [
+    {
+      "roles": [
+        "ink-muted",
+        "line"
+      ],
+      "why": "In the dark themes both resolve to Natural Gray at its own anchor, #84807C. That is the brand colour doing two jobs rather than an accident: quiet text and a border are the two places a neutral belongs, and the palette has one neutral by design. The light themes separate them — ink-muted takes a darker step there — so the collision is a property of the dark themes alone and is recorded as one."
+    }
+  ]
+}

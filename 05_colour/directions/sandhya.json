@@ -18,9 +18,38 @@
       "anchor": "#C4402B",
       "note": "The only saturated colour in the system. Used sparingly and always meaningfully — a link, a focus ring, one primary action per screen."
     },
-    "success": { "label": "Bamboo", "label_bn": "বাঁশ", "kind": "semantic", "anchor": "#2A6B2E" },
-    "warning": { "label": "Turmeric", "label_bn": "হলুদ", "kind": "semantic", "anchor": "#9A6A00" },
-    "danger":  { "label": "Alta", "label_bn": "আলতা", "kind": "semantic", "anchor": "#B02A1C" },
-    "info":    { "label": "Indigo", "label_bn": "নীল", "kind": "semantic", "anchor": "#2A5F86" }
-  }
+    "success": {
+      "label": "Bamboo",
+      "label_bn": "বাঁশ",
+      "kind": "semantic",
+      "anchor": "#2A6B2E"
+    },
+    "warning": {
+      "label": "Turmeric",
+      "label_bn": "হলুদ",
+      "kind": "semantic",
+      "anchor": "#9A6A00"
+    },
+    "danger": {
+      "label": "Alta",
+      "label_bn": "আলতা",
+      "kind": "semantic",
+      "anchor": "#B02A1C"
+    },
+    "info": {
+      "label": "Indigo",
+      "label_bn": "নীল",
+      "kind": "semantic",
+      "anchor": "#2A5F86"
+    }
+  },
+  "declared_duplicates": [
+    {
+      "roles": [
+        "ink",
+        "line"
+      ],
+      "why": "A rejected direction, kept as a record. Same property as Instrument: the line colour resolves to the body text colour in the light themes. Recorded rather than repaired, for the same reason."
+    }
+  ]
 }

@@ -116,15 +116,20 @@ CHROMA_ARC: dict[int, float] = {
 # 1/2000 resolution taking a rung whenever it is far enough from the last one.
 # The values are an outcome, which is the same rule every other number here obeys.
 SURFACE_RANGE: dict[str, tuple[float, float]] = {
+    # The dark ranges START AT ZERO so their dimmest rung is pure black, which is
+    # what makes the Natural direction's two anchors literal on both sides: pure
+    # white is the light theme's brightest surface and pure black is the dark
+    # theme's dimmest. The range was 0.128 to 0.345 when the ground was a tinted
+    # green and there was no reason to reach the floor.
     "light": (0.855, 1.000),
-    "dark": (0.128, 0.345),
+    "dark": (0.000, 0.345),
     # High contrast widens the ladder rather than compressing it. Compressing was
     # the obvious first instinct — squeeze every surface toward the extreme so
     # 7:1 is easy — but it makes the surfaces themselves indistinguishable, and
     # someone who has turned high contrast on is the last person who should be
     # asked to tell two near-identical greys apart.
     "hc-light": (0.840, 1.000),
-    "hc-dark": (0.100, 0.330),
+    "hc-dark": (0.000, 0.330),
 }
 
 # Rungs from darkest to lightest, per theme polarity. In a light theme the
@@ -135,7 +140,20 @@ LADDER_ORDER: dict[str, tuple[str, ...]] = {
     "dark": ("dim", "lowest", "low", "base", "high", "highest", "bright"),
 }
 
-SURFACE_ORDER = ("lowest", "low", "base", "high", "highest", "dim", "bright")
+SURFACE_ORDER = ("lowest", "low", "base", "high", "highest", "dim", "bright",
+                 "page")
+
+# `page` is the eighth, and it is DERIVED rather than swept. The other seven come
+# out of the lightness sweep and hold their relative brightness across themes, which
+# is what makes `bright` the brightest surface in BOTH the light and the dark theme.
+# That is Material's own bright/dim semantics and it is deliberate.
+#
+# It also means no swept surface inverts to the theme's own extreme, and the Natural
+# direction needs exactly that: a page that is pure white in the light theme and pure
+# black in the dark one. `page` is that surface. It aliases the polarity's extreme —
+# `bright` in a light theme, `dim` in a dark one — so it is never a new colour, only
+# a name for which end of the ladder the reader is looking at.
+PAGE_ALIAS = {"light": "bright", "dark": "dim"}
 
 # How much of the ground family's chroma a surface carries. A surface is a tinted
 # neutral, not a pale version of the brand colour.
@@ -248,14 +266,26 @@ class Family:
                 Color("oklch", [LIGHTNESS[s], self.chroma_ceiling * CHROMA_ARC[s], self.hue])
             )
 
-        # Snap the anchor onto the ramp: the nearest step BECOMES the brand
-        # colour, so ramp and brand can never drift apart. The anchor's own
-        # chroma set the ceiling above, so the ramp moved to meet the anchor
-        # rather than the anchor being nudged onto a ramp it does not belong to.
+        # Snap the anchor onto the ramp: the nearest step BECOMES the brand colour,
+        # so ramp and brand can never drift apart.
+        #
+        # That sentence was here from the start and the code did not do it. The
+        # anchor set the ramp's HUE and its chroma ceiling, but every step's
+        # lightness comes from the fixed LIGHTNESS table above, so the anchor almost
+        # never landed on a step. Measured on the Natural direction, whose four
+        # colours were supplied by name and by Pantone reference: the nearest step
+        # to Natural Green #2C5A3A was #2D4C36, deltaE 5.67 — a visibly different
+        # green. The brand colour was not in the palette that claimed to be built
+        # from it.
+        #
+        # The nearest step is now literally overwritten with the anchor. check()
+        # re-runs monotonic luminance and the minimum spacing afterwards, so a
+        # substitution that breaks the ramp fails the build rather than bending it.
         anchor_hex = to_hex(a)
         self.anchor_step = min(
             STEPS, key=lambda s: Color(self.ramp[s]).distance(Color(anchor_hex), space="oklab")
         )
+        self.ramp[self.anchor_step] = anchor_hex
 
     def check(self) -> None:
         ls = [float(Color(self.ramp[s]).convert("oklch")["lightness"]) for s in STEPS]
@@ -373,12 +403,15 @@ def build_surfaces(theme: Theme, ground: Family) -> dict[str, str]:
     # Distinct hexes and monotonic luminance are now guaranteed by construction,
     # so these are cheap re-derivations rather than hopes. They stay because a
     # future change to the sweep should break here, loudly.
+    # Over the SWEPT rungs only. `page` is added after this and is an alias of one
+    # of them by construction, so including it here would fail every build.
     if len(set(surfaces.values())) != len(order):
         raise Fail(f"{theme.key}: the sweep produced duplicate surfaces")
     lums = [luminance(surfaces[r]) for r in order]
     if lums != sorted(lums):
         raise Fail(f"{theme.key}: swept surfaces are not monotonic in luminance")
 
+    surfaces["page"] = surfaces[PAGE_ALIAS[theme.polarity]]
     return {role: surfaces[role] for role in SURFACE_ORDER}
 
 
@@ -396,9 +429,41 @@ def pick(fam: Family, grounds: dict[str, str], target: float, polarity: str,
     gentle, and it is what leaves room for a genuinely quieter secondary text
     role beneath it.
 
+    `prefer="anchor"` returns the family's ANCHOR STEP — the brand colour itself —
+    whenever it clears the target on every ground, and falls back to "gentle" when
+    it does not. This exists because the gentle scan stops at the first step that
+    clears, which on a light theme is usually one step lighter than the anchor: the
+    Natural direction's accent came out #426271 while its brand colour, Natural
+    Blue, is #224959 and clears 9.70:1 on white with room to spare. A palette that
+    names four colours and then ships neighbours of them is not shipping them.
+
+    The fallback is the honest half. On a dark theme a dark brand colour cannot
+    carry text on a dark surface, so the role takes a lighter step of the SAME
+    family and the proof says which step it took.
+
     The published ratio is the worst measured across all grounds, under ±1 LSB
     perturbation of both colours — never the flattering one.
     """
+    if prefer == "anchor" and fam.anchor_step is not None:
+        cand = fam.ramp[fam.anchor_step]
+        worst = min(worst_case_ratio(cand, g) for g in grounds.values())
+        if worst >= target:
+            m = {n: ratio(cand, g) for n, g in grounds.items()}
+            hardest = min(m, key=m.get)
+            return {
+                "value": cand, "family": fam.key, "step": fam.anchor_step,
+                "target": target, "measured": m, "hardest_ground": hardest,
+                "ratio": m[hardest], "worst_case_lsb": worst, "kind": kind,
+                "level": level(worst, kind, target),
+                "criterion": ("WCAG 2.2 1.4.11" if kind == "nontext"
+                              else "WCAG 2.2 1.4.6" if target == AAA_TEXT
+                              else "WCAG 2.2 1.4.3"),
+                "rationale": (f"the {fam.key} family's anchor step "
+                              f"{fam.anchor_step} — the brand colour itself, which "
+                              f"clears {target}:1 on every ground it can land on"),
+                "is_brand_anchor": True,
+            }
+        prefer = "gentle"
     # On a light ground the text must be dark, so the *gentlest* legible choice is
     # the LIGHTEST step that still clears — scan 50 upward. On a dark ground the
     # text must be light, so the gentlest is the DARKEST that clears — scan 950
@@ -587,7 +652,10 @@ def pick_on_fill(label: str, grounds: dict[str, str], target: float,
     }
 
 
-def build_theme(theme: Theme, fams: dict[str, Family]) -> dict:
+def build_theme(theme: Theme, fams: dict[str, Family],
+                fixed: dict | None = None,
+                role_sources: dict | None = None,
+                declared_duplicates: list | None = None) -> dict:
     ground = fams["ground"]
     surfaces = build_surfaces(theme, ground)
 
@@ -598,13 +666,43 @@ def build_theme(theme: Theme, fams: dict[str, Family]) -> dict:
         roles[name] = pick(fams[fam_key], surfaces, target, theme.polarity,
                            f"{theme.key}/{name}", kind, prefer)
 
-    # Primary text takes the strongest step available — there is no reason for
-    # body copy to be gentle, and taking the strongest is what leaves room for a
-    # genuinely quieter secondary role beneath it.
-    add("ink", "ground", theme.text_target, prefer="strong")
+    # Primary text. A direction may FIX it rather than take it from the ground
+    # ramp, and the Natural direction does: pure black on a white page and pure
+    # white on a black one. That is 21:1, which no ramp step can beat, and it is
+    # the reason those two colours are named in the palette at all.
+    #
+    # A fixed ink is still measured against all seven surfaces, like every other
+    # role. Being chosen by hand does not exempt it from the proof.
+    fixed_ink = None
+    if fixed:
+        fixed_ink = fixed.get("ink_light" if theme.polarity == "light" else "ink_dark")
+    if fixed_ink:
+        measured = {n: ratio(fixed_ink, g) for n, g in surfaces.items()}
+        hardest = min(measured, key=measured.get)
+        worst = min(worst_case_ratio(fixed_ink, g) for g in surfaces.values())
+        if worst < theme.text_target:
+            raise Fail(
+                f"{theme.key}/ink: the fixed ink {fixed_ink} measures {worst:.4f}:1 "
+                f"on surface {hardest!r}, under the {theme.text_target}:1 target. A "
+                f"direction that fixes its ink still has to prove it.")
+        roles["ink"] = {
+            "value": fixed_ink, "family": "fixed", "step": "ink",
+            "target": theme.text_target, "measured": measured,
+            "hardest_ground": hardest, "ratio": measured[hardest],
+            "worst_case_lsb": worst, "kind": "text",
+            "level": level(worst, "text", theme.text_target),
+            "criterion": ("WCAG 2.2 1.4.6" if theme.text_target == AAA_TEXT
+                          else "WCAG 2.2 1.4.3"),
+            "rationale": ("a fixed anchor of this direction rather than a ramp step, "
+                          "measured against every surface it can land on"),
+        }
+    else:
+        # There is no reason for body copy to be gentle, and taking the strongest
+        # is what leaves room for a genuinely quieter secondary role beneath it.
+        add("ink", "ground", theme.text_target, prefer="strong")
     add("ink-muted", "ground", theme.text_target)
-    add("line", "ground", theme.nontext_target, kind="nontext")
-    add("accent", "accent", theme.text_target)
+    add("line", "ground", theme.nontext_target, kind="nontext", prefer="anchor")
+    add("accent", "accent", theme.text_target, prefer="anchor")
     add("accent-edge", "accent", theme.nontext_target, kind="nontext")
     add("focus", "accent", theme.nontext_target, kind="nontext")
 
@@ -617,7 +715,78 @@ def build_theme(theme: Theme, fams: dict[str, Family]) -> dict:
     )
     for sem in ("success", "warning", "danger", "info"):
         if sem in fams:
-            add(sem, sem, theme.text_target)
+            add(sem, sem, theme.text_target, prefer="anchor")
+
+    # A direction with fewer families than roles has to say where the missing ones
+    # come from, and it says so in ITS OWN SPEC rather than here.
+    #
+    # Two modes, and the difference between them is the point.
+    #
+    #   "beyond"   the first step past a named sibling that still clears the target
+    #              and is visibly apart from it. NOT the extreme. The first version
+    #              of this used prefer="strong" and produced a light-theme warning
+    #              of #181716 — the grey ramp's darkest step, which reads as black.
+    #              A warning colour that looks like body text is not a warning.
+    #
+    #   "same-as"  deliberately the same colour as another role, with a reason
+    #              recorded. Information IS the accent in the Natural direction:
+    #              Natural Blue carries links, focus, the primary action and
+    #              information. Saying that plainly is honest; deriving a
+    #              near-identical second blue to avoid saying it is not.
+    for role_name, spec_row in (role_sources or {}).items():
+        if role_name in roles:
+            continue
+        mode = spec_row.get("mode")
+        if mode == "same-as":
+            sibling = roles[spec_row["same_as"]]
+            roles[role_name] = dict(sibling)
+            roles[role_name]["rationale"] = (
+                f"the same colour as {spec_row['same_as']!r} by declaration — "
+                f"{spec_row.get('why', 'no reason given')}")
+            roles[role_name]["declared_same_as"] = spec_row["same_as"]
+        elif mode == "beyond":
+            fam = fams[spec_row["family"]]
+            sib = roles[spec_row["beyond"]]
+            order = STEPS if theme.polarity == "light" else tuple(reversed(STEPS))
+            started, chosen = False, None
+            for st in order:
+                if st == sib["step"]:
+                    started = True
+                    continue
+                if not started:
+                    continue
+                cand = fam.ramp[st]
+                w = min(worst_case_ratio(cand, g) for g in surfaces.values())
+                if w >= theme.text_target and de2000(cand, sib["value"]) >= MIN_RAMP_DE:
+                    chosen = st
+                    break
+            if chosen is None:
+                raise Fail(
+                    f"{theme.key}/{role_name}: no step of {spec_row['family']!r} "
+                    f"beyond {spec_row['beyond']!r} clears {theme.text_target}:1 on "
+                    f"every surface and stays visibly apart from it. A doubled role "
+                    f"that cannot be told from its sibling must not ship.")
+            m = {n: ratio(fam.ramp[chosen], g) for n, g in surfaces.items()}
+            hardest = min(m, key=m.get)
+            worst = min(worst_case_ratio(fam.ramp[chosen], g)
+                        for g in surfaces.values())
+            roles[role_name] = {
+                "value": fam.ramp[chosen], "family": fam.key, "step": chosen,
+                "target": theme.text_target, "measured": m,
+                "hardest_ground": hardest, "ratio": m[hardest],
+                "worst_case_lsb": worst, "kind": "text",
+                "level": level(worst, "text", theme.text_target),
+                "criterion": ("WCAG 2.2 1.4.6" if theme.text_target == AAA_TEXT
+                              else "WCAG 2.2 1.4.3"),
+                "rationale": (f"the first {fam.key} step beyond "
+                              f"{spec_row['beyond']!r} that clears "
+                              f"{theme.text_target}:1 on every surface and stays at "
+                              f"least deltaE {MIN_RAMP_DE} from it"),
+                "declared_beyond": spec_row["beyond"],
+            }
+        else:
+            raise Fail(f"{theme.key}/{role_name}: role source mode {mode!r} is not "
+                       f"one this engine knows.")
 
     # The colour every filled control puts on top of itself. It is measured against
     # each fill that actually carries it, read from components.css: the primary
@@ -633,6 +802,61 @@ def build_theme(theme: Theme, fams: dict[str, Family]) -> dict:
 
     # Two names for one colour is a lie about the system's depth. If the theme's
     # target leaves no room for a quieter text role, say so rather than ship it.
+    # Roles drawn from one family must not resolve to one colour. Two names for
+    # one colour is a lie about the system's depth, and a four-hue palette invites
+    # exactly that.
+    for a, b, why in (
+        ("warning", "ink-muted",
+         "warning is the ground family's strong step and ink-muted its gentle one; "
+         "landing together would leave the palette unable to say caution in a "
+         "colour distinct from quiet text"),
+        ("warning", "ink", "warning must not be the body text colour"),
+    ):
+        # A DECLARED duplicate is allowed; an accidental one is not. That is the
+        # whole distinction: the direction spec has to name the role it is copying
+        # and say why, and then the pair is recorded rather than refused.
+        if a in roles and b in roles and roles[a]["value"] == roles[b]["value"] \
+                and roles[a].get("declared_same_as") != b:
+            raise Fail(f"{theme.key}: {a!r} and {b!r} both resolve to "
+                       f"{roles[a]['value']} — {why}.")
+
+    # Any two roles resolving to one colour must be DECLARED in the direction spec.
+    #
+    # A four-hue palette makes collisions inevitable rather than exceptional, and
+    # the choice is between engineering them away — which means deriving colours
+    # nobody chose — and naming them. The Natural direction names them. What is
+    # refused is a collision nobody noticed.
+    # Structural duplicates: pairs this ENGINE makes identical by construction, in
+    # every direction. They are declared here rather than in each direction spec,
+    # because they are a property of the code and not of a palette.
+    STRUCTURAL = {
+        frozenset(("accent-edge", "focus")):
+            "The focus ring is drawn in the accent's edge colour. Both are the "
+            "accent family measured at the non-text target, with the same "
+            "preference, so they are one colour by definition rather than by "
+            "coincidence. Every direction in this repository has shipped them "
+            "identical since the first build; nothing said so until 26 August 2026.",
+    }
+    declared = dict(STRUCTURAL)
+    declared.update({frozenset(pair["roles"]): pair.get("why", "")
+                     for pair in (declared_duplicates or [])})
+    seen: dict[str, str] = {}
+    for name, r in roles.items():
+        v = r["value"]
+        if v in seen:
+            pair = frozenset((seen[v], name))
+            if r.get("declared_same_as") == seen[v] or \
+                    roles[seen[v]].get("declared_same_as") == name:
+                continue
+            if pair not in declared:
+                raise Fail(
+                    f"{theme.key}: {sorted(pair)} both resolve to {v}, and that pair "
+                    f"is not declared in the direction spec. Two names for one "
+                    f"colour is a claim about the palette's depth and has to be made "
+                    f"on purpose, with a reason.")
+        else:
+            seen[v] = name
+
     if roles["ink-muted"]["value"] == roles["ink"]["value"]:
         raise Fail(
             f"{theme.key}: ink and ink-muted resolve to the same colour "
@@ -682,7 +906,9 @@ def run(spec_path: Path) -> dict:
         if required not in fams:
             raise NotEquipped(f"{spec['key']}: a direction must define a '{required}' family")
 
-    themes = [build_theme(t, fams) for t in THEMES]
+    themes = [build_theme(t, fams, spec.get("fixed"), spec.get("role_sources"),
+                          spec.get("declared_duplicates"))
+              for t in THEMES]
 
     return {
         "key": spec["key"],
@@ -699,6 +925,11 @@ def run(spec_path: Path) -> dict:
                      "with each channel of both colours nudged by ±1. The published "
                      "worst_case_lsb is the lowest of those results."),
         },
+        "fixed": spec.get("fixed", {}),
+        "role_sources": spec.get("role_sources", {}),
+        "declared_duplicates": spec.get("declared_duplicates", []),
+        "supersedes": spec.get("supersedes", {}),
+        "pantone": spec.get("pantone", {}),
         "steps": list(STEPS),
         "families": {
             k: {"label": f.label, "label_bn": f.label_bn, "kind": f.kind, "note": f.note,

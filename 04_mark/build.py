@@ -74,6 +74,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 TOKENS = ROOT / "07_tokens" / "build"
+PALETTE_PROOF = ROOT / "05_colour" / "generated" / "natural.proof.json"
 FONTS = ROOT / "06_type" / "candidates"
 OUT = HERE / "svg"
 RASTER = HERE / "png"
@@ -120,13 +121,50 @@ STEM_TOP = CIRCLE["cy"] - CIRCLE["r"]   # the top of the bowl
 STEM_BOTTOM = 94.0                      # the overrun, downward
 
 
-def mark_paths(stroke: float) -> str:
-    return (
-        f'<circle cx="{CIRCLE["cx"]:g}" cy="{CIRCLE["cy"]:g}" r="{CIRCLE["r"]:g}" '
-        f'fill="none" stroke="currentColor" stroke-width="{stroke:g}"/>'
-        f'<path d="M{STEM_X:g} {STEM_TOP:g}V{STEM_BOTTOM:g}" stroke="currentColor" '
-        f'stroke-width="{stroke:g}" stroke-linecap="round"/>'
-    )
+def mark_paths(stroke: float, colours: list[str] | None = None) -> str:
+    """The mark: a circle and a tangent stem.
+
+    With no colours it is ONE shape in currentColor, which is what every
+    recolourable artefact and every monochrome needs.
+
+    With four colours the bowl is cut into three equal 120-degree arcs and the stem
+    stays whole, giving exactly four strokes for four colours. The geometry does not
+    move: the arcs trace the same circle at the same radius, so every measurement
+    already proven of this mark — the safe field, the inscribed-circle fit, the
+    cross-platform size parity — holds without being re-derived. Owner's decision,
+    26 August 2026.
+
+    The arcs start at -90 degrees, the top of the bowl, so the first cut falls where
+    the stem meets it rather than in the middle of a curve.
+    """
+    if not colours:
+        return (
+            f'<circle cx="{CIRCLE["cx"]:g}" cy="{CIRCLE["cy"]:g}" r="{CIRCLE["r"]:g}" '
+            f'fill="none" stroke="currentColor" stroke-width="{stroke:g}"/>'
+            f'<path d="M{STEM_X:g} {STEM_TOP:g}V{STEM_BOTTOM:g}" stroke="currentColor" '
+            f'stroke-width="{stroke:g}" stroke-linecap="round"/>'
+        )
+    if len(colours) != 4:
+        raise Fail(f"the four-colour mark takes exactly four colours, not "
+                   f"{len(colours)}")
+
+    cx, cy, r = CIRCLE["cx"], CIRCLE["cy"], CIRCLE["r"]
+    parts = []
+    for i in range(3):
+        a0 = math.radians(-90 + i * 120)
+        a1 = math.radians(-90 + (i + 1) * 120)
+        x0, y0 = cx + r * math.cos(a0), cy + r * math.sin(a0)
+        x1, y1 = cx + r * math.cos(a1), cy + r * math.sin(a1)
+        # large-arc-flag 0 because each sweep is 120 degrees, sweep-flag 1 to run
+        # clockwise, which is the direction the angles above advance in.
+        parts.append(
+            f'<path d="M{x0:.4f} {y0:.4f}A{r:g} {r:g} 0 0 1 {x1:.4f} {y1:.4f}" '
+            f'fill="none" stroke="{colours[i]}" stroke-width="{stroke:g}" '
+            f'stroke-linecap="butt"/>')
+    parts.append(
+        f'<path d="M{STEM_X:g} {STEM_TOP:g}V{STEM_BOTTOM:g}" stroke="{colours[3]}" '
+        f'stroke-width="{stroke:g}" stroke-linecap="round"/>')
+    return "".join(parts)
 
 
 def mark_extent(stroke: float) -> tuple[float, float, float, float]:
@@ -145,10 +183,17 @@ def mark_extent(stroke: float) -> tuple[float, float, float, float]:
 # ---------------------------------------------------------------------------
 
 def shape_to_path(text: str, font_path: Path, size: float,
-                  variations: dict | None = None) -> tuple[str, float, float]:
-    """Shape `text` through HarfBuzz and return it as one SVG path.
+                  variations: dict | None = None,
+                  colours: list[str] | None = None) -> tuple[str, float, float]:
+    """Shape `text` through HarfBuzz and return it as SVG paths.
 
-    Returns (path_data, advance_width, units_per_em_scale).
+    One group per glyph, always. `colours` cycles through a list, one colour per
+    DRAWN glyph, which is what makes a four-colour wordmark possible without
+    re-typesetting anything: the shaping is identical and only the fill changes.
+    A space draws nothing, so it takes no turn in the cycle and the rhythm of the
+    colours follows the letters rather than the string.
+
+    Returns (path_data, advance_width, glyph_count).
     """
     try:
         import uharfbuzz as hb
@@ -205,8 +250,12 @@ def shape_to_path(text: str, font_path: Path, size: float,
             # passes every "does this parse" check.
             tx = (x + pos.x_offset) * scale
             ty = -pos.y_offset * scale
+            fill = ""
+            if colours:
+                fill = f' fill="{colours[len(parts) % len(colours)]}"'
             parts.append(f'<g transform="translate({tx:.3f},{ty:.3f}) '
-                         f'scale({scale:.6f},{-scale:.6f})"><path d="{d}"/></g>')
+                         f'scale({scale:.6f},{-scale:.6f})"{fill}>'
+                         f'<path d="{d}"/></g>')
         x += pos.x_advance
 
     return "".join(parts), x * scale, len(buf.glyph_infos)
@@ -736,6 +785,26 @@ def main() -> int:
             return node["$value"]["hex"]
         return v["hex"]
 
+    # The four primary colours, in the order they are drawn: three arcs of the
+    # bowl and then the stem. Read from the palette proof rather than typed, so the
+    # mark cannot drift from the brand it is drawn in.
+    try:
+        palette = json.loads(PALETTE_PROOF.read_text())
+    except FileNotFoundError as e:
+        print(f"could not run: {e}. Run 05_colour/engine.py first.", file=sys.stderr)
+        return 2
+    BRAND_ORDER = ("accent", "success", "danger", "ground")
+    brand = []
+    for fam_key in BRAND_ORDER:
+        fam = palette["families"][fam_key]
+        brand.append(fam["ramp"][str(fam["anchor_step"])])
+    brand_labels = [palette["families"][k]["label"] for k in BRAND_ORDER]
+
+    # The two anchors, read from the direction's own fixed block rather than typed,
+    # so the mark cannot disagree with the palette about what pure means.
+    PURE_BLACK = palette["fixed"]["ink_light"]
+    PURE_WHITE = palette["fixed"]["ink_dark"]
+
     ink = resolve(light["color"]["ink"]["default"]["$value"])
     paper = light["color"]["surface"]["bright"]["$value"]["hex"]
     # The Dark appearance is drawn from the dark theme's own tokens rather than
@@ -777,11 +846,23 @@ def main() -> int:
         written.append((name, f"{len(content)} bytes"))
 
     # --- the mark, two weights, one geometry -------------------------------
+    # These stay RECOLOURABLE and single-colour. They are the monochromes: set
+    # `color` to pure black or pure white and the mark follows. Apple's appearance
+    # variants and every reversed use are served from here.
     for label, stroke in (("regular", STROKE_REGULAR), ("heavy", STROKE_HEAVY)):
         write(f"mark-{label}.svg",
               svg_doc(mark_paths(stroke), GRID, GRID, ink,
                       f"Aninda Studio — the mark, {label} weight",
                       recolourable=True))
+
+    # The four-colour mark. Three arcs of the bowl and the stem, one primary each,
+    # in the order accent, success, danger, ground — Natural Blue, Green, Red, Gray.
+    # It carries fixed colours by definition, so it is not recolourable and the
+    # regression guard that refuses a root colour on the recolourable files does not
+    # apply to it.
+    write("mark-colour.svg",
+          svg_doc(mark_paths(STROKE_REGULAR, brand), GRID, GRID, brand[0],
+                  "Aninda Studio — the mark in the four primary colours"))
 
     # --- wordmarks, from real shaped outlines ------------------------------
     for name, text, font, var in (
@@ -790,6 +871,7 @@ def main() -> int:
     ):
         try:
             body, adv, _ = shape_to_path(text, font, 100.0, var)
+            colour_body, _, _ = shape_to_path(text, font, 100.0, var, brand)
         except (Fail, NotEquipped) as e:
             print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
             return 1
@@ -797,14 +879,22 @@ def main() -> int:
               svg_doc(f'<g fill="currentColor">{body}</g>', adv, 140.0, ink,
                       f"Aninda Studio — wordmark, {text}",
                       view=f"0 -100 {adv:g} 140", recolourable=True))
+        # The four-colour wordmark. Each letter takes the next primary in turn, the
+        # way Google's own wordmark carries its colours across letters rather than
+        # inside one glyph. It is NOT recolourable: the colours are the point.
+        write(f"{name}-colour.svg",
+              svg_doc(colour_body, adv, 140.0, brand[0],
+                      f"Aninda Studio — wordmark in the four primary colours, {text}",
+                      view=f"0 -100 {adv:g} 140"))
 
     # --- the web tile: rounded, because a browser will not round it for you --
     s, tx, ty = place[STROKE_HEAVY]
+    ts, ttx, tty = place[STROKE_HEAVY]
     tile_body = (
         f'<rect width="{GRID:g}" height="{GRID:g}" rx="{TILE_RADIUS_PCT:g}" '
-        f'ry="{TILE_RADIUS_PCT:g}" fill="{ink}"/>'
-        f'<g style="color:{paper}" transform="translate({tx:.4f},{ty:.4f}) '
-        f'scale({s:.6f})">{mark_paths(STROKE_HEAVY)}</g>'
+        f'ry="{TILE_RADIUS_PCT:g}" fill="{PURE_WHITE}"/>'
+        f'<g transform="translate({ttx:.4f},{tty:.4f}) '
+        f'scale({ts:.6f})">{mark_paths(STROKE_HEAVY, brand)}</g>'
     )
     write("tile-web.svg", svg_doc(tile_body, GRID, GRID, paper,
                                   "Aninda Studio — web tile"))
@@ -830,15 +920,30 @@ def main() -> int:
     s, tx, ty = place[STROKE_REGULAR]
 
     def square(ground: str, mark: str) -> str:
+        """A monochrome square. One colour on one ground."""
         return (f'<rect width="{GRID:g}" height="{GRID:g}" fill="{ground}"/>'
                 f'<g style="color:{mark}" transform="translate({tx:.4f},{ty:.4f}) '
                 f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>')
 
+    def square_colour(ground: str) -> str:
+        """The four-colour mark on a ground.
+
+        The ground is pure white and not a choice of taste. Measured on
+        26 August 2026 against the 3:1 non-text floor of WCAG 1.4.11: on pure white
+        every one of the four clears it — Natural Blue 9.47, Natural Green 7.80,
+        Natural Red 5.56, Natural Gray 3.83. On pure black two of them do not —
+        Blue falls to 2.12 and Green to 2.58. So the coloured mark can sit on white
+        and cannot sit on black, and the monochromes exist for the dark side.
+        """
+        return (f'<rect width="{GRID:g}" height="{GRID:g}" fill="{ground}"/>'
+                f'<g transform="translate({tx:.4f},{ty:.4f}) '
+                f'scale({s:.6f})">{mark_paths(STROKE_REGULAR, brand)}</g>')
+
     rounded_body = (
         f'<rect width="{GRID:g}" height="{GRID:g}" rx="{TILE_RADIUS_PCT:g}" '
-        f'ry="{TILE_RADIUS_PCT:g}" fill="{ink}"/>'
-        f'<g style="color:{paper}" transform="translate({tx:.4f},{ty:.4f}) '
-        f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>'
+        f'ry="{TILE_RADIUS_PCT:g}" fill="{PURE_WHITE}"/>'
+        f'<g transform="translate({tx:.4f},{ty:.4f}) '
+        f'scale({s:.6f})">{mark_paths(STROKE_REGULAR, brand)}</g>'
     )
     # The web set. The 1088 that used to sit here was for watchOS and has moved to
     # the Apple set below, square and unmasked, so nothing rounded is delivered to
@@ -863,13 +968,22 @@ def main() -> int:
     # says four, and Icon Composer has you author three. Three are authored here;
     # Apple's renderer generates clear light, clear dark, tinted light and tinted
     # dark from them, and this build cannot show what those four look like.
+    # Default and watchOS carry the four colours on pure white, the way Google's
+    # own mark does. Dark is a MONOCHROME — pure white on pure black — because the
+    # coloured mark measurably cannot sit on black: Natural Blue falls to 2.12 and
+    # Natural Green to 2.58 against a 3:1 floor. Apple's own appearance variants are
+    # the right place for a monochrome, so the two conventions meet here rather than
+    # fighting.
     apple = [
-        ("icon-apple-1024.svg", 1024, square(ink, paper), paper,
-         "square unmasked master, Default appearance — iOS, iPadOS, macOS, visionOS"),
-        ("icon-apple-1088-watch.svg", 1088, square(ink, paper), paper,
-         "square unmasked master, 1088px for watchOS"),
-        ("icon-apple-1024-dark.svg", 1024, square(dark_ground, dark_mark), dark_mark,
-         "square unmasked master, Dark appearance"),
+        ("icon-apple-1024.svg", 1024, square_colour(PURE_WHITE), brand[0],
+         "square unmasked master, Default appearance — the four primary colours on "
+         "pure white — iOS, iPadOS, macOS, visionOS"),
+        ("icon-apple-1088-watch.svg", 1088, square_colour(PURE_WHITE), brand[0],
+         "square unmasked master, 1088px for watchOS — the four primary colours on "
+         "pure white"),
+        ("icon-apple-1024-dark.svg", 1024, square(PURE_BLACK, PURE_WHITE), PURE_WHITE,
+         "square unmasked master, Dark appearance — monochrome, pure white on pure "
+         "black"),
     ]
     for name, size, body, colour, what in apple:
         doc = svg_doc(body, size, size, colour, f"Aninda Studio — {what}",
@@ -883,7 +997,8 @@ def main() -> int:
 
     # The Mono appearance carries no ground: Apple composites it and derives the
     # clear and tinted appearances from it, so its shape is its alpha.
-    mono_body = (f'<g style="color:{paper}" transform="translate({tx:.4f},{ty:.4f}) '
+    mono_body = (f'<g style="color:{PURE_WHITE}" '
+                 f'transform="translate({tx:.4f},{ty:.4f}) '
                  f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>')
     mono = svg_doc(mono_body, 1024, 1024, paper,
                    "Aninda Studio — Mono appearance, no ground; the alpha carries "
@@ -903,20 +1018,27 @@ def main() -> int:
     # them over the background and the system tints the monochrome one.
     write("icon-android-background-108.svg",
           svg_doc(f'<rect width="{ANDROID_GRID:g}" height="{ANDROID_GRID:g}" '
-                  f'fill="{ink}"/>',
-                  ANDROID_GRID, ANDROID_GRID, ink,
-                  "Aninda Studio — Android adaptive icon, background layer",
+                  f'fill="{PURE_WHITE}"/>',
+                  ANDROID_GRID, ANDROID_GRID, PURE_WHITE,
+                  "Aninda Studio — Android adaptive icon, background layer, "
+                  "pure white",
                   view=f"0 0 {ANDROID_GRID:g} {ANDROID_GRID:g}"))
 
-    android_mark = (f'<g style="color:{paper}" '
+    android_mark = (f'<g transform="translate({a_tx:.4f},{a_ty:.4f}) '
+                    f'scale({a_scale:.6f})">'
+                    f'{mark_paths(STROKE_REGULAR, brand)}</g>')
+    # The monochrome layer is a SILHOUETTE the system tints, so it is one colour
+    # and never four. Pure black: the launcher supplies the tint and reads the alpha.
+    android_mono = (f'<g style="color:{PURE_BLACK}" '
                     f'transform="translate({a_tx:.4f},{a_ty:.4f}) '
                     f'scale({a_scale:.6f})">{mark_paths(STROKE_REGULAR)}</g>')
-    for name, what in (
-        ("icon-android-foreground-108.svg", "Android adaptive icon, foreground layer"),
-        ("icon-android-monochrome-108.svg",
-         "Android adaptive icon, monochrome layer — the system tints this"),
+    for name, body, what in (
+        ("icon-android-foreground-108.svg", android_mark,
+         "Android adaptive icon, foreground layer — the four primary colours"),
+        ("icon-android-monochrome-108.svg", android_mono,
+         "Android adaptive icon, monochrome layer — one colour, the system tints it"),
     ):
-        doc = svg_doc(android_mark, ANDROID_GRID, ANDROID_GRID, paper,
+        doc = svg_doc(body, ANDROID_GRID, ANDROID_GRID, brand[0],
                       f"Aninda Studio — {what}",
                       view=f"0 0 {ANDROID_GRID:g} {ANDROID_GRID:g}")
         try:

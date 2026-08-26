@@ -1163,7 +1163,7 @@ def document(title: str, description: str, body: str, tokens_css: str,
         f'<meta property="og:image:width" content="{og_width}">\n'
         f'<meta property="og:image:height" content="{og_height}">\n'
         '<meta property="og:image:alt" content="The Aninda Studio mark, the name in '
-        'English and Bangla, and the line: Small, careful software.">\n'
+        'English and Bangla, and the line: Simple apps for real life.">\n'
         '<meta name="twitter:card" content="summary_large_image">\n'
         f"<script>{THEME_JS}</script>\n"
         "</head>\n"
@@ -1217,7 +1217,7 @@ def index_page(tokens_css: str, cards: dict, npm: dict, py_name: str,
     )
     return document(
         "Aninda Studio",
-        "Small, careful software, and the design system it is built on. "
+        "Simple apps for real life, and the design system they are built on. "
         "Design tokens, components and marks, measured rather than assumed.",
         body, tokens_css, og[0], og[1], ORIGIN + "/",
     )
@@ -1294,7 +1294,7 @@ def webmanifest(tokens_css: str) -> str:
         "_warning": DO_NOT_EDIT,
         "name": "Aninda Studio",
         "short_name": "Aninda",
-        "description": "Small, careful software, and the design system it is built on.",
+        "description": "Simple apps for real life, and the design system they are built on.",
         "lang": "en",
         "dir": "ltr",
         "start_url": "/",

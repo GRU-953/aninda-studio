@@ -34,11 +34,11 @@ measured against every surface it can land on, on the rounded 8-bit hex a browse
 actually produces, and then measured again with every channel of both colours
 nudged by one bit. The published figure is the worst of those results.
 
-- **28 text pairings.** The lowest is **5.3348:1**, against a
+- **28 text pairings.** The lowest is **5.1623:1**, against a
   floor of 4.5:1 (WCAG 2.2 SC 1.4.3) in the ordinary themes and 7:1 (SC 1.4.6) in
   the high-contrast ones.
 - **12 non-text pairings** — borders and focus rings. The lowest is
-  **3.8134:1**, against a floor of 3:1 (SC 1.4.11).
+  **3.7326:1**, against a floor of 3:1 (SC 1.4.11).
 
 Those two are counted separately on purpose. **WCAG defines no AAA level for
 non-text contrast**, so a border at 3.9:1 has fully met its criterion; judging it
@@ -56,10 +56,10 @@ and their alert both say the figures are examples rather than readings.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.3 MB) that needs no network, plus a 1.9 MB PDF |
-| `07_tokens/` | The design tokens: DTCG source, and 65 CSS custom properties generated from it |
+| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.4 MB) that needs no network, plus a 1.9 MB PDF |
+| `07_tokens/` | The design tokens: DTCG source, and 66 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
-| `04_mark/` | 15 mark, wordmark and icon files |
+| `04_mark/` | 18 mark, wordmark and icon files |
 | `10_assets/` | 20 ready-made images at exact platform sizes |
 | `11_site/` | The website, generated from the tokens |
 | `12_packages/` | The tokens as an npm package and a Python package |

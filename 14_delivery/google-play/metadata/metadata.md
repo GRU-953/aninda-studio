@@ -8,10 +8,10 @@ Both counts are given because neither store publishes which unit it counts. The 
 
 ### full_description
 
-*648 code points, 648 UTF-8 bytes, limit 4000.*
+*650 code points, 650 UTF-8 bytes, limit 4000.*
 
 ```
-Aninda Studio is one person making small, careful software.
+Aninda Studio is one person making simple apps for real life.
 
 Everything here is built on a design system where the claims are measured rather than asserted. Every colour pairing was measured against every surface it can land on, in a real browser, and the published figure is the worst result rather than the flattering one. Where something has a limit, the limit is written down.
 
@@ -22,10 +22,10 @@ This listing describes the studio. No app is published yet.
 
 ### short_description
 
-*49 code points, 49 UTF-8 bytes, limit 80.*
+*52 code points, 52 UTF-8 bytes, limit 80.*
 
 ```
-Small, careful software from a one-person studio.
+Simple apps for real life, from a one-person studio.
 ```
 
 ### title
@@ -40,10 +40,10 @@ Aninda Studio
 
 ### full_description
 
-*642 code points, 1684 UTF-8 bytes, limit 4000.*
+*645 code points, 1693 UTF-8 bytes, limit 4000.*
 
 ```
-অনিন্দ্য স্টুডিও — এক জন মানুষ, ছোটো আর যত্নে গড়া সফটওয়্যার।
+অনিন্দ্য স্টুডিও — এক জন মানুষ, সত্যিকারের জীবনের জন্য সহজ অ্যাপ।
 
 এখানের সব কিছু এমন একটি ডিজাইন পদ্ধতির উপর গড়া, যেখানে প্রতিটি দাবি মেপে দেখা হয়েছে, শুধু বলা হয়নি। প্রতিটি রঙের জোড়া যে যে পৃষ্ঠের উপর বসতে পারে, সবগুলোর সঙ্গে সত্যিকারের ব্রাউজারে মেপে দেখা হয়েছে — আর প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি, সবচেয়ে ভালোটি নয়। কোনো কিছুর সীমা থাকলে সেটাও লেখা আছে।
 
@@ -54,10 +54,10 @@ Aninda Studio
 
 ### short_description
 
-*37 code points, 99 UTF-8 bytes, limit 80.*
+*33 code points, 91 UTF-8 bytes, limit 80.*
 
 ```
-এক জনের গড়া ছোটো, যত্নের সফটওয়্যার।
+সত্যিকারের জীবনের জন্য সহজ অ্যাপ।
 ```
 
 ### title

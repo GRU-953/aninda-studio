@@ -13,17 +13,37 @@ Apache-2.0.
 
 ## The two layers
 
-**Primitives** are six ramps of eleven steps: `ground`, `accent`, `success`,
-`warning`, `danger`, `info`. Steps run 50, 100, 200 … 900, 950. Never use a
-primitive directly in a design. It cannot follow a theme.
+**Primitives** are four ramps of eleven steps: `ground`, `accent`, `success`,
+`danger` — Natural Gray, Natural Blue, Natural Green and Natural Red. Steps run
+50, 100, 200 … 900, 950. Never use a primitive directly in a design. It cannot
+follow a theme.
 
-**Semantic roles** are the names below. These are what you use. Each
-one holds a different value in each of the four themes, so a design written in
-roles works in all four without being rewritten.
+Each ramp CONTAINS its brand colour exactly. The step nearest the anchor is
+overwritten with the anchor itself, so `#224959` is literally in the accent ramp
+rather than approximated by a neighbour of it.
 
-The Bangla names of the ramps are brand names and are exempt from the spelling
-rules: মোহনা (ground, "estuary"), জোয়ার (accent, "tidewater"), পলি (success,
-"silt"), কাশ (warning), লাল মাটি (danger, "laterite"), বর্ষা (info, "monsoon").
+**Pure Black and Pure White are anchors, not ramps.** Neither has eleven distinct
+steps to give: black is the floor of the lightness axis and white its ceiling.
+They are used directly — as the body text colour and as the page — which is what
+makes the light theme's prose a measured 21:1.
+
+**Semantic roles** are the names below. These are what you use. Each one holds a
+different value in each of the four themes, so a design written in roles works in
+all four without being rewritten.
+
+Two roles double up, because four hues cannot fill six jobs, and both say so:
+
+- **`color.status.warning` is Natural Gray.** The palette has no amber. Warning
+  takes the first grey step beyond the muted text colour, so a caution is visibly
+  heavier than quiet prose without becoming the body text colour.
+- **`color.status.info` is the accent.** Natural Blue carries links, focus, the
+  primary action and information. With four hues there is no fifth colour to
+  separate a note from a link, and deriving a near-identical second blue to avoid
+  saying so would be worse than saying so.
+
+Both were the owner's decisions on 26 August 2026, and the colour engine refuses
+any OTHER pair of roles that resolves to one colour unless the direction spec
+declares it with a reason.
 
 ---
 
@@ -31,25 +51,26 @@ rules: মোহনা (ground, "estuary"), জোয়ার (accent, "tidewat
 
 | Role | light | dark | hc-light | hc-dark |
 |---|---|---|---|---|
-| `color.surface.lowest` | #FDFFFE | #0B0C0B | #FCFDFC | #070807 |
-| `color.surface.low` | #FBFCFC | #0E100F | #FAFAFA | #0C0C0C |
-| `color.surface.base` | #F8FAF9 | #111212 | #F7F8F7 | #0E0F0E |
-| `color.surface.high` | #F6F7F7 | #111312 | #F5F5F5 | #111111 |
-| `color.surface.highest` | #F3F5F4 | #121313 | #F2F3F2 | #111211 |
-| `color.surface.dim` | #F1F2F2 | #060707 | #F1F1F1 | #030303 |
-| `color.surface.bright` | #FFFFFF | #121413 | #FFFFFF | #121212 |
-| `color.ink.default` | #0D1A17 | #F2F9F7 | #0D1A17 | #F2F9F7 |
-| `color.ink.muted` | #41655C | #6F9B90 | #2E4B43 | #8BB5AA |
-| `color.line.default` | #578076 | #578076 | #41655C | #6F9B90 |
-| `color.accent.default` | #126974 | #42A0AE | #054D56 | #65BAC7 |
-| `color.accent.edge` | #278492 | #278492 | #126974 | #42A0AE |
-| `color.accent.hover` | #054D56 | #65BAC7 | #013137 | #8ED2DD |
-| `color.accent.on` | #FDFFFE | #0B0C0B | #FCFDFC | #070807 |
-| `color.focus.ring` | #278492 | #278492 | #126974 | #42A0AE |
-| `color.status.success` | #2D6C42 | #59A46F | #1D502E | #77BE8B |
-| `color.status.warning` | #7C5414 | #B8863E | #5D3C07 | #D2A15F |
-| `color.status.danger` | #9B3728 | #E16551 | #752519 | #FB836F |
-| `color.status.info` | #316189 | #5C96C8 | #214767 | #7AB1E1 |
+| `color.surface.lowest` | #FCFBFB | #060505 | #FCFBFB | #060505 |
+| `color.surface.low` | #F9F9F8 | #0A0A09 | #F7F7F7 | #0A0A09 |
+| `color.surface.base` | #F8F7F7 | #0E0D0D | #F4F3F3 | #0F0E0E |
+| `color.surface.high` | #F5F5F4 | #10100F | #EFEFEF | #10100F |
+| `color.surface.highest` | #F4F3F3 | #111010 | #ECEBEB | #131212 |
+| `color.surface.dim` | #F1F1F0 | #000000 | #E7E7E7 | #000000 |
+| `color.surface.bright` | #FFFFFF | #111110 | #FFFFFF | #151515 |
+| `color.surface.page` | #FFFFFF | #000000 | #FFFFFF | #000000 |
+| `color.ink.default` | #000000 | #FFFFFF | #000000 | #FFFFFF |
+| `color.ink.muted` | #605C59 | #84807C | #464341 | #AEAAA6 |
+| `color.line.default` | #84807C | #84807C | #605C59 | #84807C |
+| `color.accent.default` | #224959 | #6F98AA | #224959 | #8BB2C3 |
+| `color.accent.edge` | #577D8D | #577D8D | #426271 | #6F98AA |
+| `color.accent.hover` | #1B2D35 | #8BB2C3 | #1B2D35 | #AACBD9 |
+| `color.accent.on` | #FCFBFB | #060505 | #FCFBFB | #060505 |
+| `color.focus.ring` | #577D8D | #577D8D | #426271 | #6F98AA |
+| `color.status.success` | #2C5A3A | #6E9E7A | #1B3020 | #8AB895 |
+| `color.status.warning` | #464341 | #94908C | #2C2A28 | #C7C4C1 |
+| `color.status.danger` | #A14F39 | #CC765E | #693223 | #E6927B |
+| `color.status.info` | #224959 | #6F98AA | #224959 | #8BB2C3 |
 
 In CSS the same roles are `--as-surface-base`, `--as-ink`, `--as-accent` and so
 on. Use those, not the hexes above. The hexes are here so you can answer a

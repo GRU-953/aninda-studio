@@ -20,6 +20,7 @@
     "stroke_by_file": {
       "mark-regular.svg": 9.0,
       "mark-heavy.svg": 15.0,
+      "mark-colour.svg": 9.0,
       "tile-web.svg": 15.0,
       "icon-1024.svg": 9.0,
       "icon-512.svg": 9.0,
@@ -96,8 +97,11 @@
   "files": [
     "mark-regular.svg",
     "mark-heavy.svg",
+    "mark-colour.svg",
     "wordmark-latin.svg",
+    "wordmark-latin-colour.svg",
     "wordmark-bangla.svg",
+    "wordmark-bangla-colour.svg",
     "tile-web.svg",
     "icon-1024.svg",
     "icon-512.svg",
@@ -134,6 +138,6 @@
     "icon-android-monochrome-108.svg: 91.7% background showing \u2014 no ground; the alpha carries the shape \u2014 Android monochrome",
     "under a circle inscribed in the frame, icon-1024.svg and icon-apple-1024.svg are the same image in all 65536 pixels \u2014 the corner rounding lies entirely outside the circle watchOS and visionOS mask to, and the artwork inside it has not drifted between the two files",
     "visual parity: the mark fills 59.850x67.216 per cent of the Apple frame and 60.958x68.461 per cent of Android's visible 72 dp viewport \u2014 a difference of 1.11 and 1.24 percentage points. The corner shape differs between the platforms by decision; the size does not",
-    "contact sheet: 15 artefacts nested from the same strings written to 04_mark/svg, every caption read out of the artwork"
+    "contact sheet: 18 artefacts nested from the same strings written to 04_mark/svg, every caption read out of the artwork"
   ]
 }

@@ -3,15 +3,15 @@
   "_warning": "GENERATED FILE. Written by 11_site/build.py. Do not hand-edit — the next build overwrites it, and --check fails on any difference.",
   "name": "Aninda Studio",
   "short_name": "Aninda",
-  "description": "Small, careful software, and the design system it is built on.",
+  "description": "Simple apps for real life, and the design system they are built on.",
   "lang": "en",
   "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "id": "/",
   "display": "minimal-ui",
-  "background_color": "#F8FAF9",
-  "theme_color": "#F8FAF9",
+  "background_color": "#F8F7F7",
+  "theme_color": "#F8F7F7",
   "icons": [
     {
       "src": "/icon.svg",

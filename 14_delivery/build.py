@@ -432,9 +432,9 @@ BANNED_STORE_PATTERNS = [
 STORE_TEXT = {
     "play": {
         "title": ("Aninda Studio", 30),
-        "short_description": ("Small, careful software from a one-person studio.", 80),
+        "short_description": ("Simple apps for real life, from a one-person studio.", 80),
         "full_description": (
-            "Aninda Studio is one person making small, careful software.\n\n"
+            "Aninda Studio is one person making simple apps for real life.\n\n"
             "Everything here is built on a design system where the claims are "
             "measured rather than asserted. Every colour pairing was measured "
             "against every surface it can land on, in a real browser, and the "
@@ -448,13 +448,13 @@ STORE_TEXT = {
     },
     "apple": {
         "name": ("Aninda Studio", 30),
-        "subtitle": ("Small, careful software", 30),
+        "subtitle": ("Simple apps for real life", 30),
         "promotional_text": (
             "A design system where every colour pairing is measured against every "
             "surface it can land on, and the worst result is the one published.",
             170),
         "description": (
-            "Aninda Studio is one person making small, careful software.\n\n"
+            "Aninda Studio is one person making simple apps for real life.\n\n"
             "Everything here is built on a design system where the claims are "
             "measured rather than asserted. Every colour pairing was measured "
             "against every surface it can land on, in a real browser, and the "
@@ -477,9 +477,9 @@ STORE_TEXT = {
 STORE_TEXT_BN = {
     "play": {
         "title": ("অনিন্দ্য স্টুডিও", 30),
-        "short_description": ("এক জনের গড়া ছোটো, যত্নের সফটওয়্যার।", 80),
+        "short_description": ("সত্যিকারের জীবনের জন্য সহজ অ্যাপ।", 80),
         "full_description": (
-            "অনিন্দ্য স্টুডিও — এক জন মানুষ, ছোটো আর যত্নে গড়া সফটওয়্যার।\n\n"
+            "অনিন্দ্য স্টুডিও — এক জন মানুষ, সত্যিকারের জীবনের জন্য সহজ অ্যাপ।\n\n"
             "এখানের সব কিছু এমন একটি ডিজাইন পদ্ধতির উপর গড়া, যেখানে প্রতিটি দাবি "
             "মেপে দেখা হয়েছে, শুধু বলা হয়নি। প্রতিটি রঙের জোড়া যে যে পৃষ্ঠের উপর "
             "বসতে পারে, সবগুলোর সঙ্গে সত্যিকারের ব্রাউজারে মেপে দেখা হয়েছে — আর "
@@ -493,13 +493,15 @@ STORE_TEXT_BN = {
     },
     "apple": {
         "name": ("অনিন্দ্য স্টুডিও", 30),
-        "subtitle": ("ছোটো, যত্নের সফটওয়্যার", 30),
+        # 23 code points against Apple's 30. The fuller phrase, "সত্যিকারের জীবনের
+        # জন্য সহজ অ্যাপ", is 32 and was refused by guard_text_limits.
+        "subtitle": ("রোজকার জীবনের সহজ অ্যাপ", 30),
         "promotional_text": (
             "একটি ডিজাইন পদ্ধতি, যেখানে প্রতিটি রঙের জোড়া প্রতিটি পৃষ্ঠের সঙ্গে "
             "মেপে দেখা হয়েছে — আর প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি।",
             170),
         "description": (
-            "অনিন্দ্য স্টুডিও — এক জন মানুষ, ছোটো আর যত্নে গড়া সফটওয়্যার।\n\n"
+            "অনিন্দ্য স্টুডিও — এক জন মানুষ, সত্যিকারের জীবনের জন্য সহজ অ্যাপ।\n\n"
             "এখানের সব কিছু এমন একটি ডিজাইন পদ্ধতির উপর গড়া, যেখানে প্রতিটি দাবি "
             "মেপে দেখা হয়েছে, শুধু বলা হয়নি। প্রতিটি রঙের জোড়া যে যে পৃষ্ঠের উপর "
             "বসতে পারে, সবগুলোর সঙ্গে সত্যিকারের ব্রাউজারে মেপে দেখা হয়েছে — আর "

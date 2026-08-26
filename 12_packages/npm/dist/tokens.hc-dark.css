@@ -4,25 +4,26 @@
  * GENERATED — do not hand-edit.
  */
 [data-theme="hc-dark"] {
-  --as-surface-lowest: #070807;
-  --as-surface-low: #0C0C0C;
-  --as-surface-base: #0E0F0E;
-  --as-surface-high: #111111;
-  --as-surface-highest: #111211;
-  --as-surface-dim: #030303;
-  --as-surface-bright: #121212;
-  --as-ink: #F2F9F7;
-  --as-ink-muted: #8BB5AA;
-  --as-line: #6F9B90;
-  --as-accent: #65BAC7;
-  --as-accent-edge: #42A0AE;
-  --as-accent-hover: #8ED2DD;
-  --as-accent-on: #070807;
-  --as-focus-ring: #42A0AE;
-  --as-success: #77BE8B;
-  --as-warning: #D2A15F;
-  --as-danger: #FB836F;
-  --as-info: #7AB1E1;
+  --as-surface-lowest: #060505;
+  --as-surface-low: #0A0A09;
+  --as-surface-base: #0F0E0E;
+  --as-surface-high: #10100F;
+  --as-surface-highest: #131212;
+  --as-surface-dim: #000000;
+  --as-surface-bright: #151515;
+  --as-surface-page: #000000;
+  --as-ink: #FFFFFF;
+  --as-ink-muted: #AEAAA6;
+  --as-line: #84807C;
+  --as-accent: #8BB2C3;
+  --as-accent-edge: #6F98AA;
+  --as-accent-hover: #AACBD9;
+  --as-accent-on: #060505;
+  --as-focus-ring: #6F98AA;
+  --as-success: #8AB895;
+  --as-warning: #C7C4C1;
+  --as-danger: #E6927B;
+  --as-info: #8BB2C3;
   --as-shadow-float: none;
   --as-color-scheme: dark;
 }

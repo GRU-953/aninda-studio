@@ -3,7 +3,7 @@
   "$description": "Aninda Studio semantic tokens — Light theme. Generated; do not hand-edit. Every text pairing in this file was measured against every surface it can land on, at a target of 4.5:1, on the rounded 8-bit hex and again with every channel of both colours nudged by ±1. The published figure is the worst of those.",
   "$extensions": {
     "studio.aninda": {
-      "direction": "estuary",
+      "direction": "natural",
       "theme": "light",
       "polarity": "light",
       "highContrast": false,
@@ -20,16 +20,16 @@
         "$value": {
           "colorSpace": "srgb",
           "components": [
-            0.992157,
-            1.0,
-            0.996078
+            0.988235,
+            0.984314,
+            0.984314
           ],
-          "hex": "#FDFFFE"
+          "hex": "#FCFBFB"
         },
         "$description": "Tonal surface 'lowest' for the Light theme",
         "$extensions": {
           "studio.aninda": {
-            "luminance": 0.995583,
+            "luminance": 0.966549,
             "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
           }
         }
@@ -38,16 +38,16 @@
         "$value": {
           "colorSpace": "srgb",
           "components": [
-            0.984314,
-            0.988235,
-            0.988235
+            0.976471,
+            0.976471,
+            0.972549
           ],
-          "hex": "#FBFCFC"
+          "hex": "#F9F9F8"
         },
         "$description": "Tonal surface 'low' for the Light theme",
         "$extensions": {
           "studio.aninda": {
-            "luminance": 0.971583,
+            "luminance": 0.946684,
             "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
           }
         }
@@ -57,15 +57,15 @@
           "colorSpace": "srgb",
           "components": [
             0.972549,
-            0.980392,
-            0.976471
+            0.968627,
+            0.968627
           ],
-          "hex": "#F8FAF9"
+          "hex": "#F8F7F7"
         },
         "$description": "Tonal surface 'base' for the Light theme",
         "$extensions": {
           "studio.aninda": {
-            "luminance": 0.951672,
+            "luminance": 0.931934,
             "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
           }
         }
@@ -74,16 +74,16 @@
         "$value": {
           "colorSpace": "srgb",
           "components": [
-            0.964706,
-            0.968627,
-            0.968627
+            0.960784,
+            0.960784,
+            0.956863
           ],
-          "hex": "#F6F7F7"
+          "hex": "#F5F5F4"
         },
         "$description": "Tonal surface 'high' for the Light theme",
         "$extensions": {
           "studio.aninda": {
-            "luminance": 0.928297,
+            "luminance": 0.91249,
             "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
           }
         }
@@ -92,16 +92,16 @@
         "$value": {
           "colorSpace": "srgb",
           "components": [
+            0.956863,
             0.952941,
-            0.960784,
-            0.956863
+            0.952941
           ],
-          "hex": "#F3F5F4"
+          "hex": "#F4F3F3"
         },
         "$description": "Tonal surface 'highest' for the Light theme",
         "$extensions": {
           "studio.aninda": {
-            "luminance": 0.908911,
+            "luminance": 0.898054,
             "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
           }
         }
@@ -111,15 +111,15 @@
           "colorSpace": "srgb",
           "components": [
             0.945098,
-            0.94902,
-            0.94902
+            0.945098,
+            0.941176
           ],
-          "hex": "#F1F2F2"
+          "hex": "#F1F1F0"
         },
         "$description": "Tonal surface 'dim' for the Light theme",
         "$extensions": {
           "studio.aninda": {
-            "luminance": 0.886158,
+            "luminance": 0.879026,
             "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
           }
         }
@@ -141,39 +141,66 @@
             "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
           }
         }
+      },
+      "page": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "hex": "#FFFFFF"
+        },
+        "$description": "Tonal surface 'page' for the Light theme",
+        "$extensions": {
+          "studio.aninda": {
+            "luminance": 1.0,
+            "derivation": "swept along the lightness axis until each rung was at least ΔE2000 0.9 from the one before it"
+          }
+        }
       }
     },
     "ink": {
       "default": {
-        "$description": "lightest ground step clearing 4.5:1 against all 7 surfaces, hardest being dim",
+        "$description": "a fixed anchor of this direction rather than a ramp step, measured against every surface it can land on",
         "$extensions": {
           "studio.aninda": {
-            "family": "ground",
-            "step": 950,
+            "family": "fixed",
+            "step": "ink",
             "kind": "text",
             "proof": {
               "required": 4.5,
-              "measured": 15.9043,
-              "worstCaseLsb": 15.6124,
+              "measured": 18.5805,
+              "worstCaseLsb": 18.3044,
               "hardestGround": "dim",
               "level": "AAA",
               "criterion": "WCAG 2.2 1.4.3",
               "againstEverySurface": {
-                "lowest": 17.7633,
-                "low": 17.3556,
-                "base": 17.0173,
-                "high": 16.6202,
-                "highest": 16.2909,
-                "dim": 15.9043,
-                "bright": 17.8384
+                "lowest": 20.331,
+                "low": 19.9337,
+                "base": 19.6387,
+                "high": 19.2498,
+                "highest": 18.9611,
+                "dim": 18.5805,
+                "bright": 21.0,
+                "page": 21.0
               }
             }
           }
         },
-        "$value": "{color.ramp.ground.950}"
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "hex": "#000000"
+        }
       },
       "muted": {
-        "$description": "lightest ground step clearing 4.5:1 against all 7 surfaces, hardest being dim",
+        "$description": "lightest ground step clearing 4.5:1 against all 8 surfaces, hardest being dim",
         "$extensions": {
           "studio.aninda": {
             "family": "ground",
@@ -181,19 +208,20 @@
             "kind": "text",
             "proof": {
               "required": 4.5,
-              "measured": 5.7775,
-              "worstCaseLsb": 5.6402,
+              "measured": 5.8568,
+              "worstCaseLsb": 5.7161,
               "hardestGround": "dim",
               "level": "AA",
               "criterion": "WCAG 2.2 1.4.3",
               "againstEverySurface": {
-                "lowest": 6.4528,
-                "low": 6.3047,
-                "base": 6.1818,
-                "high": 6.0375,
-                "highest": 5.9179,
-                "dim": 5.7775,
-                "bright": 6.48
+                "lowest": 6.4085,
+                "low": 6.2833,
+                "base": 6.1903,
+                "high": 6.0677,
+                "highest": 5.9767,
+                "dim": 5.8568,
+                "bright": 6.6194,
+                "page": 6.6194
               }
             }
           }
@@ -203,7 +231,7 @@
     },
     "line": {
       "default": {
-        "$description": "lightest ground step clearing 3.0:1 against all 7 surfaces, hardest being dim",
+        "$description": "the ground family's anchor step 600 — the brand colour itself, which clears 3.0:1 on every ground it can land on",
         "$extensions": {
           "studio.aninda": {
             "family": "ground",
@@ -211,19 +239,20 @@
             "kind": "nontext",
             "proof": {
               "required": 3.0,
-              "measured": 3.938,
-              "worstCaseLsb": 3.849,
+              "measured": 3.4666,
+              "worstCaseLsb": 3.3892,
               "hardestGround": "dim",
               "level": "meets 1.4.11",
               "criterion": "WCAG 2.2 1.4.11",
               "againstEverySurface": {
-                "lowest": 4.3984,
-                "low": 4.2974,
-                "base": 4.2136,
-                "high": 4.1153,
-                "highest": 4.0338,
-                "dim": 3.938,
-                "bright": 4.4169
+                "lowest": 3.7932,
+                "low": 3.7191,
+                "base": 3.664,
+                "high": 3.5915,
+                "highest": 3.5376,
+                "dim": 3.4666,
+                "bright": 3.918,
+                "page": 3.918
               }
             }
           }
@@ -233,35 +262,36 @@
     },
     "accent": {
       "default": {
-        "$description": "lightest accent step clearing 4.5:1 against all 7 surfaces, hardest being dim",
+        "$description": "the accent family's anchor step 800 — the brand colour itself, which clears 4.5:1 on every ground it can land on",
         "$extensions": {
           "studio.aninda": {
             "family": "accent",
-            "step": 700,
+            "step": 800,
             "kind": "text",
             "proof": {
               "required": 4.5,
-              "measured": 5.6764,
-              "worstCaseLsb": 5.546,
+              "measured": 8.5813,
+              "worstCaseLsb": 8.3761,
               "hardestGround": "dim",
-              "level": "AA",
+              "level": "AAA",
               "criterion": "WCAG 2.2 1.4.3",
               "againstEverySurface": {
-                "lowest": 6.3399,
-                "low": 6.1944,
-                "base": 6.0736,
-                "high": 5.9319,
-                "highest": 5.8143,
-                "dim": 5.6764,
-                "bright": 6.3667
+                "lowest": 9.3897,
+                "low": 9.2062,
+                "base": 9.07,
+                "high": 8.8904,
+                "highest": 8.757,
+                "dim": 8.5813,
+                "bright": 9.6987,
+                "page": 9.6987
               }
             }
           }
         },
-        "$value": "{color.ramp.accent.700}"
+        "$value": "{color.ramp.accent.800}"
       },
       "edge": {
-        "$description": "lightest accent step clearing 3.0:1 against all 7 surfaces, hardest being dim",
+        "$description": "lightest accent step clearing 3.0:1 against all 8 surfaces, hardest being dim",
         "$extensions": {
           "studio.aninda": {
             "family": "accent",
@@ -269,19 +299,20 @@
             "kind": "nontext",
             "proof": {
               "required": 3.0,
-              "measured": 3.8993,
-              "worstCaseLsb": 3.8134,
+              "measured": 3.9339,
+              "worstCaseLsb": 3.8447,
               "hardestGround": "dim",
               "level": "meets 1.4.11",
               "criterion": "WCAG 2.2 1.4.11",
               "againstEverySurface": {
-                "lowest": 4.3551,
-                "low": 4.2551,
-                "base": 4.1722,
-                "high": 4.0748,
-                "highest": 3.9941,
-                "dim": 3.8993,
-                "bright": 4.3735
+                "lowest": 4.3045,
+                "low": 4.2204,
+                "base": 4.1579,
+                "high": 4.0756,
+                "highest": 4.0144,
+                "dim": 3.9339,
+                "bright": 4.4461,
+                "page": 4.4461
               }
             }
           }
@@ -289,29 +320,29 @@
         "$value": "{color.ramp.accent.600}"
       },
       "hover": {
-        "$description": "nearest accent step beyond 700, away from the label #FDFFFE, clearing 4.5:1 as a ground under that label and staying ΔE 9.28 from the resting fill",
+        "$description": "nearest accent step beyond 800, away from the label #FCFBFB, clearing 4.5:1 as a ground under that label and staying ΔE 9.72 from the resting fill",
         "$extensions": {
           "studio.aninda": {
             "family": "accent",
-            "step": 800,
+            "step": 900,
             "kind": "fill",
             "proof": {
               "required": 4.5,
-              "measured": 9.4953,
-              "worstCaseLsb": 9.2768,
+              "measured": 13.7991,
+              "worstCaseLsb": 13.4968,
               "hardestGround": "label (surface.lowest)",
               "level": "AAA",
               "criterion": "WCAG 2.2 1.4.3",
               "againstEverySurface": {
-                "label (surface.lowest)": 9.4953
+                "label (surface.lowest)": 13.7991
               }
             }
           }
         },
-        "$value": "{color.ramp.accent.800}"
+        "$value": "{color.ramp.accent.900}"
       },
       "on": {
-        "$description": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'accent'",
+        "$description": "surface.lowest, measured as ink against every fill that carries it (accent, accent-hover, danger); the published figure is the worst of them, which is 'danger'",
         "$extensions": {
           "studio.aninda": {
             "family": "surface",
@@ -319,15 +350,15 @@
             "kind": "on-fill",
             "proof": {
               "required": 4.5,
-              "measured": 6.3399,
-              "worstCaseLsb": 6.1966,
-              "hardestGround": "accent",
+              "measured": 5.5051,
+              "worstCaseLsb": 5.3822,
+              "hardestGround": "danger",
               "level": "AA",
               "criterion": "WCAG 2.2 1.4.3",
               "againstEverySurface": {
-                "accent": 6.3399,
-                "accent-hover": 9.4953,
-                "danger": 7.0385
+                "accent": 9.3897,
+                "accent-hover": 13.7991,
+                "danger": 5.5051
               }
             }
           }
@@ -335,17 +366,17 @@
         "$value": {
           "colorSpace": "srgb",
           "components": [
-            0.992157,
-            1.0,
-            0.996078
+            0.988235,
+            0.984314,
+            0.984314
           ],
-          "hex": "#FDFFFE"
+          "hex": "#FCFBFB"
         }
       }
     },
     "focus": {
       "ring": {
-        "$description": "lightest accent step clearing 3.0:1 against all 7 surfaces, hardest being dim",
+        "$description": "lightest accent step clearing 3.0:1 against all 8 surfaces, hardest being dim",
         "$extensions": {
           "studio.aninda": {
             "family": "accent",
@@ -353,19 +384,20 @@
             "kind": "nontext",
             "proof": {
               "required": 3.0,
-              "measured": 3.8993,
-              "worstCaseLsb": 3.8134,
+              "measured": 3.9339,
+              "worstCaseLsb": 3.8447,
               "hardestGround": "dim",
               "level": "meets 1.4.11",
               "criterion": "WCAG 2.2 1.4.11",
               "againstEverySurface": {
-                "lowest": 4.3551,
-                "low": 4.2551,
-                "base": 4.1722,
-                "high": 4.0748,
-                "highest": 3.9941,
-                "dim": 3.8993,
-                "bright": 4.3735
+                "lowest": 4.3045,
+                "low": 4.2204,
+                "base": 4.1579,
+                "high": 4.0756,
+                "highest": 4.0144,
+                "dim": 3.9339,
+                "bright": 4.4461,
+                "page": 4.4461
               }
             }
           }
@@ -375,116 +407,120 @@
     },
     "status": {
       "success": {
-        "$description": "lightest success step clearing 4.5:1 against all 7 surfaces, hardest being dim",
+        "$description": "the success family's anchor step 800 — the brand colour itself, which clears 4.5:1 on every ground it can land on",
         "$extensions": {
           "studio.aninda": {
             "family": "success",
-            "step": 700,
+            "step": 800,
             "kind": "text",
             "proof": {
               "required": 4.5,
-              "measured": 5.6138,
-              "worstCaseLsb": 5.4829,
+              "measured": 7.0632,
+              "worstCaseLsb": 6.8943,
               "hardestGround": "dim",
               "level": "AA",
               "criterion": "WCAG 2.2 1.4.3",
               "againstEverySurface": {
-                "lowest": 6.27,
-                "low": 6.1261,
-                "base": 6.0067,
-                "high": 5.8665,
-                "highest": 5.7503,
-                "dim": 5.6138,
-                "bright": 6.2965
+                "lowest": 7.7286,
+                "low": 7.5776,
+                "base": 7.4655,
+                "high": 7.3176,
+                "highest": 7.2079,
+                "dim": 7.0632,
+                "bright": 7.9829,
+                "page": 7.9829
               }
             }
           }
         },
-        "$value": "{color.ramp.success.700}"
+        "$value": "{color.ramp.success.800}"
       },
       "warning": {
-        "$description": "lightest warning step clearing 4.5:1 against all 7 surfaces, hardest being dim",
+        "$description": "the first ground step beyond 'ink-muted' that clears 4.5:1 on every surface and stays at least deltaE 1.5 from it",
         "$extensions": {
           "studio.aninda": {
-            "family": "warning",
-            "step": 700,
+            "family": "ground",
+            "step": 800,
             "kind": "text",
             "proof": {
               "required": 4.5,
-              "measured": 5.9716,
-              "worstCaseLsb": 5.8314,
+              "measured": 8.6841,
+              "worstCaseLsb": 8.473,
               "hardestGround": "dim",
-              "level": "AA",
+              "level": "AAA",
               "criterion": "WCAG 2.2 1.4.3",
               "againstEverySurface": {
-                "lowest": 6.6696,
-                "low": 6.5165,
-                "base": 6.3895,
-                "high": 6.2404,
-                "highest": 6.1168,
-                "dim": 5.9716,
-                "bright": 6.6978
+                "lowest": 9.5022,
+                "low": 9.3165,
+                "base": 9.1786,
+                "high": 8.9968,
+                "highest": 8.8619,
+                "dim": 8.6841,
+                "bright": 9.8148,
+                "page": 9.8148
               }
             }
           }
         },
-        "$value": "{color.ramp.warning.700}"
+        "$value": "{color.ramp.ground.800}"
       },
       "danger": {
-        "$description": "lightest danger step clearing 4.5:1 against all 7 surfaces, hardest being dim",
+        "$description": "the danger family's anchor step 600 — the brand colour itself, which clears 4.5:1 on every ground it can land on",
         "$extensions": {
           "studio.aninda": {
             "family": "danger",
-            "step": 700,
+            "step": 600,
             "kind": "text",
             "proof": {
               "required": 4.5,
-              "measured": 6.3019,
-              "worstCaseLsb": 6.1622,
+              "measured": 5.0311,
+              "worstCaseLsb": 4.9173,
               "hardestGround": "dim",
               "level": "AA",
               "criterion": "WCAG 2.2 1.4.3",
               "againstEverySurface": {
-                "lowest": 7.0385,
-                "low": 6.8769,
-                "base": 6.7429,
-                "high": 6.5855,
-                "highest": 6.455,
-                "dim": 6.3019,
-                "bright": 7.0682
+                "lowest": 5.5051,
+                "low": 5.3975,
+                "base": 5.3177,
+                "high": 5.2124,
+                "highest": 5.1342,
+                "dim": 5.0311,
+                "bright": 5.6863,
+                "page": 5.6863
               }
             }
           }
         },
-        "$value": "{color.ramp.danger.700}"
+        "$value": "{color.ramp.danger.600}"
       },
       "info": {
-        "$description": "lightest info step clearing 4.5:1 against all 7 surfaces, hardest being dim",
+        "$description": "the same colour as 'accent' by declaration — Natural Blue carries links, focus, the primary action and information. With four hues there is no fifth colour to distinguish a note from a link, and inventing a near-identical second blue to avoid saying so would be worse than saying so. Owner's decision, 26 August 2026.",
         "$extensions": {
           "studio.aninda": {
-            "family": "info",
-            "step": 700,
+            "family": "accent",
+            "step": 800,
             "kind": "text",
             "proof": {
               "required": 4.5,
-              "measured": 5.848,
-              "worstCaseLsb": 5.7107,
+              "measured": 8.5813,
+              "worstCaseLsb": 8.3761,
               "hardestGround": "dim",
-              "level": "AA",
+              "level": "AAA",
               "criterion": "WCAG 2.2 1.4.3",
               "againstEverySurface": {
-                "lowest": 6.5316,
-                "low": 6.3817,
-                "base": 6.2573,
-                "high": 6.1113,
-                "highest": 5.9902,
-                "dim": 5.848,
-                "bright": 6.5592
+                "lowest": 9.3897,
+                "low": 9.2062,
+                "base": 9.07,
+                "high": 8.8904,
+                "highest": 8.757,
+                "dim": 8.5813,
+                "bright": 9.6987,
+                "page": 9.6987
               }
             }
           }
         },
-        "$value": "{color.ramp.info.700}"
+        "$value": "{color.ramp.accent.800}"
       }
     }
   }

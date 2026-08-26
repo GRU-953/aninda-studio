@@ -65,10 +65,15 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-PROOF = ROOT / "05_colour" / "generated" / "estuary.proof.json"
 OUT = HERE / "build"
 
-DIRECTION = "estuary"
+# The chosen direction, named ONCE. PROOF is derived from it rather than written
+# out beside it: the two were separate constants, and switching the direction to
+# "natural" left PROOF still reading estuary.proof.json — so the build reported a
+# new direction and emitted the old palette, silently and with no gate able to see
+# it. One name, one source.
+DIRECTION = "natural"
+PROOF = ROOT / "05_colour" / "generated" / f"{DIRECTION}.proof.json"
 SCHEMA = "https://tr.designtokens.org/format/"
 NS = "studio.aninda"
 
@@ -486,6 +491,11 @@ FORCED_COLORS = {
         "color.surface.highest": "Canvas",
         "color.surface.dim": "Canvas",
         "color.surface.bright": "Canvas",
+        # The page, added with the Natural direction. It aliases the polarity's own
+        # extreme — pure white in a light theme, pure black in a dark one — and in
+        # forced-colors mode the operating system supplies the page, so it takes
+        # Canvas like every other surface.
+        "color.surface.page": "Canvas",
         "color.ink.default": "CanvasText",
         # CanvasText, not GrayText. CSS Color 4 defines GrayText normatively as
         # DISABLED text, and this role paints toast bodies, empty-state messages,

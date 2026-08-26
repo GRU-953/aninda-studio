@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- GENERATED FILE. Written by 15_native/build.py. Do not hand-edit — the next build overwrites it. -->
 <resources>
-    <color name="aninda_accent">#42A0AE</color>
-    <color name="aninda_accent_edge">#278492</color>
-    <color name="aninda_accent_hover">#65BAC7</color>
-    <color name="aninda_accent_on">#0B0C0B</color>
-    <color name="aninda_danger">#E16551</color>
-    <color name="aninda_focus_ring">#278492</color>
-    <color name="aninda_info">#5C96C8</color>
-    <color name="aninda_ink">#F2F9F7</color>
-    <color name="aninda_ink_muted">#6F9B90</color>
-    <color name="aninda_line">#578076</color>
-    <color name="aninda_success">#59A46F</color>
-    <color name="aninda_surface_base">#111212</color>
-    <color name="aninda_surface_bright">#121413</color>
-    <color name="aninda_surface_dim">#060707</color>
-    <color name="aninda_surface_high">#111312</color>
-    <color name="aninda_surface_highest">#121313</color>
-    <color name="aninda_surface_low">#0E100F</color>
-    <color name="aninda_surface_lowest">#0B0C0B</color>
-    <color name="aninda_warning">#B8863E</color>
+    <color name="aninda_accent">#6F98AA</color>
+    <color name="aninda_accent_edge">#577D8D</color>
+    <color name="aninda_accent_hover">#8BB2C3</color>
+    <color name="aninda_accent_on">#060505</color>
+    <color name="aninda_danger">#CC765E</color>
+    <color name="aninda_focus_ring">#577D8D</color>
+    <color name="aninda_info">#6F98AA</color>
+    <color name="aninda_ink">#FFFFFF</color>
+    <color name="aninda_ink_muted">#84807C</color>
+    <color name="aninda_line">#84807C</color>
+    <color name="aninda_success">#6E9E7A</color>
+    <color name="aninda_surface_base">#0E0D0D</color>
+    <color name="aninda_surface_bright">#111110</color>
+    <color name="aninda_surface_dim">#000000</color>
+    <color name="aninda_surface_high">#10100F</color>
+    <color name="aninda_surface_highest">#111010</color>
+    <color name="aninda_surface_low">#0A0A09</color>
+    <color name="aninda_surface_lowest">#060505</color>
+    <color name="aninda_surface_page">#000000</color>
+    <color name="aninda_warning">#94908C</color>
 </resources>

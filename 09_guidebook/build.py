@@ -115,7 +115,17 @@ CARDS_DIR = ROOT / "08_components" / "cards"
 FONTS_DIR = ROOT / "08_components" / "fonts"
 MARK_DIR = ROOT / "04_mark"
 SVG_DIR = MARK_DIR / "svg"
-PROOF_JSON = ROOT / "05_colour" / "generated" / "estuary.proof.json"
+# The chosen direction is READ from the token set rather than named here.
+#
+# It was hard-coded as "estuary". When the palette was replaced on 26 August 2026
+# the token build switched to "natural" and this line did not, so the book asked
+# the new four-family token set for a ramp called "warning" that the old six-family
+# proof still listed — KeyError: 'warning'. The token file records which direction
+# it came from, so there is one name for it and every consumer reads that one.
+_PRIM = json.loads(
+    (ROOT / "07_tokens" / "build" / "primitive.tokens.json").read_text())
+DIRECTION = _PRIM["$extensions"]["studio.aninda"]["direction"]
+PROOF_JSON = ROOT / "05_colour" / "generated" / f"{DIRECTION}.proof.json"
 MEASUREMENTS_JSON = ROOT / "06_type" / "_data" / "measurements.json"
 FONT_FACTS_JSON = ROOT / "06_type" / "_data" / "font_facts.json"
 # The external authorities this book cites, with a URL and a date on each. The
@@ -578,7 +588,7 @@ def kit_files() -> list[tuple[str, Path, str]]:
         items.append((f"04_mark/svg/{name}", SVG_DIR / name, "Identity artwork"))
     items.append(("04_mark/manifest.json", MARK_DIR / "manifest.json",
                   "The mark's construction, with every check it passed"))
-    items.append(("05_colour/generated/estuary.proof.json", PROOF_JSON,
+    items.append((f"05_colour/generated/{DIRECTION}.proof.json", PROOF_JSON,
                   "Every colour, every ramp, every measured ratio"))
 
     for path in sorted(NPM_DIST.iterdir()):
@@ -1195,7 +1205,7 @@ def block_banned_latin() -> str:
 # Sources: 07_tokens/build/primitive.tokens.json,
 #          07_tokens/build/semantic.{light,dark,hc-light,hc-dark}.tokens.json,
 #          07_tokens/build/forced-colors.map.json,
-#          05_colour/generated/estuary.proof.json (names and premise only).
+#          05_colour/generated/<direction>.proof.json (names and premise only).
 # Every ratio below is read from the proof carried inside the token file. None
 # of them is transcribed.
 # ---------------------------------------------------------------------------

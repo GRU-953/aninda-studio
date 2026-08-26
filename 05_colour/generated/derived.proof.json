@@ -13,6 +13,11 @@
     "gamut_map": "oklch-chroma",
     "note": "Every ratio is measured on the rounded 8-bit hex, then re-measured with each channel of both colours nudged by \u00b11. The published worst_case_lsb is the lowest of those results."
   },
+  "fixed": {},
+  "role_sources": {},
+  "declared_duplicates": [],
+  "supersedes": {},
+  "pantone": {},
   "steps": [
     50,
     100,
@@ -46,7 +51,7 @@
         "600": "#6B7B6E",
         "700": "#546156",
         "800": "#3C473E",
-        "900": "#252D26",
+        "900": "#17251A",
         "950": "#141914"
       },
       "ramp_luminance": {
@@ -59,7 +64,7 @@
         "600": 0.184173,
         "700": 0.11106,
         "800": 0.058149,
-        "900": 0.0241,
+        "900": 0.015798,
         "950": 0.008945
       }
     },
@@ -78,7 +83,7 @@
         "200": "#C9E5AD",
         "300": "#ADD483",
         "400": "#8FBB59",
-        "500": "#74A135",
+        "500": "#6E9B2E",
         "600": "#5C861A",
         "700": "#466A04",
         "800": "#314E00",
@@ -91,7 +96,7 @@
         "200": 0.714728,
         "300": 0.576093,
         "400": 0.42101,
-        "500": 0.294593,
+        "500": 0.269545,
         "600": 0.193997,
         "700": 0.116187,
         "800": 0.061016,
@@ -115,7 +120,7 @@
         "300": "#92D4C5",
         "400": "#6BBDAB",
         "500": "#49A391",
-        "600": "#308777",
+        "600": "#2E8B7A",
         "700": "#1C6B5D",
         "800": "#0E4F44",
         "900": "#05322A",
@@ -128,7 +133,7 @@
         "300": 0.572278,
         "400": 0.424599,
         "500": 0.296541,
-        "600": 0.192874,
+        "600": 0.204504,
         "700": 0.115521,
         "800": 0.061024,
         "900": 0.024805,
@@ -150,7 +155,7 @@
         "200": "#F2D6A9",
         "300": "#E6BE7E",
         "400": "#D2A252",
-        "500": "#B8862C",
+        "500": "#B8862B",
         "600": "#9B6D0A",
         "700": "#7C5400",
         "800": "#5D3D00",
@@ -163,7 +168,7 @@
         "200": 0.69836,
         "300": 0.551576,
         "400": 0.401528,
-        "500": 0.274235,
+        "500": 0.274161,
         "600": 0.179286,
         "700": 0.106262,
         "800": 0.056649,
@@ -188,7 +193,7 @@
         "400": "#79BF79",
         "500": "#5BA55C",
         "600": "#428945",
-        "700": "#2F6D32",
+        "700": "#2F7A33",
         "800": "#1F5021",
         "900": "#103312",
         "950": "#061D07"
@@ -201,7 +206,7 @@
         "400": 0.42706,
         "500": 0.299063,
         "600": 0.194786,
-        "700": 0.117715,
+        "700": 0.147619,
         "800": 0.061382,
         "900": 0.025214,
         "950": 0.009328
@@ -223,7 +228,7 @@
         "300": "#E0C085",
         "400": "#CAA55C",
         "500": "#B18A3A",
-        "600": "#947021",
+        "600": "#96701A",
         "700": "#77570E",
         "800": "#583F03",
         "900": "#382701",
@@ -236,7 +241,7 @@
         "300": 0.552411,
         "400": 0.402406,
         "500": 0.278304,
-        "600": 0.179947,
+        "600": 0.181476,
         "700": 0.107705,
         "800": 0.056365,
         "900": 0.022941,
@@ -260,7 +265,7 @@
         "400": "#F7866F",
         "500": "#DE6851",
         "600": "#BD4F3A",
-        "700": "#993A28",
+        "700": "#A5341F",
         "800": "#732819",
         "900": "#4B160D",
         "950": "#2D0904"
@@ -273,7 +278,7 @@
         "400": 0.379748,
         "500": 0.260267,
         "600": 0.16718,
-        "700": 0.099527,
+        "700": 0.105556,
         "800": 0.052332,
         "900": 0.02099,
         "950": 0.007621
@@ -296,7 +301,7 @@
         "400": "#74B7C5",
         "500": "#559DAC",
         "600": "#3D828F",
-        "700": "#2A6772",
+        "700": "#24707E",
         "800": "#1A4C55",
         "900": "#0D3036",
         "950": "#041B1F"
@@ -309,7 +314,7 @@
         "400": 0.4161,
         "500": 0.290228,
         "600": 0.189398,
-        "700": 0.114072,
+        "700": 0.134692,
         "800": 0.060441,
         "900": 0.024657,
         "950": 0.009086
@@ -332,7 +337,8 @@
         "high": "#F5F5F5",
         "highest": "#F2F3F2",
         "dim": "#F1F1F1",
-        "bright": "#FFFFFF"
+        "bright": "#FFFFFF",
+        "page": "#FFFFFF"
       },
       "surface_luminance": {
         "lowest": 0.979743,
@@ -341,7 +347,8 @@
         "high": 0.913099,
         "highest": 0.893892,
         "dim": 0.879622,
-        "bright": 1.0
+        "bright": 1.0,
+        "page": 1.0
       },
       "roles": {
         "ink": {
@@ -356,7 +363,8 @@
             "high": 16.339,
             "highest": 16.0131,
             "dim": 15.7711,
-            "bright": 17.8133
+            "bright": 17.8133,
+            "page": 17.8133
           },
           "hardest_ground": "dim",
           "ratio": 15.7711,
@@ -364,7 +372,7 @@
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "lightest ground step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest ground step clearing 4.5:1 against all 8 surfaces, hardest being dim"
         },
         "ink-muted": {
           "value": "#546156",
@@ -378,7 +386,8 @@
             "high": 5.9798,
             "highest": 5.8605,
             "dim": 5.7719,
-            "bright": 6.5193
+            "bright": 6.5193,
+            "page": 6.5193
           },
           "hardest_ground": "dim",
           "ratio": 5.7719,
@@ -386,29 +395,31 @@
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "lightest ground step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest ground step clearing 4.5:1 against all 8 surfaces, hardest being dim"
         },
         "line": {
-          "value": "#6B7B6E",
+          "value": "#17251A",
           "family": "ground",
-          "step": 600,
+          "step": 900,
           "target": 3.0,
           "measured": {
-            "lowest": 4.3974,
-            "low": 4.2958,
-            "base": 4.2116,
-            "high": 4.1128,
-            "highest": 4.0307,
-            "dim": 3.9698,
-            "bright": 4.4839
+            "lowest": 15.65,
+            "low": 15.2887,
+            "base": 14.9889,
+            "high": 14.6371,
+            "highest": 14.3452,
+            "dim": 14.1283,
+            "bright": 15.9578,
+            "page": 15.9578
           },
           "hardest_ground": "dim",
-          "ratio": 3.9698,
-          "worst_case_lsb": 3.8793,
+          "ratio": 14.1283,
+          "worst_case_lsb": 13.8353,
           "kind": "nontext",
           "level": "meets 1.4.11",
           "criterion": "WCAG 2.2 1.4.11",
-          "rationale": "lightest ground step clearing 3.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "the ground family's anchor step 900 \u2014 the brand colour itself, which clears 3.0:1 on every ground it can land on",
+          "is_brand_anchor": true
         },
         "accent": {
           "value": "#466A04",
@@ -422,7 +433,8 @@
             "high": 5.7953,
             "highest": 5.6797,
             "dim": 5.5938,
-            "bright": 6.3182
+            "bright": 6.3182,
+            "page": 6.3182
           },
           "hardest_ground": "dim",
           "ratio": 5.5938,
@@ -430,7 +442,7 @@
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "lightest accent step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest accent step clearing 4.5:1 against all 8 surfaces, hardest being dim"
         },
         "accent-edge": {
           "value": "#5C861A",
@@ -444,7 +456,8 @@
             "high": 3.9472,
             "highest": 3.8684,
             "dim": 3.81,
-            "bright": 4.3033
+            "bright": 4.3033,
+            "page": 4.3033
           },
           "hardest_ground": "dim",
           "ratio": 3.81,
@@ -452,7 +465,7 @@
           "kind": "nontext",
           "level": "meets 1.4.11",
           "criterion": "WCAG 2.2 1.4.11",
-          "rationale": "lightest accent step clearing 3.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest accent step clearing 3.0:1 against all 8 surfaces, hardest being dim"
         },
         "focus": {
           "value": "#5C861A",
@@ -466,7 +479,8 @@
             "high": 3.9472,
             "highest": 3.8684,
             "dim": 3.81,
-            "bright": 4.3033
+            "bright": 4.3033,
+            "page": 4.3033
           },
           "hardest_ground": "dim",
           "ratio": 3.81,
@@ -474,7 +488,7 @@
           "kind": "nontext",
           "level": "meets 1.4.11",
           "criterion": "WCAG 2.2 1.4.11",
-          "rationale": "lightest accent step clearing 3.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest accent step clearing 3.0:1 against all 8 surfaces, hardest being dim"
         },
         "accent-hover": {
           "value": "#314E00",
@@ -496,26 +510,28 @@
           "rationale": "nearest accent step beyond 700, away from the label #FCFDFC, clearing 4.5:1 as a ground under that label and staying \u0394E 9.46 from the resting fill"
         },
         "success": {
-          "value": "#2F6D32",
+          "value": "#2F7A33",
           "family": "success",
           "step": 700,
           "target": 4.5,
           "measured": {
-            "lowest": 6.1398,
-            "low": 5.9981,
-            "base": 5.8805,
-            "high": 5.7425,
-            "highest": 5.6279,
-            "dim": 5.5429,
-            "bright": 6.2606
+            "lowest": 5.2107,
+            "low": 5.0905,
+            "base": 4.9906,
+            "high": 4.8735,
+            "highest": 4.7763,
+            "dim": 4.7041,
+            "bright": 5.3133,
+            "page": 5.3133
           },
           "hardest_ground": "dim",
-          "ratio": 5.5429,
-          "worst_case_lsb": 5.4138,
+          "ratio": 4.7041,
+          "worst_case_lsb": 4.5973,
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "lightest success step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "rationale": "the success family's anchor step 700 \u2014 the brand colour itself, which clears 4.5:1 on every ground it can land on",
+          "is_brand_anchor": true
         },
         "warning": {
           "value": "#77570E",
@@ -529,7 +545,8 @@
             "high": 6.107,
             "highest": 5.9852,
             "dim": 5.8947,
-            "bright": 6.658
+            "bright": 6.658,
+            "page": 6.658
           },
           "hardest_ground": "dim",
           "ratio": 5.8947,
@@ -537,51 +554,55 @@
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "lightest warning step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest warning step clearing 4.5:1 against all 8 surfaces, hardest being dim"
         },
         "danger": {
-          "value": "#993A28",
+          "value": "#A5341F",
           "family": "danger",
           "step": 700,
           "target": 4.5,
           "measured": {
-            "lowest": 6.8867,
-            "low": 6.7277,
-            "base": 6.5957,
-            "high": 6.441,
-            "highest": 6.3125,
-            "dim": 6.2171,
-            "bright": 7.0221
+            "lowest": 6.6198,
+            "low": 6.467,
+            "base": 6.3401,
+            "high": 6.1913,
+            "highest": 6.0679,
+            "dim": 5.9761,
+            "bright": 6.75,
+            "page": 6.75
           },
           "hardest_ground": "dim",
-          "ratio": 6.2171,
-          "worst_case_lsb": 6.078,
+          "ratio": 5.9761,
+          "worst_case_lsb": 5.8467,
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "lightest danger step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "rationale": "the danger family's anchor step 700 \u2014 the brand colour itself, which clears 4.5:1 on every ground it can land on",
+          "is_brand_anchor": true
         },
         "info": {
-          "value": "#2A6772",
+          "value": "#24707E",
           "family": "info",
           "step": 700,
           "target": 4.5,
           "measured": {
-            "lowest": 6.2762,
-            "low": 6.1313,
-            "base": 6.011,
-            "high": 5.87,
-            "highest": 5.7529,
-            "dim": 5.6659,
-            "bright": 6.3996
+            "lowest": 5.5755,
+            "low": 5.4468,
+            "base": 5.3399,
+            "high": 5.2146,
+            "highest": 5.1106,
+            "dim": 5.0334,
+            "bright": 5.6852,
+            "page": 5.6852
           },
           "hardest_ground": "dim",
-          "ratio": 5.6659,
-          "worst_case_lsb": 5.5332,
+          "ratio": 5.0334,
+          "worst_case_lsb": 4.9178,
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "lightest info step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "rationale": "the info family's anchor step 700 \u2014 the brand colour itself, which clears 4.5:1 on every ground it can land on",
+          "is_brand_anchor": true
         },
         "on-accent": {
           "value": "#FCFDFC",
@@ -591,7 +612,7 @@
           "measured": {
             "accent": 6.1963,
             "accent-hover": 9.2756,
-            "danger": 6.8867
+            "danger": 6.6198
           },
           "hardest_ground": "accent",
           "ratio": 6.1963,
@@ -613,22 +634,24 @@
       "text_target": 4.5,
       "nontext_target": 3.0,
       "surfaces": {
-        "lowest": "#0A0B0A",
-        "low": "#0E0E0E",
-        "base": "#0F100F",
-        "high": "#111111",
-        "highest": "#111211",
-        "dim": "#070707",
-        "bright": "#121212"
+        "lowest": "#040504",
+        "low": "#090909",
+        "base": "#0C0D0C",
+        "high": "#101010",
+        "highest": "#101110",
+        "dim": "#000000",
+        "bright": "#111111",
+        "page": "#000000"
       },
       "surface_luminance": {
-        "lowest": 0.003258,
-        "low": 0.004391,
-        "base": 0.005066,
-        "high": 0.005605,
-        "highest": 0.005923,
-        "dim": 0.002125,
-        "bright": 0.006049
+        "lowest": 0.001431,
+        "low": 0.002732,
+        "base": 0.003926,
+        "high": 0.005182,
+        "highest": 0.005485,
+        "dim": 0.0,
+        "bright": 0.005605,
+        "page": 0.0
       },
       "roles": {
         "ink": {
@@ -637,21 +660,22 @@
           "step": 50,
           "target": 4.5,
           "measured": {
-            "lowest": 18.4388,
-            "low": 18.0545,
-            "base": 17.8332,
-            "high": 17.6603,
-            "highest": 17.5602,
-            "dim": 18.8396,
-            "bright": 17.5206
+            "lowest": 19.0937,
+            "low": 18.6228,
+            "base": 18.2105,
+            "high": 17.796,
+            "highest": 17.6988,
+            "dim": 19.6402,
+            "bright": 17.6603,
+            "page": 19.6402
           },
           "hardest_ground": "bright",
-          "ratio": 17.5206,
-          "worst_case_lsb": 17.2259,
+          "ratio": 17.6603,
+          "worst_case_lsb": 17.3683,
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "darkest ground step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest ground step clearing 4.5:1 against all 8 surfaces, hardest being bright"
         },
         "ink-muted": {
           "value": "#859688",
@@ -659,21 +683,22 @@
           "step": 500,
           "target": 4.5,
           "measured": {
-            "lowest": 6.3045,
-            "low": 6.1731,
-            "base": 6.0975,
-            "high": 6.0384,
-            "highest": 6.0041,
-            "dim": 6.4416,
-            "bright": 5.9906
+            "lowest": 6.5284,
+            "low": 6.3674,
+            "base": 6.2265,
+            "high": 6.0848,
+            "highest": 6.0515,
+            "dim": 6.7153,
+            "bright": 6.0384,
+            "page": 6.7153
           },
           "hardest_ground": "bright",
-          "ratio": 5.9906,
-          "worst_case_lsb": 5.8659,
+          "ratio": 6.0384,
+          "worst_case_lsb": 5.9144,
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "darkest ground step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest ground step clearing 4.5:1 against all 8 surfaces, hardest being bright"
         },
         "line": {
           "value": "#6B7B6E",
@@ -681,43 +706,46 @@
           "step": 600,
           "target": 3.0,
           "measured": {
-            "lowest": 4.397,
-            "low": 4.3053,
-            "base": 4.2526,
-            "high": 4.2113,
-            "highest": 4.1875,
-            "dim": 4.4926,
-            "bright": 4.178
+            "lowest": 4.5531,
+            "low": 4.4408,
+            "base": 4.3425,
+            "high": 4.2437,
+            "highest": 4.2205,
+            "dim": 4.6835,
+            "bright": 4.2113,
+            "page": 4.6835
           },
           "hardest_ground": "bright",
-          "ratio": 4.178,
-          "worst_case_lsb": 4.0854,
+          "ratio": 4.2113,
+          "worst_case_lsb": 4.1191,
           "kind": "nontext",
           "level": "meets 1.4.11",
           "criterion": "WCAG 2.2 1.4.11",
-          "rationale": "darkest ground step clearing 3.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest ground step clearing 3.0:1 against all 8 surfaces, hardest being bright"
         },
         "accent": {
-          "value": "#74A135",
+          "value": "#6E9B2E",
           "family": "accent",
           "step": 500,
           "target": 4.5,
           "measured": {
-            "lowest": 6.4703,
-            "low": 6.3354,
-            "base": 6.2578,
-            "high": 6.1971,
-            "highest": 6.162,
-            "dim": 6.6109,
-            "bright": 6.1481
+            "lowest": 6.2131,
+            "low": 6.0598,
+            "base": 5.9257,
+            "high": 5.7908,
+            "highest": 5.7592,
+            "dim": 6.3909,
+            "bright": 5.7467,
+            "page": 6.3909
           },
           "hardest_ground": "bright",
-          "ratio": 6.1481,
-          "worst_case_lsb": 6.0224,
+          "ratio": 5.7467,
+          "worst_case_lsb": 5.6293,
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "darkest accent step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "the accent family's anchor step 500 \u2014 the brand colour itself, which clears 4.5:1 on every ground it can land on",
+          "is_brand_anchor": true
         },
         "accent-edge": {
           "value": "#5C861A",
@@ -725,21 +753,22 @@
           "step": 600,
           "target": 3.0,
           "measured": {
-            "lowest": 4.5814,
-            "low": 4.486,
-            "base": 4.431,
-            "high": 4.388,
-            "highest": 4.3631,
-            "dim": 4.681,
-            "bright": 4.3533
+            "lowest": 4.7442,
+            "low": 4.6271,
+            "base": 4.5247,
+            "high": 4.4217,
+            "highest": 4.3976,
+            "dim": 4.8799,
+            "bright": 4.388,
+            "page": 4.8799
           },
           "hardest_ground": "bright",
-          "ratio": 4.3533,
-          "worst_case_lsb": 4.2591,
+          "ratio": 4.388,
+          "worst_case_lsb": 4.2943,
           "kind": "nontext",
           "level": "meets 1.4.11",
           "criterion": "WCAG 2.2 1.4.11",
-          "rationale": "darkest accent step clearing 3.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest accent step clearing 3.0:1 against all 8 surfaces, hardest being bright"
         },
         "focus": {
           "value": "#5C861A",
@@ -747,21 +776,22 @@
           "step": 600,
           "target": 3.0,
           "measured": {
-            "lowest": 4.5814,
-            "low": 4.486,
-            "base": 4.431,
-            "high": 4.388,
-            "highest": 4.3631,
-            "dim": 4.681,
-            "bright": 4.3533
+            "lowest": 4.7442,
+            "low": 4.6271,
+            "base": 4.5247,
+            "high": 4.4217,
+            "highest": 4.3976,
+            "dim": 4.8799,
+            "bright": 4.388,
+            "page": 4.8799
           },
           "hardest_ground": "bright",
-          "ratio": 4.3533,
-          "worst_case_lsb": 4.2591,
+          "ratio": 4.388,
+          "worst_case_lsb": 4.2943,
           "kind": "nontext",
           "level": "meets 1.4.11",
           "criterion": "WCAG 2.2 1.4.11",
-          "rationale": "darkest accent step clearing 3.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest accent step clearing 3.0:1 against all 8 surfaces, hardest being bright"
         },
         "accent-hover": {
           "value": "#8FBB59",
@@ -769,18 +799,18 @@
           "step": 400,
           "target": 4.5,
           "measured": {
-            "label (surface.lowest)": 8.8439
+            "label (surface.lowest)": 9.1581
           },
           "hardest_ground": "label (surface.lowest)",
-          "ratio": 8.8439,
-          "worst_case_lsb": 8.6918,
+          "ratio": 9.1581,
+          "worst_case_lsb": 9.0022,
           "kind": "fill",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.3",
           "carries": "surface.lowest",
           "rest_step": 500,
-          "de_from_rest": 8.076,
-          "rationale": "nearest accent step beyond 500, away from the label #0A0B0A, clearing 4.5:1 as a ground under that label and staying \u0394E 8.08 from the resting fill"
+          "de_from_rest": 10.035,
+          "rationale": "nearest accent step beyond 500, away from the label #040504, clearing 4.5:1 as a ground under that label and staying \u0394E 10.04 from the resting fill"
         },
         "success": {
           "value": "#5BA55C",
@@ -788,21 +818,22 @@
           "step": 500,
           "target": 4.5,
           "measured": {
-            "lowest": 6.5542,
-            "low": 6.4176,
-            "base": 6.339,
-            "high": 6.2775,
-            "highest": 6.2419,
-            "dim": 6.6967,
-            "bright": 6.2278
+            "lowest": 6.787,
+            "low": 6.6196,
+            "base": 6.473,
+            "high": 6.3257,
+            "highest": 6.2912,
+            "dim": 6.9813,
+            "bright": 6.2775,
+            "page": 6.9813
           },
           "hardest_ground": "bright",
-          "ratio": 6.2278,
-          "worst_case_lsb": 6.1012,
+          "ratio": 6.2775,
+          "worst_case_lsb": 6.1516,
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "darkest success step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest success step clearing 4.5:1 against all 8 surfaces, hardest being bright"
         },
         "warning": {
           "value": "#B18A3A",
@@ -810,21 +841,22 @@
           "step": 500,
           "target": 4.5,
           "measured": {
-            "lowest": 6.1644,
-            "low": 6.036,
-            "base": 5.962,
-            "high": 5.9042,
-            "highest": 5.8707,
-            "dim": 6.2984,
-            "bright": 5.8575
+            "lowest": 6.3834,
+            "low": 6.2259,
+            "base": 6.0881,
+            "high": 5.9495,
+            "highest": 5.917,
+            "dim": 6.5661,
+            "bright": 5.9042,
+            "page": 6.5661
           },
           "hardest_ground": "bright",
-          "ratio": 5.8575,
-          "worst_case_lsb": 5.7364,
+          "ratio": 5.9042,
+          "worst_case_lsb": 5.7838,
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "darkest warning step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest warning step clearing 4.5:1 against all 8 surfaces, hardest being bright"
         },
         "danger": {
           "value": "#DE6851",
@@ -832,21 +864,22 @@
           "step": 500,
           "target": 4.5,
           "measured": {
-            "lowest": 5.8257,
-            "low": 5.7043,
-            "base": 5.6344,
-            "high": 5.5798,
-            "highest": 5.5482,
-            "dim": 5.9524,
-            "bright": 5.5356
+            "lowest": 6.0327,
+            "low": 5.8839,
+            "base": 5.7536,
+            "high": 5.6227,
+            "highest": 5.5919,
+            "dim": 6.2053,
+            "bright": 5.5798,
+            "page": 6.2053
           },
           "hardest_ground": "bright",
-          "ratio": 5.5356,
-          "worst_case_lsb": 5.4244,
+          "ratio": 5.5798,
+          "worst_case_lsb": 5.4692,
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "darkest danger step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest danger step clearing 4.5:1 against all 8 surfaces, hardest being bright"
         },
         "info": {
           "value": "#559DAC",
@@ -854,35 +887,36 @@
           "step": 500,
           "target": 4.5,
           "measured": {
-            "lowest": 6.3883,
-            "low": 6.2552,
-            "base": 6.1785,
-            "high": 6.1186,
-            "highest": 6.0839,
-            "dim": 6.5272,
-            "bright": 6.0702
+            "lowest": 6.6152,
+            "low": 6.452,
+            "base": 6.3092,
+            "high": 6.1656,
+            "highest": 6.1319,
+            "dim": 6.8046,
+            "bright": 6.1186,
+            "page": 6.8046
           },
           "hardest_ground": "bright",
-          "ratio": 6.0702,
-          "worst_case_lsb": 5.9458,
+          "ratio": 6.1186,
+          "worst_case_lsb": 5.995,
           "kind": "text",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
-          "rationale": "darkest info step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest info step clearing 4.5:1 against all 8 surfaces, hardest being bright"
         },
         "on-accent": {
-          "value": "#0A0B0A",
+          "value": "#040504",
           "family": "surface",
           "step": "lowest",
           "target": 4.5,
           "measured": {
-            "accent": 6.4703,
-            "accent-hover": 8.8439,
-            "danger": 5.8257
+            "accent": 6.2131,
+            "accent-hover": 9.1581,
+            "danger": 6.0327
           },
           "hardest_ground": "danger",
-          "ratio": 5.8257,
-          "worst_case_lsb": 5.7209,
+          "ratio": 6.0327,
+          "worst_case_lsb": 5.9253,
           "kind": "on-fill",
           "level": "AA",
           "criterion": "WCAG 2.2 1.4.3",
@@ -906,7 +940,8 @@
         "high": "#F5F5F5",
         "highest": "#F2F3F2",
         "dim": "#F1F1F1",
-        "bright": "#FFFFFF"
+        "bright": "#FFFFFF",
+        "page": "#FFFFFF"
       },
       "surface_luminance": {
         "lowest": 0.979743,
@@ -915,7 +950,8 @@
         "high": 0.913099,
         "highest": 0.893892,
         "dim": 0.879622,
-        "bright": 1.0
+        "bright": 1.0,
+        "page": 1.0
       },
       "roles": {
         "ink": {
@@ -930,7 +966,8 @@
             "high": 16.339,
             "highest": 16.0131,
             "dim": 15.7711,
-            "bright": 17.8133
+            "bright": 17.8133,
+            "page": 17.8133
           },
           "hardest_ground": "dim",
           "ratio": 15.7711,
@@ -938,7 +975,7 @@
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "lightest ground step clearing 7.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest ground step clearing 7.0:1 against all 8 surfaces, hardest being dim"
         },
         "ink-muted": {
           "value": "#3C473E",
@@ -952,7 +989,8 @@
             "high": 8.9053,
             "highest": 8.7277,
             "dim": 8.5958,
-            "bright": 9.7088
+            "bright": 9.7088,
+            "page": 9.7088
           },
           "hardest_ground": "dim",
           "ratio": 8.5958,
@@ -960,29 +998,31 @@
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "lightest ground step clearing 7.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest ground step clearing 7.0:1 against all 8 surfaces, hardest being dim"
         },
         "line": {
-          "value": "#546156",
+          "value": "#17251A",
           "family": "ground",
-          "step": 700,
+          "step": 900,
           "target": 4.5,
           "measured": {
-            "lowest": 6.3935,
-            "low": 6.246,
-            "base": 6.1235,
-            "high": 5.9798,
-            "highest": 5.8605,
-            "dim": 5.7719,
-            "bright": 6.5193
+            "lowest": 15.65,
+            "low": 15.2887,
+            "base": 14.9889,
+            "high": 14.6371,
+            "highest": 14.3452,
+            "dim": 14.1283,
+            "bright": 15.9578,
+            "page": 15.9578
           },
           "hardest_ground": "dim",
-          "ratio": 5.7719,
-          "worst_case_lsb": 5.6337,
+          "ratio": 14.1283,
+          "worst_case_lsb": 13.8353,
           "kind": "nontext",
           "level": "meets policy",
-          "criterion": "policy, above WCAG 2.2 1.4.11 \u2014 WCAG defines no AAA level for non-text contrast",
-          "rationale": "lightest ground step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "criterion": "WCAG 2.2 1.4.11",
+          "rationale": "the ground family's anchor step 900 \u2014 the brand colour itself, which clears 4.5:1 on every ground it can land on",
+          "is_brand_anchor": true
         },
         "accent": {
           "value": "#314E00",
@@ -996,7 +1036,8 @@
             "high": 8.6753,
             "highest": 8.5023,
             "dim": 8.3737,
-            "bright": 9.4581
+            "bright": 9.4581,
+            "page": 9.4581
           },
           "hardest_ground": "dim",
           "ratio": 8.3737,
@@ -1004,7 +1045,7 @@
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "lightest accent step clearing 7.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest accent step clearing 7.0:1 against all 8 surfaces, hardest being dim"
         },
         "accent-edge": {
           "value": "#466A04",
@@ -1018,7 +1059,8 @@
             "high": 5.7953,
             "highest": 5.6797,
             "dim": 5.5938,
-            "bright": 6.3182
+            "bright": 6.3182,
+            "page": 6.3182
           },
           "hardest_ground": "dim",
           "ratio": 5.5938,
@@ -1026,7 +1068,7 @@
           "kind": "nontext",
           "level": "meets policy",
           "criterion": "policy, above WCAG 2.2 1.4.11 \u2014 WCAG defines no AAA level for non-text contrast",
-          "rationale": "lightest accent step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest accent step clearing 4.5:1 against all 8 surfaces, hardest being dim"
         },
         "focus": {
           "value": "#466A04",
@@ -1040,7 +1082,8 @@
             "high": 5.7953,
             "highest": 5.6797,
             "dim": 5.5938,
-            "bright": 6.3182
+            "bright": 6.3182,
+            "page": 6.3182
           },
           "hardest_ground": "dim",
           "ratio": 5.5938,
@@ -1048,7 +1091,7 @@
           "kind": "nontext",
           "level": "meets policy",
           "criterion": "policy, above WCAG 2.2 1.4.11 \u2014 WCAG defines no AAA level for non-text contrast",
-          "rationale": "lightest accent step clearing 4.5:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest accent step clearing 4.5:1 against all 8 surfaces, hardest being dim"
         },
         "accent-hover": {
           "value": "#1D3100",
@@ -1081,7 +1124,8 @@
             "high": 8.6468,
             "highest": 8.4744,
             "dim": 8.3462,
-            "bright": 9.427
+            "bright": 9.427,
+            "page": 9.427
           },
           "hardest_ground": "dim",
           "ratio": 8.3462,
@@ -1089,7 +1133,7 @@
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "lightest success step clearing 7.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest success step clearing 7.0:1 against all 8 surfaces, hardest being dim"
         },
         "warning": {
           "value": "#583F03",
@@ -1103,7 +1147,8 @@
             "high": 9.0546,
             "highest": 8.8741,
             "dim": 8.7399,
-            "bright": 9.8717
+            "bright": 9.8717,
+            "page": 9.8717
           },
           "hardest_ground": "dim",
           "ratio": 8.7399,
@@ -1111,7 +1156,7 @@
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "lightest warning step clearing 7.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest warning step clearing 7.0:1 against all 8 surfaces, hardest being dim"
         },
         "danger": {
           "value": "#732819",
@@ -1125,7 +1170,8 @@
             "high": 9.4115,
             "highest": 9.2238,
             "dim": 9.0844,
-            "bright": 10.2607
+            "bright": 10.2607,
+            "page": 10.2607
           },
           "hardest_ground": "dim",
           "ratio": 9.0844,
@@ -1133,7 +1179,7 @@
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "lightest danger step clearing 7.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest danger step clearing 7.0:1 against all 8 surfaces, hardest being dim"
         },
         "info": {
           "value": "#1A4C55",
@@ -1147,7 +1193,8 @@
             "high": 8.7205,
             "highest": 8.5466,
             "dim": 8.4174,
-            "bright": 9.5073
+            "bright": 9.5073,
+            "page": 9.5073
           },
           "hardest_ground": "dim",
           "ratio": 8.4174,
@@ -1155,7 +1202,7 @@
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "lightest info step clearing 7.0:1 against all 7 surfaces, hardest being dim"
+          "rationale": "lightest info step clearing 7.0:1 against all 8 surfaces, hardest being dim"
         },
         "on-accent": {
           "value": "#FCFDFC",
@@ -1187,22 +1234,24 @@
       "text_target": 7.0,
       "nontext_target": 4.5,
       "surfaces": {
-        "lowest": "#070807",
-        "low": "#0C0C0C",
-        "base": "#0E0F0E",
-        "high": "#111111",
-        "highest": "#111211",
-        "dim": "#030303",
-        "bright": "#121212"
+        "lowest": "#040504",
+        "low": "#090909",
+        "base": "#0C0D0C",
+        "high": "#101010",
+        "highest": "#101110",
+        "dim": "#000000",
+        "bright": "#111111",
+        "page": "#000000"
       },
       "surface_luminance": {
-        "lowest": 0.002342,
-        "low": 0.003677,
-        "base": 0.004667,
-        "high": 0.005605,
-        "highest": 0.005923,
-        "dim": 0.000911,
-        "bright": 0.006049
+        "lowest": 0.001431,
+        "low": 0.002732,
+        "base": 0.003926,
+        "high": 0.005182,
+        "highest": 0.005485,
+        "dim": 0.0,
+        "bright": 0.005605,
+        "page": 0.0
       },
       "roles": {
         "ink": {
@@ -1211,21 +1260,22 @@
           "step": 50,
           "target": 7.0,
           "measured": {
-            "lowest": 18.7615,
-            "low": 18.295,
-            "base": 17.9634,
-            "high": 17.6603,
-            "highest": 17.5602,
-            "dim": 19.2889,
-            "bright": 17.5206
+            "lowest": 19.0937,
+            "low": 18.6228,
+            "base": 18.2105,
+            "high": 17.796,
+            "highest": 17.6988,
+            "dim": 19.6402,
+            "bright": 17.6603,
+            "page": 19.6402
           },
           "hardest_ground": "bright",
-          "ratio": 17.5206,
-          "worst_case_lsb": 17.2259,
+          "ratio": 17.6603,
+          "worst_case_lsb": 17.3683,
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "darkest ground step clearing 7.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest ground step clearing 7.0:1 against all 8 surfaces, hardest being bright"
         },
         "ink-muted": {
           "value": "#9FB0A2",
@@ -1233,21 +1283,22 @@
           "step": 400,
           "target": 7.0,
           "measured": {
-            "lowest": 8.7941,
-            "low": 8.5754,
-            "base": 8.42,
-            "high": 8.278,
-            "highest": 8.231,
-            "dim": 9.0413,
-            "bright": 8.2125
+            "lowest": 8.9498,
+            "low": 8.7291,
+            "base": 8.5358,
+            "high": 8.3416,
+            "highest": 8.296,
+            "dim": 9.206,
+            "bright": 8.278,
+            "page": 9.206
           },
           "hardest_ground": "bright",
-          "ratio": 8.2125,
-          "worst_case_lsb": 8.0517,
+          "ratio": 8.278,
+          "worst_case_lsb": 8.1183,
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "darkest ground step clearing 7.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest ground step clearing 7.0:1 against all 8 surfaces, hardest being bright"
         },
         "line": {
           "value": "#859688",
@@ -1255,21 +1306,22 @@
           "step": 500,
           "target": 4.5,
           "measured": {
-            "lowest": 6.4149,
-            "low": 6.2554,
-            "base": 6.142,
-            "high": 6.0384,
-            "highest": 6.0041,
-            "dim": 6.5952,
-            "bright": 5.9906
+            "lowest": 6.5284,
+            "low": 6.3674,
+            "base": 6.2265,
+            "high": 6.0848,
+            "highest": 6.0515,
+            "dim": 6.7153,
+            "bright": 6.0384,
+            "page": 6.7153
           },
           "hardest_ground": "bright",
-          "ratio": 5.9906,
-          "worst_case_lsb": 5.8659,
+          "ratio": 6.0384,
+          "worst_case_lsb": 5.9144,
           "kind": "nontext",
           "level": "meets policy",
           "criterion": "policy, above WCAG 2.2 1.4.11 \u2014 WCAG defines no AAA level for non-text contrast",
-          "rationale": "darkest ground step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest ground step clearing 4.5:1 against all 8 surfaces, hardest being bright"
         },
         "accent": {
           "value": "#8FBB59",
@@ -1277,65 +1329,68 @@
           "step": 400,
           "target": 7.0,
           "measured": {
-            "lowest": 8.9987,
-            "low": 8.775,
-            "base": 8.616,
-            "high": 8.4706,
-            "highest": 8.4225,
-            "dim": 9.2517,
-            "bright": 8.4036
+            "lowest": 9.1581,
+            "low": 8.9322,
+            "base": 8.7345,
+            "high": 8.5356,
+            "highest": 8.489,
+            "dim": 9.4202,
+            "bright": 8.4706,
+            "page": 9.4202
           },
           "hardest_ground": "bright",
-          "ratio": 8.4036,
-          "worst_case_lsb": 8.2412,
+          "ratio": 8.4706,
+          "worst_case_lsb": 8.3093,
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "darkest accent step clearing 7.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest accent step clearing 7.0:1 against all 8 surfaces, hardest being bright"
         },
         "accent-edge": {
-          "value": "#74A135",
+          "value": "#6E9B2E",
           "family": "accent",
           "step": 500,
           "target": 4.5,
           "measured": {
-            "lowest": 6.5835,
-            "low": 6.4198,
-            "base": 6.3035,
-            "high": 6.1971,
-            "highest": 6.162,
-            "dim": 6.7686,
-            "bright": 6.1481
+            "lowest": 6.2131,
+            "low": 6.0598,
+            "base": 5.9257,
+            "high": 5.7908,
+            "highest": 5.7592,
+            "dim": 6.3909,
+            "bright": 5.7467,
+            "page": 6.3909
           },
           "hardest_ground": "bright",
-          "ratio": 6.1481,
-          "worst_case_lsb": 6.0224,
+          "ratio": 5.7467,
+          "worst_case_lsb": 5.6293,
           "kind": "nontext",
           "level": "meets policy",
           "criterion": "policy, above WCAG 2.2 1.4.11 \u2014 WCAG defines no AAA level for non-text contrast",
-          "rationale": "darkest accent step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest accent step clearing 4.5:1 against all 8 surfaces, hardest being bright"
         },
         "focus": {
-          "value": "#74A135",
+          "value": "#6E9B2E",
           "family": "accent",
           "step": 500,
           "target": 4.5,
           "measured": {
-            "lowest": 6.5835,
-            "low": 6.4198,
-            "base": 6.3035,
-            "high": 6.1971,
-            "highest": 6.162,
-            "dim": 6.7686,
-            "bright": 6.1481
+            "lowest": 6.2131,
+            "low": 6.0598,
+            "base": 5.9257,
+            "high": 5.7908,
+            "highest": 5.7592,
+            "dim": 6.3909,
+            "bright": 5.7467,
+            "page": 6.3909
           },
           "hardest_ground": "bright",
-          "ratio": 6.1481,
-          "worst_case_lsb": 6.0224,
+          "ratio": 5.7467,
+          "worst_case_lsb": 5.6293,
           "kind": "nontext",
           "level": "meets policy",
           "criterion": "policy, above WCAG 2.2 1.4.11 \u2014 WCAG defines no AAA level for non-text contrast",
-          "rationale": "darkest accent step clearing 4.5:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest accent step clearing 4.5:1 against all 8 surfaces, hardest being bright"
         },
         "accent-hover": {
           "value": "#ADD483",
@@ -1343,18 +1398,18 @@
           "step": 300,
           "target": 7.0,
           "measured": {
-            "label (surface.lowest)": 11.9616
+            "label (surface.lowest)": 12.1734
           },
           "hardest_ground": "label (surface.lowest)",
-          "ratio": 11.9616,
-          "worst_case_lsb": 11.7713,
+          "ratio": 12.1734,
+          "worst_case_lsb": 11.9785,
           "kind": "fill",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
           "carries": "surface.lowest",
           "rest_step": 400,
           "de_from_rest": 7.57,
-          "rationale": "nearest accent step beyond 400, away from the label #070807, clearing 7.0:1 as a ground under that label and staying \u0394E 7.57 from the resting fill"
+          "rationale": "nearest accent step beyond 400, away from the label #040504, clearing 7.0:1 as a ground under that label and staying \u0394E 7.57 from the resting fill"
         },
         "success": {
           "value": "#79BF79",
@@ -1362,21 +1417,22 @@
           "step": 400,
           "target": 7.0,
           "measured": {
-            "lowest": 9.1143,
-            "low": 8.8877,
-            "base": 8.7266,
-            "high": 8.5794,
-            "highest": 8.5307,
-            "dim": 9.3705,
-            "bright": 8.5115
+            "lowest": 9.2757,
+            "low": 9.0469,
+            "base": 8.8466,
+            "high": 8.6453,
+            "highest": 8.5981,
+            "dim": 9.5412,
+            "bright": 8.5794,
+            "page": 9.5412
           },
           "hardest_ground": "bright",
-          "ratio": 8.5115,
-          "worst_case_lsb": 8.3478,
+          "ratio": 8.5794,
+          "worst_case_lsb": 8.4168,
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "darkest success step clearing 7.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest success step clearing 7.0:1 against all 8 surfaces, hardest being bright"
         },
         "warning": {
           "value": "#CAA55C",
@@ -1384,21 +1440,22 @@
           "step": 400,
           "target": 7.0,
           "measured": {
-            "lowest": 8.6433,
-            "low": 8.4284,
-            "base": 8.2756,
-            "high": 8.136,
-            "highest": 8.0899,
-            "dim": 8.8863,
-            "bright": 8.0716
+            "lowest": 8.7963,
+            "low": 8.5794,
+            "base": 8.3895,
+            "high": 8.1985,
+            "highest": 8.1537,
+            "dim": 9.0481,
+            "bright": 8.136,
+            "page": 9.0481
           },
           "hardest_ground": "bright",
-          "ratio": 8.0716,
-          "worst_case_lsb": 7.9142,
+          "ratio": 8.136,
+          "worst_case_lsb": 7.9796,
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "darkest warning step clearing 7.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest warning step clearing 7.0:1 against all 8 surfaces, hardest being bright"
         },
         "danger": {
           "value": "#F7866F",
@@ -1406,21 +1463,22 @@
           "step": 400,
           "target": 7.0,
           "measured": {
-            "lowest": 8.2104,
-            "low": 8.0063,
-            "base": 7.8612,
-            "high": 7.7285,
-            "highest": 7.6847,
-            "dim": 8.4412,
-            "bright": 7.6674
+            "lowest": 8.3558,
+            "low": 8.1497,
+            "base": 7.9693,
+            "high": 7.7879,
+            "highest": 7.7453,
+            "dim": 8.595,
+            "bright": 7.7285,
+            "page": 8.595
           },
           "hardest_ground": "bright",
-          "ratio": 7.6674,
-          "worst_case_lsb": 7.5199,
+          "ratio": 7.7285,
+          "worst_case_lsb": 7.582,
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "darkest danger step clearing 7.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest danger step clearing 7.0:1 against all 8 surfaces, hardest being bright"
         },
         "info": {
           "value": "#74B7C5",
@@ -1428,35 +1486,36 @@
           "step": 400,
           "target": 7.0,
           "measured": {
-            "lowest": 8.9049,
-            "low": 8.6835,
-            "base": 8.5261,
-            "high": 8.3823,
-            "highest": 8.3347,
-            "dim": 9.1553,
-            "bright": 8.316
+            "lowest": 9.0626,
+            "low": 8.8391,
+            "base": 8.6434,
+            "high": 8.4467,
+            "highest": 8.4005,
+            "dim": 9.322,
+            "bright": 8.3823,
+            "page": 9.322
           },
           "hardest_ground": "bright",
-          "ratio": 8.316,
-          "worst_case_lsb": 8.1549,
+          "ratio": 8.3823,
+          "worst_case_lsb": 8.2223,
           "kind": "text",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",
-          "rationale": "darkest info step clearing 7.0:1 against all 7 surfaces, hardest being bright"
+          "rationale": "darkest info step clearing 7.0:1 against all 8 surfaces, hardest being bright"
         },
         "on-accent": {
-          "value": "#070807",
+          "value": "#040504",
           "family": "surface",
           "step": "lowest",
           "target": 7.0,
           "measured": {
-            "accent": 8.9987,
-            "accent-hover": 11.9616,
-            "danger": 8.2104
+            "accent": 9.1581,
+            "accent-hover": 12.1734,
+            "danger": 8.3558
           },
           "hardest_ground": "danger",
-          "ratio": 8.2104,
-          "worst_case_lsb": 8.0722,
+          "ratio": 8.3558,
+          "worst_case_lsb": 8.2143,
           "kind": "on-fill",
           "level": "AAA",
           "criterion": "WCAG 2.2 1.4.6",

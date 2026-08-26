@@ -4,25 +4,26 @@
  * GENERATED — do not hand-edit.
  */
 [data-theme="hc-light"] {
-  --as-surface-lowest: #FCFDFC;
-  --as-surface-low: #FAFAFA;
-  --as-surface-base: #F7F8F7;
-  --as-surface-high: #F5F5F5;
-  --as-surface-highest: #F2F3F2;
-  --as-surface-dim: #F1F1F1;
+  --as-surface-lowest: #FCFBFB;
+  --as-surface-low: #F7F7F7;
+  --as-surface-base: #F4F3F3;
+  --as-surface-high: #EFEFEF;
+  --as-surface-highest: #ECEBEB;
+  --as-surface-dim: #E7E7E7;
   --as-surface-bright: #FFFFFF;
-  --as-ink: #0D1A17;
-  --as-ink-muted: #2E4B43;
-  --as-line: #41655C;
-  --as-accent: #054D56;
-  --as-accent-edge: #126974;
-  --as-accent-hover: #013137;
-  --as-accent-on: #FCFDFC;
-  --as-focus-ring: #126974;
-  --as-success: #1D502E;
-  --as-warning: #5D3C07;
-  --as-danger: #752519;
-  --as-info: #214767;
+  --as-surface-page: #FFFFFF;
+  --as-ink: #000000;
+  --as-ink-muted: #464341;
+  --as-line: #605C59;
+  --as-accent: #224959;
+  --as-accent-edge: #426271;
+  --as-accent-hover: #1B2D35;
+  --as-accent-on: #FCFBFB;
+  --as-focus-ring: #426271;
+  --as-success: #1B3020;
+  --as-warning: #2C2A28;
+  --as-danger: #693223;
+  --as-info: #224959;
   --as-shadow-float: none;
   --as-color-scheme: light;
 }

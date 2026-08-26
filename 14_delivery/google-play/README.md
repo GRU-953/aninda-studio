@@ -13,27 +13,27 @@ incomplete as a submission, and `CHECKLIST.md` says which is which.
 
 | File | Pixels | Bytes | What it is |
 |---|---|---|---|
-| `app-res/mipmap-hdpi/ic_launcher_background.png` | 162 x 162 | 474 | Android adaptive icon background layer at hdpi, 162 px for a 108 dp canvas.|
-| `app-res/mipmap-hdpi/ic_launcher_foreground.png` | 162 x 162 | 1,825 | Android adaptive icon foreground layer at hdpi, 162 px for a 108 dp canvas.|
-| `app-res/mipmap-hdpi/ic_launcher_monochrome.png` | 162 x 162 | 1,825 | Android adaptive icon monochrome layer at hdpi, 162 px for a 108 dp canvas.|
-| `app-res/mipmap-mdpi/ic_launcher_background.png` | 108 x 108 | 366 | Android adaptive icon background layer at mdpi, 108 px for a 108 dp canvas.|
-| `app-res/mipmap-mdpi/ic_launcher_foreground.png` | 108 x 108 | 1,249 | Android adaptive icon foreground layer at mdpi, 108 px for a 108 dp canvas.|
-| `app-res/mipmap-mdpi/ic_launcher_monochrome.png` | 108 x 108 | 1,249 | Android adaptive icon monochrome layer at mdpi, 108 px for a 108 dp canvas.|
-| `app-res/mipmap-xhdpi/ic_launcher_background.png` | 216 x 216 | 618 | Android adaptive icon background layer at xhdpi, 216 px for a 108 dp canvas.|
-| `app-res/mipmap-xhdpi/ic_launcher_foreground.png` | 216 x 216 | 2,482 | Android adaptive icon foreground layer at xhdpi, 216 px for a 108 dp canvas.|
-| `app-res/mipmap-xhdpi/ic_launcher_monochrome.png` | 216 x 216 | 2,482 | Android adaptive icon monochrome layer at xhdpi, 216 px for a 108 dp canvas.|
-| `app-res/mipmap-xxhdpi/ic_launcher_background.png` | 324 x 324 | 912 | Android adaptive icon background layer at xxhdpi, 324 px for a 108 dp canvas.|
-| `app-res/mipmap-xxhdpi/ic_launcher_foreground.png` | 324 x 324 | 4,070 | Android adaptive icon foreground layer at xxhdpi, 324 px for a 108 dp canvas.|
-| `app-res/mipmap-xxhdpi/ic_launcher_monochrome.png` | 324 x 324 | 4,070 | Android adaptive icon monochrome layer at xxhdpi, 324 px for a 108 dp canvas.|
-| `app-res/mipmap-xxxhdpi/ic_launcher_background.png` | 432 x 432 | 1,325 | Android adaptive icon background layer at xxxhdpi, 432 px for a 108 dp canvas.|
-| `app-res/mipmap-xxxhdpi/ic_launcher_foreground.png` | 432 x 432 | 5,713 | Android adaptive icon foreground layer at xxxhdpi, 432 px for a 108 dp canvas.|
-| `app-res/mipmap-xxxhdpi/ic_launcher_monochrome.png` | 432 x 432 | 5,713 | Android adaptive icon monochrome layer at xxxhdpi, 432 px for a 108 dp canvas.|
-| `store-listing/feature-graphic-1024x500.png` | 1024 x 500 | 29,329 | Google Play feature graphic. Mandatory to publish a listing.|
-| `store-listing/icon-512.png` | 512 x 512 | 13,037 | Google Play store icon. Full square; Play applies its own 30 per cent corner mask and its own drop shadow.|
-| `store-listing/screenshots/frames/phone-1080x1920-01.png` | 1080 x 1920 | 110,359 | Screenshot frame 1 of 4, Android phone. A template.|
-| `store-listing/screenshots/frames/phone-1080x1920-02.png` | 1080 x 1920 | 110,539 | Screenshot frame 2 of 4, Android phone. A template.|
-| `store-listing/screenshots/frames/phone-1080x1920-03.png` | 1080 x 1920 | 110,512 | Screenshot frame 3 of 4, Android phone. A template.|
-| `store-listing/screenshots/frames/phone-1080x1920-04.png` | 1080 x 1920 | 110,204 | Screenshot frame 4 of 4, Android phone. A template.|
+| `app-res/mipmap-hdpi/ic_launcher_background.png` | 162 x 162 | 470 | Android adaptive icon background layer at hdpi, 162 px for a 108 dp canvas.|
+| `app-res/mipmap-hdpi/ic_launcher_foreground.png` | 162 x 162 | 2,912 | Android adaptive icon foreground layer at hdpi, 162 px for a 108 dp canvas.|
+| `app-res/mipmap-hdpi/ic_launcher_monochrome.png` | 162 x 162 | 1,610 | Android adaptive icon monochrome layer at hdpi, 162 px for a 108 dp canvas.|
+| `app-res/mipmap-mdpi/ic_launcher_background.png` | 108 x 108 | 363 | Android adaptive icon background layer at mdpi, 108 px for a 108 dp canvas.|
+| `app-res/mipmap-mdpi/ic_launcher_foreground.png` | 108 x 108 | 2,061 | Android adaptive icon foreground layer at mdpi, 108 px for a 108 dp canvas.|
+| `app-res/mipmap-mdpi/ic_launcher_monochrome.png` | 108 x 108 | 1,173 | Android adaptive icon monochrome layer at mdpi, 108 px for a 108 dp canvas.|
+| `app-res/mipmap-xhdpi/ic_launcher_background.png` | 216 x 216 | 614 | Android adaptive icon background layer at xhdpi, 216 px for a 108 dp canvas.|
+| `app-res/mipmap-xhdpi/ic_launcher_foreground.png` | 216 x 216 | 3,928 | Android adaptive icon foreground layer at xhdpi, 216 px for a 108 dp canvas.|
+| `app-res/mipmap-xhdpi/ic_launcher_monochrome.png` | 216 x 216 | 2,197 | Android adaptive icon monochrome layer at xhdpi, 216 px for a 108 dp canvas.|
+| `app-res/mipmap-xxhdpi/ic_launcher_background.png` | 324 x 324 | 908 | Android adaptive icon background layer at xxhdpi, 324 px for a 108 dp canvas.|
+| `app-res/mipmap-xxhdpi/ic_launcher_foreground.png` | 324 x 324 | 5,909 | Android adaptive icon foreground layer at xxhdpi, 324 px for a 108 dp canvas.|
+| `app-res/mipmap-xxhdpi/ic_launcher_monochrome.png` | 324 x 324 | 3,396 | Android adaptive icon monochrome layer at xxhdpi, 324 px for a 108 dp canvas.|
+| `app-res/mipmap-xxxhdpi/ic_launcher_background.png` | 432 x 432 | 1,321 | Android adaptive icon background layer at xxxhdpi, 432 px for a 108 dp canvas.|
+| `app-res/mipmap-xxxhdpi/ic_launcher_foreground.png` | 432 x 432 | 8,066 | Android adaptive icon foreground layer at xxxhdpi, 432 px for a 108 dp canvas.|
+| `app-res/mipmap-xxxhdpi/ic_launcher_monochrome.png` | 432 x 432 | 4,722 | Android adaptive icon monochrome layer at xxxhdpi, 432 px for a 108 dp canvas.|
+| `store-listing/feature-graphic-1024x500.png` | 1024 x 500 | 29,761 | Google Play feature graphic. Mandatory to publish a listing.|
+| `store-listing/icon-512.png` | 512 x 512 | 13,697 | Google Play store icon. Full square; Play applies its own 30 per cent corner mask and its own drop shadow.|
+| `store-listing/screenshots/frames/phone-1080x1920-01.png` | 1080 x 1920 | 108,591 | Screenshot frame 1 of 4, Android phone. A template.|
+| `store-listing/screenshots/frames/phone-1080x1920-02.png` | 1080 x 1920 | 108,697 | Screenshot frame 2 of 4, Android phone. A template.|
+| `store-listing/screenshots/frames/phone-1080x1920-03.png` | 1080 x 1920 | 108,650 | Screenshot frame 3 of 4, Android phone. A template.|
+| `store-listing/screenshots/frames/phone-1080x1920-04.png` | 1080 x 1920 | 108,310 | Screenshot frame 4 of 4, Android phone. A template.|
 
 ## The text
 

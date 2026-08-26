@@ -212,9 +212,9 @@ missing, the plugin says which and makes nothing.
 | Thing | How many | Notes |
 | --- | --- | --- |
 | Variable collections | 2 | `Primitives` with one mode, `Theme` with four. |
-| Variables | 129 | 110 primitives, 19 semantic roles. |
-| Variable aliases | 44 | 11 roles across four themes point at a primitive rather than repeating its value. |
-| Paint styles | 19 | One per semantic role, bound to the `Theme` variable so it follows the mode. |
+| Variables | 108 | 88 primitives, 20 semantic roles. |
+| Variable aliases | 40 | 11 roles across four themes point at a primitive rather than repeating its value. |
+| Paint styles | 20 | One per semantic role, bound to the `Theme` variable so it follows the mode. |
 | Text styles | 16 | Seven Latin, seven Bangla, two monospaced. |
 | Effect styles | 1 | The focus ring. |
 | Grid styles | 2 | A twelve-column layout and an 8 px square grid. |

@@ -10,6 +10,7 @@
     "color.surface.highest": "Canvas",
     "color.surface.dim": "Canvas",
     "color.surface.bright": "Canvas",
+    "color.surface.page": "Canvas",
     "color.ink.default": "CanvasText",
     "color.ink.muted": "CanvasText",
     "color.line.default": "CanvasText",

@@ -297,7 +297,7 @@ def icon_page(source: str, opaque: bool, maskable: bool = False, safe: float = 0
     )
 
 
-TAGLINE = "Small, careful software."
+TAGLINE = "Simple apps for real life."
 SITE_URL = "anindastudio.com"
 STRAPLINE = "Design tokens, components and marks. Measured, not assumed."
 

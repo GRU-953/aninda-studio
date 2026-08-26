@@ -10,7 +10,7 @@ give.
 
 - no framework import reached the layer that is compiled here
 - no deprecated Material role name is used as a token name
-- 152 emitted colour values re-derived and matched to their tokens
+- 160 emitted colour values re-derived and matched to their tokens
 - 4 file Swift package builds and tests with Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101) — Executed 3 tests, with 0 failures (0 unexpected)
 - 2 Kotlin file(s) compile with kotlinc-jvm 2.4.10 (JRE 26.0.2)
 

@@ -3,7 +3,7 @@
   "$description": "Aninda Studio primitive tokens. Generated — do not hand-edit. Colour ramps are computed in OKLCH and gamut-mapped into sRGB; every value is the rounded 8-bit hex a browser will actually produce.",
   "$extensions": {
     "studio.aninda": {
-      "direction": "estuary",
+      "direction": "natural",
       "generatedBy": "07_tokens/build.py",
       "spec": "DTCG 2025.10 (Final Community Group Report, 28 October 2025) — a W3C Community Group specification, NOT a W3C Standard"
     }
@@ -16,16 +16,225 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.94902,
-              0.976471,
-              0.968627
+              0.972549,
+              0.968627,
+              0.964706
             ],
-            "hex": "#F2F9F7"
+            "hex": "#F8F7F6"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 50,
-              "luminance": 0.933438,
+              "luminance": 0.931318,
+              "isAnchor": false
+            }
+          }
+        },
+        "100": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.933333,
+              0.92549,
+              0.921569
+            ],
+            "hex": "#EEECEB"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 100,
+              "luminance": 0.841663,
+              "isAnchor": false
+            }
+          }
+        },
+        "200": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.862745,
+              0.85098,
+              0.843137
+            ],
+            "hex": "#DCD9D7"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 200,
+              "luminance": 0.697477,
+              "isAnchor": false
+            }
+          }
+        },
+        "300": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.780392,
+              0.768627,
+              0.756863
+            ],
+            "hex": "#C7C4C1"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 300,
+              "luminance": 0.554723,
+              "isAnchor": false
+            }
+          }
+        },
+        "400": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.682353,
+              0.666667,
+              0.65098
+            ],
+            "hex": "#AEAAA6"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 400,
+              "luminance": 0.405014,
+              "isAnchor": false
+            }
+          }
+        },
+        "500": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.580392,
+              0.564706,
+              0.54902
+            ],
+            "hex": "#94908C"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 500,
+              "luminance": 0.281359,
+              "isAnchor": false
+            }
+          }
+        },
+        "600": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.517647,
+              0.501961,
+              0.486275
+            ],
+            "hex": "#84807C"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 600,
+              "luminance": 0.217992,
+              "isAnchor": true
+            }
+          }
+        },
+        "700": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.376471,
+              0.360784,
+              0.34902
+            ],
+            "hex": "#605C59"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 700,
+              "luminance": 0.108624,
+              "isAnchor": false
+            }
+          }
+        },
+        "800": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.27451,
+              0.262745,
+              0.254902
+            ],
+            "hex": "#464341"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 800,
+              "luminance": 0.056981,
+              "isAnchor": false
+            }
+          }
+        },
+        "900": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.172549,
+              0.164706,
+              0.156863
+            ],
+            "hex": "#2C2A28"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 900,
+              "luminance": 0.023446,
+              "isAnchor": false
+            }
+          }
+        },
+        "950": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.094118,
+              0.090196,
+              0.086275
+            ],
+            "hex": "#181716"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 950,
+              "luminance": 0.008649,
+              "isAnchor": false
+            }
+          }
+        },
+        "$description": "Natural Gray (প্রাকৃতিক ধূসর) — Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text — so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor.",
+        "$extensions": {
+          "studio.aninda": {
+            "hueOklch": 67.68,
+            "chromaCeiling": 0.00771,
+            "anchor": "#84807C",
+            "anchorStep": 600
+          }
+        }
+      },
+      "accent": {
+        "50": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.94902,
+              0.976471,
+              0.988235
+            ],
+            "hex": "#F2F9FC"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 50,
+              "luminance": 0.936566,
               "isAnchor": false
             }
           }
@@ -35,15 +244,15 @@
             "colorSpace": "srgb",
             "components": [
               0.890196,
-              0.941176,
-              0.92549
+              0.937255,
+              0.960784
             ],
-            "hex": "#E3F0EC"
+            "hex": "#E3EFF5"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 100,
-              "luminance": 0.847068,
+              "luminance": 0.846561,
               "isAnchor": false
             }
           }
@@ -52,16 +261,16 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.784314,
-              0.882353,
-              0.854902
+              0.780392,
+              0.870588,
+              0.913725
             ],
-            "hex": "#C8E1DA"
+            "hex": "#C7DEE9"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 200,
-              "luminance": 0.711911,
+              "luminance": 0.702672,
               "isAnchor": false
             }
           }
@@ -71,15 +280,15 @@
             "colorSpace": "srgb",
             "components": [
               0.666667,
-              0.807843,
-              0.768627
+              0.796078,
+              0.85098
             ],
-            "hex": "#AACEC4"
+            "hex": "#AACBD9"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 300,
-              "luminance": 0.566734,
+              "luminance": 0.562668,
               "isAnchor": false
             }
           }
@@ -89,15 +298,15 @@
             "colorSpace": "srgb",
             "components": [
               0.545098,
-              0.709804,
-              0.666667
+              0.698039,
+              0.764706
             ],
-            "hex": "#8BB5AA"
+            "hex": "#8BB2C3"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 400,
-              "luminance": 0.414382,
+              "luminance": 0.412691,
               "isAnchor": false
             }
           }
@@ -107,15 +316,15 @@
             "colorSpace": "srgb",
             "components": [
               0.435294,
-              0.607843,
-              0.564706
+              0.596078,
+              0.666667
             ],
-            "hex": "#6F9B90"
+            "hex": "#6F98AA"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 500,
-              "luminance": 0.288352,
+              "luminance": 0.287376,
               "isAnchor": false
             }
           }
@@ -125,15 +334,224 @@
             "colorSpace": "srgb",
             "components": [
               0.341176,
-              0.501961,
-              0.462745
+              0.490196,
+              0.552941
             ],
-            "hex": "#578076"
+            "hex": "#577D8D"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 600,
-              "luminance": 0.187721,
+              "luminance": 0.186161,
+              "isAnchor": false
+            }
+          }
+        },
+        "700": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.258824,
+              0.384314,
+              0.443137
+            ],
+            "hex": "#426271"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 700,
+              "luminance": 0.110856,
+              "isAnchor": false
+            }
+          }
+        },
+        "800": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.133333,
+              0.286275,
+              0.34902
+            ],
+            "hex": "#224959"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 800,
+              "luminance": 0.058262,
+              "isAnchor": true
+            }
+          }
+        },
+        "900": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.105882,
+              0.176471,
+              0.207843
+            ],
+            "hex": "#1B2D35"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 900,
+              "luminance": 0.023668,
+              "isAnchor": false
+            }
+          }
+        },
+        "950": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.05098,
+              0.098039,
+              0.121569
+            ],
+            "hex": "#0D191F"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 950,
+              "luminance": 0.008797,
+              "isAnchor": false
+            }
+          }
+        },
+        "$description": "Natural Blue (প্রাকৃতিক নীল) — Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA.",
+        "$extensions": {
+          "studio.aninda": {
+            "hueOklch": 227.242,
+            "chromaCeiling": 0.05175,
+            "anchor": "#224959",
+            "anchorStep": 800
+          }
+        }
+      },
+      "success": {
+        "50": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.94902,
+              0.980392,
+              0.956863
+            ],
+            "hex": "#F2FAF4"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 50,
+              "luminance": 0.937799,
+              "isAnchor": false
+            }
+          }
+        },
+        "100": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.890196,
+              0.945098,
+              0.901961
+            ],
+            "hex": "#E3F1E6"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 100,
+              "luminance": 0.849543,
+              "isAnchor": false
+            }
+          }
+        },
+        "200": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.780392,
+              0.886275,
+              0.803922
+            ],
+            "hex": "#C7E2CD"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 200,
+              "luminance": 0.70942,
+              "isAnchor": false
+            }
+          }
+        },
+        "300": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.666667,
+              0.815686,
+              0.701961
+            ],
+            "hex": "#AAD0B3"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 300,
+              "luminance": 0.569117,
+              "isAnchor": false
+            }
+          }
+        },
+        "400": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.541176,
+              0.721569,
+              0.584314
+            ],
+            "hex": "#8AB895"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 400,
+              "luminance": 0.418534,
+              "isAnchor": false
+            }
+          }
+        },
+        "500": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.431373,
+              0.619608,
+              0.478431
+            ],
+            "hex": "#6E9E7A"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 500,
+              "luminance": 0.291732,
+              "isAnchor": false
+            }
+          }
+        },
+        "600": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.337255,
+              0.513725,
+              0.384314
+            ],
+            "hex": "#568362"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 600,
+              "luminance": 0.190924,
               "isAnchor": false
             }
           }
@@ -143,15 +561,15 @@
             "colorSpace": "srgb",
             "components": [
               0.254902,
-              0.396078,
-              0.360784
+              0.403922,
+              0.294118
             ],
-            "hex": "#41655C"
+            "hex": "#41674B"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 700,
-              "luminance": 0.112036,
+              "luminance": 0.11332,
               "isAnchor": false
             }
           }
@@ -160,17 +578,17 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.180392,
-              0.294118,
-              0.262745
+              0.172549,
+              0.352941,
+              0.227451
             ],
-            "hex": "#2E4B43"
+            "hex": "#2C5A3A"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 800,
-              "luminance": 0.060181,
-              "isAnchor": false
+              "luminance": 0.08153,
+              "isAnchor": true
             }
           }
         },
@@ -179,433 +597,15 @@
             "colorSpace": "srgb",
             "components": [
               0.105882,
-              0.184314,
-              0.164706
-            ],
-            "hex": "#1B2F2A"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 900,
-              "luminance": 0.024331,
-              "isAnchor": true
-            }
-          }
-        },
-        "950": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.05098,
-              0.101961,
-              0.090196
-            ],
-            "hex": "#0D1A17"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 950,
-              "luminance": 0.008862,
-              "isAnchor": false
-            }
-          }
-        },
-        "$description": "Estuary (মোহনা) — The ground, and the source of every surface tint and every text role.",
-        "$extensions": {
-          "studio.aninda": {
-            "hueOklch": 176.896,
-            "chromaCeiling": 0.05127,
-            "anchor": "#0C3A31",
-            "anchorStep": 900
-          }
-        }
-      },
-      "accent": {
-        "50": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.929412,
-              0.980392,
-              0.992157
-            ],
-            "hex": "#EDFAFD"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 50,
-              "luminance": 0.934671,
-              "isAnchor": false
-            }
-          }
-        },
-        "100": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.85098,
-              0.94902,
-              0.968627
-            ],
-            "hex": "#D9F2F7"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 100,
-              "luminance": 0.849706,
-              "isAnchor": false
-            }
-          }
-        },
-        "200": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.709804,
-              0.894118,
-              0.92549
-            ],
-            "hex": "#B5E4EC"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 200,
-              "luminance": 0.713654,
-              "isAnchor": false
-            }
-          }
-        },
-        "300": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.556863,
-              0.823529,
-              0.866667
-            ],
-            "hex": "#8ED2DD"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 300,
-              "luminance": 0.570629,
-              "isAnchor": false
-            }
-          }
-        },
-        "400": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.396078,
-              0.729412,
-              0.780392
-            ],
-            "hex": "#65BAC7"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 400,
-              "luminance": 0.420066,
-              "isAnchor": false
-            }
-          }
-        },
-        "500": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.258824,
-              0.627451,
-              0.682353
-            ],
-            "hex": "#42A0AE"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 500,
-              "luminance": 0.293546,
-              "isAnchor": false
-            }
-          }
-        },
-        "600": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.152941,
-              0.517647,
-              0.572549
-            ],
-            "hex": "#278492"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 600,
-              "luminance": 0.190083,
-              "isAnchor": true
-            }
-          }
-        },
-        "700": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.070588,
-              0.411765,
-              0.454902
-            ],
-            "hex": "#126974"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 700,
-              "luminance": 0.114921,
-              "isAnchor": false
-            }
-          }
-        },
-        "800": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.019608,
-              0.301961,
-              0.337255
-            ],
-            "hex": "#054D56"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 800,
-              "luminance": 0.060116,
-              "isAnchor": false
-            }
-          }
-        },
-        "900": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.003922,
-              0.192157,
-              0.215686
-            ],
-            "hex": "#013137"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 900,
-              "luminance": 0.024788,
-              "isAnchor": false
-            }
-          }
-        },
-        "950": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.0,
-              0.105882,
+              0.188235,
               0.12549
             ],
-            "hex": "#001B20"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 950,
-              "luminance": 0.008881,
-              "isAnchor": false
-            }
-          }
-        },
-        "$description": "Tidewater (জোয়ার) — A cyan-teal one hue-step off the ground. Carries links, focus and the primary action.",
-        "$extensions": {
-          "studio.aninda": {
-            "hueOklch": 208.996,
-            "chromaCeiling": 0.0899,
-            "anchor": "#0E7C8A",
-            "anchorStep": 600
-          }
-        }
-      },
-      "success": {
-        "50": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.937255,
-              0.984314,
-              0.94902
-            ],
-            "hex": "#EFFBF2"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 50,
-              "luminance": 0.937556,
-              "isAnchor": false
-            }
-          }
-        },
-        "100": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.870588,
-              0.956863,
-              0.886275
-            ],
-            "hex": "#DEF4E2"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 100,
-              "luminance": 0.857214,
-              "isAnchor": false
-            }
-          }
-        },
-        "200": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.745098,
-              0.901961,
-              0.780392
-            ],
-            "hex": "#BEE6C7"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 200,
-              "luminance": 0.716634,
-              "isAnchor": false
-            }
-          }
-        },
-        "300": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.607843,
-              0.835294,
-              0.666667
-            ],
-            "hex": "#9BD5AA"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 300,
-              "luminance": 0.574582,
-              "isAnchor": false
-            }
-          }
-        },
-        "400": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.466667,
-              0.745098,
-              0.545098
-            ],
-            "hex": "#77BE8B"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 400,
-              "luminance": 0.426118,
-              "isAnchor": false
-            }
-          }
-        },
-        "500": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.34902,
-              0.643137,
-              0.435294
-            ],
-            "hex": "#59A46F"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 500,
-              "luminance": 0.298216,
-              "isAnchor": false
-            }
-          }
-        },
-        "600": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.25098,
-              0.533333,
-              0.341176
-            ],
-            "hex": "#408857"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 600,
-              "luminance": 0.193858,
-              "isAnchor": false
-            }
-          }
-        },
-        "700": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.176471,
-              0.423529,
-              0.258824
-            ],
-            "hex": "#2D6C42"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 700,
-              "luminance": 0.11676,
-              "isAnchor": true
-            }
-          }
-        },
-        "800": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.113725,
-              0.313725,
-              0.180392
-            ],
-            "hex": "#1D502E"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 800,
-              "luminance": 0.061956,
-              "isAnchor": false
-            }
-          }
-        },
-        "900": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.058824,
-              0.196078,
-              0.105882
-            ],
-            "hex": "#0F321B"
+            "hex": "#1B3020"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 900,
-              "luminance": 0.024618,
+              "luminance": 0.024511,
               "isAnchor": false
             }
           }
@@ -614,236 +614,27 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.019608,
-              0.113725,
-              0.05098
+              0.047059,
+              0.105882,
+              0.062745
             ],
-            "hex": "#051D0D"
+            "hex": "#0C1B10"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 950,
-              "luminance": 0.0094,
+              "luminance": 0.008994,
               "isAnchor": false
             }
           }
         },
-        "$description": "Silt (পলি) — semantic",
+        "$description": "Natural Green (প্রাকৃতিক সবুজ) — Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA.",
         "$extensions": {
           "studio.aninda": {
-            "hueOklch": 152.008,
-            "chromaCeiling": 0.10913,
-            "anchor": "#1B6B3A",
-            "anchorStep": 700
-          }
-        }
-      },
-      "warning": {
-        "50": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              1.0,
-              0.964706,
-              0.921569
-            ],
-            "hex": "#FFF6EB"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 50,
-              "luminance": 0.931701,
-              "isAnchor": false
-            }
-          }
-        },
-        "100": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.984314,
-              0.917647,
-              0.839216
-            ],
-            "hex": "#FBEAD6"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 100,
-              "luminance": 0.842106,
-              "isAnchor": false
-            }
-          }
-        },
-        "200": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.952941,
-              0.835294,
-              0.686275
-            ],
-            "hex": "#F3D5AF"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 200,
-              "luminance": 0.697394,
-              "isAnchor": false
-            }
-          }
-        },
-        "300": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.901961,
-              0.741176,
-              0.529412
-            ],
-            "hex": "#E6BD87"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 300,
-              "luminance": 0.549688,
-              "isAnchor": false
-            }
-          }
-        },
-        "400": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.823529,
-              0.631373,
-              0.372549
-            ],
-            "hex": "#D2A15F"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 400,
-              "luminance": 0.400189,
-              "isAnchor": false
-            }
-          }
-        },
-        "500": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.721569,
-              0.52549,
-              0.243137
-            ],
-            "hex": "#B8863E"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 500,
-              "luminance": 0.275894,
-              "isAnchor": false
-            }
-          }
-        },
-        "600": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.607843,
-              0.423529,
-              0.145098
-            ],
-            "hex": "#9B6C25"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 600,
-              "luminance": 0.178281,
-              "isAnchor": false
-            }
-          }
-        },
-        "700": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.486275,
-              0.329412,
-              0.078431
-            ],
-            "hex": "#7C5414"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 700,
-              "luminance": 0.106767,
-              "isAnchor": true
-            }
-          }
-        },
-        "800": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.364706,
-              0.235294,
-              0.027451
-            ],
-            "hex": "#5D3C07"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 800,
-              "luminance": 0.055745,
-              "isAnchor": false
-            }
-          }
-        },
-        "900": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.231373,
-              0.145098,
-              0.007843
-            ],
-            "hex": "#3B2502"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 900,
-              "luminance": 0.022574,
-              "isAnchor": false
-            }
-          }
-        },
-        "950": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.137255,
-              0.07451,
-              0.0
-            ],
-            "hex": "#231300"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 950,
-              "luminance": 0.008231,
-              "isAnchor": false
-            }
-          }
-        },
-        "$description": "Kans (কাশ) — semantic",
-        "$extensions": {
-          "studio.aninda": {
-            "hueOklch": 73.298,
-            "chromaCeiling": 0.108,
-            "anchor": "#8A5A00",
-            "anchorStep": 700
+            "hueOklch": 151.991,
+            "chromaCeiling": 0.07375,
+            "anchor": "#2C5A3A",
+            "anchorStep": 800
           }
         }
       },
@@ -853,15 +644,15 @@
             "colorSpace": "srgb",
             "components": [
               1.0,
-              0.94902,
-              0.929412
+              0.952941,
+              0.937255
             ],
-            "hex": "#FFF2ED"
+            "hex": "#FFF3EF"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 50,
-              "luminance": 0.908792,
+              "luminance": 0.915936,
               "isAnchor": false
             }
           }
@@ -871,15 +662,15 @@
             "colorSpace": "srgb",
             "components": [
               1.0,
-              0.886275,
-              0.854902
+              0.898039,
+              0.866667
             ],
-            "hex": "#FFE2DA"
+            "hex": "#FFE5DD"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 100,
-              "luminance": 0.807156,
+              "luminance": 0.8252,
               "isAnchor": false
             }
           }
@@ -889,15 +680,15 @@
             "colorSpace": "srgb",
             "components": [
               1.0,
-              0.780392,
-              0.72549
+              0.8,
+              0.745098
             ],
-            "hex": "#FFC7B9"
+            "hex": "#FFCCBE"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 200,
-              "luminance": 0.656114,
+              "luminance": 0.681651,
               "isAnchor": false
             }
           }
@@ -906,243 +697,34 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              1.0,
-              0.65098,
-              0.576471
-            ],
-            "hex": "#FFA693"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 300,
-              "luminance": 0.506415,
-              "isAnchor": false
-            }
-          }
-        },
-        "400": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.984314,
-              0.513725,
-              0.435294
-            ],
-            "hex": "#FB836F"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 400,
-              "luminance": 0.378925,
-              "isAnchor": false
-            }
-          }
-        },
-        "500": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.882353,
-              0.396078,
-              0.317647
-            ],
-            "hex": "#E16551"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 500,
-              "luminance": 0.259115,
-              "isAnchor": false
-            }
-          }
-        },
-        "600": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.752941,
-              0.298039,
-              0.227451
-            ],
-            "hex": "#C04C3A"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 600,
-              "luminance": 0.166826,
-              "isAnchor": false
-            }
-          }
-        },
-        "700": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.607843,
-              0.215686,
-              0.156863
-            ],
-            "hex": "#9B3728"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 700,
-              "luminance": 0.098553,
-              "isAnchor": true
-            }
-          }
-        },
-        "800": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.458824,
-              0.145098,
-              0.098039
-            ],
-            "hex": "#752519"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 800,
-              "luminance": 0.051759,
-              "isAnchor": false
-            }
-          }
-        },
-        "900": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.298039,
-              0.082353,
-              0.047059
-            ],
-            "hex": "#4C150C"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 900,
-              "luminance": 0.020996,
-              "isAnchor": false
-            }
-          }
-        },
-        "950": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.180392,
-              0.031373,
-              0.015686
-            ],
-            "hex": "#2E0804"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 950,
-              "luminance": 0.007634,
-              "isAnchor": false
-            }
-          }
-        },
-        "$description": "Laterite (লাল মাটি) — semantic",
-        "$extensions": {
-          "studio.aninda": {
-            "hueOklch": 31.189,
-            "chromaCeiling": 0.15914,
-            "anchor": "#A8301F",
-            "anchorStep": 700
-          }
-        }
-      },
-      "info": {
-        "50": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.937255,
-              0.976471,
-              1.0
-            ],
-            "hex": "#EFF9FF"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 50,
-              "luminance": 0.933217,
-              "isAnchor": false
-            }
-          }
-        },
-        "100": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.870588,
-              0.937255,
-              1.0
-            ],
-            "hex": "#DEEFFF"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 100,
-              "luminance": 0.84482,
-              "isAnchor": false
-            }
-          }
-        },
-        "200": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.745098,
-              0.870588,
-              0.988235
-            ],
-            "hex": "#BEDEFC"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 200,
-              "luminance": 0.702169,
-              "isAnchor": false
-            }
-          }
-        },
-        "300": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.615686,
-              0.792157,
-              0.952941
-            ],
-            "hex": "#9DCAF3"
-          },
-          "$extensions": {
-            "studio.aninda": {
-              "step": 300,
-              "luminance": 0.55879,
-              "isAnchor": false
-            }
-          }
-        },
-        "400": {
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.478431,
+              0.972549,
               0.694118,
-              0.882353
+              0.615686
             ],
-            "hex": "#7AB1E1"
+            "hex": "#F8B19D"
+          },
+          "$extensions": {
+            "studio.aninda": {
+              "step": 300,
+              "luminance": 0.538371,
+              "isAnchor": false
+            }
+          }
+        },
+        "400": {
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.901961,
+              0.572549,
+              0.482353
+            ],
+            "hex": "#E6927B"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 400,
-              "luminance": 0.410169,
+              "luminance": 0.388129,
               "isAnchor": false
             }
           }
@@ -1151,16 +733,16 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.360784,
-              0.588235,
-              0.784314
+              0.8,
+              0.462745,
+              0.368627
             ],
-            "hex": "#5C96C8"
+            "hex": "#CC765E"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 500,
-              "luminance": 0.282572,
+              "luminance": 0.266041,
               "isAnchor": false
             }
           }
@@ -1169,17 +751,17 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.270588,
-              0.486275,
-              0.666667
+              0.631373,
+              0.309804,
+              0.223529
             ],
-            "hex": "#457CAA"
+            "hex": "#A14F39"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 600,
-              "luminance": 0.185821,
-              "isAnchor": false
+              "luminance": 0.134656,
+              "isAnchor": true
             }
           }
         },
@@ -1187,17 +769,17 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.192157,
-              0.380392,
-              0.537255
+              0.545098,
+              0.278431,
+              0.203922
             ],
-            "hex": "#316189"
+            "hex": "#8B4734"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 700,
-              "luminance": 0.110081,
-              "isAnchor": true
+              "luminance": 0.102442,
+              "isAnchor": false
             }
           }
         },
@@ -1205,16 +787,16 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.129412,
-              0.278431,
-              0.403922
+              0.411765,
+              0.196078,
+              0.137255
             ],
-            "hex": "#214767"
+            "hex": "#693223"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 800,
-              "luminance": 0.058088,
+              "luminance": 0.054062,
               "isAnchor": false
             }
           }
@@ -1223,16 +805,16 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.070588,
-              0.176471,
-              0.258824
+              0.266667,
+              0.117647,
+              0.078431
             ],
-            "hex": "#122D42"
+            "hex": "#441E14"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 900,
-              "luminance": 0.023986,
+              "luminance": 0.022082,
               "isAnchor": false
             }
           }
@@ -1241,27 +823,27 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.027451,
-              0.098039,
-              0.156863
+              0.156863,
+              0.054902,
+              0.031373
             ],
-            "hex": "#071928"
+            "hex": "#280E08"
           },
           "$extensions": {
             "studio.aninda": {
               "step": 950,
-              "luminance": 0.008936,
+              "luminance": 0.007828,
               "isAnchor": false
             }
           }
         },
-        "$description": "Monsoon (বর্ষা) — semantic",
+        "$description": "Natural Red (প্রাকৃতিক লাল) — Primary. A warm terracotta. Measured 5.69:1 on white at its anchor — it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp.",
         "$extensions": {
           "studio.aninda": {
-            "hueOklch": 245.674,
-            "chromaCeiling": 0.0962,
-            "anchor": "#235E8C",
-            "anchorStep": 700
+            "hueOklch": 36.01,
+            "chromaCeiling": 0.11435,
+            "anchor": "#A14F39",
+            "anchorStep": 600
           }
         }
       }

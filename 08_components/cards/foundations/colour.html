@@ -68,25 +68,26 @@
   --as-bangla-scale-title: 0.822;
   --as-bangla-scale-display: 0.825;
   --as-bangla-line-height: 1.6;
-  --as-surface-lowest: #FDFFFE;
-  --as-surface-low: #FBFCFC;
-  --as-surface-base: #F8FAF9;
-  --as-surface-high: #F6F7F7;
-  --as-surface-highest: #F3F5F4;
-  --as-surface-dim: #F1F2F2;
+  --as-surface-lowest: #FCFBFB;
+  --as-surface-low: #F9F9F8;
+  --as-surface-base: #F8F7F7;
+  --as-surface-high: #F5F5F4;
+  --as-surface-highest: #F4F3F3;
+  --as-surface-dim: #F1F1F0;
   --as-surface-bright: #FFFFFF;
-  --as-ink: #0D1A17;
-  --as-ink-muted: #41655C;
-  --as-line: #578076;
-  --as-accent: #126974;
-  --as-accent-edge: #278492;
-  --as-accent-hover: #054D56;
-  --as-accent-on: #FDFFFE;
-  --as-focus-ring: #278492;
-  --as-success: #2D6C42;
-  --as-warning: #7C5414;
-  --as-danger: #9B3728;
-  --as-info: #316189;
+  --as-surface-page: #FFFFFF;
+  --as-ink: #000000;
+  --as-ink-muted: #605C59;
+  --as-line: #84807C;
+  --as-accent: #224959;
+  --as-accent-edge: #577D8D;
+  --as-accent-hover: #1B2D35;
+  --as-accent-on: #FCFBFB;
+  --as-focus-ring: #577D8D;
+  --as-success: #2C5A3A;
+  --as-warning: #464341;
+  --as-danger: #A14F39;
+  --as-info: #224959;
   --as-shadow-float: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.08);
   --as-color-scheme: light;
 }
@@ -97,25 +98,26 @@
    explicit choice further down the tree possible at all. */
 @media (prefers-color-scheme: dark) {
 :root:not([data-theme]) {
-      --as-surface-lowest: #0B0C0B;
-      --as-surface-low: #0E100F;
-      --as-surface-base: #111212;
-      --as-surface-high: #111312;
-      --as-surface-highest: #121313;
-      --as-surface-dim: #060707;
-      --as-surface-bright: #121413;
-      --as-ink: #F2F9F7;
-      --as-ink-muted: #6F9B90;
-      --as-line: #578076;
-      --as-accent: #42A0AE;
-      --as-accent-edge: #278492;
-      --as-accent-hover: #65BAC7;
-      --as-accent-on: #0B0C0B;
-      --as-focus-ring: #278492;
-      --as-success: #59A46F;
-      --as-warning: #B8863E;
-      --as-danger: #E16551;
-      --as-info: #5C96C8;
+      --as-surface-lowest: #060505;
+      --as-surface-low: #0A0A09;
+      --as-surface-base: #0E0D0D;
+      --as-surface-high: #10100F;
+      --as-surface-highest: #111010;
+      --as-surface-dim: #000000;
+      --as-surface-bright: #111110;
+      --as-surface-page: #000000;
+      --as-ink: #FFFFFF;
+      --as-ink-muted: #84807C;
+      --as-line: #84807C;
+      --as-accent: #6F98AA;
+      --as-accent-edge: #577D8D;
+      --as-accent-hover: #8BB2C3;
+      --as-accent-on: #060505;
+      --as-focus-ring: #577D8D;
+      --as-success: #6E9E7A;
+      --as-warning: #94908C;
+      --as-danger: #CC765E;
+      --as-info: #6F98AA;
       --as-shadow-float: none;
       --as-color-scheme: dark;
   }
@@ -124,50 +126,52 @@
 /* 3. The same, for high contrast. */
 @media (prefers-contrast: more) {
 :root:not([data-theme]) {
-      --as-surface-lowest: #FCFDFC;
-      --as-surface-low: #FAFAFA;
-      --as-surface-base: #F7F8F7;
-      --as-surface-high: #F5F5F5;
-      --as-surface-highest: #F2F3F2;
-      --as-surface-dim: #F1F1F1;
+      --as-surface-lowest: #FCFBFB;
+      --as-surface-low: #F7F7F7;
+      --as-surface-base: #F4F3F3;
+      --as-surface-high: #EFEFEF;
+      --as-surface-highest: #ECEBEB;
+      --as-surface-dim: #E7E7E7;
       --as-surface-bright: #FFFFFF;
-      --as-ink: #0D1A17;
-      --as-ink-muted: #2E4B43;
-      --as-line: #41655C;
-      --as-accent: #054D56;
-      --as-accent-edge: #126974;
-      --as-accent-hover: #013137;
-      --as-accent-on: #FCFDFC;
-      --as-focus-ring: #126974;
-      --as-success: #1D502E;
-      --as-warning: #5D3C07;
-      --as-danger: #752519;
-      --as-info: #214767;
+      --as-surface-page: #FFFFFF;
+      --as-ink: #000000;
+      --as-ink-muted: #464341;
+      --as-line: #605C59;
+      --as-accent: #224959;
+      --as-accent-edge: #426271;
+      --as-accent-hover: #1B2D35;
+      --as-accent-on: #FCFBFB;
+      --as-focus-ring: #426271;
+      --as-success: #1B3020;
+      --as-warning: #2C2A28;
+      --as-danger: #693223;
+      --as-info: #224959;
       --as-shadow-float: none;
       --as-color-scheme: light;
   }
 }
 @media (prefers-contrast: more) and (prefers-color-scheme: dark) {
 :root:not([data-theme]) {
-      --as-surface-lowest: #070807;
-      --as-surface-low: #0C0C0C;
-      --as-surface-base: #0E0F0E;
-      --as-surface-high: #111111;
-      --as-surface-highest: #111211;
-      --as-surface-dim: #030303;
-      --as-surface-bright: #121212;
-      --as-ink: #F2F9F7;
-      --as-ink-muted: #8BB5AA;
-      --as-line: #6F9B90;
-      --as-accent: #65BAC7;
-      --as-accent-edge: #42A0AE;
-      --as-accent-hover: #8ED2DD;
-      --as-accent-on: #070807;
-      --as-focus-ring: #42A0AE;
-      --as-success: #77BE8B;
-      --as-warning: #D2A15F;
-      --as-danger: #FB836F;
-      --as-info: #7AB1E1;
+      --as-surface-lowest: #060505;
+      --as-surface-low: #0A0A09;
+      --as-surface-base: #0F0E0E;
+      --as-surface-high: #10100F;
+      --as-surface-highest: #131212;
+      --as-surface-dim: #000000;
+      --as-surface-bright: #151515;
+      --as-surface-page: #000000;
+      --as-ink: #FFFFFF;
+      --as-ink-muted: #AEAAA6;
+      --as-line: #84807C;
+      --as-accent: #8BB2C3;
+      --as-accent-edge: #6F98AA;
+      --as-accent-hover: #AACBD9;
+      --as-accent-on: #060505;
+      --as-focus-ring: #6F98AA;
+      --as-success: #8AB895;
+      --as-warning: #C7C4C1;
+      --as-danger: #E6927B;
+      --as-info: #8BB2C3;
       --as-shadow-float: none;
       --as-color-scheme: dark;
   }
@@ -176,94 +180,98 @@
 /* 4. An explicit choice, on ANY element — which is what lets a dark
    panel sit inside a light page. These come last so they win. */
 [data-theme="light"] {
-  --as-surface-lowest: #FDFFFE;
-  --as-surface-low: #FBFCFC;
-  --as-surface-base: #F8FAF9;
-  --as-surface-high: #F6F7F7;
-  --as-surface-highest: #F3F5F4;
-  --as-surface-dim: #F1F2F2;
+  --as-surface-lowest: #FCFBFB;
+  --as-surface-low: #F9F9F8;
+  --as-surface-base: #F8F7F7;
+  --as-surface-high: #F5F5F4;
+  --as-surface-highest: #F4F3F3;
+  --as-surface-dim: #F1F1F0;
   --as-surface-bright: #FFFFFF;
-  --as-ink: #0D1A17;
-  --as-ink-muted: #41655C;
-  --as-line: #578076;
-  --as-accent: #126974;
-  --as-accent-edge: #278492;
-  --as-accent-hover: #054D56;
-  --as-accent-on: #FDFFFE;
-  --as-focus-ring: #278492;
-  --as-success: #2D6C42;
-  --as-warning: #7C5414;
-  --as-danger: #9B3728;
-  --as-info: #316189;
+  --as-surface-page: #FFFFFF;
+  --as-ink: #000000;
+  --as-ink-muted: #605C59;
+  --as-line: #84807C;
+  --as-accent: #224959;
+  --as-accent-edge: #577D8D;
+  --as-accent-hover: #1B2D35;
+  --as-accent-on: #FCFBFB;
+  --as-focus-ring: #577D8D;
+  --as-success: #2C5A3A;
+  --as-warning: #464341;
+  --as-danger: #A14F39;
+  --as-info: #224959;
   --as-shadow-float: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.08);
   --as-color-scheme: light;
 }
 [data-theme="dark"] {
-  --as-surface-lowest: #0B0C0B;
-  --as-surface-low: #0E100F;
-  --as-surface-base: #111212;
-  --as-surface-high: #111312;
-  --as-surface-highest: #121313;
-  --as-surface-dim: #060707;
-  --as-surface-bright: #121413;
-  --as-ink: #F2F9F7;
-  --as-ink-muted: #6F9B90;
-  --as-line: #578076;
-  --as-accent: #42A0AE;
-  --as-accent-edge: #278492;
-  --as-accent-hover: #65BAC7;
-  --as-accent-on: #0B0C0B;
-  --as-focus-ring: #278492;
-  --as-success: #59A46F;
-  --as-warning: #B8863E;
-  --as-danger: #E16551;
-  --as-info: #5C96C8;
+  --as-surface-lowest: #060505;
+  --as-surface-low: #0A0A09;
+  --as-surface-base: #0E0D0D;
+  --as-surface-high: #10100F;
+  --as-surface-highest: #111010;
+  --as-surface-dim: #000000;
+  --as-surface-bright: #111110;
+  --as-surface-page: #000000;
+  --as-ink: #FFFFFF;
+  --as-ink-muted: #84807C;
+  --as-line: #84807C;
+  --as-accent: #6F98AA;
+  --as-accent-edge: #577D8D;
+  --as-accent-hover: #8BB2C3;
+  --as-accent-on: #060505;
+  --as-focus-ring: #577D8D;
+  --as-success: #6E9E7A;
+  --as-warning: #94908C;
+  --as-danger: #CC765E;
+  --as-info: #6F98AA;
   --as-shadow-float: none;
   --as-color-scheme: dark;
 }
 [data-theme="hc-light"] {
-  --as-surface-lowest: #FCFDFC;
-  --as-surface-low: #FAFAFA;
-  --as-surface-base: #F7F8F7;
-  --as-surface-high: #F5F5F5;
-  --as-surface-highest: #F2F3F2;
-  --as-surface-dim: #F1F1F1;
+  --as-surface-lowest: #FCFBFB;
+  --as-surface-low: #F7F7F7;
+  --as-surface-base: #F4F3F3;
+  --as-surface-high: #EFEFEF;
+  --as-surface-highest: #ECEBEB;
+  --as-surface-dim: #E7E7E7;
   --as-surface-bright: #FFFFFF;
-  --as-ink: #0D1A17;
-  --as-ink-muted: #2E4B43;
-  --as-line: #41655C;
-  --as-accent: #054D56;
-  --as-accent-edge: #126974;
-  --as-accent-hover: #013137;
-  --as-accent-on: #FCFDFC;
-  --as-focus-ring: #126974;
-  --as-success: #1D502E;
-  --as-warning: #5D3C07;
-  --as-danger: #752519;
-  --as-info: #214767;
+  --as-surface-page: #FFFFFF;
+  --as-ink: #000000;
+  --as-ink-muted: #464341;
+  --as-line: #605C59;
+  --as-accent: #224959;
+  --as-accent-edge: #426271;
+  --as-accent-hover: #1B2D35;
+  --as-accent-on: #FCFBFB;
+  --as-focus-ring: #426271;
+  --as-success: #1B3020;
+  --as-warning: #2C2A28;
+  --as-danger: #693223;
+  --as-info: #224959;
   --as-shadow-float: none;
   --as-color-scheme: light;
 }
 [data-theme="hc-dark"] {
-  --as-surface-lowest: #070807;
-  --as-surface-low: #0C0C0C;
-  --as-surface-base: #0E0F0E;
-  --as-surface-high: #111111;
-  --as-surface-highest: #111211;
-  --as-surface-dim: #030303;
-  --as-surface-bright: #121212;
-  --as-ink: #F2F9F7;
-  --as-ink-muted: #8BB5AA;
-  --as-line: #6F9B90;
-  --as-accent: #65BAC7;
-  --as-accent-edge: #42A0AE;
-  --as-accent-hover: #8ED2DD;
-  --as-accent-on: #070807;
-  --as-focus-ring: #42A0AE;
-  --as-success: #77BE8B;
-  --as-warning: #D2A15F;
-  --as-danger: #FB836F;
-  --as-info: #7AB1E1;
+  --as-surface-lowest: #060505;
+  --as-surface-low: #0A0A09;
+  --as-surface-base: #0F0E0E;
+  --as-surface-high: #10100F;
+  --as-surface-highest: #131212;
+  --as-surface-dim: #000000;
+  --as-surface-bright: #151515;
+  --as-surface-page: #000000;
+  --as-ink: #FFFFFF;
+  --as-ink-muted: #AEAAA6;
+  --as-line: #84807C;
+  --as-accent: #8BB2C3;
+  --as-accent-edge: #6F98AA;
+  --as-accent-hover: #AACBD9;
+  --as-accent-on: #060505;
+  --as-focus-ring: #6F98AA;
+  --as-success: #8AB895;
+  --as-warning: #C7C4C1;
+  --as-danger: #E6927B;
+  --as-info: #8BB2C3;
   --as-shadow-float: none;
   --as-color-scheme: dark;
 }
@@ -281,6 +289,7 @@
       --as-surface-highest: Canvas;
       --as-surface-dim: Canvas;
       --as-surface-bright: Canvas;
+      --as-surface-page: Canvas;
       --as-ink: CanvasText;
       --as-ink-muted: CanvasText;
       --as-line: CanvasText;
@@ -375,7 +384,12 @@
 
 .as-root {
   margin: 0;
-  background-color: var(--as-surface-low);
+  /* The page is the polarity's own extreme — pure white in a light theme, pure
+     black in a dark one. It was surface-low, a tinted rung, which meant cards
+     floated ABOVE the page on a slightly grey ground. The Natural direction
+     inverts that: the page is pure, and the surfaces that sit on it carry the
+     faint grey tint instead. */
+  background-color: var(--as-surface-page);
   color: var(--as-ink);
   font-family: var(--as-font-latin);
   font-size: var(--as-text-body);
@@ -517,7 +531,7 @@
   padding: var(--as-space-1) var(--as-space-3);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-control);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   font-family: inherit;
   font-size: var(--as-text-body);
@@ -572,7 +586,7 @@
 }
 
 .as-btn--danger:hover {
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-danger);
 }
 
@@ -655,7 +669,7 @@
   padding: var(--as-space-1) var(--as-space-2);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-control);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   font-family: inherit;
   font-size: var(--as-text-body);
@@ -820,7 +834,7 @@
   padding: 0 var(--as-space-1);
   border: 1px solid currentColor;
   border-radius: var(--as-radius-badge);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink-muted);
   font-size: var(--as-text-caption);
   font-weight: 600;
@@ -858,7 +872,7 @@
   padding: var(--as-space-4);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-card);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   box-shadow: var(--as-shadow-float);
   min-width: 0;
@@ -939,7 +953,7 @@
   padding: var(--as-space-4);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-card);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   box-shadow: var(--as-shadow-float);
 }
@@ -1141,7 +1155,7 @@
   padding: var(--as-space-2) var(--as-space-3);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-control);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   box-shadow: var(--as-shadow-float);
   min-width: 0;
@@ -1186,7 +1200,7 @@
   padding: var(--as-space-5) var(--as-space-3);
   border: 1px dashed var(--as-line);
   border-radius: var(--as-radius-card);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   text-align: center;
   min-width: 0;
 }
@@ -1312,7 +1326,7 @@
   padding: var(--as-space-1) var(--as-space-2);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-control);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   font-family: inherit;
   font-size: var(--as-text-caption);
@@ -1469,10 +1483,10 @@
 
 <div class="as-stack">
   <p class="as-hint">Ten text and line roles, measured against the hardest surface each one can land on in this theme.</p>
-  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 15.90:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 5.78:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 3.94:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 5.68:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 3.90:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 9.50:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 3.90:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 5.61:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 5.97:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 6.30:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 5.85:1 · needs 4.5:1</span></span></div></div>
+  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 18.58:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 5.86:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 3.47:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 8.58:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 3.93:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 13.80:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 3.93:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 7.06:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 8.68:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 5.03:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 8.58:1 · needs 4.5:1</span></span></div></div>
   <hr class="as-divider">
   <p class="as-hint">Seven surfaces. Each rung is at least &Delta;E2000 0.9 from the one before it, so the steps are visible without being loud.</p>
-  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#FDFFFE</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#FBFCFC</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#F8FAF9</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#F6F7F7</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#F3F5F4</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#F1F2F2</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#FFFFFF</span></span></div></div>
+  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#FCFBFB</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#F9F9F8</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#F8F7F7</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#F5F5F4</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#F4F3F3</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#F1F1F0</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#FFFFFF</span></span></div></div>
 </div>
 </div>
 </section>
@@ -1483,35 +1497,35 @@
 <div class="as-doc-panel" data-theme="light" role="group" aria-labelledby="colour-light-label"><p class="as-doc-panel__label" id="colour-light-label"><span>Light <span lang="bn">আলো</span></span><code>data-theme="light"</code></p>
 <div class="as-stack">
   <p class="as-hint">Ten text and line roles, measured against the hardest surface each one can land on in this theme.</p>
-  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 15.90:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 5.78:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 3.94:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 5.68:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 3.90:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 9.50:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 3.90:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 5.61:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 5.97:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 6.30:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 5.85:1 · needs 4.5:1</span></span></div></div>
+  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 18.58:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 5.86:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 3.47:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 8.58:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 3.93:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 13.80:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 3.93:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 7.06:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 8.68:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 5.03:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 8.58:1 · needs 4.5:1</span></span></div></div>
   <hr class="as-divider">
   <p class="as-hint">Seven surfaces. Each rung is at least &Delta;E2000 0.9 from the one before it, so the steps are visible without being loud.</p>
-  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#FDFFFE</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#FBFCFC</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#F8FAF9</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#F6F7F7</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#F3F5F4</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#F1F2F2</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#FFFFFF</span></span></div></div>
+  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#FCFBFB</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#F9F9F8</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#F8F7F7</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#F5F5F4</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#F4F3F3</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#F1F1F0</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#FFFFFF</span></span></div></div>
 </div></div><div class="as-doc-panel" data-theme="dark" role="group" aria-labelledby="colour-dark-label"><p class="as-doc-panel__label" id="colour-dark-label"><span>Dark <span lang="bn">অন্ধকার</span></span><code>data-theme="dark"</code></p>
 <div class="as-stack">
   <p class="as-hint">Ten text and line roles, measured against the hardest surface each one can land on in this theme.</p>
-  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 17.33:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 5.96:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 4.19:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 6.05:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 4.23:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 8.77:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 4.23:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 6.13:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 5.74:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 5.45:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 5.86:1 · needs 4.5:1</span></span></div></div>
+  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 18.89:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 4.82:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 4.82:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 6.07:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 4.25:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 8.97:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 4.25:1 · needs 3.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 6.15:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 5.96:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 5.69:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 6.07:1 · needs 4.5:1</span></span></div></div>
   <hr class="as-divider">
   <p class="as-hint">Seven surfaces. Each rung is at least &Delta;E2000 0.9 from the one before it, so the steps are visible without being loud.</p>
-  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#0B0C0B</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#0E100F</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#111212</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#111312</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#121313</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#060707</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#121413</span></span></div></div>
+  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#060505</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#0A0A09</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#0E0D0D</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#10100F</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#111010</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#000000</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#111110</span></span></div></div>
 </div></div><div class="as-doc-panel" data-theme="hc-light" role="group" aria-labelledby="colour-hc-light-label"><p class="as-doc-panel__label" id="colour-hc-light-label"><span>High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></span><code>data-theme="hc-light"</code></p>
 <div class="as-stack">
   <p class="as-hint">Ten text and line roles, measured against the hardest surface each one can land on in this theme.</p>
-  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 15.79:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 8.44:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 5.74:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 8.44:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 5.64:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 13.77:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 5.64:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 8.30:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 8.79:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 9.14:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 8.60:1 · needs 7.0:1</span></span></div></div>
+  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 16.98:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 7.94:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 5.35:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 7.84:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 5.28:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 13.80:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 5.28:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 11.40:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 11.56:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 8.16:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 7.84:1 · needs 7.0:1</span></span></div></div>
   <hr class="as-divider">
   <p class="as-hint">Seven surfaces. Each rung is at least &Delta;E2000 0.9 from the one before it, so the steps are visible without being loud.</p>
-  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#FCFDFC</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#FAFAFA</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#F7F8F7</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#F5F5F5</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#F2F3F2</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#F1F1F1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#FFFFFF</span></span></div></div>
+  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#FCFBFB</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#F7F7F7</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#F4F3F3</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#EFEFEF</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#ECEBEB</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#E7E7E7</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#FFFFFF</span></span></div></div>
 </div></div><div class="as-doc-panel" data-theme="hc-dark" role="group" aria-labelledby="colour-hc-dark-label"><p class="as-doc-panel__label" id="colour-hc-dark-label"><span>High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></span><code>data-theme="hc-dark"</code></p>
 <div class="as-stack">
   <p class="as-hint">Ten text and line roles, measured against the hardest surface each one can land on in this theme.</p>
-  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 17.55:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 8.29:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 6.04:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 8.39:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 6.13:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 11.86:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 6.13:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 8.49:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 8.03:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 7.65:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 8.21:1 · needs 7.0:1</span></span></div></div>
+  <div class="as-grid as-grid--wide"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Body text and headings</span><span class="as-doc-swatch__meta">--as-ink · 18.26:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-ink-muted)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Secondary text, hints, captions</span><span class="as-doc-swatch__meta">--as-ink-muted · 7.91:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-line)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Borders, rules, dividers</span><span class="as-doc-swatch__meta">--as-line · 4.66:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Links, the primary action</span><span class="as-doc-swatch__meta">--as-accent · 8.05:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-edge)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The line around an accent surface</span><span class="as-doc-swatch__meta">--as-accent-edge · 5.87:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-accent-hover)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The hovered primary action, measured against the label it carries</span><span class="as-doc-swatch__meta">--as-accent-hover · 11.88:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-focus-ring)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">The focus indicator</span><span class="as-doc-swatch__meta">--as-focus-ring · 5.87:1 · needs 4.5:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-success)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something finished</span><span class="as-doc-swatch__meta">--as-success · 8.15:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-warning)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something needs attention</span><span class="as-doc-swatch__meta">--as-warning · 10.52:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-danger)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something failed</span><span class="as-doc-swatch__meta">--as-danger · 7.62:1 · needs 7.0:1</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-info)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Something worth knowing</span><span class="as-doc-swatch__meta">--as-info · 8.05:1 · needs 7.0:1</span></span></div></div>
   <hr class="as-divider">
   <p class="as-hint">Seven surfaces. Each rung is at least &Delta;E2000 0.9 from the one before it, so the steps are visible without being loud.</p>
-  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#070807</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#0C0C0C</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#0E0F0E</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#111111</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#111211</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#030303</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#121212</span></span></div></div>
+  <div class="as-grid"><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-lowest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface lowest</span><span class="as-doc-swatch__meta">#060505</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-low)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface low</span><span class="as-doc-swatch__meta">#0A0A09</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-base)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface base</span><span class="as-doc-swatch__meta">#0F0E0E</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-high)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface high</span><span class="as-doc-swatch__meta">#10100F</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-highest)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface highest</span><span class="as-doc-swatch__meta">#131212</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-dim)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface dim</span><span class="as-doc-swatch__meta">#000000</span></span></div><div class="as-doc-swatch"><span class="as-doc-swatch__chip" style="background-color: var(--as-surface-bright)"></span><span class="as-doc-swatch__body"><span class="as-doc-swatch__name">Surface bright</span><span class="as-doc-swatch__meta">#151515</span></span></div></div>
 </div></div>
 </div>
 </section>
-<section class="as-doc-section"><h2 class="as-doc-section__title">Every role, measured</h2><p class="as-doc-section__note">Nothing in these tables was typed. Every figure is read from the token files at build time, so the prose cannot drift away from the palette.</p><div class="as-stack as-stack--loose"><h3 class="as-h3">Light <span lang="bn">আলো</span></h3><div class="as-scroll-x"><table class="as-table as-table--numeric"><caption>Every figure is read from 07_tokens/build/semantic.light.tokens.json at build time. None of it is typed here.</caption><thead><tr><th scope="col">Role</th><th scope="col">Token</th><th scope="col">Ramp step</th><th scope="col" class="as-num">Needs</th><th scope="col" class="as-num">Measured</th><th scope="col" class="as-num">Worst case &plusmn;1 LSB</th><th scope="col">Level</th><th scope="col">Criterion</th><th scope="col">Hardest surface</th></tr></thead><tbody><tr><th scope="row">Body text and headings</th><td><code>--as-ink</code></td><td>Estuary <span lang="bn">মোহনা</span> 950</td><td class="as-num">4.5:1</td><td class="as-num">15.9043:1</td><td class="as-num">15.6124:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Secondary text, hints, captions</th><td><code>--as-ink-muted</code></td><td>Estuary <span lang="bn">মোহনা</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.7775:1</td><td class="as-num">5.6402:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Borders, rules, dividers</th><td><code>--as-line</code></td><td>Estuary <span lang="bn">মোহনা</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">3.9380:1</td><td class="as-num">3.8490:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>dim</td></tr><tr><th scope="row">Links, the primary action</th><td><code>--as-accent</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.6764:1</td><td class="as-num">5.5460:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">The line around an accent surface</th><td><code>--as-accent-edge</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">3.8993:1</td><td class="as-num">3.8134:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>dim</td></tr><tr><th scope="row">The hovered primary action, measured against the label it carries</th><td><code>--as-accent-hover</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 800</td><td class="as-num">4.5:1</td><td class="as-num">9.4953:1</td><td class="as-num">9.2768:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>label (surface.lowest)</td></tr><tr><th scope="row">The focus indicator</th><td><code>--as-focus-ring</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">3.8993:1</td><td class="as-num">3.8134:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>dim</td></tr><tr><th scope="row">Something finished</th><td><code>--as-success</code></td><td>Silt <span lang="bn">পলি</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.6138:1</td><td class="as-num">5.4829:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Something needs attention</th><td><code>--as-warning</code></td><td>Kans <span lang="bn">কাশ</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.9716:1</td><td class="as-num">5.8314:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Something failed</th><td><code>--as-danger</code></td><td>Laterite <span lang="bn">লাল মাটি</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">6.3019:1</td><td class="as-num">6.1622:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Something worth knowing</th><td><code>--as-info</code></td><td>Monsoon <span lang="bn">বর্ষা</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.8480:1</td><td class="as-num">5.7107:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr></tbody></table></div><h3 class="as-h3">Dark <span lang="bn">অন্ধকার</span></h3><div class="as-scroll-x"><table class="as-table as-table--numeric"><caption>Every figure is read from 07_tokens/build/semantic.dark.tokens.json at build time. None of it is typed here.</caption><thead><tr><th scope="col">Role</th><th scope="col">Token</th><th scope="col">Ramp step</th><th scope="col" class="as-num">Needs</th><th scope="col" class="as-num">Measured</th><th scope="col" class="as-num">Worst case &plusmn;1 LSB</th><th scope="col">Level</th><th scope="col">Criterion</th><th scope="col">Hardest surface</th></tr></thead><tbody><tr><th scope="row">Body text and headings</th><td><code>--as-ink</code></td><td>Estuary <span lang="bn">মোহনা</span> 50</td><td class="as-num">4.5:1</td><td class="as-num">17.3265:1</td><td class="as-num">17.0278:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Secondary text, hints, captions</th><td><code>--as-ink-muted</code></td><td>Estuary <span lang="bn">মোহনা</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">5.9612:1</td><td class="as-num">5.8353:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Borders, rules, dividers</th><td><code>--as-line</code></td><td>Estuary <span lang="bn">মোহনা</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">4.1882:1</td><td class="as-num">4.0943:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>bright</td></tr><tr><th scope="row">Links, the primary action</th><td><code>--as-accent</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">6.0527:1</td><td class="as-num">5.9274:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">The line around an accent surface</th><td><code>--as-accent-edge</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">4.2299:1</td><td class="as-num">4.1375:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>bright</td></tr><tr><th scope="row">The hovered primary action, measured against the label it carries</th><td><code>--as-accent-hover</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 400</td><td class="as-num">4.5:1</td><td class="as-num">8.7727:1</td><td class="as-num">8.6199:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>label (surface.lowest)</td></tr><tr><th scope="row">The focus indicator</th><td><code>--as-focus-ring</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">4.2299:1</td><td class="as-num">4.1375:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>bright</td></tr><tr><th scope="row">Something finished</th><td><code>--as-success</code></td><td>Silt <span lang="bn">পলি</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">6.1350:1</td><td class="as-num">6.0074:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Something needs attention</th><td><code>--as-warning</code></td><td>Kans <span lang="bn">কাশ</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">5.7417:1</td><td class="as-num">5.6207:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Something failed</th><td><code>--as-danger</code></td><td>Laterite <span lang="bn">লাল মাটি</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">5.4461:1</td><td class="as-num">5.3348:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Something worth knowing</th><td><code>--as-info</code></td><td>Monsoon <span lang="bn">বর্ষা</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">5.8593:1</td><td class="as-num">5.7362:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr></tbody></table></div><h3 class="as-h3">High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></h3><div class="as-scroll-x"><table class="as-table as-table--numeric"><caption>Every figure is read from 07_tokens/build/semantic.hc-light.tokens.json at build time. None of it is typed here.</caption><thead><tr><th scope="col">Role</th><th scope="col">Token</th><th scope="col">Ramp step</th><th scope="col" class="as-num">Needs</th><th scope="col" class="as-num">Measured</th><th scope="col" class="as-num">Worst case &plusmn;1 LSB</th><th scope="col">Level</th><th scope="col">Criterion</th><th scope="col">Hardest surface</th></tr></thead><tbody><tr><th scope="row">Body text and headings</th><td><code>--as-ink</code></td><td>Estuary <span lang="bn">মোহনা</span> 950</td><td class="as-num">7.0:1</td><td class="as-num">15.7933:1</td><td class="as-num">15.5030:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Secondary text, hints, captions</th><td><code>--as-ink-muted</code></td><td>Estuary <span lang="bn">মোহনা</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">8.4372:1</td><td class="as-num">8.2335:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Borders, rules, dividers</th><td><code>--as-line</code></td><td>Estuary <span lang="bn">মোহনা</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.7371:1</td><td class="as-num">5.6007:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>dim</td></tr><tr><th scope="row">Links, the primary action</th><td><code>--as-accent</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">8.4422:1</td><td class="as-num">8.2447:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">The line around an accent surface</th><td><code>--as-accent-edge</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.6368:1</td><td class="as-num">5.5072:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>dim</td></tr><tr><th scope="row">The hovered primary action, measured against the label it carries</th><td><code>--as-accent-hover</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 900</td><td class="as-num">7.0:1</td><td class="as-num">13.7688:1</td><td class="as-num">13.4699:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>label (surface.lowest)</td></tr><tr><th scope="row">The focus indicator</th><td><code>--as-focus-ring</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.6368:1</td><td class="as-num">5.5072:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>dim</td></tr><tr><th scope="row">Something finished</th><td><code>--as-success</code></td><td>Silt <span lang="bn">পলি</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">8.3035:1</td><td class="as-num">8.1064:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Something needs attention</th><td><code>--as-warning</code></td><td>Kans <span lang="bn">কাশ</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">8.7912:1</td><td class="as-num">8.5828:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Something failed</th><td><code>--as-danger</code></td><td>Laterite <span lang="bn">লাল মাটি</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">9.1356:1</td><td class="as-num">8.9340:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Something worth knowing</th><td><code>--as-info</code></td><td>Monsoon <span lang="bn">বর্ষা</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">8.6006:1</td><td class="as-num">8.3959:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr></tbody></table></div><h3 class="as-h3">High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></h3><div class="as-scroll-x"><table class="as-table as-table--numeric"><caption>Every figure is read from 07_tokens/build/semantic.hc-dark.tokens.json at build time. None of it is typed here.</caption><thead><tr><th scope="col">Role</th><th scope="col">Token</th><th scope="col">Ramp step</th><th scope="col" class="as-num">Needs</th><th scope="col" class="as-num">Measured</th><th scope="col" class="as-num">Worst case &plusmn;1 LSB</th><th scope="col">Level</th><th scope="col">Criterion</th><th scope="col">Hardest surface</th></tr></thead><tbody><tr><th scope="row">Body text and headings</th><td><code>--as-ink</code></td><td>Estuary <span lang="bn">মোহনা</span> 50</td><td class="as-num">7.0:1</td><td class="as-num">17.5461:1</td><td class="as-num">17.2510:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Secondary text, hints, captions</th><td><code>--as-ink-muted</code></td><td>Estuary <span lang="bn">মোহনা</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">8.2853:1</td><td class="as-num">8.1239:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Borders, rules, dividers</th><td><code>--as-line</code></td><td>Estuary <span lang="bn">মোহনা</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">6.0367:1</td><td class="as-num">5.9118:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>bright</td></tr><tr><th scope="row">Links, the primary action</th><td><code>--as-accent</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">8.3867:1</td><td class="as-num">8.2253:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">The line around an accent surface</th><td><code>--as-accent-edge</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">6.1294:1</td><td class="as-num">6.0051:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>bright</td></tr><tr><th scope="row">The hovered primary action, measured against the label it carries</th><td><code>--as-accent-hover</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 300</td><td class="as-num">7.0:1</td><td class="as-num">11.8572:1</td><td class="as-num">11.6686:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>label (surface.lowest)</td></tr><tr><th scope="row">The focus indicator</th><td><code>--as-focus-ring</code></td><td>Tidewater <span lang="bn">জোয়ার</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">6.1294:1</td><td class="as-num">6.0051:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>bright</td></tr><tr><th scope="row">Something finished</th><td><code>--as-success</code></td><td>Silt <span lang="bn">পলি</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">8.4947:1</td><td class="as-num">8.3311:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Something needs attention</th><td><code>--as-warning</code></td><td>Kans <span lang="bn">কাশ</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">8.0321:1</td><td class="as-num">7.8755:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Something failed</th><td><code>--as-danger</code></td><td>Laterite <span lang="bn">লাল মাটি</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">7.6527:1</td><td class="as-num">7.5060:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Something worth knowing</th><td><code>--as-info</code></td><td>Monsoon <span lang="bn">বর্ষা</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">8.2101:1</td><td class="as-num">8.0507:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr></tbody></table></div></div></section>
+<section class="as-doc-section"><h2 class="as-doc-section__title">Every role, measured</h2><p class="as-doc-section__note">Nothing in these tables was typed. Every figure is read from the token files at build time, so the prose cannot drift away from the palette.</p><div class="as-stack as-stack--loose"><h3 class="as-h3">Light <span lang="bn">আলো</span></h3><div class="as-scroll-x"><table class="as-table as-table--numeric"><caption>Every figure is read from 07_tokens/build/semantic.light.tokens.json at build time. None of it is typed here.</caption><thead><tr><th scope="col">Role</th><th scope="col">Token</th><th scope="col">Ramp step</th><th scope="col" class="as-num">Needs</th><th scope="col" class="as-num">Measured</th><th scope="col" class="as-num">Worst case &plusmn;1 LSB</th><th scope="col">Level</th><th scope="col">Criterion</th><th scope="col">Hardest surface</th></tr></thead><tbody><tr><th scope="row">Body text and headings</th><td><code>--as-ink</code></td><td> </td><td class="as-num">4.5:1</td><td class="as-num">18.5805:1</td><td class="as-num">18.3044:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Secondary text, hints, captions</th><td><code>--as-ink-muted</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.8568:1</td><td class="as-num">5.7161:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Borders, rules, dividers</th><td><code>--as-line</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">3.4666:1</td><td class="as-num">3.3892:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>dim</td></tr><tr><th scope="row">Links, the primary action</th><td><code>--as-accent</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 800</td><td class="as-num">4.5:1</td><td class="as-num">8.5813:1</td><td class="as-num">8.3761:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">The line around an accent surface</th><td><code>--as-accent-edge</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">3.9339:1</td><td class="as-num">3.8447:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>dim</td></tr><tr><th scope="row">The hovered primary action, measured against the label it carries</th><td><code>--as-accent-hover</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 900</td><td class="as-num">4.5:1</td><td class="as-num">13.7991:1</td><td class="as-num">13.4968:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>label (surface.lowest)</td></tr><tr><th scope="row">The focus indicator</th><td><code>--as-focus-ring</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">3.9339:1</td><td class="as-num">3.8447:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>dim</td></tr><tr><th scope="row">Something finished</th><td><code>--as-success</code></td><td>Natural Green <span lang="bn">প্রাকৃতিক সবুজ</span> 800</td><td class="as-num">4.5:1</td><td class="as-num">7.0632:1</td><td class="as-num">6.8943:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Something needs attention</th><td><code>--as-warning</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 800</td><td class="as-num">4.5:1</td><td class="as-num">8.6841:1</td><td class="as-num">8.4730:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Something failed</th><td><code>--as-danger</code></td><td>Natural Red <span lang="bn">প্রাকৃতিক লাল</span> 600</td><td class="as-num">4.5:1</td><td class="as-num">5.0311:1</td><td class="as-num">4.9173:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr><tr><th scope="row">Something worth knowing</th><td><code>--as-info</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 800</td><td class="as-num">4.5:1</td><td class="as-num">8.5813:1</td><td class="as-num">8.3761:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>dim</td></tr></tbody></table></div><h3 class="as-h3">Dark <span lang="bn">অন্ধকার</span></h3><div class="as-scroll-x"><table class="as-table as-table--numeric"><caption>Every figure is read from 07_tokens/build/semantic.dark.tokens.json at build time. None of it is typed here.</caption><thead><tr><th scope="col">Role</th><th scope="col">Token</th><th scope="col">Ramp step</th><th scope="col" class="as-num">Needs</th><th scope="col" class="as-num">Measured</th><th scope="col" class="as-num">Worst case &plusmn;1 LSB</th><th scope="col">Level</th><th scope="col">Criterion</th><th scope="col">Hardest surface</th></tr></thead><tbody><tr><th scope="row">Body text and headings</th><td><code>--as-ink</code></td><td> </td><td class="as-num">4.5:1</td><td class="as-num">18.8935:1</td><td class="as-num">18.5855:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Secondary text, hints, captions</th><td><code>--as-ink-muted</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 600</td><td class="as-num">4.5:1</td><td class="as-num">4.8222:1</td><td class="as-num">4.7190:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Borders, rules, dividers</th><td><code>--as-line</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">4.8222:1</td><td class="as-num">4.7190:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>bright</td></tr><tr><th scope="row">Links, the primary action</th><td><code>--as-accent</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">6.0707:1</td><td class="as-num">5.9468:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">The line around an accent surface</th><td><code>--as-accent-edge</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">4.2494:1</td><td class="as-num">4.1571:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>bright</td></tr><tr><th scope="row">The hovered primary action, measured against the label it carries</th><td><code>--as-accent-hover</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 400</td><td class="as-num">4.5:1</td><td class="as-num">8.9700:1</td><td class="as-num">8.8159:1</td><td>AAA</td><td>WCAG 2.2 1.4.3</td><td>label (surface.lowest)</td></tr><tr><th scope="row">The focus indicator</th><td><code>--as-focus-ring</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 600</td><td class="as-num">3.0:1</td><td class="as-num">4.2494:1</td><td class="as-num">4.1571:1</td><td>meets 1.4.11</td><td>WCAG 2.2 1.4.11</td><td>bright</td></tr><tr><th scope="row">Something finished</th><td><code>--as-success</code></td><td>Natural Green <span lang="bn">প্রাকৃতিক সবুজ</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">6.1491:1</td><td class="as-num">6.0241:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Something needs attention</th><td><code>--as-warning</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">5.9624:1</td><td class="as-num">5.8397:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Something failed</th><td><code>--as-danger</code></td><td>Natural Red <span lang="bn">প্রাকৃতিক লাল</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">5.6868:1</td><td class="as-num">5.5717:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr><tr><th scope="row">Something worth knowing</th><td><code>--as-info</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">6.0707:1</td><td class="as-num">5.9468:1</td><td>AA</td><td>WCAG 2.2 1.4.3</td><td>bright</td></tr></tbody></table></div><h3 class="as-h3">High contrast, light <span lang="bn">বেশি কনট্রাস্ট, আলো</span></h3><div class="as-scroll-x"><table class="as-table as-table--numeric"><caption>Every figure is read from 07_tokens/build/semantic.hc-light.tokens.json at build time. None of it is typed here.</caption><thead><tr><th scope="col">Role</th><th scope="col">Token</th><th scope="col">Ramp step</th><th scope="col" class="as-num">Needs</th><th scope="col" class="as-num">Measured</th><th scope="col" class="as-num">Worst case &plusmn;1 LSB</th><th scope="col">Level</th><th scope="col">Criterion</th><th scope="col">Hardest surface</th></tr></thead><tbody><tr><th scope="row">Body text and headings</th><td><code>--as-ink</code></td><td> </td><td class="as-num">7.0:1</td><td class="as-num">16.9821:1</td><td class="as-num">16.7244:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Secondary text, hints, captions</th><td><code>--as-ink-muted</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">7.9370:1</td><td class="as-num">7.7416:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Borders, rules, dividers</th><td><code>--as-line</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.3529:1</td><td class="as-num">5.2228:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>dim</td></tr><tr><th scope="row">Links, the primary action</th><td><code>--as-accent</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">7.8430:1</td><td class="as-num">7.6531:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">The line around an accent surface</th><td><code>--as-accent-edge</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.2787:1</td><td class="as-num">5.1514:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>dim</td></tr><tr><th scope="row">The hovered primary action, measured against the label it carries</th><td><code>--as-accent-hover</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 900</td><td class="as-num">7.0:1</td><td class="as-num">13.7991:1</td><td class="as-num">13.4968:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>label (surface.lowest)</td></tr><tr><th scope="row">The focus indicator</th><td><code>--as-focus-ring</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 700</td><td class="as-num">4.5:1</td><td class="as-num">5.2787:1</td><td class="as-num">5.1514:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>dim</td></tr><tr><th scope="row">Something finished</th><td><code>--as-success</code></td><td>Natural Green <span lang="bn">প্রাকৃতিক সবুজ</span> 900</td><td class="as-num">7.0:1</td><td class="as-num">11.3956:1</td><td class="as-num">11.1382:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Something needs attention</th><td><code>--as-warning</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 900</td><td class="as-num">7.0:1</td><td class="as-num">11.5609:1</td><td class="as-num">11.2990:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Something failed</th><td><code>--as-danger</code></td><td>Natural Red <span lang="bn">প্রাকৃতিক লাল</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">8.1595:1</td><td class="as-num">7.9671:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr><tr><th scope="row">Something worth knowing</th><td><code>--as-info</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 800</td><td class="as-num">7.0:1</td><td class="as-num">7.8430:1</td><td class="as-num">7.6531:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>dim</td></tr></tbody></table></div><h3 class="as-h3">High contrast, dark <span lang="bn">বেশি কনট্রাস্ট, অন্ধকার</span></h3><div class="as-scroll-x"><table class="as-table as-table--numeric"><caption>Every figure is read from 07_tokens/build/semantic.hc-dark.tokens.json at build time. None of it is typed here.</caption><thead><tr><th scope="col">Role</th><th scope="col">Token</th><th scope="col">Ramp step</th><th scope="col" class="as-num">Needs</th><th scope="col" class="as-num">Measured</th><th scope="col" class="as-num">Worst case &plusmn;1 LSB</th><th scope="col">Level</th><th scope="col">Criterion</th><th scope="col">Hardest surface</th></tr></thead><tbody><tr><th scope="row">Body text and headings</th><td><code>--as-ink</code></td><td> </td><td class="as-num">7.0:1</td><td class="as-num">18.2612:1</td><td class="as-num">17.9429:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Secondary text, hints, captions</th><td><code>--as-ink-muted</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">7.9134:1</td><td class="as-num">7.7515:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Borders, rules, dividers</th><td><code>--as-line</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 600</td><td class="as-num">4.5:1</td><td class="as-num">4.6608:1</td><td class="as-num">4.5558:1</td><td>meets policy</td><td>WCAG 2.2 1.4.11</td><td>bright</td></tr><tr><th scope="row">Links, the primary action</th><td><code>--as-accent</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">8.0469:1</td><td class="as-num">7.8834:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">The line around an accent surface</th><td><code>--as-accent-edge</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">5.8675:1</td><td class="as-num">5.7412:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>bright</td></tr><tr><th scope="row">The hovered primary action, measured against the label it carries</th><td><code>--as-accent-hover</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 300</td><td class="as-num">7.0:1</td><td class="as-num">11.8775:1</td><td class="as-num">11.6859:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>label (surface.lowest)</td></tr><tr><th scope="row">The focus indicator</th><td><code>--as-focus-ring</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 500</td><td class="as-num">4.5:1</td><td class="as-num">5.8675:1</td><td class="as-num">5.7412:1</td><td>meets policy</td><td>policy, above WCAG 2.2 1.4.11 — WCAG defines no AAA level for non-text contrast</td><td>bright</td></tr><tr><th scope="row">Something finished</th><td><code>--as-success</code></td><td>Natural Green <span lang="bn">প্রাকৃতিক সবুজ</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">8.1486:1</td><td class="as-num">7.9835:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Something needs attention</th><td><code>--as-warning</code></td><td>Natural Gray <span lang="bn">প্রাকৃতিক ধূসর</span> 300</td><td class="as-num">7.0:1</td><td class="as-num">10.5171:1</td><td class="as-num">10.3134:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Something failed</th><td><code>--as-danger</code></td><td>Natural Red <span lang="bn">প্রাকৃতিক লাল</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">7.6198:1</td><td class="as-num">7.4653:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr><tr><th scope="row">Something worth knowing</th><td><code>--as-info</code></td><td>Natural Blue <span lang="bn">প্রাকৃতিক নীল</span> 400</td><td class="as-num">7.0:1</td><td class="as-num">8.0469:1</td><td class="as-num">7.8834:1</td><td>AAA</td><td>WCAG 2.2 1.4.6</td><td>bright</td></tr></tbody></table></div></div></section>
 <section class="as-doc-section"><h2 class="as-doc-section__title">How to write it</h2><p class="as-doc-section__note">The classes carry the design decisions. The markup carries the meaning, and no class can supply that for you.</p><div class="as-code"><div class="as-code__head"><span class="as-code__name">markup</span><button type="button" class="as-btn as-btn--small">Copy the code</button></div><pre class="as-code__pre"><code>&lt;span class=&quot;as-badge as-badge--danger&quot;&gt;
   &lt;svg class=&quot;as-icon&quot;&gt;…&lt;/svg&gt;&lt;span&gt;Failed&lt;/span&gt;
 &lt;/span&gt;

@@ -54,7 +54,12 @@
 
 .as-root {
   margin: 0;
-  background-color: var(--as-surface-low);
+  /* The page is the polarity's own extreme — pure white in a light theme, pure
+     black in a dark one. It was surface-low, a tinted rung, which meant cards
+     floated ABOVE the page on a slightly grey ground. The Natural direction
+     inverts that: the page is pure, and the surfaces that sit on it carry the
+     faint grey tint instead. */
+  background-color: var(--as-surface-page);
   color: var(--as-ink);
   font-family: var(--as-font-latin);
   font-size: var(--as-text-body);
@@ -196,7 +201,7 @@
   padding: var(--as-space-1) var(--as-space-3);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-control);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   font-family: inherit;
   font-size: var(--as-text-body);
@@ -251,7 +256,7 @@
 }
 
 .as-btn--danger:hover {
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-danger);
 }
 
@@ -334,7 +339,7 @@
   padding: var(--as-space-1) var(--as-space-2);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-control);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   font-family: inherit;
   font-size: var(--as-text-body);
@@ -499,7 +504,7 @@
   padding: 0 var(--as-space-1);
   border: 1px solid currentColor;
   border-radius: var(--as-radius-badge);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink-muted);
   font-size: var(--as-text-caption);
   font-weight: 600;
@@ -537,7 +542,7 @@
   padding: var(--as-space-4);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-card);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   box-shadow: var(--as-shadow-float);
   min-width: 0;
@@ -618,7 +623,7 @@
   padding: var(--as-space-4);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-card);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   box-shadow: var(--as-shadow-float);
 }
@@ -820,7 +825,7 @@
   padding: var(--as-space-2) var(--as-space-3);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-control);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   box-shadow: var(--as-shadow-float);
   min-width: 0;
@@ -865,7 +870,7 @@
   padding: var(--as-space-5) var(--as-space-3);
   border: 1px dashed var(--as-line);
   border-radius: var(--as-radius-card);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   text-align: center;
   min-width: 0;
 }
@@ -991,7 +996,7 @@
   padding: var(--as-space-1) var(--as-space-2);
   border: 1px solid var(--as-line);
   border-radius: var(--as-radius-control);
-  background-color: var(--as-surface-bright);
+  background-color: var(--as-surface-lowest);
   color: var(--as-ink);
   font-family: inherit;
   font-size: var(--as-text-caption);
