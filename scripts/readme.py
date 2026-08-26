@@ -426,9 +426,15 @@ Stated here rather than discovered later:
 - **Rendering checks are Chromium only.** They run on macOS locally and on Ubuntu
   in CI, from a clean checkout, so the results are not particular to one machine.
   Safari, Firefox and real Windows High Contrast were not run.
-- **The icons are rounded everywhere, Apple included.** That is a deliberate
-  choice against Apple's current guidance, and what it trades away is recorded in
-  `04_mark/manifest.json`.
+- **The corner shape now differs between platforms, on purpose.** Apple and
+  Android are given square, unmasked artwork, because both apply their own mask
+  and derive their own effects from the edges of what they are given. The web
+  keeps the rounded tile, because a browser will not round a favicon for you.
+  This reversed the opposite decision of 14 August 2026; both are recorded in
+  `04_mark/manifest.json`. What does **not** differ is how large the mark reads:
+  it fills 59.850 × 67.216 per cent of the Apple frame and 60.958 × 68.461 per
+  cent of Android's visible area, a difference of 1.11 and 1.24 percentage
+  points, and the build fails if that gap ever exceeds two.
 - **The website is not deployed, and its domain is not registered.**
   `11_site/` names `anindastudio.com` in its CNAME, its canonical URLs, its sitemap
   and its social image, because that is the address it is built for. The `.com`
@@ -543,9 +549,13 @@ def bangla(f: dict) -> str:
 - **পরীক্ষা শুধু Chromium-এ।** নিজের ম্যাকে আর CI-তে উবুন্টুতে, দুই জায়গাতেই চলে —
   তাই ফলাফল কোনো একটি যন্ত্রের উপর নির্ভর করে না। Safari, Firefox আর উইন্ডোজের হাই
   কনট্রাস্ট পরীক্ষা করা হয়নি।
-- **সব জায়গায় আইকনের কোণ গোল, Apple-সহ।** এটি Apple-এর বর্তমান নির্দেশনার
-  বিপরীতে নেওয়া একটি সিদ্ধান্ত। এর বিনিময়ে কী ছাড়া হলো, তা
-  `04_mark/manifest.json`-এ লেখা আছে।
+- **আইকনের কোণ এখন প্রতিটি জায়গায় আলাদা, আর সেটা ইচ্ছে করেই।** Apple আর
+  Android-কে দেওয়া আইকনের কোণ গোল করা হয় না — ওরা নিজেরাই আকার দেয়। ওয়েবে
+  কোণ গোলই থাকে, কারণ ব্রাউজার নিজে থেকে ফেভিকনের কোণ গোল করে না। ২৬ অগস্ট
+  ২০২৬-এ নেওয়া এই সিদ্ধান্ত ১৪ অগস্টের উল্টো সিদ্ধান্তটি বদলে দিয়েছে; দুটিই
+  `04_mark/manifest.json`-এ লেখা আছে। যা বদলায়নি তা হলো চিহ্নটি কত বড়ো দেখায় —
+  দুই জায়গার পার্থক্য ১.১১ আর ১.২৪ শতাংশ বিন্দু, আর সেটা দুইয়ের বেশি হলে
+  বিল্ড থেমে যায়।
 - **ওয়েবসাইটটি এখনো প্রকাশ করা হয়নি, ডোমেইনটিও নিবন্ধন করা হয়নি।** `11_site/`
   ফোল্ডারে `anindastudio.com` লেখা আছে, কারণ সাইটটি ওই ঠিকানার জন্যই তৈরি।
   ১৯ অগস্ট ২০২৬ পর্যন্ত `.com` নিবন্ধকের কাছে ওই নামের কোনো রেকর্ড নেই, তাই

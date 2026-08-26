@@ -6,11 +6,30 @@
   "renderer": "Chromium via Playwright, device_scale_factor 1",
   "colour": "No colour is typed in the generator. Every ground is a var(--as-…) resolved from 07_tokens/css/tokens.css.",
   "icon_policy": {
-    "decision": "One rounded icon is used on every surface, Apple included. Owner's decision, 14 August 2026.",
-    "app_store_only": "icon-appstore-square-1024.svg",
-    "used_here": "The rounded icon only. icon-appstore-square-1024.svg is not rendered by this build."
+    "decision": "Each platform's own icon geometry is followed. Apple and Google receive square, unmasked artwork and apply their own masks. The web keeps the rounded tile, because a browser will not round a favicon for you. Owner's decision, 26 August 2026.",
+    "reason": "This kit now ships to two developer accounts. Both platforms ask for unmasked artwork and both derive something from the edges of what they are given: Apple its Liquid Glass specular highlights, Google its own corner mask and drop shadow. Google publishes a figure where Apple does not — a radius of 30 per cent of the icon size, applied by Play. Supplying pre-rounded artwork means both of those follow the wrong geometry, and the cost of that could not be measured outside their renderers. Supplying what each asks for removes the unknown instead of accepting it.",
+    "surfaces": {
+      "web": [
+        "tile-web.svg",
+        "icon-1024.svg",
+        "icon-512.svg",
+        "icon-192.svg"
+      ],
+      "apple": [
+        "icon-apple-1024.svg",
+        "icon-apple-1088-watch.svg",
+        "icon-apple-1024-dark.svg",
+        "icon-apple-1024-mono.svg"
+      ],
+      "android": [
+        "icon-android-background-108.svg",
+        "icon-android-foreground-108.svg",
+        "icon-android-monochrome-108.svg"
+      ]
+    },
+    "used_here": "The web set only. The Apple and Android masters are delivered by the store packages rather than rendered into this folder, because they are not web assets."
   },
-  "transparency": "The everyday icon is rounded and its corners are transparent. Every file marked opaque has a ground drawn behind it, and the build measures the alpha channel to prove it rather than trusting the CSS.",
+  "transparency": "The web icon is rounded and its corners are transparent. Every file marked opaque has a ground drawn behind it, and the build measures the alpha channel to prove it rather than trusting the CSS.",
   "verification_key": {
     "verified": "Checked against the platform's own help page on the date given, with the URL and the sentence it came from.",
     "stable": "Long-stable size. It has been the same for years across browsers and platforms and is not tied to one company's current help page.",

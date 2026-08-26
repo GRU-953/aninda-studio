@@ -9,7 +9,7 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "61a748432320255e59d917de03b297e69c45390dca25b67765cd8eb0867e83a6";
+export const BUNDLE_SHA256 = "42a6abc3c3f677c27c0f4f04119671f0fdcd52b37e63e1c62a7d6b06eb4de5a6";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
   "07_tokens/build/primitive.tokens.json": "7be43f00f028eb56f3ac4b853b6ca043aec4cea5ad680a68065f8415725186a3",
@@ -18,17 +18,22 @@ export const SOURCE_HASHES: { [file: string]: string } = {
   "07_tokens/build/semantic.hc-light.tokens.json": "46ccb577f108f8d2e4d50e05325ae669ea0fdd2da8304ae11c1b11a1ab6022a2",
   "07_tokens/build/semantic.hc-dark.tokens.json": "92c7347bb61a429b47786e652d0b3e4582fa56ad26dc740d2cd6c00042037ad2",
   "07_tokens/build/forced-colors.map.json": "58560c18bc09567071160cfea947402ab7f1ad44a9eb128c0ce6d6ae0e10f641",
-  "04_mark/svg/icon-1024.svg": "9ff31c7bfa022fdd1cfbcf6782320b84d83422ddd617f97a8ab41248409407bd",
-  "04_mark/svg/icon-1088-watch.svg": "f0dd4c249a78419af2855f90344cb05d1335444194c1ac9059e1b81c5b6bd6cb",
+  "04_mark/svg/icon-1024.svg": "e43a353d8b44b94994094bfbce5dbafb90e6ae7f1b356c080601421e17687779",
   "04_mark/svg/icon-192.svg": "58b7f359ff0841f399214b16ec5790932106dc66854b6c87c7dee88dc20eadb7",
   "04_mark/svg/icon-512.svg": "3b00945f46b41e8017622d73e3eafb49c63209f2a2e8ac9342b91fd0de5caac1",
-  "04_mark/svg/icon-appstore-square-1024.svg": "a7d60253c14a9f9b7e494fa9aa4182a732bd507f3800e1677afea829a5e93a3c",
+  "04_mark/svg/icon-android-background-108.svg": "8e1c3c76d6e8750c8fcff96dc273ca50de5191a7130390f84e995da265d42a0f",
+  "04_mark/svg/icon-android-foreground-108.svg": "a50b23896002c6460168d8acdbf96b29d4b5e034f7bffd880743e43bcb9639fd",
+  "04_mark/svg/icon-android-monochrome-108.svg": "cddc566e3dfb3ab40dbb7ae5bd8eae3ce40b071e7bdc1faadd42c1ed8fafece4",
+  "04_mark/svg/icon-apple-1024-dark.svg": "198e23ac7b78e2f5d56a3d3ef1d35351ac2402eacf8274db095459f4407c05f4",
+  "04_mark/svg/icon-apple-1024-mono.svg": "564c9fd27bc8ef6e3da619db696a08d5523cdf1b493869f66f09e42d76e44aa9",
+  "04_mark/svg/icon-apple-1024.svg": "7927849de9a8040eb7b69ba1f63ab6db12569655b6f796d04011b74006bafe28",
+  "04_mark/svg/icon-apple-1088-watch.svg": "104ec3a2db202ccd1ac0ec0d53e5e02d46c9d6820d3272506927406b9c1df768",
   "04_mark/svg/mark-heavy.svg": "43544b56cd14e0d65fdb63a68d0e2113ae4428f1bdf73cdc4b4016d0f7423fbc",
   "04_mark/svg/mark-regular.svg": "dae564226af690e7dd0a00d14a4a56c80535ec2a8284b7c8b9cd181082220787",
   "04_mark/svg/tile-web.svg": "b631c922ebb4287e9d227fd4303864e7373dbf38467ca086fbde9cbee573600b",
   "04_mark/svg/wordmark-bangla.svg": "6b42edde179882a29c3147a78e333ef3e341fbd16913ec8fd70519599d8b464d",
   "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
-  "04_mark/manifest.json": "440d2eafd5c5ebb6d66d3a5aae0a5e170dc2b9a88ebacc697ced0bc8a877f4ad",
+  "04_mark/manifest.json": "51d59435ee05e03e1b3de3db994c980c0155102cad0b1ab641eb5616985119ef",
   "08_components/_cards.json": "bd177c1e4882eaa9df2c6a6bc1d3807563914b0c7c463c9fdd3fd8915ee08421"
 };
 
@@ -3551,12 +3556,7 @@ export const BUNDLED: RawInput = {
   {
     "name": "icon-1024",
     "file": "icon-1024.svg",
-    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"1024\" height=\"1024\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — the icon, 1024px — rounded, used everywhere</title><rect width=\"100\" height=\"100\" rx=\"24\" ry=\"24\" fill=\"#0D1A17\"/><g style=\"color:#FFFFFF\" transform=\"translate(9.4862,-7.0876) scale(0.920767)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
-  },
-  {
-    "name": "icon-1088-watch",
-    "file": "icon-1088-watch.svg",
-    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"1088\" height=\"1088\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — the icon, 1088px for watchOS — rounded</title><rect width=\"100\" height=\"100\" rx=\"24\" ry=\"24\" fill=\"#0D1A17\"/><g style=\"color:#FFFFFF\" transform=\"translate(9.4862,-7.0876) scale(0.920767)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"1024\" height=\"1024\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — the icon, 1024px — rounded, for the web</title><rect width=\"100\" height=\"100\" rx=\"24\" ry=\"24\" fill=\"#0D1A17\"/><g style=\"color:#FFFFFF\" transform=\"translate(9.4862,-7.0876) scale(0.920767)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
   },
   {
     "name": "icon-192",
@@ -3569,9 +3569,39 @@ export const BUNDLED: RawInput = {
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"512\" height=\"512\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — the icon, 512px — avatars and PWA</title><rect width=\"100\" height=\"100\" rx=\"24\" ry=\"24\" fill=\"#0D1A17\"/><g style=\"color:#FFFFFF\" transform=\"translate(9.4862,-7.0876) scale(0.920767)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
   },
   {
-    "name": "icon-appstore-square-1024",
-    "file": "icon-appstore-square-1024.svg",
-    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"1024\" height=\"1024\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — square unmasked master, for Icon Composer and App Store submission only</title><rect width=\"100\" height=\"100\" fill=\"#0D1A17\"/><g style=\"color:#FFFFFF\" transform=\"translate(9.4862,-7.0876) scale(0.920767)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
+    "name": "icon-android-background-108",
+    "file": "icon-android-background-108.svg",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 108 108\" width=\"108\" height=\"108\" role=\"img\" fill=\"none\" style=\"color:#0D1A17\"><title>Aninda Studio — Android adaptive icon, background layer</title><rect width=\"108\" height=\"108\" fill=\"#0D1A17\"/></svg>\n"
+  },
+  {
+    "name": "icon-android-foreground-108",
+    "file": "icon-android-foreground-108.svg",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 108 108\" width=\"108\" height=\"108\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — Android adaptive icon, foreground layer</title><g style=\"color:#FFFFFF\" transform=\"translate(24.2899,12.1358) scale(0.675229)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
+  },
+  {
+    "name": "icon-android-monochrome-108",
+    "file": "icon-android-monochrome-108.svg",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 108 108\" width=\"108\" height=\"108\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — Android adaptive icon, monochrome layer — the system tints this</title><g style=\"color:#FFFFFF\" transform=\"translate(24.2899,12.1358) scale(0.675229)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
+  },
+  {
+    "name": "icon-apple-1024-dark",
+    "file": "icon-apple-1024-dark.svg",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"1024\" height=\"1024\" role=\"img\" fill=\"none\" style=\"color:#F2F9F7\"><title>Aninda Studio — square unmasked master, Dark appearance</title><rect width=\"100\" height=\"100\" fill=\"#0B0C0B\"/><g style=\"color:#F2F9F7\" transform=\"translate(9.4862,-7.0876) scale(0.920767)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
+  },
+  {
+    "name": "icon-apple-1024-mono",
+    "file": "icon-apple-1024-mono.svg",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"1024\" height=\"1024\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — Mono appearance, no ground; the alpha carries the shape</title><g style=\"color:#FFFFFF\" transform=\"translate(9.4862,-7.0876) scale(0.920767)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
+  },
+  {
+    "name": "icon-apple-1024",
+    "file": "icon-apple-1024.svg",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"1024\" height=\"1024\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — square unmasked master, Default appearance — iOS, iPadOS, macOS, visionOS</title><rect width=\"100\" height=\"100\" fill=\"#0D1A17\"/><g style=\"color:#FFFFFF\" transform=\"translate(9.4862,-7.0876) scale(0.920767)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
+  },
+  {
+    "name": "icon-apple-1088-watch",
+    "file": "icon-apple-1088-watch.svg",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"1088\" height=\"1088\" role=\"img\" fill=\"none\" style=\"color:#FFFFFF\"><title>Aninda Studio — square unmasked master, 1088px for watchOS</title><rect width=\"100\" height=\"100\" fill=\"#0D1A17\"/><g style=\"color:#FFFFFF\" transform=\"translate(9.4862,-7.0876) scale(0.920767)\"><circle cx=\"44\" cy=\"58\" r=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"9\"/><path d=\"M72 30V94\" stroke=\"currentColor\" stroke-width=\"9\" stroke-linecap=\"round\"/></g></svg>\n"
   },
   {
     "name": "mark-heavy",
@@ -3623,10 +3653,14 @@ export const BUNDLED: RawInput = {
       "mark-heavy.svg": 15.0,
       "tile-web.svg": 15.0,
       "icon-1024.svg": 9.0,
-      "icon-1088-watch.svg": 9.0,
       "icon-512.svg": 9.0,
       "icon-192.svg": 9.0,
-      "icon-appstore-square-1024.svg": 9.0
+      "icon-apple-1024.svg": 9.0,
+      "icon-apple-1088-watch.svg": 9.0,
+      "icon-apple-1024-dark.svg": 9.0,
+      "icon-apple-1024-mono.svg": 9.0,
+      "icon-android-foreground-108.svg": 9.0,
+      "icon-android-monochrome-108.svg": 9.0
     }
   },
   "clear_space": "half the mark's own height on all four sides",
@@ -3636,18 +3670,59 @@ export const BUNDLED: RawInput = {
   "tile_radius_px_at_1024": 245.8,
   "tile_radius_source": "read at build time from dimension.radius.hero. That token is 24 px; this is 24 units per 100 on the icon grid, which is 245.8 px of rounding on the 1024 px icon. The numeral is reused deliberately, so the icon corner belongs to the same family as every other rounded corner in the kit \u2014 it is an echo, not a unit conversion. Apple publishes no corner radius; this number is ours and is not claimed to be theirs.",
   "icon_policy": {
-    "decision": "One rounded icon is used on every surface, Apple included. Owner's decision, 14 August 2026.",
-    "everyday": [
-      "icon-1024.svg",
-      "icon-1088-watch.svg",
-      "icon-512.svg",
-      "icon-192.svg",
-      "tile-web.svg"
+    "decision": "Each platform's own icon geometry is followed. Apple and Google receive square, unmasked artwork and apply their own masks. The web keeps the rounded tile, because a browser will not round a favicon for you. Owner's decision, 26 August 2026.",
+    "reason": "This kit now ships to two developer accounts. Both platforms ask for unmasked artwork and both derive something from the edges of what they are given: Apple its Liquid Glass specular highlights, Google its own corner mask and drop shadow. Google publishes a figure where Apple does not \u2014 a radius of 30 per cent of the icon size, applied by Play. Supplying pre-rounded artwork means both of those follow the wrong geometry, and the cost of that could not be measured outside their renderers. Supplying what each asks for removes the unknown instead of accepting it.",
+    "accepted_consequence": "The corner shape now differs between surfaces: rounded on the web, and whatever each platform draws on Apple and Android. The SIZE does not differ with it, and that is measured rather than hoped for \u2014 see the visual-parity line in 'checks'.",
+    "surfaces": {
+      "web": [
+        "tile-web.svg",
+        "icon-1024.svg",
+        "icon-512.svg",
+        "icon-192.svg"
+      ],
+      "apple": [
+        "icon-apple-1024.svg",
+        "icon-apple-1088-watch.svg",
+        "icon-apple-1024-dark.svg",
+        "icon-apple-1024-mono.svg"
+      ],
+      "android": [
+        "icon-android-background-108.svg",
+        "icon-android-foreground-108.svg",
+        "icon-android-monochrome-108.svg"
+      ]
+    },
+    "apple_appearances": {
+      "authored_here": [
+        "default",
+        "dark",
+        "mono"
+      ],
+      "derived_by_apple": [
+        "clear light",
+        "clear dark",
+        "tinted light",
+        "tinted dark"
+      ],
+      "note": "Apple's own material is inconsistent about the count, and all three counts are right in their own context: the specification table lists six appearances, the prose says four, and Icon Composer has you author three. Three are authored here. The other four are generated by Apple's renderer from them, and this build cannot show what they look like."
+    },
+    "android_geometry": {
+      "grid": 108.0,
+      "safe_zone": 66.0,
+      "reserved_margin_each_side": 21.0,
+      "source": "developer.android.com/develop/ui/views/launch/icon_design_adaptive, page updated 13 August 2026, read 26 August 2026. Both figures are Google's: every layer is 108x108 dp, the outer 18 dp per side is reserved for masking and motion effects, and the 66x66 dp centre is the zone no launcher mask may clip."
+    },
+    "superseded": [
+      {
+        "decision": "One rounded icon is used on every surface, Apple included.",
+        "taken": "14 August 2026",
+        "reversed": "26 August 2026",
+        "why_reversed": "This kit now ships to both stores, and both ask for unmasked artwork.",
+        "trade_off_as_recorded_then": "Apple's current guidance asks for square, unmasked artwork: the system applies the mask and derives Liquid Glass specular highlights from the layer edges, so a pre-rounded edge sits inside the mask and the highlight follows the wrong geometry. Apple's own wording is that pre-masked artwork 'negatively impacts specular highlight effects' and makes edges 'look jagged'. Measured here: under the circle watchOS and visionOS mask to, the rounded icon and the square master are the same image in every pixel. Judged rather than measured: in a static render under Apple's rounded-rectangle mask the difference looks slight. That one is not a measurement, because Apple publishes no corner radius, so there is no mask to composite against without substituting our own radius for theirs. The dynamic cost \u2014 the moving specular highlight \u2014 could not be measured outside Apple's own renderer and is not known.",
+        "what_of_it_still_holds": "The measured half still holds: under a circular mask the rounded icon and the square master were the same image in every pixel. What changed is the judged half and the unknown half \u2014 and the unknown one is now removed rather than carried, because each platform is given the geometry it asks for."
+      }
     ],
-    "app_store_only": "icon-appstore-square-1024.svg",
-    "trade_off": "Apple's current guidance asks for square, unmasked artwork: the system applies the mask and derives Liquid Glass specular highlights from the layer edges, so a pre-rounded edge sits inside the mask and the highlight follows the wrong geometry. Apple's own wording is that pre-masked artwork 'negatively impacts specular highlight effects' and makes edges 'look jagged'. Measured here: under the circle watchOS and visionOS mask to, the rounded icon and the square master are the same image in every pixel \u2014 see the difference recorded in 'checks' below. Judged rather than measured: in a static render under Apple's rounded-rectangle mask the difference looks slight. That one is not a measurement, because Apple publishes no corner radius, so there is no mask to composite against without substituting our own radius for theirs. The dynamic cost \u2014 the moving specular highlight \u2014 could not be measured outside Apple's own renderer and is not known.",
-    "if_you_ever_submit_to_the_app_store": "Use icon-appstore-square-1024.svg, not the rounded icon. Icon Composer expects unmasked layers.",
-    "verified_against": "Apple Human Interface Guidelines, checked 14 August 2026"
+    "verified_against": "Apple Human Interface Guidelines and the Google Play icon design specifications, checked 26 August 2026"
   },
   "files": [
     "mark-regular.svg",
@@ -3656,10 +3731,15 @@ export const BUNDLED: RawInput = {
     "wordmark-bangla.svg",
     "tile-web.svg",
     "icon-1024.svg",
-    "icon-1088-watch.svg",
     "icon-512.svg",
     "icon-192.svg",
-    "icon-appstore-square-1024.svg"
+    "icon-apple-1024.svg",
+    "icon-apple-1088-watch.svg",
+    "icon-apple-1024-dark.svg",
+    "icon-apple-1024-mono.svg",
+    "icon-android-background-108.svg",
+    "icon-android-foreground-108.svg",
+    "icon-android-monochrome-108.svg"
   ],
   "contact_sheet": "proof.svg \u2014 generated from the same strings written to 04_mark/svg, with every caption read out of the artwork",
   "checks": [
@@ -3670,15 +3750,22 @@ export const BUNDLED: RawInput = {
     "negative control passed: naive 16 glyphs \u2260 shaped 11 glyphs",
     "icon at stroke 9: mark 65.0\u00d773.0 scaled \u00d70.9208, worst corner exactly on the 45-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 90-unit field",
     "icon at stroke 15: mark 71.0\u00d779.0 scaled \u00d70.8473, worst corner exactly on the 45-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 90-unit field",
+    "icon at stroke 9 on the 108-unit grid: mark 65.0\u00d773.0 scaled \u00d70.6752, worst corner exactly on the 33-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 66-unit field",
     "4 recolourable files carry no root colour and draw in currentColor",
     "tile-web.svg: 4.7% background showing \u2014 rounded",
-    "icon-1024.svg: 4.7% background showing \u2014 rounded \u2014 the everyday icon, all platforms",
-    "icon-1088-watch.svg: 4.7% background showing \u2014 rounded",
+    "icon-1024.svg: 4.7% background showing \u2014 rounded \u2014 the web icon",
     "icon-512.svg: 4.7% background showing \u2014 rounded",
     "icon-192.svg: 4.7% background showing \u2014 rounded",
-    "icon-appstore-square-1024.svg: 0.0% background showing \u2014 square and fully opaque \u2014 App Store only",
-    "under a circle inscribed in the frame, icon-1024.svg and icon-appstore-square-1024.svg are the same image in all 65536 pixels \u2014 the corner rounding lies entirely outside the circle watchOS and visionOS mask to, and the artwork inside it has not drifted between the two files",
-    "contact sheet: 10 artefacts nested from the same strings written to 04_mark/svg, every caption read out of the artwork"
+    "icon-apple-1024.svg: 0.0% background showing \u2014 square and fully opaque \u2014 Apple, Default",
+    "icon-apple-1088-watch.svg: 0.0% background showing \u2014 square and fully opaque \u2014 Apple, watchOS",
+    "icon-apple-1024-dark.svg: 0.0% background showing \u2014 square and fully opaque \u2014 Apple, Dark",
+    "icon-android-background-108.svg: 0.0% background showing \u2014 flat and fully opaque \u2014 Android background",
+    "icon-apple-1024-mono.svg: 82.6% background showing \u2014 no ground; the alpha carries the shape \u2014 Apple, Mono",
+    "icon-android-foreground-108.svg: 91.7% background showing \u2014 no ground; the alpha carries the shape \u2014 Android foreground",
+    "icon-android-monochrome-108.svg: 91.7% background showing \u2014 no ground; the alpha carries the shape \u2014 Android monochrome",
+    "under a circle inscribed in the frame, icon-1024.svg and icon-apple-1024.svg are the same image in all 65536 pixels \u2014 the corner rounding lies entirely outside the circle watchOS and visionOS mask to, and the artwork inside it has not drifted between the two files",
+    "visual parity: the mark fills 59.850x67.216 per cent of the Apple frame and 60.958x68.461 per cent of Android's visible 72 dp viewport \u2014 a difference of 1.11 and 1.24 percentage points. The corner shape differs between the platforms by decision; the size does not",
+    "contact sheet: 15 artefacts nested from the same strings written to 04_mark/svg, every caption read out of the artwork"
   ]
 },
   cards: {

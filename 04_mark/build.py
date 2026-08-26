@@ -83,6 +83,15 @@ STROKE_REGULAR = 9.0     # at STROKE_SWITCH_PX and above
 STROKE_HEAVY = 15.0      # below it
 STROKE_SWITCH_PX = 24    # the size the weight changes at
 SAFE = 90.0              # essential shapes live inside 90 of the 100 units
+
+# Android's adaptive icon is a different canvas with a different rule, and both
+# numbers are Google's rather than this kit's: every layer is 108x108 dp, the outer
+# 18 dp on each side is reserved for masking and motion effects, and the 66x66 dp
+# centre is the zone no launcher mask may clip.
+# developer.android.com/develop/ui/views/launch/icon_design_adaptive,
+# page updated 13 August 2026, read 26 August 2026.
+ANDROID_GRID = 108.0
+ANDROID_SAFE = 66.0
 # Read from the token at build time by tile_radius_pct() below, never typed.
 TILE_RADIUS_PCT: float | None = None
 
@@ -312,7 +321,25 @@ def check_apple_master(svg: str) -> None:
             raise Fail(f"Apple master: {why} (found '{banned}')")
 
 
-def icon_placement(stroke: float) -> tuple[float, float, float, str]:
+def check_transparent_layer(svg: str, name: str) -> None:
+    """A layer whose shape is carried by its alpha must not have a ground drawn
+    behind it.
+
+    Apple's Mono appearance and Android's foreground and monochrome layers are all
+    composited by the system over something it supplies. A background rect baked
+    into any of them defeats that: on Android the launcher's own background layer
+    is hidden, and the monochrome silhouette the system tints becomes a filled
+    square. This is cheap to get wrong by copying the square master and cheap to
+    catch here.
+    """
+    if "<rect" in svg.lower():
+        raise Fail(f"{name}: carries a <rect> ground. This layer is composited over "
+                   f"something the system supplies, so its shape has to be carried "
+                   f"by the alpha channel alone.")
+
+
+def icon_placement(stroke: float, grid: float = GRID,
+                   safe: float = SAFE) -> tuple[float, float, float, str]:
     """Derive the scale and offset that put the mark safely inside an icon.
 
     The 90-of-100 safe field is a constraint on an ICON, not on the mark drawn on
@@ -328,7 +355,7 @@ def icon_placement(stroke: float) -> tuple[float, float, float, str]:
     """
     x0, y0, x1, y1 = mark_extent(stroke)
     w, h = x1 - x0, y1 - y0
-    radius = SAFE / 2
+    radius = safe / 2
 
     half_diagonal = math.hypot(w, h) / 2
     scale = radius / half_diagonal
@@ -337,22 +364,27 @@ def icon_placement(stroke: float) -> tuple[float, float, float, str]:
 
     # Place the mark's centre at the icon's centre.
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-    tx = GRID / 2 - cx * scale
-    ty = GRID / 2 - cy * scale
+    tx = grid / 2 - cx * scale
+    ty = grid / 2 - cy * scale
 
     # Prove it, rather than trusting the arithmetic above.
     corners = [(x0, y0), (x1, y0), (x0, y1), (x1, y1)]
-    worst = max(math.hypot(px * scale + tx - GRID / 2, py * scale + ty - GRID / 2)
+    worst = max(math.hypot(px * scale + tx - grid / 2, py * scale + ty - grid / 2)
                 for px, py in corners)
     if worst > radius + 1e-6:
         raise Fail(f"icon placement at stroke {stroke:g}: a corner still sits "
                    f"{worst:.2f} units from centre, outside the {radius:g}-unit "
                    f"inscribed circle")
+    # The band was written as the literal 5 to 95, which is (grid - safe) / 2 on
+    # the 100-unit grid and silently wrong on any other. Android's canvas is 108
+    # with a 66-unit safe zone, where the band is 21 to 87.
+    lo, hi = (grid - safe) / 2, grid - (grid - safe) / 2
     for px, py in corners:
         sx, sy = px * scale + tx, py * scale + ty
-        if not (5 - 1e-6 <= sx <= 95 + 1e-6 and 5 - 1e-6 <= sy <= 95 + 1e-6):
-            raise Fail(f"icon placement at stroke {stroke:g}: a corner lands at "
-                       f"({sx:.2f},{sy:.2f}), outside the {SAFE:g}-unit safe field")
+        if not (lo - 1e-6 <= sx <= hi + 1e-6 and lo - 1e-6 <= sy <= hi + 1e-6):
+            raise Fail(f"icon placement at stroke {stroke:g} on a {grid:g}-unit grid: "
+                       f"a corner lands at ({sx:.2f},{sy:.2f}), outside the "
+                       f"{lo:g}-to-{hi:g} band of the {safe:g}-unit safe field")
 
     # The figure is worth stating and worth not overstating. The scale above is
     # radius / half-diagonal, so the worst corner lands EXACTLY on the circle
@@ -362,14 +394,17 @@ def icon_placement(stroke: float) -> tuple[float, float, float, str]:
     # the check does earn is the box constraint on the next line: the corners have
     # to fall inside the 5-to-95 band, and that can fail.
     fit = "exactly on" if abs(worst - radius) < 1e-6 else f"{worst:.2f} of {radius:g} from"
-    note = (f"icon at stroke {stroke:g}: mark {w:.1f}×{h:.1f} scaled ×{scale:.4f}, worst "
-            f"corner {fit} the {radius:g}-unit inscribed circle — the scale is derived "
-            f"from the mark's own diagonal, so this is a fit by construction; what is "
-            f"tested is that all four corners also land inside the {SAFE:g}-unit field")
+    where = "" if grid == GRID else f" on the {grid:g}-unit grid"
+    note = (f"icon at stroke {stroke:g}{where}: mark {w:.1f}×{h:.1f} scaled ×{scale:.4f}, "
+            f"worst corner {fit} the {radius:g}-unit inscribed circle — the scale is "
+            f"derived from the mark's own diagonal, so this is a fit by construction; "
+            f"what is tested is that all four corners also land inside the "
+            f"{safe:g}-unit field")
     return scale, tx, ty, note
 
 
-def render_check(docs: dict[str, str]) -> list[str]:
+def render_check(docs: dict[str, str], place: dict[float, tuple[float, float, float]],
+                 a_scale: float) -> list[str]:
     """Render each icon artefact over a garish background and measure what covers it.
 
     An Apple master must cover 100% of its frame: square, full-bleed, fully opaque.
@@ -411,14 +446,35 @@ def render_check(docs: dict[str, str]) -> list[str]:
     notes.append(f"4 recolourable files carry no root colour and draw in currentColor")
 
     PROBE = (255, 0, 255)
+    # Three kinds of artefact, three bands.
+    #   rounded  — a web tile, whose transparent corners are the point of it
+    #   opaque   — a platform master, which must cover its whole frame
+    #   alpha    — a layer the system composites, whose shape IS its alpha, so most
+    #              of the frame is background BY DESIGN. The band still has to be
+    #              two-sided: near 100 would mean nothing was drawn at all, which is
+    #              exactly the failure a one-sided check would pass.
     expectations = {
         "tile-web.svg": (2.0, 12.0, "rounded"),
-        "icon-1024.svg": (2.0, 12.0, "rounded — the everyday icon, all platforms"),
-        "icon-1088-watch.svg": (2.0, 12.0, "rounded"),
+        "icon-1024.svg": (2.0, 12.0, "rounded — the web icon"),
         "icon-512.svg": (2.0, 12.0, "rounded"),
         "icon-192.svg": (2.0, 12.0, "rounded"),
-        "icon-appstore-square-1024.svg": (0.0, 0.5,
-                                          "square and fully opaque — App Store only"),
+        "icon-apple-1024.svg": (0.0, 0.5, "square and fully opaque — Apple, Default"),
+        "icon-apple-1088-watch.svg": (0.0, 0.5,
+                                      "square and fully opaque — Apple, watchOS"),
+        "icon-apple-1024-dark.svg": (0.0, 0.5,
+                                     "square and fully opaque — Apple, Dark"),
+        "icon-android-background-108.svg": (0.0, 0.5,
+                                            "flat and fully opaque — Android background"),
+        # Measured on 26 August 2026 and then pinned to +/- 1.0 percentage point:
+        # Mono 82.6, both Android layers 91.7. The bands were wide while the figures
+        # were unknown; leaving them wide would let the mark shrink or grow by a
+        # third without any gate noticing.
+        "icon-apple-1024-mono.svg": (81.6, 83.6,
+                                     "no ground; the alpha carries the shape — Apple, Mono"),
+        "icon-android-foreground-108.svg": (90.7, 92.7,
+                                            "no ground; the alpha carries the shape — Android foreground"),
+        "icon-android-monochrome-108.svg": (90.7, 92.7,
+                                            "no ground; the alpha carries the shape — Android monochrome"),
     }
     with sync_playwright() as p:
         try:
@@ -470,7 +526,7 @@ def render_check(docs: dict[str, str]) -> list[str]:
         # no corner radius, so there is no mask to composite against, and using our
         # own radius as a stand-in for theirs would be circular.
         clipped = {}
-        for name in ("icon-1024.svg", "icon-appstore-square-1024.svg"):
+        for name in ("icon-1024.svg", "icon-apple-1024.svg"):
             page = browser.new_page(viewport={"width": 256, "height": 256})
             doc = docs[name].replace(
                 "<svg ",
@@ -480,7 +536,7 @@ def render_check(docs: dict[str, str]) -> list[str]:
             page.wait_for_timeout(250)
             clipped[name] = Image.open(io.BytesIO(page.screenshot())).convert("RGB")
             page.close()
-        rounded, square = clipped["icon-1024.svg"], clipped["icon-appstore-square-1024.svg"]
+        rounded, square = clipped["icon-1024.svg"], clipped["icon-apple-1024.svg"]
         if rounded.size != square.size:
             browser.close()
             raise Fail(f"the two icons rendered at different sizes, {rounded.size} "
@@ -498,9 +554,45 @@ def render_check(docs: dict[str, str]) -> list[str]:
             )
         notes.append(
             f"under a circle inscribed in the frame, icon-1024.svg and "
-            f"icon-appstore-square-1024.svg are the same image in all {total} pixels — "
+            f"icon-apple-1024.svg are the same image in all {total} pixels — "
             f"the corner rounding lies entirely outside the circle watchOS and visionOS "
             f"mask to, and the artwork inside it has not drifted between the two files"
+        )
+
+        # Visual parity between the two platforms, measured rather than hoped for.
+        #
+        # Following each platform's own geometry means the corner SHAPE now differs
+        # between Apple and Android. The thing that must NOT differ is how big the
+        # mark reads, and the two canvases make that easy to get wrong: Apple's mark
+        # is placed inside 100 units of which all 100 are shown, while Android's is
+        # placed inside 108 units of which only the middle 72 are ever displayed.
+        # Comparing the two raw scales would say they are wildly different and mean
+        # nothing. What matters is the fraction of the VISIBLE area the mark fills.
+        ax0, ay0, ax1, ay1 = mark_extent(STROKE_REGULAR)
+        aw, ah = (ax1 - ax0), (ay1 - ay0)
+        apple_w = 100.0 * aw * place[STROKE_REGULAR][0] / GRID
+        apple_h = 100.0 * ah * place[STROKE_REGULAR][0] / GRID
+        visible = ANDROID_GRID - 2 * 18.0          # Google's own reserved margin
+        android_w = 100.0 * aw * a_scale / visible
+        android_h = 100.0 * ah * a_scale / visible
+        dw, dh = abs(android_w - apple_w), abs(android_h - apple_h)
+        TOLERANCE_PP = 2.0
+        if dw > TOLERANCE_PP or dh > TOLERANCE_PP:
+            browser.close()
+            raise Fail(
+                f"the mark reads at a different size on the two platforms: "
+                f"{apple_w:.3f}x{apple_h:.3f} per cent of the Apple frame against "
+                f"{android_w:.3f}x{android_h:.3f} per cent of Android's visible 72 dp, "
+                f"a difference of {dw:.2f} and {dh:.2f} percentage points against a "
+                f"tolerance of {TOLERANCE_PP:g}. Following each platform's geometry is "
+                f"meant to change the corner shape, not the size of the mark."
+            )
+        notes.append(
+            f"visual parity: the mark fills {apple_w:.3f}x{apple_h:.3f} per cent of the "
+            f"Apple frame and {android_w:.3f}x{android_h:.3f} per cent of Android's "
+            f"visible 72 dp viewport — a difference of {dw:.2f} and {dh:.2f} percentage "
+            f"points. The corner shape differs between the platforms by decision; the "
+            f"size does not"
         )
         browser.close()
     return notes
@@ -629,6 +721,7 @@ def main() -> int:
     global TILE_RADIUS_PCT
     try:
         light = json.loads((TOKENS / "semantic.light.tokens.json").read_text())
+        dark = json.loads((TOKENS / "semantic.dark.tokens.json").read_text())
         prim = json.loads((TOKENS / "primitive.tokens.json").read_text())
     except FileNotFoundError as e:
         print(f"could not run: {e}. Run 07_tokens/build.py first.", file=sys.stderr)
@@ -645,6 +738,11 @@ def main() -> int:
 
     ink = resolve(light["color"]["ink"]["default"]["$value"])
     paper = light["color"]["surface"]["bright"]["$value"]["hex"]
+    # The Dark appearance is drawn from the dark theme's own tokens rather than
+    # from a darkened copy of the light ones, so it cannot drift away from the
+    # rest of the system.
+    dark_ground = resolve(dark["color"]["surface"]["lowest"]["$value"])
+    dark_mark = resolve(dark["color"]["ink"]["default"]["$value"])
 
     notes: list[str] = []
     place: dict[float, tuple[float, float, float]] = {}
@@ -654,6 +752,9 @@ def main() -> int:
             scale, tx, ty, note = icon_placement(s)
             place[s] = (scale, tx, ty)
             notes.append(note)
+        a_scale, a_tx, a_ty, a_note = icon_placement(
+            STROKE_REGULAR, grid=ANDROID_GRID, safe=ANDROID_SAFE)
+        notes.append(a_note)
     except NotEquipped as e:
         print(f"could not run: {e}", file=sys.stderr)
         return 2
@@ -708,30 +809,42 @@ def main() -> int:
     write("tile-web.svg", svg_doc(tile_body, GRID, GRID, paper,
                                   "Aninda Studio — web tile"))
 
-    # --- the delivery icons: one rounded artefact, used everywhere ----------
-    # OWNER'S DECISION, 14 August 2026: use the rounded tile everywhere, Apple
-    # included, so the icon is identical on every surface.
+    # --- the delivery icons -------------------------------------------------
+    # OWNER'S DECISION, 26 August 2026, REVERSING the decision of 14 August 2026.
     #
-    # What that trades away, recorded here so nobody has to rediscover it: Apple's
-    # current guidance asks for square, unmasked artwork because the system applies
-    # the mask itself and derives Liquid Glass specular highlights from the layer
-    # edges. A pre-rounded edge sits inside the mask, so the highlight follows the
-    # wrong geometry, and the already-anti-aliased corner gets re-sampled by the
-    # system mask. In a static render the difference is small; under Apple's live
-    # materials it is not measurable from here.
+    # The earlier rule was one rounded icon on every surface, Apple included. It is
+    # reversed because this kit now ships to two developer accounts, and BOTH
+    # platforms ask for unmasked artwork and derive something from the edges of what
+    # they are given: Apple its Liquid Glass specular highlights, Google its own
+    # corner mask and drop shadow. Google publishes a figure where Apple does not —
+    # a radius of 30% of the icon size, applied by Play. Supplying pre-rounded
+    # artwork means both of those follow the wrong geometry, and the cost of that
+    # could not be measured outside their renderers. Supplying what each asks for
+    # removes the unknown rather than accepting it.
     #
-    # The square master is still produced, as the LAST file below, for the one
-    # place it is actually required: an App Store submission through Icon Composer.
+    # The web keeps the rounded tile, because a browser will not round a favicon.
+    #
+    # The superseded decision and its whole trade-off text are preserved in the
+    # manifest under icon_policy.superseded, because a reversed decision that
+    # vanishes teaches nobody anything.
     s, tx, ty = place[STROKE_REGULAR]
+
+    def square(ground: str, mark: str) -> str:
+        return (f'<rect width="{GRID:g}" height="{GRID:g}" fill="{ground}"/>'
+                f'<g style="color:{mark}" transform="translate({tx:.4f},{ty:.4f}) '
+                f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>')
+
     rounded_body = (
         f'<rect width="{GRID:g}" height="{GRID:g}" rx="{TILE_RADIUS_PCT:g}" '
         f'ry="{TILE_RADIUS_PCT:g}" fill="{ink}"/>'
         f'<g style="color:{paper}" transform="translate({tx:.4f},{ty:.4f}) '
         f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>'
     )
+    # The web set. The 1088 that used to sit here was for watchOS and has moved to
+    # the Apple set below, square and unmasked, so nothing rounded is delivered to
+    # a platform that masks for itself.
     for name, size, what in (
-        ("icon-1024", 1024, "the icon, 1024px — rounded, used everywhere"),
-        ("icon-1088-watch", 1088, "the icon, 1088px for watchOS — rounded"),
+        ("icon-1024", 1024, "the icon, 1024px — rounded, for the web"),
         ("icon-512", 512, "the icon, 512px — avatars and PWA"),
         ("icon-192", 192, "the icon, 192px — PWA"),
     ):
@@ -744,24 +857,74 @@ def main() -> int:
               svg_doc(rounded_body, size, size, paper,
                       f"Aninda Studio — {what}", view=f"0 0 {GRID:g} {GRID:g}"))
 
-    # The square, unmasked master. Not the everyday icon any more — kept because
-    # Icon Composer and an App Store submission still require it, and producing it
-    # costs one file.
-    square_body = (
-        f'<rect width="{GRID:g}" height="{GRID:g}" fill="{ink}"/>'
-        f'<g style="color:{paper}" transform="translate({tx:.4f},{ty:.4f}) '
-        f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>'
-    )
-    doc = svg_doc(square_body, 1024, 1024, paper,
-                  "Aninda Studio — square unmasked master, for Icon Composer and "
-                  "App Store submission only",
-                  view=f"0 0 {GRID:g} {GRID:g}")
+    # --- Apple: square, unmasked, three authored appearances ----------------
+    # Apple's own material gives three different counts and all three are right in
+    # their own context: the specification table lists six appearances, the prose
+    # says four, and Icon Composer has you author three. Three are authored here;
+    # Apple's renderer generates clear light, clear dark, tinted light and tinted
+    # dark from them, and this build cannot show what those four look like.
+    apple = [
+        ("icon-apple-1024.svg", 1024, square(ink, paper), paper,
+         "square unmasked master, Default appearance — iOS, iPadOS, macOS, visionOS"),
+        ("icon-apple-1088-watch.svg", 1088, square(ink, paper), paper,
+         "square unmasked master, 1088px for watchOS"),
+        ("icon-apple-1024-dark.svg", 1024, square(dark_ground, dark_mark), dark_mark,
+         "square unmasked master, Dark appearance"),
+    ]
+    for name, size, body, colour, what in apple:
+        doc = svg_doc(body, size, size, colour, f"Aninda Studio — {what}",
+                      view=f"0 0 {GRID:g} {GRID:g}")
+        try:
+            check_apple_master(doc)
+        except Fail as e:
+            print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
+            return 1
+        write(name, doc)
+
+    # The Mono appearance carries no ground: Apple composites it and derives the
+    # clear and tinted appearances from it, so its shape is its alpha.
+    mono_body = (f'<g style="color:{paper}" transform="translate({tx:.4f},{ty:.4f}) '
+                 f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>')
+    mono = svg_doc(mono_body, 1024, 1024, paper,
+                   "Aninda Studio — Mono appearance, no ground; the alpha carries "
+                   "the shape",
+                   view=f"0 0 {GRID:g} {GRID:g}")
     try:
-        check_apple_master(doc)
+        check_apple_master(mono)
+        check_transparent_layer(mono, "icon-apple-1024-mono.svg")
     except Fail as e:
         print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
         return 1
-    write("icon-appstore-square-1024.svg", doc)
+    write("icon-apple-1024-mono.svg", mono)
+
+    # --- Android: three layers on the 108-unit canvas -----------------------
+    # The background is flat and full-bleed; the foreground and the monochrome
+    # silhouette carry their shape in the alpha, because the launcher composites
+    # them over the background and the system tints the monochrome one.
+    write("icon-android-background-108.svg",
+          svg_doc(f'<rect width="{ANDROID_GRID:g}" height="{ANDROID_GRID:g}" '
+                  f'fill="{ink}"/>',
+                  ANDROID_GRID, ANDROID_GRID, ink,
+                  "Aninda Studio — Android adaptive icon, background layer",
+                  view=f"0 0 {ANDROID_GRID:g} {ANDROID_GRID:g}"))
+
+    android_mark = (f'<g style="color:{paper}" '
+                    f'transform="translate({a_tx:.4f},{a_ty:.4f}) '
+                    f'scale({a_scale:.6f})">{mark_paths(STROKE_REGULAR)}</g>')
+    for name, what in (
+        ("icon-android-foreground-108.svg", "Android adaptive icon, foreground layer"),
+        ("icon-android-monochrome-108.svg",
+         "Android adaptive icon, monochrome layer — the system tints this"),
+    ):
+        doc = svg_doc(android_mark, ANDROID_GRID, ANDROID_GRID, paper,
+                      f"Aninda Studio — {what}",
+                      view=f"0 0 {ANDROID_GRID:g} {ANDROID_GRID:g}")
+        try:
+            check_transparent_layer(doc, name)
+        except Fail as e:
+            print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
+            return 1
+        write(name, doc)
 
     # --- render the icons and MEASURE them ---------------------------------
     # Every check above reads the source. None of them can see what a renderer
@@ -776,7 +939,7 @@ def main() -> int:
     # export PLAYWRIGHT_BROWSERS_PATH silently skipped both and reported success.
     # The docstring has always documented 2 as "could not run"; it now returns it.
     try:
-        notes += render_check(docs)
+        notes += render_check(docs, place, a_scale)
     except NotEquipped as e:
         print(f"could not run: {e}\n"
               f"  The render gate is not optional: it is the only check that sees what a\n"
@@ -840,31 +1003,90 @@ def main() -> int:
                                "corner radius; this number is ours and is not "
                                "claimed to be theirs."),
         "icon_policy": {
-            "decision": ("One rounded icon is used on every surface, Apple included. "
-                         "Owner's decision, 14 August 2026."),
-            "everyday": ["icon-1024.svg", "icon-1088-watch.svg", "icon-512.svg",
-                         "icon-192.svg", "tile-web.svg"],
-            "app_store_only": "icon-appstore-square-1024.svg",
-            "trade_off": (
-                "Apple's current guidance asks for square, unmasked artwork: the "
-                "system applies the mask and derives Liquid Glass specular "
-                "highlights from the layer edges, so a pre-rounded edge sits inside "
-                "the mask and the highlight follows the wrong geometry. Apple's own "
-                "wording is that pre-masked artwork 'negatively impacts specular "
-                "highlight effects' and makes edges 'look jagged'. Measured here: "
-                "under the circle watchOS and visionOS mask to, the rounded icon and "
-                "the square master are the same image in every pixel — see the "
-                "difference recorded in 'checks' below. Judged rather than measured: "
-                "in a static render under Apple's rounded-rectangle mask the "
-                "difference looks slight. That one is not a measurement, because "
-                "Apple publishes no corner radius, so there is no mask to composite "
-                "against without substituting our own radius for theirs. The dynamic "
-                "cost — the moving specular highlight — could not be measured outside "
-                "Apple's own renderer and is not known."),
-            "if_you_ever_submit_to_the_app_store": (
-                "Use icon-appstore-square-1024.svg, not the rounded icon. Icon "
-                "Composer expects unmasked layers."),
-            "verified_against": "Apple Human Interface Guidelines, checked 14 August 2026",
+            "decision": (
+                "Each platform's own icon geometry is followed. Apple and Google "
+                "receive square, unmasked artwork and apply their own masks. The web "
+                "keeps the rounded tile, because a browser will not round a favicon "
+                "for you. Owner's decision, 26 August 2026."),
+            "reason": (
+                "This kit now ships to two developer accounts. Both platforms ask for "
+                "unmasked artwork and both derive something from the edges of what "
+                "they are given: Apple its Liquid Glass specular highlights, Google "
+                "its own corner mask and drop shadow. Google publishes a figure where "
+                "Apple does not — a radius of 30 per cent of the icon size, applied by "
+                "Play. Supplying pre-rounded artwork means both of those follow the "
+                "wrong geometry, and the cost of that could not be measured outside "
+                "their renderers. Supplying what each asks for removes the unknown "
+                "instead of accepting it."),
+            "accepted_consequence": (
+                "The corner shape now differs between surfaces: rounded on the web, "
+                "and whatever each platform draws on Apple and Android. The SIZE does "
+                "not differ with it, and that is measured rather than hoped for — see "
+                "the visual-parity line in 'checks'."),
+            "surfaces": {
+                "web": ["tile-web.svg", "icon-1024.svg", "icon-512.svg",
+                        "icon-192.svg"],
+                "apple": ["icon-apple-1024.svg", "icon-apple-1088-watch.svg",
+                          "icon-apple-1024-dark.svg", "icon-apple-1024-mono.svg"],
+                "android": ["icon-android-background-108.svg",
+                            "icon-android-foreground-108.svg",
+                            "icon-android-monochrome-108.svg"],
+            },
+            "apple_appearances": {
+                "authored_here": ["default", "dark", "mono"],
+                "derived_by_apple": ["clear light", "clear dark", "tinted light",
+                                     "tinted dark"],
+                "note": (
+                    "Apple's own material is inconsistent about the count, and all "
+                    "three counts are right in their own context: the specification "
+                    "table lists six appearances, the prose says four, and Icon "
+                    "Composer has you author three. Three are authored here. The other "
+                    "four are generated by Apple's renderer from them, and this build "
+                    "cannot show what they look like."),
+            },
+            "android_geometry": {
+                "grid": ANDROID_GRID,
+                "safe_zone": ANDROID_SAFE,
+                "reserved_margin_each_side": (ANDROID_GRID - ANDROID_SAFE - 24.0) / 2 + 12.0,
+                "source": ("developer.android.com/develop/ui/views/launch/"
+                           "icon_design_adaptive, page updated 13 August 2026, read "
+                           "26 August 2026. Both figures are Google's: every layer is "
+                           "108x108 dp, the outer 18 dp per side is reserved for "
+                           "masking and motion effects, and the 66x66 dp centre is the "
+                           "zone no launcher mask may clip."),
+            },
+            "superseded": [{
+                "decision": ("One rounded icon is used on every surface, Apple "
+                             "included."),
+                "taken": "14 August 2026",
+                "reversed": "26 August 2026",
+                "why_reversed": ("This kit now ships to both stores, and both ask for "
+                                 "unmasked artwork."),
+                "trade_off_as_recorded_then": (
+                    "Apple's current guidance asks for square, unmasked artwork: the "
+                    "system applies the mask and derives Liquid Glass specular "
+                    "highlights from the layer edges, so a pre-rounded edge sits "
+                    "inside the mask and the highlight follows the wrong geometry. "
+                    "Apple's own wording is that pre-masked artwork 'negatively "
+                    "impacts specular highlight effects' and makes edges 'look "
+                    "jagged'. Measured here: under the circle watchOS and visionOS "
+                    "mask to, the rounded icon and the square master are the same "
+                    "image in every pixel. Judged rather than measured: in a static "
+                    "render under Apple's rounded-rectangle mask the difference looks "
+                    "slight. That one is not a measurement, because Apple publishes no "
+                    "corner radius, so there is no mask to composite against without "
+                    "substituting our own radius for theirs. The dynamic cost — the "
+                    "moving specular highlight — could not be measured outside Apple's "
+                    "own renderer and is not known."),
+                "what_of_it_still_holds": (
+                    "The measured half still holds: under a circular mask the rounded "
+                    "icon and the square master were the same image in every pixel. "
+                    "What changed is the judged half and the unknown half — and the "
+                    "unknown one is now removed rather than carried, because each "
+                    "platform is given the geometry it asks for."),
+            }],
+            "verified_against": ("Apple Human Interface Guidelines and the Google Play "
+                                 "icon design specifications, checked 26 August 2026"),
         },
         "files": [n for n, _ in written],
         "contact_sheet": ("proof.svg — generated from the same strings written to "
@@ -875,6 +1097,18 @@ def main() -> int:
     # Everything above only computed and checked. This is the only place that
     # touches the disk, and it is reached only when every gate has passed.
     OUT.mkdir(parents=True, exist_ok=True)
+    # Remove anything this build no longer writes. Until 26 August 2026 this script
+    # only ever added files, so retiring one left it on disk: the rounded
+    # icon-1088-watch.svg and icon-appstore-square-1024.svg would both have survived
+    # every gate here and gone on flowing into 10_assets, the guidebook's figure
+    # list and two plugin bundles, all of which glob this directory. A generator
+    # that cannot remove is a generator whose output is only ever a superset of
+    # what it means.
+    removed: list[str] = []
+    for stale in sorted(OUT.glob("*.svg")):
+        if stale.name not in docs:
+            stale.unlink()
+            removed.append(stale.name)
     for name, content in docs.items():
         (OUT / name).write_text(content)
     (HERE / "proof.svg").write_text(sheet)
@@ -883,6 +1117,8 @@ def main() -> int:
     for n in notes:
         print(f"  ok    {n}")
     print()
+    for name in removed:
+        print(f"  removed {name:<26} no longer written by this build")
     for name, size in written:
         print(f"  wrote {name:<28} {size}")
     print(f"  wrote {'proof.svg':<28} {len(sheet)} bytes")

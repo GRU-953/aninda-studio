@@ -656,12 +656,20 @@ def block_figure_construction() -> str:
 
 def block_figure_icons() -> str:
     order = [
-        ("icon-1024.svg", "icon-1024", "The everyday icon, every platform"),
+        ("icon-1024.svg", "icon-1024", "The web icon, rounded"),
         ("icon-512.svg", "icon-512", "Avatars and progressive web apps"),
         ("icon-192.svg", "icon-192", "Progressive web apps"),
-        ("icon-1088-watch.svg", "icon-1088-watch", "watchOS, masked to a circle"),
         ("tile-web.svg", "tile-web", "Web tile, heavy weight"),
-        ("icon-appstore-square-1024.svg", "icon-appstore", "App Store submission only"),
+        ("icon-apple-1024.svg", "icon-apple", "Apple, Default — square, unmasked"),
+        ("icon-apple-1024-dark.svg", "icon-apple-dark", "Apple, Dark"),
+        ("icon-apple-1024-mono.svg", "icon-apple-mono", "Apple, Mono — no ground"),
+        ("icon-apple-1088-watch.svg", "icon-apple-watch", "Apple, watchOS at 1088"),
+        ("icon-android-background-108.svg", "icon-android-bg",
+         "Android, background layer"),
+        ("icon-android-foreground-108.svg", "icon-android-fg",
+         "Android, foreground layer"),
+        ("icon-android-monochrome-108.svg", "icon-android-mono",
+         "Android, monochrome — the system tints this"),
     ]
     cells = []
     for name, ident, caption in order:
@@ -746,16 +754,26 @@ def block_mark_files() -> str:
 def block_icon_files() -> str:
     m = read_json(MARK_DIR / "manifest.json")
     pol = m["icon_policy"]
+    where = {
+        "web": "The web. Rounded, because a browser will not round a favicon for you",
+        "apple": "Apple. Square and unmasked — the system applies its own mask",
+        "android": "Android. A layer the launcher composites",
+    }
     rows = []
-    for name in pol["everyday"]:
-        rows.append([f"<code>{e(name)}</code>", "Everyday — used on every platform"])
-    rows.append([f"<code>{e(pol['app_store_only'])}</code>",
-                 "App Store submission only. Square, unmasked, fully opaque"])
+    for surface, names in pol["surfaces"].items():
+        for name in names:
+            rows.append([f"<code>{e(name)}</code>", e(where[surface])])
+    sup = pol["superseded"][0]
     return (
-        table(["File", "Where it is used"], rows,
-                caption="Every icon artefact, and the one surface each is for.")
+        table(["File", "Which platform it is for"], rows,
+                caption="Every icon artefact, and the platform each one is for.")
         + note(f"<p><strong>The decision.</strong> {e(pol['decision'])} "
-               f"Verified against the {e(pol['verified_against'])}.</p>")
+               f"{e(pol['reason'])} Verified against the "
+               f"{e(pol['verified_against'])}.</p>")
+        + note(f"<p><strong>What this reversed.</strong> On {e(sup['taken'])} the "
+               f"decision here was the opposite: {e(sup['decision'])} It was reversed "
+               f"on {e(sup['reversed'])}. {e(sup['why_reversed'])} "
+               f"{e(sup['what_of_it_still_holds'])}</p>")
     )
 
 
@@ -804,6 +822,28 @@ def block_icon_mask_measurement() -> str:
             "chapter states this as measured, so it must not be assembled without it."
         )
     return note(f"<p><strong>Measured.</strong> {e(measured[0][0].upper() + measured[0][1:])}.</p>")
+
+
+def block_icon_visual_parity() -> str:
+    """The Apple-against-Android size comparison, read out of the mark manifest.
+
+    Following each platform's own geometry changes the corner SHAPE on purpose. The
+    thing it must not change is how large the mark reads, and that is the claim a
+    reader will most want evidence for, because it is the one that decides whether
+    two different-shaped icons still look like one brand. 04_mark/build.py measures
+    it and this block prints what it measured.
+    """
+    m = read_json(MARK_DIR / "manifest.json")
+    measured = [line for line in m["checks"] if line.startswith("visual parity")]
+    if len(measured) != 1:
+        raise BuildError(
+            f"04_mark/manifest.json holds {len(measured)} visual-parity measurements, "
+            "expected exactly one. The chapter states this as measured, so it must "
+            "not be assembled without it."
+        )
+    text = measured[0]
+    text = text[0].upper() + text[1:]
+    return note(f"<p><strong>Measured.</strong> {e(text)}.</p>")
 
 
 def block_voice_strings() -> str:
@@ -2289,6 +2329,7 @@ def render_markdown(path: Path, bn_key: str | None, print_mode: bool) -> str:
                 "mark-files": block_mark_files,
                 "icon-files": block_icon_files,
                 "icon-mask-measurement": block_icon_mask_measurement,
+                "icon-visual-parity": block_icon_visual_parity,
                 "publication": block_publication,
                 "voice-strings": block_voice_strings,
                 "bn-strings-buttons": block_bn_strings_buttons,

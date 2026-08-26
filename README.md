@@ -56,10 +56,10 @@ and their alert both say the figures are examples rather than readings.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.2 MB) that needs no network, plus a 1.9 MB PDF |
+| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.3 MB) that needs no network, plus a 1.9 MB PDF |
 | `07_tokens/` | The design tokens: DTCG source, and 64 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
-| `04_mark/` | 10 mark, wordmark and icon files |
+| `04_mark/` | 15 mark, wordmark and icon files |
 | `10_assets/` | 20 ready-made images at exact platform sizes |
 | `11_site/` | The website, generated from the tokens |
 | `12_packages/` | The tokens as an npm package and a Python package |
@@ -150,9 +150,15 @@ Stated here rather than discovered later:
 - **Rendering checks are Chromium only.** They run on macOS locally and on Ubuntu
   in CI, from a clean checkout, so the results are not particular to one machine.
   Safari, Firefox and real Windows High Contrast were not run.
-- **The icons are rounded everywhere, Apple included.** That is a deliberate
-  choice against Apple's current guidance, and what it trades away is recorded in
-  `04_mark/manifest.json`.
+- **The corner shape now differs between platforms, on purpose.** Apple and
+  Android are given square, unmasked artwork, because both apply their own mask
+  and derive their own effects from the edges of what they are given. The web
+  keeps the rounded tile, because a browser will not round a favicon for you.
+  This reversed the opposite decision of 14 August 2026; both are recorded in
+  `04_mark/manifest.json`. What does **not** differ is how large the mark reads:
+  it fills 59.850 × 67.216 per cent of the Apple frame and 60.958 × 68.461 per
+  cent of Android's visible area, a difference of 1.11 and 1.24 percentage
+  points, and the build fails if that gap ever exceeds two.
 - **The website is not deployed, and its domain is not registered.**
   `11_site/` names `anindastudio.com` in its CNAME, its canonical URLs, its sitemap
   and its social image, because that is the address it is built for. The `.com`

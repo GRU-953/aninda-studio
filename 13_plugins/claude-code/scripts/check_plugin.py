@@ -341,10 +341,14 @@ def bundled_pairs() -> dict[str, str]:
     pairs = dict(BUNDLED_FROM_REPO)
     for source in sorted((REPO_ROOT / "07_tokens" / "build").glob("*.json")):
         pairs[f"aninda-brand/assets/tokens/{source.name}"] = f"07_tokens/build/{source.name}"
+    # From the SOURCE side, with no `copy.exists()` guard, for the same reason the
+    # fonts are: an opt-in list cannot notice a file that has gone. 04_mark/build.py
+    # gained a deletion sweep on 26 August 2026 and retired two icons the same day,
+    # and both survived here — a shipped skill would have carried
+    # icon-appstore-square-1024.svg and icon-1088-watch.svg after the build stopped
+    # writing them, with a manifest beside them that no longer named either.
     for source in sorted((REPO_ROOT / "04_mark" / "svg").glob("*.svg")):
-        copy = SKILLS / "aninda-brand" / "assets" / "marks" / source.name
-        if copy.exists():
-            pairs[f"aninda-brand/assets/marks/{source.name}"] = f"04_mark/svg/{source.name}"
+        pairs[f"aninda-brand/assets/marks/{source.name}"] = f"04_mark/svg/{source.name}"
     # Every subset font, from the source side, so a MISSING copy is a failure and
     # not merely an absence. This is the direction the hand-typed entry got wrong.
     for source in sorted((REPO_ROOT / "08_components" / "fonts").glob("*.woff2")):
@@ -356,6 +360,18 @@ def bundled_pairs() -> dict[str, str]:
 def sync_bundled_copies() -> int:
     """Copy every source over its bundled copy. Prints what it changed."""
     changed = []
+    # Remove bundled marks the source no longer writes, before copying the rest.
+    # Without this the skill accumulates: a retired icon stays on disk, gets zipped
+    # into the .skill bundle, and is handed to whoever installs the plugin.
+    marks_dir = SKILLS / "aninda-brand" / "assets" / "marks"
+    live = {p.name for p in (REPO_ROOT / "04_mark" / "svg").glob("*.svg")}
+    live.add("manifest.json")
+    if marks_dir.is_dir():
+        for stale in sorted(marks_dir.glob("*.svg")):
+            if stale.name not in live:
+                stale.unlink()
+                changed.append(f"skills/aninda-brand/assets/marks/{stale.name}  "
+                               f"REMOVED — 04_mark/build.py no longer writes it")
     for relative, origin in sorted(bundled_pairs().items()):
         copy, source = SKILLS / relative, REPO_ROOT / origin
         if not source.exists():

@@ -49,6 +49,44 @@ WORDMARK_EM_FLOOR_PX = 12
 # The one size Apple asks for, and the one this file exists to satisfy.
 APPSTORE_SIZE = 1024
 
+# Each platform's masters, and the only sizes each is delivered at. Owner's
+# decision of 26 August 2026: every platform gets the geometry it asks for, so
+# Apple and Android receive square, unmasked artwork and the web keeps the rounded
+# tile. The sizes are the platforms' own figures, not this kit's.
+PLATFORM_MASTERS = {
+    "apple": {
+        1024: {"default": "icon-apple-1024.svg",
+               "dark": "icon-apple-1024-dark.svg",
+               "mono": "icon-apple-1024-mono.svg"},
+        1088: {"default": "icon-apple-1088-watch.svg"},
+    },
+}
+# Android delivers the same 108 dp layer at five densities: px = dp x dpi / 160.
+# Google publishes the formula and not the table, so this is derived and says so.
+ANDROID_DENSITIES = {"mdpi": 108, "hdpi": 162, "xhdpi": 216,
+                     "xxhdpi": 324, "xxxhdpi": 432}
+
+
+def guard_unmasked(svg: str, name: str) -> None:
+    """Read the artwork, rather than trusting the flag that asked for it.
+
+    The refusal below is keyed on what was requested. That is one rename or one
+    re-glob away from handing out a rounded file while still reporting it as the
+    square master, so the bytes are checked too.
+    """
+    low = svg.lower()
+    for banned in ("rx=", "ry=", "clip-path", "filter"):
+        if banned in low:
+            raise Refused(
+                f"{name} is not unmasked: it carries '{banned}'.",
+                "Apple derives its Liquid Glass specular highlights from the layer "
+                "edges, and Google Play applies a corner mask of 30 per cent of the "
+                "icon size and adds the drop shadow itself. Baked-in rounding sends "
+                "both of those after the wrong geometry.",
+                "Re-run 04_mark/build.py, which writes these masters square, and "
+                "sync the skill with check_plugin.py --sync.",
+            )
+
 # Which roles the mark itself may be drawn in. The marks card in the system
 # shows the regular weight in the ink and the heavy weight in the accent, and a
 # knock-out onto a bright surface is how it sits on a dark ground. Everything
@@ -534,23 +572,45 @@ def make_icon(args) -> dict:
                 "edges, so a pre-rounded edge sits inside the mask and the highlight follows the "
                 "wrong geometry. Apple's own wording is that pre-masked artwork 'negatively "
                 "impacts specular highlight effects' and makes edges 'look jagged'.",
-                "For a rounded icon use `asset.py icon` without --appstore. That is the everyday "
-                "icon and it is used on every other surface, Apple included.",
+                "For the rounded icon use `asset.py icon` without --appstore. Since "
+                "26 August 2026 that is the WEB icon only — a browser will not round "
+                "a favicon for you, and Apple and Google both round for themselves.",
             )
-        if int(args.size) != APPSTORE_SIZE:
+        if int(args.size) not in PLATFORM_MASTERS["apple"]:
             raise Refused(
-                f"The App Store master is {APPSTORE_SIZE} x {APPSTORE_SIZE} px and nothing else.",
-                f"Asked for {int(args.size)} px. Apple asks for 1024 x 1024 (1088 for watchOS), "
-                "and Icon Composer expects that exact master.",
-                f"Use --size {APPSTORE_SIZE}, or drop --appstore if you want another size.",
+                "Apple's masters come at two sizes and nothing else.",
+                f"Asked for {int(args.size)} px. Apple's app icon layout size is "
+                "1024 x 1024 px for iOS, iPadOS, macOS and visionOS, and 1088 x 1088 "
+                "px for watchOS. Icon Composer expects those exact masters.",
+                "Use --size 1024 or --size 1088, or drop --appstore for the rounded "
+                "web icon at any size.",
             )
-        svg = read_mark("icon-appstore-square-1024.svg")
+        size = int(args.size)
+        appearance = getattr(args, "appearance", None) or "default"
+        available = PLATFORM_MASTERS["apple"].get(size, {})
+        if appearance not in available:
+            raise Refused(
+                f"There is no {appearance} appearance at {size} px.",
+                "Apple's masters are 1024 px for iOS, iPadOS, macOS and visionOS, "
+                "with Default, Dark and Mono appearances, and 1088 px for watchOS "
+                "with Default only. Apple generates clear light, clear dark, tinted "
+                "light and tinted dark from those three; they are not authored here.",
+                f"At {size} px the appearances are: "
+                f"{', '.join(sorted(available)) or 'none — use 1024 or 1088'}.",
+            )
+        name = available[appearance]
+        svg = read_mark(name)
+        guard_unmasked(svg, name)
         where = write_out(svg, args.out)
         return {
-            "made": f"the App Store master, {APPSTORE_SIZE} x {APPSTORE_SIZE} px, square and unmasked",
+            "made": f"the Apple master, {size} x {size} px, {appearance} appearance, "
+                    f"square and unmasked",
             "written to": where,
-            "shape": "square, fully opaque, 0.0 % background showing",
-            "use": "an App Store submission through Icon Composer, and nothing else",
+            "from": name,
+            "shape": ("no ground; the alpha carries the shape" if appearance == "mono"
+                      else "square, fully opaque"),
+            "use": "Icon Composer, which expects unmasked layers and applies the mask "
+                   "and the Liquid Glass effects itself",
         }
 
     size = int(args.size)
@@ -588,7 +648,9 @@ def make_icon(args) -> dict:
             "the mark's worst corner sits 45.00 of 45 units from the centre, inside both the "
             "90-unit field and the circle watchOS and visionOS mask to"
         ),
-        "if you submit to the App Store": "use `asset.py icon --appstore` instead, not this file",
+        "if you submit to a store": "use `asset.py icon --appstore` for Apple's "
+                                    "square unmasked master. This rounded file is "
+                                    "for the web.",
     }
 
 
@@ -698,8 +760,9 @@ def do_list(semantic) -> dict:
         "wordmark scripts": "latin, bangla",
         "published icon sizes": "192, 512, 1024, 1088 (watchOS)",
         "the one exception": (
-            "`icon --appstore` gives the square unmasked 1024 px master. It is the only file for "
-            "an App Store submission, and a radius on it is refused."
+            "`icon --appstore` gives Apple's square unmasked masters: --size 1024 with "
+            "--appearance default, dark or mono, and --size 1088 for watchOS. A radius "
+            "on any of them is refused."
         ),
         "examples": (
             "asset.py mark --weight heavy --size 20 --on surface-base --theme dark --out mark.svg | "
@@ -750,7 +813,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_icon = sub.add_parser("icon", help="an app or platform icon")
     p_icon.add_argument("--size", default=1024, type=int)
-    p_icon.add_argument("--appstore", action="store_true", help="the square unmasked master")
+    p_icon.add_argument("--appstore", action="store_true",
+                        help="Apple's square unmasked master")
+    p_icon.add_argument("--appearance", default="default",
+                        choices=("default", "dark", "mono"),
+                        help="which Apple appearance; 1024 only")
     p_icon.add_argument("--radius", default=None, type=float, help="refused with --appstore")
     p_icon.add_argument("--rounded", action="store_true", help="refused with --appstore")
     p_icon.add_argument("--out", default=None)

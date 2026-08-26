@@ -22,10 +22,12 @@ The one geometry fact that governs everything
     not match what it declared.
 
 Icon policy
-    04_mark/manifest.json records the owner's decision of 14 August 2026: one
-    rounded icon on every surface, Apple included. icon-appstore-square-1024.svg
-    is NOT used by anything here. It exists for an App Store submission only, and
-    MANIFEST.json records that.
+    04_mark/manifest.json records the owner's decision of 26 August 2026, which
+    reversed the decision of 14 August: each platform's own icon geometry is
+    followed. This folder holds the WEB set only — the rounded tile and the
+    favicons — because a browser will not round a favicon for you. The Apple and
+    Android masters are square and unmasked by design and are delivered by the
+    store packages, not rendered here.
 
 Colour
     Not one colour is typed in this file. Grounds are var(--as-…) resolved from
@@ -984,8 +986,8 @@ def run(check_only: bool = False) -> int:
     print(f"Could NOT be verified against any published spec: {len(unverified)}")
     for name in unverified:
         print(f"  · {name}")
-    print("\nicon-appstore-square-1024.svg is not used by anything here. It exists "
-          "for an App Store submission only — see 04_mark/manifest.json.")
+    print("\nThe Apple and Android masters are not rendered here. This folder is "
+          "the web set; those are store assets — see 04_mark/manifest.json.")
     print("favicon.ico carries no text header: the ICO container has no field for "
           "one. Its provenance is in MANIFEST.json.")
     return 0
@@ -1066,11 +1068,13 @@ def build_manifest(items: list[dict], out: dict[str, bytes]) -> bytes:
                   "var(--as-…) resolved from 07_tokens/css/tokens.css.",
         "icon_policy": {
             "decision": mark_policy["decision"],
-            "app_store_only": mark_policy["app_store_only"],
-            "used_here": "The rounded icon only. "
-                         "icon-appstore-square-1024.svg is not rendered by this build.",
+            "reason": mark_policy["reason"],
+            "surfaces": mark_policy["surfaces"],
+            "used_here": ("The web set only. The Apple and Android masters are "
+                          "delivered by the store packages rather than rendered "
+                          "into this folder, because they are not web assets."),
         },
-        "transparency": "The everyday icon is rounded and its corners are "
+        "transparency": "The web icon is rounded and its corners are "
                         "transparent. Every file marked opaque has a ground drawn "
                         "behind it, and the build measures the alpha channel to "
                         "prove it rather than trusting the CSS.",
