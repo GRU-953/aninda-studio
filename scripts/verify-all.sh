@@ -146,6 +146,7 @@ run "guidebook PDF vs the book" $PY 09_guidebook/scripts/pdf.py --check
 run "claude-design bundle"    $PY 13_plugins/claude-design/build.py --check
 run "benchmark verdicts"      $PY scripts/benchmark.py --check
 run "findings register"       $PY scripts/findings.py --check
+run "platform gap register"   $PY scripts/gaps.py --check
 
 echo "--- plugins ---"
 run "claude-code plugin"      $PY 13_plugins/claude-code/scripts/check_plugin.py

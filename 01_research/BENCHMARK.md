@@ -1,7 +1,11 @@
 # Benchmark — Aninda Studio against published industry guidance
 
 **Status:** source document for a guidebook chapter. Not the chapter itself.
-**All facts below checked:** 14 August 2026.
+**All facts below checked:** 14 August 2026, and re-checked in full on **26 August 2026**.
+The re-check contradicted nothing. Eleven of eleven Apple change-log dates, both Compose
+versions, all ten shape values and all six expressive spring pairs came back unchanged. What
+it did produce is six sharper citations and two asset requirements this document had missed,
+both of which predate the first check. Each is marked *(added 26 Aug 2026)* where it appears.
 **Language:** UK English.
 
 ---
@@ -155,7 +159,7 @@ and 10 June 2024.
 
 | Criterion | Their published standard | What it means for this kit |
 |---|---|---|
-| Two material systems | Liquid Glass is the **functional layer** — controls and navigation. Standard materials serve the **content layer**. Apple's instruction is not to use Liquid Glass in the content layer. *(Materials page, current 14 Aug 2026)* | If this kit ever specifies a translucent surface, it must say which layer it belongs to. A brand surface is content-layer, and therefore uses standard materials, not Liquid Glass. |
+| Two material systems | Liquid Glass is the **functional layer** — controls and navigation. Standard materials serve the **content layer**. Apple's instruction is not to use Liquid Glass in the content layer. *(Materials page, change log 9 Sep 2025; re-checked 26 Aug 2026)* | If this kit ever specifies a translucent surface, it must say which layer it belongs to. A brand surface is content-layer, and therefore uses standard materials, not Liquid Glass. |
 | Two Liquid Glass variants | Regular and clear. Regular is the general-purpose variant and is the one to use where there is a significant amount of text. *(Materials page)* | Any text-bearing surface in this kit that sits on a translucent background uses the regular equivalent, never the clear one. |
 | Contrast over materials | **Apple states no contrast ratio for text over materials.** Legibility is delivered by system *vibrancy* — an automatic adjustment that pushes foreground colours away from whatever is behind them — rather than by a fixed ratio. Apple does warn against quaternary vibrancy on the thinnest materials because "the contrast is too low". *(Materials page)* | This kit cannot inherit a number here, because there is not one. It must set its own measurable rule: no text over any translucent surface unless the measured contrast against the *worst-case* backdrop still passes. That is stricter than Apple's guidance, and defensible precisely because Apple's is qualitative. |
 | The one published number | With **clear** Liquid Glass over bright content, Apple suggests considering a dark dimming layer at **35% opacity**. *(Materials page)* | This is the only numeric material value in the guidance. If this kit reproduces it, it must be reproduced in context — clear variant, bright content — not generalised into a house rule. |
@@ -203,6 +207,9 @@ Typography page change log: 16 December 2025.
 | Apple Style Guide | Re-published as a PDF on **25 June 2026**. Apple's closest public equivalent to a verbal-identity guide. | The best available public model for the voice and terminology half of a brand book. |
 | Apple Design Resources | Template files for Figma, Sketch and Photoshop; App Icon Template refreshed **23 June 2026**. | The source of truth for icon construction, in place of a published grid. |
 | WWDC26 session 251 | *Communicate your brand identity on iOS*, **8 June 2026**. Thesis: the content layer is where brand belongs. | The strongest single statement of the brand-versus-system boundary this kit is built around. |
+| App Store asset best practices *(added 26 Aug 2026)* | Announced **5 August 2026** — nine days before this document's first check, and missed by it. New creative slots: a **product page header**, a **search results creative**, and **In-App Events** media. Figma, Photoshop and Pixelmator templates are supplied. The page publishes **aspect ratios only** — In-App Events card 16:9, event details 9:16 — and **no pixel dimensions for any slot**. Rules: every asset must meet a **4+ age rating whatever the app's own rating**; no pricing, discounts, URLs, copyright symbols, other-platform logos, or Apple recognitions such as Editor's Choice. Video autoplays muted and loops, so it must work silently. | Two lessons. The first is a gap in this document's own method: an announcement nine days old was missed because the check read guideline pages and not the developer news feed. The second is that a slot with a published aspect ratio and no published pixel size is a slot this kit must describe honestly rather than fill with a guess. |
+| Accessibility Nutrition Labels *(added 26 Aug 2026)* | **Voluntary today, and no deadline has been announced.** Apple's own wording is "voluntary to start", and the Upcoming Requirements page carries no entry for them. Nine declarable features: VoiceOver, Voice Control, Larger Text, Dark Interface, Differentiate Without Colour Alone, Sufficient Contrast, Reduced Motion, Captions, Audio Descriptions. The threshold to claim one is strict — a person must be able to complete **all** common tasks using that feature. | This kit can already substantiate several of these from measurements it holds: sufficient contrast, differentiate without colour alone, dark interface, and larger text. That is a rare position for a small studio and it is worth claiming once an app exists — but only to the strict threshold, and never as a marketing line. |
+| App Store localisations *(added 26 Aug 2026)* | The metadata language list includes **Bangla**, added **30 March 2026** in a batch of eleven. Apple names it "Bangla", not "Bengali". | This kit writes in Bangla and holds 94 orthography-verified strings. Apple now accepts store metadata in that language, and uses the same name for it that this studio does. Both store packages therefore carry English and Bangla metadata rather than English alone. |
 | A brand kit | **Does not exist publicly.** | See section 2. |
 
 ---
@@ -258,9 +265,11 @@ mislead anyone who tried to build on it.
 
 | Criterion | Their published standard | What it means for this kit |
 |---|---|---|
-| Spring-based motion | `MotionScheme.standard()` and `MotionScheme.expressive()`, each providing six specifications on a 2×3 grid: `defaultSpatialSpec`, `fastSpatialSpec`, `slowSpatialSpec`, `defaultEffectsSpec`, `fastEffectsSpec`, `slowEffectsSpec`. *(checked 14 Aug 2026)* | The 2×3 structure — three speeds across two kinds of motion — is worth borrowing even if the values are not. |
-| The expressive values | Spatial: default damping 0.8 / stiffness 380; fast 0.6 / 800; slow 0.8 / 200. Effects: default 1.0 / 1600; fast 1.0 / 3800; slow 1.0 / 800. *(checked 14 Aug 2026)* | Damping controls whether a spring overshoots its target before settling; stiffness controls how fast it gets there. |
-| The damping split | **Every effects damping is exactly 1.0** — critically damped, meaning it never overshoots. **Every spatial damping is below 1.0** — underdamped, meaning it overshoots and settles. *(derived directly from the values above)* | This is the actual design rule underneath the numbers, and it transfers even to a kit that uses simple easing curves: things that *move* may overshoot; things that *fade, tint or resize in place* must not. Worth stating in the guidebook as the principle, with the values as evidence. |
+| Spring-based motion | `MotionScheme.standard()` and `MotionScheme.expressive()`, each providing six specifications on a 2×3 grid: `defaultSpatialSpec`, `fastSpatialSpec`, `slowSpatialSpec`, `defaultEffectsSpec`, `fastEffectsSpec`, `slowEffectsSpec`. **The numbers are not in `MotionScheme.kt`** — that file holds only token references. They live in `StandardMotionTokens.kt` and `ExpressiveMotionTokens.kt`, both `VERSION: v0_14_0`. *(citation corrected 26 Aug 2026)* | The 2×3 structure — three speeds across two kinds of motion — is worth borrowing even if the values are not. |
+| The expressive values | Spatial: default damping 0.8 / stiffness 380; fast 0.6 / 800; slow 0.8 / 200. Effects: default 1.0 / 1600; fast 1.0 / 3800; slow 1.0 / 800. *(re-checked 26 Aug 2026, unchanged)* | Damping controls whether a spring overshoots its target before settling; stiffness controls how fast it gets there. |
+| The standard values *(added 26 Aug 2026)* | Spatial: default damping 0.9 / stiffness 700; fast 0.9 / 1400; slow 0.9 / 300. Effects: default 1.0 / 1600; fast 1.0 / 3800; slow 1.0 / 800. |
+| The effects halves are identical *(added 26 Aug 2026)* | The three effects specifications are **byte-identical between the two schemes** — 1600, 3800 and 800, damping 1.0 throughout. Only the spatial halves differ. |
+| The damping split | **Every effects damping is exactly 1.0** — critically damped, meaning it never overshoots. **Every spatial damping is below 1.0** — underdamped, meaning it overshoots and settles. This holds in **both** schemes, not only the expressive one: 0.9 throughout standard, 0.6 to 0.8 in expressive. *(derived from both token files, 26 Aug 2026)* | This is the actual design rule underneath the numbers, and it transfers even to a kit that uses simple easing curves: things that *move* may overshoot; things that *fade, tint or resize in place* must not. Worth stating in the guidebook as the principle, with the values as evidence. |
 | The older tokens still exist | The duration and easing tokens were **not** replaced by springs. **16 durations** (50–1000 ms) and **10 easing curves** remain published, including `EasingEmphasized` at (0.2, 0, 0, 1). *(checked 14 Aug 2026)* | A kit built on durations and cubic-Bézier curves — the four numbers that describe an acceleration curve — is not out of date relative to Material. It is using the other half of a system that publishes both. |
 
 ### 4.5 Typography
@@ -276,7 +285,7 @@ mislead anyone who tried to build on it.
 | It is opt-in | Dynamic colour — an Android feature that derives an app palette from the user's wallpaper — is **opt-in per app**. A developer must call `applyToActivitiesIfAvailable()`. *(checked 14 Aug 2026)* | Nothing forces a brand palette to give way to the wallpaper. This is a choice, and this kit must state which choice it makes. |
 | The two routes | Either hold brand colours static, or **harmonise** them towards the user's palette using `HarmonizedColors`. *(checked 14 Aug 2026)* | Naming the mechanism matters. "We keep our brand colours" is a position; "we keep our brand colours and do not use `HarmonizedColors`" is a specification. |
 | The engine | `material-color-utilities`, built on HCT — hue, chroma and tone, a colour model derived from CAM16 and CIE L\* — and actively maintained (last pushed 10 August 2026). | Usable as a dependency. |
-| The tool that is not | **Material Theme Builder's GitHub repository was archived in July 2026**, although the hosted tool still runs. *(checked 14 Aug 2026)* | Do not build any pipeline step on it. An archived repository receives no fixes. This is one of the traps a benchmark exists to catch. |
+| The tool that is not | **Material Theme Builder's GitHub repository was archived on 23 July 2026** — "This repository was archived by the owner… It is now read-only." The hosted tool still runs, and the trap is tighter than it first looked: `m3.material.io/theme-builder` now redirects to `material-foundation.github.io/material-theme-builder/`, which is **that same archived repository published as a static site**. There is no maintained deployment behind it, and Google names no replacement. *(re-checked 26 Aug 2026)* | Do not build any pipeline step on it. An archived repository receives no fixes. This is one of the traps a benchmark exists to catch. |
 
 ### 4.7 Accessibility
 
@@ -300,6 +309,7 @@ mislead anyone who tried to build on it.
 |---|---|---|
 | Brand guidelines | **Not public.** `google.com/permissions` returns a 301 redirect to `about.google/brand-resource-center`, which leads on to a partner marketing hub requiring a login; `brand.google` redirects to a Google sign-in. | Section 2's finding, confirmed on Google's side. |
 | Google Sans | Not available on Google Fonts. | The corporate typeface is withheld while the design system is given away — the clearest single illustration of the brand/system split. |
+| Play Store icon design specification *(added 26 Aug 2026)* | Page last updated **15 June 2026**, and missed by the first check. 512×512 px, 32-bit PNG, **sRGB**, maximum **1024 KB**. Shape: **full square — Google Play applies the mask itself.** Corner radius: **30 % of the icon size**, applied by Play. Shadow: **none in the asset** — Play adds it. Icons that do not meet the specification are shown in legacy mode at 75 % scale. | This is the same "export the full square, unmasked, and let the system shape it" rule this document records for Apple in section 3.1 — and it is the sharper of the two, because **Google publishes a number where Apple publishes none**. That contrast is worth keeping: criterion 3 forbids attributing any corner radius to Apple, and the reason it can be stated so flatly is that another platform shows what publishing one actually looks like. Note also a conflict inside Google's own material: Play Console asks for "32-bit PNG (with alpha)" while this page says to avoid transparency and use a brand background colour. The workable reading is a 32-bit PNG whose artwork is opaque edge to edge. |
 | Google Fonts licensing | Most fonts are under SIL OFL 1.1; some under Apache-2.0; the Ubuntu fonts under the UFL. **The top-level directory encodes the licence** (`ofl/`, `apache/`, `ufl/`). Some fonts carry a **Reserved Font Name**, meaning a modified fork may legally require renaming. | If this kit bundles or recommends any Google font, the licence must be read from the directory it sits in, and any Reserved Font Name must be checked before any modified version is distributed. |
 
 ---
@@ -546,11 +556,16 @@ canonical entry point is given and the specific page named.
 | Source | URL | Date on the source |
 |---|---|---|
 | Human Interface Guidelines — App Icons | `developer.apple.com/design/human-interface-guidelines/app-icons` | Change log 8 Jun 2026 (prev. 9 Jun 2025, 10 Jun 2024) |
-| Human Interface Guidelines — Materials | `developer.apple.com/design/human-interface-guidelines/foundations/materials/` | Current at check |
+| Human Interface Guidelines — Materials | `developer.apple.com/design/human-interface-guidelines/foundations/materials/` | Change log 9 Sep 2025 |
 | Human Interface Guidelines — Typography | `developer.apple.com/design/human-interface-guidelines/typography` | Change log 16 Dec 2025 |
-| Human Interface Guidelines — Accessibility | `developer.apple.com/design/human-interface-guidelines/accessibility` | Current at check |
-| Human Interface Guidelines — Motion | `developer.apple.com/design/human-interface-guidelines/motion` | Current at check |
+| Human Interface Guidelines — Accessibility | `developer.apple.com/design/human-interface-guidelines/accessibility` | Change log 9 Jun 2025 |
+| Human Interface Guidelines — Motion | `developer.apple.com/design/human-interface-guidelines/motion` | Change log 9 Sep 2025 |
 | Human Interface Guidelines — Focus and selection | `developer.apple.com/design/human-interface-guidelines/focus-and-selection` | Change log 24 Oct 2023 |
+| App Store asset best practices | `developer.apple.com/app-store/asset-best-practices/` | Announced 5 Aug 2026; read 26 Aug 2026 |
+| App Store Connect — screenshot specifications | `developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications` | Read 26 Aug 2026 (alpha-channel line added 8 Jul 2026; Watch sizes 19 Aug 2026) |
+| App Store Connect — app store localizations | `developer.apple.com/help/app-store-connect/reference/app-store-localizations` | Bangla added 30 Mar 2026; read 26 Aug 2026 |
+| Accessibility Nutrition Labels — overview | `developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels` | Read 26 Aug 2026; voluntary, no deadline announced |
+| What's new in Apple design guidance | `developer.apple.com/design/whats-new/` | Newest entry 23 Jun 2026; read 26 Aug 2026 |
 | Human Interface Guidelines — Branding | `developer.apple.com/design/human-interface-guidelines/foundations/branding/` | Current at check |
 | Adopting Liquid Glass | `developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass` | Current at check |
 | Creating your app icon using Icon Composer (Xcode documentation) | `developer.apple.com/documentation/xcode` — Icon Composer article | Current at check |
@@ -569,14 +584,20 @@ canonical entry point is given and the specific page named.
 | Material 3 Expressive launch announcement | `blog.google/products-and-platforms/platforms/android/material-3-expressive-android-wearos-launch/` | 13 May 2025 |
 | Material 3 specification | `m3.material.io` | Current at check |
 | Compose Material 3 release notes (versions, alphas, promotions) | `developer.android.com/jetpack/androidx/releases/compose-material3` | 1.4.0 and 1.5.0-alpha26, both 12 Aug 2026 |
-| Compose `ColorScheme`, `ShapeTokens.kt`, `MaterialShapes.kt`, `MotionScheme` | AndroidX source, via `developer.android.com` and the AndroidX repository | Checked 14 Aug 2026 |
+| Compose `ColorScheme`, `ShapeTokens.kt`, `MaterialShapes.kt`, `StandardMotionTokens.kt`, `ExpressiveMotionTokens.kt` | AndroidX source, via `developer.android.com` and the AndroidX repository | Checked 14 Aug 2026; re-read 26 Aug 2026, all values unchanged |
 | Material Components for Android (maintenance mode) | `github.com/material-components/material-components-android` | Checked 14 Aug 2026 |
 | Material Web Components (maintenance mode) | `github.com/material-components/material-web` | Checked 14 Aug 2026 |
 | `material-color-utilities` | `github.com/material-foundation/material-color-utilities` | Last push 10 Aug 2026 |
-| Material Theme Builder (repository archived) | `github.com/material-foundation/material-theme-builder` | Archived Jul 2026 |
+| Material Theme Builder (repository archived) | `github.com/material-foundation/material-theme-builder`, hosted at `material-foundation.github.io/material-theme-builder/` | Archived 23 Jul 2026; the hosted tool is that archived repository served as a static site |
 | Android accessibility guidance (touch targets, contrast) | `developer.android.com` — accessibility pages | Checked 14 Aug 2026 |
 | Expressive design research | `design.google/library/expressive-material-design-google-research` | **No publish date on the page** |
 | Google brand resources (redirect chain) | `google.com/permissions` → `about.google/brand-resource-center` → `partnermarketinghub.withgoogle.com`; `brand.google` → sign-in | Checked 14 Aug 2026 |
+| Google Play — icon design specifications | `developer.android.com/distribute/google-play/resources/icon-design-specifications` | Page updated 15 Jun 2026; read 26 Aug 2026 |
+| Android — adaptive icon design | `developer.android.com/develop/ui/views/launch/icon_design_adaptive` | Page updated 13 Aug 2026; read 26 Aug 2026 |
+| Google Play Console — add preview assets | `support.google.com/googleplay/android-developer/answer/9866151` | No date published; read 26 Aug 2026 |
+| Android — core app quality guidelines | `developer.android.com/docs/quality-guidelines/core-app-quality` | Page updated 21 Aug 2026; read 26 Aug 2026 |
+| Material 3 — colour roles | `m3.material.io/styles/color/roles` | Read 26 Aug 2026 through a browser; the page is JavaScript-rendered |
+| androidx — StandardMotionTokens.kt and ExpressiveMotionTokens.kt | `github.com/androidx/androidx` — `compose/material3/.../tokens/` | VERSION v0_14_0; read 26 Aug 2026 |
 | Google Fonts licensing structure | `fonts.google.com` and `github.com/google/fonts` (`ofl/`, `apache/`, `ufl/`) | Checked 14 Aug 2026 |
 
 ### Standards and formats

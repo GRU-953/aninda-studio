@@ -96,6 +96,12 @@ REBUILD_CHAIN = [
     # tree and the register is part of it. It reads only 01_research/_data, so it
     # can run anywhere; here, next to the other document generators.
     "scripts/findings.py",
+    # The platform-gap register, like the findings register, is generated from its
+    # own data under 01_research/_data and reads nothing else, so it can run
+    # anywhere in the chain. It sits next to findings.py because the two are read
+    # together: one records distance from this system's own rules, the other
+    # distance from Apple's and Google's.
+    "scripts/gaps.py",
     "scripts/readme.py",
 ]
 
@@ -176,7 +182,7 @@ def check_rebuild_chain() -> dict:
     """
     names = ("build.py", "build.mjs", "emit_css.py", "engine.py", "readme.py",
              "pdf.py", "specimen.py", "review_bangla.py", "build_skills.py",
-             "findings.py", "benchmark.py")
+             "findings.py", "benchmark.py", "gaps.py")
     # `git ls-files` rather than rglob, because rglob also walks ignored trees —
     # a stray git worktree under .claude/ made the first version of this guard
     # report eleven generators that are not part of the repository at all.

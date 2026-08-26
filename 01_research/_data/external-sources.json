@@ -1,5 +1,5 @@
 {
- "_generator": "extracted from 01_research/BENCHMARK.md by hand once, on 19 August 2026, so the guidebook can cite what the research already established. The sources list is parsed from that file's section 9 tables.",
+ "_generator": "extracted from 01_research/BENCHMARK.md by hand once, on 19 August 2026, so the guidebook can cite what the research already established. Re-checked and extended on 26 August 2026 with the sources read that day. The sources list is parsed from that file's section 9 tables.",
  "sources": [
   {
    "authority": "Apple",
@@ -318,10 +318,76 @@
    "title": "Spotify Encore",
    "url": "No public documentation found",
    "date_on_source": "Checked 14 Aug 2026"
+  },
+  {
+   "authority": "Apple",
+   "title": "App Store asset best practices",
+   "url": "developer.apple.com/app-store/asset-best-practices/",
+   "date_on_source": "Announced 5 Aug 2026; read 26 Aug 2026"
+  },
+  {
+   "authority": "Apple",
+   "title": "App Store Connect — screenshot specifications",
+   "url": "developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+   "date_on_source": "Read 26 Aug 2026"
+  },
+  {
+   "authority": "Apple",
+   "title": "App Store Connect — app store localizations",
+   "url": "developer.apple.com/help/app-store-connect/reference/app-store-localizations",
+   "date_on_source": "Bangla added 30 Mar 2026; read 26 Aug 2026"
+  },
+  {
+   "authority": "Apple",
+   "title": "Accessibility Nutrition Labels — overview",
+   "url": "developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels",
+   "date_on_source": "Read 26 Aug 2026"
+  },
+  {
+   "authority": "Apple",
+   "title": "What's new in Apple design guidance",
+   "url": "developer.apple.com/design/whats-new/",
+   "date_on_source": "Newest entry 23 Jun 2026; read 26 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Google Play — icon design specifications",
+   "url": "developer.android.com/distribute/google-play/resources/icon-design-specifications",
+   "date_on_source": "Page updated 15 Jun 2026; read 26 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Android — adaptive icon design",
+   "url": "developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+   "date_on_source": "Page updated 13 Aug 2026; read 26 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Google Play Console — add preview assets",
+   "url": "support.google.com/googleplay/android-developer/answer/9866151",
+   "date_on_source": "No date published; read 26 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Android — core app quality guidelines",
+   "url": "developer.android.com/docs/quality-guidelines/core-app-quality",
+   "date_on_source": "Page updated 21 Aug 2026; read 26 Aug 2026"
+  },
+  {
+   "authority": "Google",
+   "title": "Material 3 — colour roles",
+   "url": "m3.material.io/styles/color/roles",
+   "date_on_source": "Read 26 Aug 2026 through a browser; the page is JavaScript-rendered"
+  },
+  {
+   "authority": "Google",
+   "title": "androidx — StandardMotionTokens.kt and ExpressiveMotionTokens.kt",
+   "url": "github.com/androidx/androidx",
+   "date_on_source": "VERSION v0_14_0; read 26 Aug 2026"
   }
  ],
  "platforms": {
-  "checked": "14 August 2026",
+  "checked": "14 August 2026, re-checked 26 August 2026",
   "type": {
    "source": "Apple Human Interface Guidelines — Typography",
    "source_date": "change log 16 December 2025",
@@ -356,7 +422,7 @@
   },
   "targets": {
    "source": "Apple Human Interface Guidelines — Accessibility",
-   "source_date": "current at check",
+   "source_date": "change log 9 June 2025",
    "rows": [
     {
      "platform": "iOS and iPadOS",
@@ -387,7 +453,7 @@
   },
   "spacing": {
    "source": "Apple Human Interface Guidelines — Accessibility",
-   "source_date": "current at check",
+   "source_date": "change log 9 June 2025",
    "bezelled_pt": 12,
    "unbezelled_pt": 24,
    "claim": "Apple treats spacing between controls as as important as size, suggesting roughly 12 pt of padding around bezelled elements and roughly 24 pt around unbezelled ones."

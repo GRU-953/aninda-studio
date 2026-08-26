@@ -16,6 +16,14 @@
    "half_right": 0,
    "by": "14 agents in an adversarial workflow — seven lenses, each finding re-run by an independent skeptic instructed to refute it",
    "note": "Rounds 4 and 5. 38 entries raised here and 4 of the first pass's entries re-checked. Every entry raised here was fixed the same day, so its status is recorded as fixed rather than open."
+  },
+  {
+   "date": "26 August 2026",
+   "covered": 1,
+   "already_fixed": 0,
+   "half_right": 0,
+   "by": "the platform-conformance pass",
+   "note": "A single entry, raised and fixed the same day while establishing that the tree was green before the conformance work began. It is recorded because it is the kind of defect this register exists for: a guard that was written correctly, tested in the one environment where it cannot fail, and wrong everywhere the work is actually done."
   }
  ],
  "_preamble": "# Open findings — carried forward\n\n<!-- This file ships, so it is held to 02_strategy/ENGLISH-STANDARD.md like any\n other prose here — including the banned-word list. Four banned words arrived\n in it when the findings were copied in verbatim from the reviewers' own\n wording, and CI's lint job caught them. If you paste a finding in, reword it.\n A findings record that breaks the rule it records findings about is a poor\n advertisement for the rule. -->\n\nRound 1 of the convergence review raised 59 findings across six independent\nlenses, each adversarially verified before it counted. The blockers and majors\nwere fixed. These minors were judged not worth the change at the time, and are\nrecorded here rather than dropped, because an unwritten known fault becomes an\nunknown one within a week.\n\nEach is real and reproducible. None affects correctness of the design system's\noutput. If you disagree with a judgement, the finding is here to be picked up.\n",
@@ -1658,6 +1666,23 @@
     ],
     "note": "Both closed on the same day. The `git add -N` form was proved on a throwaway repository. specimen.py has not been run end to end and this says so rather than implying otherwise: what was proved is that its two new helpers round-trip against all 70 stored paths and that every stored path resolves to a real file. Re-running it fully is the remaining check, and it needs a browser and renders every specimen page.",
     "evidence": "`git add -N` control, in a scratch repository with one committed and one new file under gen/: `git diff --exit-code gen` → exit 0, the hole; `git add -N -- gen && git diff --exit-code gen` → exit 1, closed. specimen.py: importing it and applying `rel(absolute(x)) == x` to all 70 paths in font_facts.json and measurements.json gives 0 problems, and every one resolves to a file that exists. Downstream, `scripts/check_measurements.py` passes and `09_guidebook/build.py --check` passes."
+   }
+  },
+  {
+   "id": "R6-1",
+   "round": 6,
+   "heading": "The package gate's own ignore list was shattered by the space in the repository's path, so it fired on the file it was written to skip",
+   "file": "12_packages/build.py",
+   "body": "`12_packages/build.py` sweeps the two package trees for files the build did not write, which is the drift a one-directional comparison cannot see. It asks `git check-ignore` which of those files are ignored and skips them, and its own comment names the case: \"a __pycache__ written by importing the module locally is the obvious case, and failing on it would make this gate fire on a clean tree for a file that can never ship.\"\n\nThe guard was right and it did not work. `git check-ignore` echoes one path per line, and the result was read with `.stdout.split()`, which splits on any whitespace. This repository lives at `/Volumes/Aninda Studio/Aninda_Studio`, and the space in `Aninda Studio` split every returned path in two: `/Volumes/Aninda` and a mangled remainder. The ignored set therefore matched nothing, and the gate fired on exactly the `__pycache__` it was written to skip.\n\nThe shape of it is the part worth keeping. It passed in CI every time, because GitHub checks out to a path with no space in it. It failed only on the machine the work is done on. A gate that is green everywhere except where you are standing teaches you to distrust your own tree.\n\nSmallest fix: `.splitlines()` rather than `.split()`. One word.",
+   "verdict": {
+    "id": "R6-1",
+    "status": "fixed",
+    "severity_now": "major",
+    "verified_on": "26 August 2026",
+    "passes": [
+     "26 August 2026"
+    ],
+    "note": "Measured before the fix: `git check-ignore --stdin` returned the single line `/Volumes/Aninda Studio/Aninda_Studio/12_packages/python/src/aninda_studio_tokens/__pycache__/__init__.cpython-313.pyc`; `.split()` turned that one path into two entries, `/Volumes/Aninda` and `/Volumes/Aninda Studio/Aninda_Studio/Studio/Aninda_Studio/12_packages/.../__init__.cpython-313.pyc`, and the real path was in neither. `.splitlines()` returns the one correct entry. After the fix, `./.venv/bin/python 12_packages/build.py --check` passes with the .pyc still present on disk: \"both packages match the source, 39 files, and hold nothing this build did not write.\" Before the fix the same command with the same file present exited 1. The tree holds one `check-ignore` call and one `.stdout.split()`, both in this file, so the fix is complete rather than a first instance."
    }
   }
  ]

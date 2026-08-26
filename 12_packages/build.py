@@ -926,11 +926,20 @@ def main() -> int:
         # and failing on it would make this gate fire on a clean tree for a file
         # that can never ship. Asked of git rather than pattern-matched here, so
         # there is one list of what is ignored.
+        # splitlines(), NOT split(). `git check-ignore` echoes one path per line,
+        # and a path may contain a space — this repository lives at
+        # "/Volumes/Aninda Studio/Aninda_Studio". split() shattered each returned
+        # path at that space into "/Volumes/Aninda" and a mangled remainder, so the
+        # ignored set never matched anything and the gate fired on a __pycache__
+        # this code is written specifically to skip. It passed in CI throughout,
+        # because GitHub checks out to a path with no space in it — which is the
+        # worst shape a bug can take: green everywhere except the machine the work
+        # is actually done on.
         ignored = subprocess.run(
             ["git", "check-ignore", "--stdin"], cwd=ROOT, text=True,
             input="\n".join(str(p) for sub in ("npm", "python")
                             for p in (HERE / sub).rglob("*") if p.is_file()),
-            capture_output=True).stdout.split()
+            capture_output=True).stdout.splitlines()
         ignored = {Path(line).resolve() for line in ignored}
         for sub in ("npm", "python"):
             root = HERE / sub
