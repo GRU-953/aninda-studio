@@ -44,7 +44,10 @@ generator is invisible to the gate meant to catch it.
 `main` is green: all 42 gates locally, all eight CI jobs. Benchmark **24 met, 4
 part met**. Platform gaps **19 of 23 closed**. Version **2.0.0**.
 
-One branch exists, `compose-against-androidx`, and it is **not** merged. See below.
+One branch exists, `compose-against-androidx` at `c780c3a`, pushed and **not**
+merged. Its Gradle gate is failing on purpose — see below. No commit hash is given
+for `main` here: this page is committed to `main`, so any hash it named would be
+the one before itself. `git log --oneline -1` is the answer.
 
 ---
 
