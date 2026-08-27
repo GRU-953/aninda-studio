@@ -10,7 +10,7 @@ binary the reader does not have is a pipeline that only works here.
 
 WHAT THIS SCRIPT INSISTS ON, AND WHY
 
-  * `await document.fonts.ready` before printing. Without it the Bangla prints in
+  * `await document.fonts.ready` before printing. Without it the type prints in
     a fallback face. The fonts are embedded as base64 in the document, and
     Chromium will happily lay out and print a page before it has finished
     decoding them.
@@ -70,9 +70,13 @@ INTERACTIVE_HTML = GUIDEBOOK / "Aninda-Studio-Guidebook.html"
 OUT_PDF = GUIDEBOOK / "Aninda-Studio-Guidebook.pdf"
 PROBE_PDF = GUIDEBOOK / "_probe-interactive.pdf"
 
+# The faces the print build has to have loaded before it is allowed to print.
+# "Noto Serif Bengali" was the third, and the reason it was checked at all is
+# worth keeping: without `await document.fonts.ready` the Bangla printed in a
+# fallback face, silently, in a PDF that looked finished. The same risk applies to
+# these two.
 FONT_CHECKS = [
     '16px Literata',
-    '16px "Noto Serif Bengali"',
     '16px "Aninda Mono"',
 ]
 
@@ -108,7 +112,7 @@ def render_pdf(html_path: Path, pdf_path: Path, strict: bool) -> dict:
         page.on("request", on_request)
         page.goto(doc_url, wait_until="load")
 
-        # 1. Fonts. Without this the Bangla prints in a fallback face.
+        # 1. Fonts. Without this the type prints in a fallback face.
         page.evaluate("() => document.fonts.ready")
         for spec in FONT_CHECKS:
             observed["fonts"][spec] = page.evaluate(
@@ -204,18 +208,17 @@ def check_against_source(pdf_path: Path, html_path: Path) -> list[str]:
     Every heading in the print build must appear in the PDF. That is what catches a
     chapter that was rewritten after the PDF was last made.
 
-    THE LATIN PART ONLY, AND WHY
+    WHY IT SPLITS ON NON-LATIN SCRIPT, WHICH IS NOW TRIVIAL AND WAS NOT
     PDF text is stored in VISUAL order. Bangla reorders pre-base vowels and builds
-    conjuncts, so extraction gives back the glyphs as they sit on the page rather
-    than as they were written: "অনিন্দ্য স্টুডিও" comes out "অনি ন্দ্য স্টুডি ও". The
-    first version of this check compared whole headings and failed 15 of 130 on a PDF
-    it had regenerated seconds earlier — every one of them a heading containing
-    Bangla, and none of them actually stale.
+    conjuncts, so extraction gave back the glyphs as they sat on the page rather
+    than as they were written. The first version of this check compared whole
+    headings and failed 15 of 130 on a PDF it had regenerated seconds earlier —
+    every one a heading containing Bangla, and none actually stale.
 
-    So each heading is reduced to its Latin run before comparing. All 130 headings
-    have one, so nothing drops out of the check. What this cannot see is a Bangla
-    heading that changed while its English stayed put; that is stated rather than
-    papered over.
+    The split below is kept even though the book is now English and it therefore
+    finds nothing to split on. It costs one regular expression, it is the reason
+    the check works at all, and deleting it would leave the next person to
+    rediscover visual-order extraction the hard way.
     """
     problems: list[str] = []
     text = pdf_text(pdf_path)
@@ -231,11 +234,10 @@ def check_against_source(pdf_path: Path, html_path: Path) -> list[str]:
         plain = re.sub(r"<[^>]+>", "", raw)
         plain = html_mod.unescape(plain)
         plain = re.sub(r"\s+", " ", plain).strip()
-        # Each Latin SEGMENT, not the heading with Bangla squeezed out. Many
-        # headings put Latin on both sides of the Bangla — "Estuary — মোহনা /
-        # ground" — so collapsing them gives "Estuary ground", which is never a
-        # contiguous run in the PDF. Splitting on the Bangla fixes it and is
-        # stricter: both halves have to be there.
+        # Each LATIN SEGMENT, not the heading with non-Latin script squeezed
+        # out. Headings used to put Latin on both sides of a Bangla run, so
+        # collapsing them gave a string that was never contiguous in the PDF.
+        # Splitting is also stricter: every segment has to be there, not just one.
         segments = [seg.strip(" ,·—/·")
                     for seg in re.split(r"[\u0980-\u09FF]+", plain)]
         segments = [re.sub(r"\s+", " ", seg) for seg in segments if len(seg.strip()) >= 4]

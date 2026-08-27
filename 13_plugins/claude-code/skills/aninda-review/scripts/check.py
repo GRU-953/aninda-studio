@@ -129,7 +129,10 @@ BANGLA_RECORD = (
 # removal can be called done, and when it is empty this gate proves that no Bangla
 # ships anywhere outside the record. Do not add to it to make a build pass.
 BANGLA_PENDING = (
-    "09_guidebook/chapters/",
+    # 09_guidebook/chapters was here until 27 August 2026 and is not any more:
+    # thirteen English chapters, no Bangla sections, no language toggle. The list
+    # is empty because the removal reached it, which is the only way this list is
+    # allowed to shrink.
 )
 
 # The studio's own name, which stays.

@@ -137,9 +137,6 @@ BANGLA_STANDARD = ROOT / "06_type" / "BANGLA-STANDARD.md"
 
 THEMES = ["light", "dark", "hc-light", "hc-dark"]
 
-# Sources a Bangla string is allowed to come from. Every one of these is either
-# a primary-source review (BANGLA-STANDARD.md) or a generated artefact whose
-# Bangla was taken from it. Nothing else may contribute Bangla to this book.
 VERIFIED_BN_SOURCES = [
     BANGLA_STANDARD,
     ROOT / "06_type" / "RECOMMENDATION.md",
@@ -153,135 +150,6 @@ VERIFIED_BN_SOURCES = [
 ]
 
 # ---------------------------------------------------------------------------
-# The verified Bangla strings, and only these
-#
-class BuildError(Exception):
-    pass
-
-
-# Source: the "Recommended final strings" table of 06_type/BANGLA-STANDARD.md,
-# 14 August 2026. The values below are the RECOMMENDED column, so the six
-# corrections are already applied. Nothing is added to this table by hand.
-#
-# No counts in this comment. It used to say "27 strings reviewed, 6 changed, 21
-# unchanged", which was wrong about a table of 31 rows in the same repository.
-# bangla_standard_counts() counts that table, and the build refuses to write the
-# book if the document's own summary line disagrees with the count.
-#
-# This is HALF the Bangla. 06_type/bangla-strings.json is merged over it below and
-# supplies most of what actually ships. Where neither holds a string, the English
-# is used and the gap is named in the book itself.
-# ---------------------------------------------------------------------------
-
-BN = {
-    "wm-1": "অনিন্দ্য স্টুডিও",
-    "wm-2": "অনিন্দ্য",
-    "th-1": "আলো",
-    "th-2": "অন্ধকার",
-    "th-3": "বেশি কনট্রাস্ট",
-    "col-1": "মোহনা",
-    "col-2": "জোয়ার",
-    "col-3": "পলি",
-    "col-4": "কাশ",
-    "col-5": "লাল মাটি",
-    "col-6": "বর্ষা",
-    "bt-1": "লেখাটি সংরক্ষণ করুন",
-    "bt-2": "বাতিল করুন",
-    "bt-3": "ফাইলটি মুছে ফেলুন",
-    "bt-4": "আবার চেষ্টা করুন",
-    "bt-5": "কোডটি কপি করুন",
-    "ms-1": "সংরক্ষণ করা যায়নি। আপনার লেখা এখনো আছে — একটু পরে আবার চেষ্টা করুন।",
-    "ms-2": "ফাইলটি অনেক বড়ো। সর্বোচ্চ ১০ মেগাবাইট।",
-    "ms-3": "এখনো কিছু নেই। শুরু করতে প্রথম লেখাটি যোগ করুন।",
-    "ms-4": "সংরক্ষিত হয়েছে",
-    "vc-1": (
-        "আমি ছোটো, যত্নে গড়া সফটওয়্যার বানাই। কোনো কিছুর সীমা থাকলে সেটা "
-        "এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না।"
-    ),
-    "gb-1": "স্বাগতম",
-    "gb-2": "নাম",
-    "gb-3": "চিহ্ন",
-    "gb-4": "রং",
-    "gb-5": "হরফ",
-    "gb-6": "ফাঁক ও আকার",
-    "gb-7": "উপাদান",
-    "gb-8": "গতি",
-    "gb-9": "কণ্ঠস্বর",
-    "gb-10": "যা এই পদ্ধতি করে না",
-}
-
-BN_ENGLISH = {
-    "bt-1": "Save the entry",
-    "bt-2": "Cancel",
-    "bt-3": "Delete the file",
-    "bt-4": "Try again",
-    "bt-5": "Copy the code",
-    "ms-1": "Couldn't save. Your work is still here — try again in a moment.",
-    "ms-2": "That file is too large. 10 MB at most.",
-    "ms-3": "Nothing here yet. Add your first entry to begin.",
-    "ms-4": "Saved",
-}
-
-# ---------------------------------------------------------------------------
-# Chapters
-# ---------------------------------------------------------------------------
-
-# 06_type/bangla-strings.json was written after the BN table above and holds 94
-# approved strings under readable keys — `chapter.icons`, `card.button.name` and so
-# on — each carrying the rule number or dictionary page it rests on. Merging it
-# here rather than copying strings across keeps one maintained source: two copies
-# of a translation drift, and the one that drifts is the one nobody is looking at.
-_STRINGS = ROOT / "06_type" / "bangla-strings.json"
-if _STRINGS.exists():
-    for _k, _v in json.loads(_STRINGS.read_text(encoding="utf-8")).items():
-        if _v.get("bn"):
-            BN[_k] = _v["bn"]
-
-
-# The two high-contrast theme labels.
-#
-# THIS BLOCK USED TO SIT FOURTEEN LINES ABOVE THE MERGE ABOVE IT. It read
-# `BN.get("theme.hc-light", f"{BN['th-3']} — {BN['th-1']}")`, and at that point in
-# the file the merge had not run, so the key was never there and the em-dash
-# fallback always won. 06_type/bangla-strings.json holds both compounds with a
-# cited basis — verified th-3 joined to verified th-1 with the same comma the
-# English label uses, comma being ordinary Western punctuation in Bangla — and
-# neither reached any shipped surface. The book then printed "The compound was not
-# itself reviewed" underneath an em-dash form nobody had reviewed, which is a false
-# statement about the standing of a string that is in fact approved.
-#
-# The fallback is kept, and it now raises instead of inventing: a missing key is a
-# gap to declare, not one to paper over with punctuation of this file's choosing.
-def _composed(key: str) -> str:
-    value = BN.get(key)
-    if not value:
-        raise BuildError(
-            f"06_type/bangla-strings.json has no approved string for {key!r}. "
-            f"This book will not compose one: an unreviewed compound presented as "
-            f"a label is exactly what the Bangla policy forbids. Add the key with "
-            f"its basis, or remove the label."
-        )
-    return value
-
-
-BN_COMPOSED = {
-    "hc-light": _composed("theme.hc-light"),
-    "hc-dark": _composed("theme.hc-dark"),
-}
-
-# The basis each one rests on, read from the register rather than described here.
-BN_COMPOSED_BASIS = {}
-if _STRINGS.exists():
-    _register = json.loads(_STRINGS.read_text(encoding="utf-8"))
-    for _key, _short in (("theme.hc-light", "hc-light"), ("theme.hc-dark", "hc-dark")):
-        BN_COMPOSED_BASIS[_short] = _register.get(_key, {}).get("basis", "")
-
-# The English labels the approved Bangla is keyed to. The book used to write
-# "High contrast light" while the Bangla was joined with the comma the label
-# carries, so the two halves of the same row disagreed about the wording.
-COMPOSED_EN = {"hc-light": "High contrast, light", "hc-dark": "High contrast, dark"}
-
-
 CHAPTERS = [
     # (number, slug, English title, Bangla title id or None, source)
     # All fourteen keyed to chapter.* in 06_type/bangla-strings.json. Ten used to
@@ -292,37 +160,44 @@ CHAPTERS = [
     # comment at the head of the BN table names this exact consequence: "two copies
     # of a translation drift, and the one that drifts is the one nobody is looking
     # at." Verified all ten agreed at the moment of the change.
-    ("01", "welcome", "Welcome", "chapter.welcome", "file"),
-    ("02", "the-name", "The name", "chapter.the-name", "file"),
-    ("03", "the-mark", "The mark", "chapter.the-mark", "file"),
-    ("04", "icons", "Icons", "chapter.icons", "file"),
-    ("05", "colour", "Colour", "chapter.colour", "generated"),
-    ("06", "type", "Type", "chapter.type", "generated"),
-    ("07", "space-and-shape", "Space and shape", "chapter.space-and-shape", "generated"),
-    ("08", "components", "Components", "chapter.components", "generated"),
-    ("09", "motion", "Motion", "chapter.motion", "generated"),
-    ("10", "voice", "Voice", "chapter.voice", "file"),
-    ("11", "writing-in-bangla", "Writing in Bangla", "chapter.writing-in-bangla", "file"),
-    ("12", "applying-it", "Applying it", "chapter.applying-it", "file"),
-    ("13", "licence-and-trademarks", "Licence and trademarks", "chapter.licence-and-trademarks", "file"),
-    ("14", "what-this-system-does-not-do", "What this system does not do", "chapter.what-this-system-does-not-do", "file"),
+    # Thirteen chapters, and the numbers RUN CONSECUTIVELY. "Writing in Bangla"
+    # was chapter 11 and went with the Bangla on 27 August 2026; 12, 13 and 14
+    # moved up rather than leaving a hole. A gap would show on the cover, in the
+    # contents and in every #ch-NN anchor, in a book whose whole claim is that its
+    # numbers are measured — and renaming three files is cheaper than explaining it.
+    #
+    # The fourth field was a verified-Bangla key for the chapter's own title. Every
+    # chapter had one, and each was checked against the string register before it
+    # could be printed.
+    ("01", "welcome", "Welcome", "file"),
+    ("02", "the-name", "The name", "file"),
+    ("03", "the-mark", "The mark", "file"),
+    ("04", "icons", "Icons", "file"),
+    ("05", "colour", "Colour", "generated"),
+    ("06", "type", "Type", "generated"),
+    ("07", "space-and-shape", "Space and shape", "generated"),
+    ("08", "components", "Components", "generated"),
+    ("09", "motion", "Motion", "generated"),
+    ("10", "voice", "Voice", "file"),
+    ("11", "applying-it", "Applying it", "file"),
+    ("12", "licence-and-trademarks", "Licence and trademarks", "file"),
+    ("13", "what-this-system-does-not-do", "What this system does not do", "file"),
 ]
 
 CHAPTER_STANDFIRST = {
     "01": "What this is, who wrote it, and why the brand and the design system are two artefacts rather than one.",
-    "02": "Aninda Studio in two scripts, and the one difference between them that looks like a mistake and is not.",
+    "02": "A Bangla name written in Latin script, and the one thing about it that looks like a mistake and is not.",
     "03": "A circle tangent to a stem that overruns downward. One geometry, two weights, and the mistake that produced it.",
-    "04": "One rounded icon on every surface, Apple included — and exactly what that trades away.",
+    "04": "Each platform gets the icon geometry it asks for — and exactly what that trades away.",
     "05": "Every ramp, every role and every measured ratio in four themes, read out of the token files.",
-    "06": "Two scripts, one scale, a measured multiplier for Bangla and a floor it never goes below.",
+    "06": "Two faces, one scale, and the measurements that chose them over twenty-eight others.",
     "07": "A 4 px scale in ten steps, four radii, four target sizes and one focus ring.",
     "08": "Thirty cards in three groups, and the three rules the component layer is built to keep.",
     "09": "Two durations, three curves, and why Material's spring system was read and not adopted.",
     "10": "Plain international English, British spelling, and the six words that are banned outright.",
-    "11": "Standard Bangla by the Bangla Academy's own rules, and the policy of never inventing any.",
-    "12": "How to install it, theme it, check it, and rebuild this book.",
-    "13": "Three licences, one thing with no licence at all, and where the boundary falls.",
-    "14": "The honest list. Not a disclaimer — every item changes how much weight to put on something earlier.",
+    "11": "How to install it, theme it, check it, and rebuild this book.",
+    "12": "Three licences, one thing with no licence at all, and where the boundary falls.",
+    "13": "The honest list. Not a disclaimer — every item changes how much weight to put on something earlier.",
 }
 
 
@@ -333,17 +208,6 @@ CHAPTER_STANDFIRST = {
 
 def e(text) -> str:
     return html_mod.escape(str(text), quote=True)
-
-
-def bn_span(key: str, large: bool = False) -> str:
-    text = BN[key]
-    cls = ' class="as-bn-large"' if large else ""
-    return f'<span lang="bn"{cls}>{e(text)}</span>'
-
-
-def bn_raw(text: str, large: bool = False) -> str:
-    cls = ' class="as-bn-large"' if large else ""
-    return f'<span lang="bn"{cls}>{e(text)}</span>'
 
 
 def read_json(path: Path):
@@ -549,6 +413,10 @@ def inline_svg(name: str, cls: str, title: str, theme_aware: bool = False) -> st
 # ---------------------------------------------------------------------------
 
 
+class BuildError(Exception):
+    """A check did not pass. Nothing is written."""
+
+
 def kit_files() -> list[tuple[str, Path, str]]:
     """(display path, real path, what it is). Order is stable, so --check works."""
     items: list[tuple[str, Path, str]] = []
@@ -692,22 +560,21 @@ def block_figure_icons() -> str:
 
 
 def block_figure_wordmarks() -> str:
+    """One wordmark. There were two, in two scripts, side by side.
+
+    The Bangla wordmark went with the Bangla on 27 August 2026. Its cell carried a
+    note worth keeping the substance of: the image's accessible name was written in
+    English on purpose, because an SVG <title> is the whole accessible name and SVG
+    offers no way to mark the language of PART of one — so Bangla embedded there was
+    pronounced by an English speech engine. That constraint still applies to any
+    future artwork whose name is not English.
+    """
     latin = inline_svg("wordmark-latin.svg", "gb-wordmark",
-                       "The Latin wordmark — aninda studio", theme_aware=True)
-    bangla = inline_svg("wordmark-bangla.svg", "gb-wordmark",
-                        # English only. This becomes an SVG <title>, the image's accessible
-                        # name, and SVG has no way to mark the language of PART of a
-                        # title — so embedding the Bangla here meant a screen reader
-                        # pronounced it with an English engine. The Bangla wordmark
-                        # itself appears as real tagged text in this chapter, so
-                        # naming the image in English loses nothing.
-                        "The Bangla wordmark", theme_aware=True)
+                       "The wordmark — aninda studio", theme_aware=True)
     return (
         '<figure class="gb-figure gb-figure--wordmarks">'
         f'<div class="gb-wordbox">{latin}'
-        '<figcaption class="gb-caption">Latin — aninda studio</figcaption></div>'
-        f'<div class="gb-wordbox">{bangla}'
-        f'<figcaption class="gb-caption">Bangla — {bn_span("wm-1", large=True)}</figcaption></div>'
+        '<figcaption class="gb-caption">aninda studio</figcaption></div>'
         "</figure>"
     )
 
@@ -856,183 +723,94 @@ def block_icon_visual_parity() -> str:
     return note(f"<p><strong>Measured.</strong> {e(text)}.</p>")
 
 
-def block_voice_strings() -> str:
-    rows = []
-    for key in ("bt-1", "bt-2", "bt-3", "bt-4", "bt-5"):
-        rows.append([e(BN_ENGLISH[key]), bn_span(key)])
-    for key in ("ms-1", "ms-2", "ms-3", "ms-4"):
-        rows.append([e(BN_ENGLISH[key]), bn_span(key)])
-    return table(["English", "Bangla"], rows,
-                 caption="The verified button and message strings, English first.")
+def block_bangla_removed() -> str:
+    """The measured half of the Bangla work, kept after the Bangla went.
 
+    This was four sections of the type chapter until 27 August 2026 — the
+    multiplier's derivation, the size floor, the weight bump and the shaping
+    proof. It is the strongest measurement in this book: two rendered ink heights
+    read out of Chromium at six nominal sizes, and a luminance reading that decided
+    a weight step. Deleting it would have deleted the evidence for a decision, so
+    it moved here instead, into the chapter about what this system does not do.
 
-def block_bn_strings_buttons() -> str:
-    rows = [[bn_span(k), e(BN_ENGLISH[k])] for k in ("bt-1", "bt-2", "bt-3", "bt-4", "bt-5")]
-    return table(["Bangla", "English"], rows, caption="Buttons.")
-
-
-def block_bn_strings_messages() -> str:
-    rows = [[bn_span(k), e(BN_ENGLISH[k])] for k in ("ms-1", "ms-2", "ms-3", "ms-4")]
-    return table(["Bangla", "English"], rows, caption="Messages.")
-
-
-def bangla_standard_counts() -> dict[str, int]:
-    """Count the recommended-strings table of 06_type/BANGLA-STANDARD.md.
-
-    The document's own summary line said "Strings reviewed: 27 · changed: 6 ·
-    unchanged: 21" four rows above a table of 31 rows, of which 6 are marked changed
-    and 25 unchanged. 6 + 21 = 27 makes the line look internally consistent, which
-    is why nobody rechecked it against the rows. This book then reprinted all three
-    figures under a caption naming that file as their source.
-
-    So they are counted here, from the table, and guard_bangla_standard_summary()
-    below checks the document's own summary line against the same count — because
-    the figures in a hand-written document cannot be generated, but they can be
-    verified.
+    It reads 06_type/_data/measurements.json and NOT the token set. That is the
+    point of putting it here: the tokens it used to quote have been removed, and a
+    record that depended on them would have died with them. The measurements file
+    is retained, so this passage still cites what was actually read.
     """
-    lines = BANGLA_STANDARD.read_text(encoding="utf-8").splitlines()
-    try:
-        start = next(i for i, line in enumerate(lines)
-                     if line.strip() == "## Recommended final strings")
-    except StopIteration:
-        raise BuildError(
-            f"{BANGLA_STANDARD.name} has no '## Recommended final strings' heading, "
-            f"so its review counts cannot be counted."
-        )
-    changed = unchanged = 0
-    for line in lines[start + 1:]:
-        if line.startswith("## "):
-            break
-        if not line.startswith("| ") or line.startswith("| id") or line.startswith("|---"):
-            continue
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) < 4:
-            continue
-        if cells[3] == "yes":
-            changed += 1
-        elif cells[3] == "no":
-            unchanged += 1
-    if not changed and not unchanged:
-        raise BuildError(f"{BANGLA_STANDARD.name}: no rows found under "
-                         f"'## Recommended final strings'")
-    return {"reviewed": changed + unchanged, "changed": changed,
-            "unchanged": unchanged}
+    meas = read_json(MEASUREMENTS_JSON)
+    ratio = meas["ratios"]["08-editorial-revised"]
+    out: list[str] = []
 
+    out.append(
+        "<p>Bangla and Latin do not look the same size at the same size. Bangla's "
+        "reading height — baseline to the matra — the headline stroke along the top of "
+        "the letters — sat at about 0.62 em against Latin's x-height of about "
+        "0.51 em. Setting both at 16 px made the Bangla look a fifth larger, so it "
+        "was multiplied down until the two measured heights matched.</p>")
 
-def guard_bangla_standard_summary() -> None:
-    """The summary line in BANGLA-STANDARD.md must match the table under it."""
-    counts = bangla_standard_counts()
-    text = BANGLA_STANDARD.read_text(encoding="utf-8")
-    match = re.search(r"\*\*Strings reviewed:\s*(\d+)\s*·\s*changed:\s*(\d+)"
-                      r"\s*·\s*unchanged:\s*(\d+)\*\*", text)
-    if not match:
-        raise BuildError(
-            f"{BANGLA_STANDARD.name} has no '**Strings reviewed: N · changed: N · "
-            f"unchanged: N**' line. This book reprints those three figures, so the "
-            f"line has to be there to be checked."
-        )
-    claimed = tuple(int(g) for g in match.groups())
-    counted = (counts["reviewed"], counts["changed"], counts["unchanged"])
-    if claimed != counted:
-        raise BuildError(
-            f"{BANGLA_STANDARD.name} claims reviewed/changed/unchanged = {claimed} "
-            f"and its own table counts {counted}. This book reprints those figures, "
-            f"so it will not print a number the document it names cannot support."
-        )
-
-
-def block_bangla_provenance() -> str:
-    cards = read_json(CARDS_JSON)
-    gaps = cards["_bangla_gaps"]
-    counts = bangla_standard_counts()
-    rows = [
-        ["Reviewed strings", str(counts["reviewed"])],
-        ["Changed by the review", str(counts["changed"])],
-        ["Unchanged", str(counts["unchanged"])],
-        ["Verified strings available to this book", str(len(BN))],
-        ["Component cards with no verified Bangla name",
-         str(len(gaps["name_bn"])) + " of 30"],
-        ["Component cards with no verified Bangla subtitle",
-         str(len(gaps["subtitle_bn"])) + " of 30"],
-    ]
-    return table(["Measure", "Count"], rows,
-                 caption="The Bangla this book rests on. The first three rows are "
-                         "counted from the recommended-strings table of "
-                         "06_type/BANGLA-STANDARD.md; the fourth is the register "
-                         "in 06_type/bangla-strings.json merged over it, which is "
-                         "where most of what you can see comes from.")
-
-
-def _gap_caption(rows: list[list[str]]) -> str:
-    """Count the rows and describe them, rather than asserting a figure above them.
-
-    This caption used to read "Four of the fourteen chapters have no verified
-    Bangla title" — hardcoded, directly above generated rows, and refuted by every
-    one of them: all fourteen chapters now carry a Bangla title from
-    06_type/bangla-strings.json, and not one "What is missing" cell mentions a
-    missing title. It understated what the system holds, which is the safe
-    direction, and it was still a false counted claim in the chapter the book
-    offers as the calibration for everything else.
-    """
-    total = len(rows)
-    without = sum(1 for row in rows if "<em>none</em>" in row[1])
-    if without:
-        return (f"{without} of the {total} chapters have no verified Bangla title. "
-                f"All {total} lack verified Bangla body prose.")
-    return (f"All {total} chapters have a verified Bangla title. All {total} lack "
-            f"verified Bangla body prose — only the approved strings appear.")
-
-
-def block_bangla_gaps() -> str:
     rows = []
-    for num, slug, title, bn_key, _src in CHAPTERS:
-        if bn_key:
-            rows.append([f"{num} — {e(title)}", bn_span(bn_key),
-                         "Body prose. Only the verified strings appear."])
-        else:
-            rows.append([f"{num} — {e(title)}", "<em>none</em>",
-                         "Title <strong>and</strong> body. Both stay in English."])
-    # The standing is read from the register, not typed. Both compounds ARE
-    # approved, with a cited basis, and the previous wording here said the opposite
-    # about them — under an em-dash form that nobody had reviewed, because the
-    # fallback that produced it ran before the register was merged.
-    extra = [
-        [e(COMPOSED_EN[key]), bn_raw(BN_COMPOSED[key]), e(BN_COMPOSED_BASIS[key])]
-        for key in ("hc-light", "hc-dark")
-    ]
+    for size in ("11", "12", "16", "28", "56", "100"):
+        s = ratio["per_size"][size]
+        rows.append([
+            f"{size} px",
+            f"{s['latin_x_height_px']:.3f} px ({s['latin_x_height_em']:.4f} em)",
+            f"{s['bangla_matra_height_px']:.3f} px "
+            f"({s['bangla_matra_height_em']:.4f} em)",
+            f"×{s['bangla_appears_larger_by']:.4f}",
+            f"<b>×{s['bangla_size_multiplier']:.3f}</b>",
+        ])
+    out.append(table(["Nominal size", "Literata x-height",
+                      "Noto Serif Bengali baseline to the matra",
+                      "Bangla appeared larger by", "Multiplier"], rows,
+                     caption="Where the Bangla multiplier came from: two measured "
+                             "heights at each nominal size, read off rendered ink."))
 
-    cards = read_json(CARDS_JSON)
-    gaps = cards["_bangla_gaps"]
-    total_cards = len(cards["cards"])
-    no_name = gaps["name_bn"]
-    no_subtitle = gaps["subtitle_bn"]
+    out.append(
+        f"<p>The headline figure was <strong>×"
+        f"{ratio['bangla_size_multiplier_at_16']}</strong> at body size, and it "
+        "barely moved across the scale because Literata's x-height is nearly flat "
+        "along its optical-size axis. Every figure above was read off real rendered "
+        "ink in Chromium through the Canvas text-metrics interface, never from what "
+        "a font declares about itself.</p>")
 
-    # Derived, all four numbers. What stood here was a hand-typed paragraph under
-    # generated rows, and it made four false statements at once: a summary reading
-    # "The 0 component cards with no verified Bangla name", an empty body where
-    # names were promised, "all 30 cards lack a verified Bangla subtitle" when the
-    # register supplies all 30, and "five foundations" where there are six. Nothing
-    # was named above. The identical fault — a typed count over generated rows —
-    # had been diagnosed and repaired in _gap_caption sixteen lines earlier in this
-    # same function, and the repair landed in one of two adjacent copies.
-    def _standing(missing: list[str], what: str) -> str:
-        if not missing:
-            return (f'<p class="gb-caption">All {total_cards} component cards carry a '
-                    f'verified Bangla {what}, so there is no gap to list here.</p>')
-        return (f'<p class="gb-caption">{len(missing)} of {total_cards} component '
-                f'cards have no verified Bangla {what}: {e(", ".join(missing))}.</p>')
+    out.append(note(
+        "<p><strong>Why declared metrics were not trusted.</strong> Noto Sans "
+        "Bengali declares a cap height of 622 units, and that is not the height of "
+        "its capital H — it is the matra height. The field had been repurposed. A "
+        "design system that read it to align two scripts would have been aligning "
+        "to the wrong thing entirely. That warning outlives the Bangla: a declared "
+        "metric is a claim, and this system measures claims.</p>"))
 
-    return (
-        table(["Chapter", "Verified Bangla title", "What is missing"], rows,
-              caption=_gap_caption(rows))
-        + table(["Label", "String used", "Standing"], extra,
-                caption="The two composed theme labels, with the basis each rests "
-                        "on read from 06_type/bangla-strings.json. Both are "
-                        "approved; an earlier version of this book said they were "
-                        "not, over a form nobody had reviewed.")
-        + _standing(no_name, "name")
-        + _standing(no_subtitle, "subtitle")
-    )
+    out.append(
+        "<p>Two rules followed from it. Bangla never went below <strong>12 px</strong> "
+        "whatever the multiplier said, because below that the matra and the "
+        "conjuncts stopped surviving. And <strong>below 14 px it gained one weight "
+        "step</strong>: measured at a device scale factor of 1, the matra at 12 px "
+        "and weight 400 rendered at luminance 123 on white, which reads as grey "
+        "rather than black, and at weight 500 it held at 108. Those were the only "
+        "size-dependent compensation rules this system had, and they left with the "
+        "script they were measured for.</p>")
+
+    shaping = meas["shaping"]["notoserifbengali"]
+    out.append(
+        f"<p>Shaping was proved, not assumed: {shaping['passed']} conjuncts and the "
+        "five test words shaped through HarfBuzz with no dotted circles, no missing "
+        "glyphs and no stray hasantas. The studio name shaped 16 code points into "
+        "11 glyphs, and a negative control confirmed that was real — mapping each "
+        "code point straight through the cmap gave 16. That negative control is the "
+        "one piece of this that did not leave. It is now an English ligature test, "
+        "and <code>04_mark/manifest.json</code> records both what it proves and what "
+        "it no longer does.</p>")
+
+    out.append(note(
+        "<p><strong>What none of this measured.</strong> Whether the Bangla read "
+        "well to a Bangla reader. Every ruling was sourced to the Bangla Academy's "
+        "own dictionary, and sourced is not the same as read well — no second Bangla "
+        "reader was ever asked, and that gap closed by removal rather than by being "
+        "filled.</p>"))
+
+    return "".join(out)
 
 
 def block_font_licences() -> str:
@@ -1073,16 +851,23 @@ def _pdf_sizes() -> str:
     printed FROM this HTML — and in that case the sentence says the measurement
     has not been taken rather than quoting a number for a file that is not there.
     """
-    pdf = HERE / "Aninda-Studio-Guidebook.pdf"
-    if pdf.exists():
-        printed = (f"Printing the print build gives a PDF of "
-                   f"{fmt_bytes(pdf.stat().st_size)}, read from the file in this "
-                   f"repository. ")
-    else:
-        printed = ("The print build's PDF has not been produced in this tree, so "
-                   "its size is not quoted here. ")
-    return (printed + "Printing the interactive build gave one of about 14.2 MB "
-            "when that was measured, once, while deciding this split; that PDF is "
+    # THE PRINT PDF'S OWN SIZE IS NOT QUOTED, and that is a fix rather than an
+    # omission. This sentence used to read it off the file, which is a loop: the
+    # PDF is printed FROM this HTML, so the book cited a figure its own text
+    # changed. It converged only while the size was stable. Removing the Bangla
+    # took the PDF from 1.9 MB to 1.2 MB and the build stopped being idempotent —
+    # same byte LENGTH both runs, because the two figures are the same width, and
+    # different content. --check reported "differs — on disk 543177 bytes,
+    # regenerated 543177 bytes", which is a strange sentence and an accurate one.
+    #
+    # The two figures that remain are inputs rather than outputs: the kit's own
+    # size on disk, and one recorded measurement of an interactive PDF that is not
+    # shipped. Neither moves when this paragraph does.
+    return ("Printing the interactive build gave a PDF of about 14.2 MB when that "
+            "was measured, once, while deciding this split; the print build's is a "
+            "small fraction of it. That figure is not quoted here, because this "
+            "book is what the PDF is printed from and a document that cites the "
+            "size of its own output cannot settle. That PDF is "
             "not shipped, ")
 
 
@@ -1121,7 +906,7 @@ def block_output_files(print_mode: bool) -> str:
         "<code>scripts/pdf.py --probe-interactive</code> to re-measure it after "
         "the kit grows.</p>"
         "<p>Fonts and images stay in both builds. Without the embedded fonts the "
-        "Bangla prints in a fallback face, which is the one thing this book must "
+        "type prints in a fallback face, which is the one thing this book must "
         "not do.</p>"
     )
     return table(["File", "What it is"], rows,
@@ -1147,33 +932,6 @@ def block_kit_index() -> str:
     )
 
 
-def block_gap_notice(bn_key: str | None) -> str:
-    if bn_key:
-        head = (
-            "<p><strong>The title of this chapter is verified. Its body prose is "
-            "not written.</strong></p>"
-        )
-    else:
-        head = (
-            "<p><strong>Neither the title nor the body of this chapter exists in "
-            "verified Bangla.</strong></p>"
-        )
-    return note(
-        head
-        + "<p>Only Bangla that has been checked against the Bangla Academy's 2012 "
-        "spelling rules and its own dictionary is shipped in this system. No "
-        "Bangla is written for this book. Where a verified string does not exist, "
-        "the English stays and the gap is named here and in chapter 14.</p>"
-        "<p>The English section of this chapter carries the full text. Whatever "
-        "Bangla appears below is verified, and there is no more of it.</p>",
-        kind="gap",
-    )
-
-
-def block_bn_block(key: str) -> str:
-    return f'<blockquote class="gb-quote" lang="bn">{e(BN[key])}</blockquote>'
-
-
 def block_banned_words() -> str:
     """The one place the blocklist itself is printed. It is marked
     `data-verbatim` so the English guard skips it — a list of banned words is the
@@ -1181,16 +939,6 @@ def block_banned_words() -> str:
     return ('<p class="gb-verbatim" data-verbatim><b>'
             + " · ".join(BANNED_WORDS[:4] + ["of course"] + BANNED_WORDS[4:])
             + "</b></p>")
-
-
-def block_bangla_punctuation() -> str:
-    """Also `data-verbatim`: naming the exclamation mark as a character is not
-    the same as using one, and the guard cannot tell the difference."""
-    return ('<p class="gb-verbatim" data-verbatim>'
-            "Statement <b>।</b> U+0964 · question <b>?</b> U+003F · "
-            "exclamation <b>!</b> U+0021. Phrase level: <b>,</b> <b>;</b> "
-            "<b>:</b> — the ordinary Western marks. There is no "
-            "Bengali-specific question or exclamation mark.</p>")
 
 
 def block_banned_latin() -> str:
@@ -1361,12 +1109,6 @@ def theme_section(tok: Tokens, theme: str) -> str:
     proof_theme = tok.proof["themes"][theme]
     ext = tok.semantic[theme]["$extensions"]["studio.aninda"]
     label = proof_theme["label"]
-    if theme == "light":
-        bn_label = bn_span("th-1", large=True)
-    elif theme == "dark":
-        bn_label = bn_span("th-2", large=True)
-    else:
-        bn_label = bn_raw(BN_COMPOSED[theme], large=True)
 
     surfaces = tok.surfaces(theme)
     chips = []
@@ -1428,7 +1170,7 @@ def theme_section(tok: Tokens, theme: str) -> str:
 
     return (
         f'<section class="gb-theme" data-theme="{e(theme)}">'
-        f"<h3>{e(label)} — {bn_label}</h3>"
+        f"<h3>{e(label)}</h3>"
         + table(["Setting", "Value"],
                 caption=f"What the {e(label)} theme is measured against.",
                 rows=[["Polarity", e(ext["polarity"])],
@@ -1462,70 +1204,6 @@ def theme_section(tok: Tokens, theme: str) -> str:
     )
 
 
-def chapter_colour_bn(tok: Tokens) -> str:
-    """The colour chapter is the one place the Bangla is substantial, because
-    the colour names and two of the four theme names are verified strings."""
-    out = [block_gap_notice("gb-4")]
-    proof = tok.proof
-    out.append("<h2>The colour names</h2>")
-    out.append(
-        "<p>The palette was replaced on 26 August 2026 and its colours have English "
-        "names only. The previous six carried Bangla names, and those names belong "
-        "to colours that no longer exist — reusing one for a different colour would "
-        "be worse than leaving the column empty, so it is empty.</p>")
-    rows = []
-    for family, fam in proof["families"].items():
-        ramp = tok.ramp(family)
-        anchor = ramp["$extensions"]["studio.aninda"]["anchor"]
-        rows.append([
-            e(fam["label"]),
-            f"<code>{e(anchor)}</code>",
-            e(family),
-            e(fam["label_bn"]) if fam.get("label_bn") else "<em>not yet named</em>",
-        ])
-    out.append(table(["English", "Anchor", "Role", "Bangla"], rows,
-                     caption="Each colour family, the anchor it is built from, and "
-                             "the role it fills."))
-
-    out.append("<h2>The four themes</h2>")
-    rows = []
-    for theme in THEMES:
-        label = proof["themes"][theme]["label"]
-        if theme == "light":
-            bnv, standing = bn_span("th-1", large=True), "Verified"
-        elif theme == "dark":
-            bnv, standing = bn_span("th-2", large=True), "Verified"
-        else:
-            bnv, standing = (bn_raw(BN_COMPOSED[theme], large=True),
-                             e(BN_COMPOSED_BASIS[theme]))
-        rows.append([bnv, e(label), standing])
-    out.append(table(["Bangla", "English", "Standing"], rows,
-                     caption="The four theme names in Bangla, and how each "
-                             "string stands."))
-    out.append(note(
-        "<p>The draft Bangla for high contrast was উচ্চ বৈসাদৃশ্য, and the review "
-        "rejected it on two grounds. বৈসাদৃশ্য means dissimilarity — an abstract "
-        "comparison between two things — and not the tonal contrast of a display; "
-        "and উচ্চ is a তৎসম register that clashes with the plain voice used "
-        "everywhere else. বেশি কনট্রাস্ট is the recommended form, licensed as a "
-        "loanword by rule 2.6.</p>"))
-
-    out.append("<h2>The ramps</h2>")
-    out.append(
-        "<p>The numbers do not change between languages. Every ramp, every "
-        "measured ratio and every proof is in the English section, read from the "
-        "same token files.</p>")
-    return "".join(out)
-
-
-# ---------------------------------------------------------------------------
-# Generated chapter — Type
-#
-# Sources: 07_tokens/build/primitive.tokens.json, 08_components/_cards.json,
-#          06_type/_data/measurements.json, 06_type/_data/font_facts.json.
-# ---------------------------------------------------------------------------
-
-
 def cite(entry: dict) -> str:
     """One citation: the authority, the page, its URL and the date it carried."""
     return (f'<span class="gb-cite">{e(entry["title"])} — '
@@ -1550,7 +1228,6 @@ def block_platform_floors() -> str:
     caption_rem = tok_caption = None
     prim = read_json(TOKENS_DIR / "primitive.tokens.json")
     px = prim["dimension"]["type"]["caption"]["$value"]["value"] * 16
-    floor_px = prim["dimension"]["type"]["bangla-min"]["$value"]["value"]
     rows = []
     for row in ty["rows"]:
         clears = px >= row["minimum_pt"]
@@ -1571,9 +1248,7 @@ def block_platform_floors() -> str:
           f'{e(ty["note"])}</p>'
         + f'<p>This kit is built for the web, where the unit is the CSS pixel and '
           f'there is no platform minimum to clear — so its own floor is the one it '
-          f'sets: <b>{px:g} px</b> for the smallest step, and a hard '
-          f'<b>{floor_px:g} px</b> for Bangla at any size, because below that the '
-          f'{bn_raw("মাত্রা")} stops resolving into a line. Ported to an Apple '
+          f'sets: <b>{px:g} px</b> for the smallest step. Ported to an Apple '
           f'platform, that floor clears iOS, iPadOS, macOS, visionOS and watchOS, and '
           f'does <b>not</b> clear tvOS, whose minimum is '
           f'{[r["minimum_pt"] for r in ty["rows"] if r["platform"] == "tvOS"][0]} pt. '
@@ -1739,120 +1414,6 @@ def chapter_type_en(tok: Tokens) -> str:
                      caption="The type scale in rem and at a 16 px root, with the "
                              "measured Bangla multiplier for each step."))
 
-    out.append("<h2>Why Bangla needs a multiplier at all</h2>")
-    out.append(
-        "<p>Bangla and Latin do not look the same size at the same size. Bangla's "
-        "reading height — the distance from the baseline to the মাত্রা, the "
-        "headline stroke running along the top of the letters — sits at about "
-        "0.62 em. Latin's reading height, its x-height, sits at about 0.51 em. "
-        "Setting both at 16 px makes the Bangla look a fifth larger, so the "
-        "Bangla is multiplied down until the two measured heights match.</p>")
-    rows = []
-    for size in ("11", "12", "16", "28", "56", "100"):
-        p = pairing["per_size"][size]
-        rows.append([
-            f"{size} px",
-            f"{p['latin_x_height_px']:.3f} px ({p['latin_x_height_em']:.4f} em)",
-            f"{p['bangla_matra_height_px']:.3f} px ({p['bangla_matra_height_em']:.4f} em)",
-            f"×{p['bangla_appears_larger_by']:.4f}",
-            f"<b>×{p['bangla_size_multiplier']:.3f}</b>",
-        ])
-    out.append(table(["Nominal size", "Literata x-height",
-                      "Noto Serif Bengali baseline to মাত্রা",
-                      "Bangla appears larger by", "Multiplier"], rows,
-                     caption="Where the Bangla multiplier comes from: two "
-                             "measured heights at each nominal size."))
-    out.append(
-        f"<p>The headline figure is <strong>×{pairing['bangla_size_multiplier_at_16']}"
-        "</strong> at body size. It barely moves across the scale, because "
-        "Literata's x-height is nearly flat across its optical-size axis. Every "
-        "figure above was read off real rendered ink in Chromium using the "
-        "Canvas text-metrics interface, not from what the font declares about "
-        "itself.</p>")
-    out.append(note(
-        "<p><strong>Why declared metrics were not trusted.</strong> Noto Sans "
-        "Bengali declares a cap height of 622 units. That is not the height of "
-        "its capital H — it is the মাত্রা height. The field has been repurposed. A "
-        "design system that read it to align two scripts would be aligning to the "
-        "wrong thing entirely.</p>"))
-
-    out.append("<h2>The floor, and the weight bump</h2>")
-    bump = tok.prim("dimension.type.bangla-weight-bump-below")["$value"]["value"]
-    out.append(
-        f"<p><strong>Bangla never goes below {bn_min:g} px</strong>, whatever the "
-        "multiplier would otherwise say. Applying the multiplier strictly all the "
-        "way down drives Bangla under the size at which its মাত্রা and its "
-        "conjuncts survive.</p>")
-    out.append(
-        f"<p><strong>Below {bump:g} px Bangla gains one weight step.</strong> "
-        "Measured at a device scale factor of 1: at 12 px and weight 400 the "
-        "মাত্রা renders at luminance 123 on white, which reads as grey rather than "
-        "black. At weight 500 it holds at 108. Body size lands at 13.1 px and "
-        "caption size lower still, so both gain the step; anything at lead size "
-        "or larger is exempt.</p>")
-    nsb = meas["matra"]["notoserifbengali"]
-    out.append(table(
-        ["Measure", "Noto Serif Bengali"],
-        caption="The মাত্রা stroke, measured, and why it sets a weight step.",
-        rows=
-        [["মাত্রা thickness", f"{nsb['matra_thickness_em']} em"],
-         ["At 16 px", f"{nsb['matra_thickness_px_at_16']} device px"],
-         ["At 11 px", f"{nsb['matra_thickness_px_at_11']} device px"],
-         ["Continuity across কলকাতা at 240 px",
-          f"{nsb['columns_carrying_headline']} of {nsb['columns_total']} columns "
-          f"({nsb['continuity_ratio']:.3f})"]]))
-    out.append(
-        "<p>The thinnest মাত্রা of any text face measured, which is the price of "
-        "the editorial register. It is why the weight bump exists and why the "
-        "floor is not negotiable.</p>")
-    out.append(note(
-        "<p>The floor is a <strong>judgement built on the measurements, not "
-        "itself a measurement</strong>. The trade is between exact size parity "
-        "and Bangla legibility, and legibility wins.</p>"))
-
-    out.append("<h2>Line height</h2>")
-    lh = tok.prim("number.lineHeight.bangla")["$value"]
-    floor = meas["line_height"]["notoserifbengali"]["min_line_height_unitless"]
-    out.append(
-        f"<p>Bangla runs at {lh}. The collision floor — the first line-height at "
-        f"which a descender-heavy Bangla line stacked above a headline-heavy one "
-        f"separates into two bands of ink with clear white between them — was "
-        f"measured at {floor}. The token is the floor plus air, because ink that "
-        "merely stops touching is a low bar.</p>")
-    out.append(note(
-        "<p><strong>Do not use the fonts' own declared line spacing.</strong> The "
-        "default line box a browser computes from declared metrics is wildly "
-        "inconsistent between Bangla faces — one declares 1.866 em, another "
-        "1.325. Setting <code>line-height: normal</code> would give a different "
-        "rhythm per face. Set the token.</p>"))
-
-    out.append("<h2>Shaping</h2>")
-    shaping = meas["shaping"]["notoserifbengali"]
-    words = shaping["words"]
-    rows = []
-    for key, w in words.items():
-        rows.append([
-            bn_raw(w["text"], large=True),
-            str(w["in_chars"]),
-            str(w["out_glyphs"]),
-            "none" if not w["notdef"] else "yes",
-            "none" if not w["dotted_circle"] else "yes",
-        ])
-    out.append(table(["Test string", "Code points", "Glyphs", "Missing glyph",
-                      "Dotted circle"], rows,
-                     caption=f"Conjuncts passed: {shaping['passed']}."))
-    out.append(
-        "<p>Sixteen conjuncts and five words were shaped with HarfBuzz. No "
-        "dotted circles, no missing glyphs, no stray hasantas. The studio name "
-        "shapes 16 code points into 11 glyphs, which is the conjunct formation "
-        "working. A negative control confirmed it: a naive count gives 16 "
-        "glyphs, and shaped output gives 11.</p>")
-    out.append(note(
-        "<p><strong>That is a test for failure, not for quality.</strong> It "
-        "proves nothing is broken. Whether these conjuncts read as well-drawn "
-        "Bangla to a Bangla reader is a judgement no measurement can make, and "
-        "no Bangla reader has been asked.</p>"))
-
     out.append("<h2>The families this one was chosen over</h2>")
     rows = []
     for key, p in meas["ratios"].items():
@@ -1876,42 +1437,8 @@ def chapter_type_en(tok: Tokens) -> str:
         "audiences are equal, that is the one failure that is not acceptable. "
         "Literata has an x-height a full pixel taller, which lifts the multiplier "
         "to ×0.816 and holds it nearly flat across the whole scale.</p>")
-    out.append("<h2>The floor, per platform</h2>")
-    out.append(block_platform_floors())
 
     return "".join(out)
-
-
-def chapter_type_bn(tok: Tokens) -> str:
-    out = [block_gap_notice("gb-5")]
-    meas = read_json(MEASUREMENTS_JSON)
-    out.append("<h2>The word this chapter turns on</h2>")
-    out.append(
-        "<p><strong>মাত্রা</strong> — the headline stroke running along the top of "
-        "the letters. Every size rule in this system exists because of it. It is "
-        "the height that governs how large Bangla looks, and it is the first "
-        "thing to go pale when the type gets small.</p>")
-    shaping = meas["shaping"]["notoserifbengali"]["words"]
-    rows = [[bn_raw(w["text"], large=True), str(w["in_chars"]), str(w["out_glyphs"])]
-            for w in shaping.values()]
-    out.append("<h2>The shaping test strings</h2>")
-    out.append(table(["String", "Code points", "Glyphs"], rows,
-                     caption="The shaping test strings, with code points in and "
-                             "glyphs out."))
-    out.append(
-        "<p>These five strings and sixteen conjuncts were shaped with HarfBuzz "
-        "and produced no dotted circles, no missing glyphs and no stray hasantas. "
-        "The English section carries the full measurement set, the multipliers, "
-        "the 12 px floor and the weight bump — all of them numbers rather than "
-        "prose, identical in both languages.</p>")
-    return "".join(out)
-
-
-# ---------------------------------------------------------------------------
-# Generated chapter — Space and shape
-#
-# Source: 07_tokens/build/primitive.tokens.json.
-# ---------------------------------------------------------------------------
 
 
 def chapter_space_en(tok: Tokens) -> str:
@@ -2016,40 +1543,6 @@ def chapter_space_en(tok: Tokens) -> str:
     return "".join(out)
 
 
-def chapter_space_bn(tok: Tokens) -> str:
-    out = [block_gap_notice("gb-6")]
-    out.append(
-        "<p>This chapter is ten numbers, four numbers, four numbers and two "
-        "numbers. None of them changes between languages, and the English "
-        "section carries all of them with the reason for each.</p>")
-    space = tok.prim("dimension.space")
-    values = [f"{space[k]['$value']['value']:g}"
-              for k in sorted((k for k in space if not k.startswith("$")), key=int)]
-    radii = [f"{tok.prim(f'dimension.radius.{k}')['$value']['value']:g}"
-             for k in ("badge", "control", "card", "hero")]
-    targets = [f"{tok.prim(f'dimension.target.{k}')['$value']['value']:g}"
-               for k in ("min", "apple-min", "comfortable", "android-min")]
-    fw = tok.prim("dimension.focus.ring-width")["$value"]["value"]
-    fo = tok.prim("dimension.focus.ring-offset")["$value"]["value"]
-    out.append(table(
-        ["Scale", "Steps"],
-        caption="Every step of every scale in this chapter, in one place. All "
-                "values in px, read from the token file.",
-        rows=[["Space", ", ".join(values)],
-              ["Radii", ", ".join(radii)],
-              ["Targets", ", ".join(targets)],
-              ["Focus ring", f"{fw:g} wide, {fo:g} offset"]]))
-    return "".join(out)
-
-
-# ---------------------------------------------------------------------------
-# Generated chapter — Components
-#
-# Source: 08_components/_cards.json and the header of
-#         08_components/src/components.css.
-# ---------------------------------------------------------------------------
-
-
 def chapter_components_en(tok: Tokens) -> str:
     cards = read_json(CARDS_JSON)
     out: list[str] = []
@@ -2104,16 +1597,13 @@ def chapter_components_en(tok: Tokens) -> str:
         for card in cards["cards"]:
             if card["group"] != group:
                 continue
-            name_bn = (bn_raw(card["name_bn"], large=True) if card["name_bn"]
-                       else '<span class="gb-muted">no verified Bangla</span>')
             rows.append([
                 f"<b>{e(card['name'])}</b>",
-                name_bn,
                 card["subtitle"],
                 f"{card['width']} × {card['height']}",
             ])
         out.append(f"<h2>{group} — {counts[group]}</h2>")
-        out.append(table(["Card", "Bangla", "What it shows", "Design canvas"], rows,
+        out.append(table(["Card", "What it shows", "Design canvas"], rows,
                          caption=f"The {group.lower()} cards, read from 08_components/_cards.json."))
 
     out.append("<h2>The fonts each card carries</h2>")
@@ -2141,43 +1631,6 @@ def chapter_components_en(tok: Tokens) -> str:
         "check that cannot fail is not a check.</li>"
         "</ul>")
     return "".join(out)
-
-
-def chapter_components_bn(tok: Tokens) -> str:
-    cards = read_json(CARDS_JSON)
-    gaps = cards["_bangla_gaps"]
-    out = [block_gap_notice("gb-7")]
-    out.append("<h2>The cards that do have a verified Bangla name</h2>")
-    rows = [[bn_raw(c["name_bn"], large=True), e(c["name"]), e(c["group"])]
-            for c in cards["cards"] if c["name_bn"]]
-    out.append(table(["Bangla", "English", "Group"], rows,
-                     caption="The cards that do have a verified Bangla name."))
-    # Every number here is counted. This paragraph used to read "Five of the
-    # thirty cards carry a verified Bangla name" and "none of the thirty has a
-    # verified Bangla subtitle" beside a generated "The other {n} do not" — so it
-    # said five, zero and thirty about the same set of cards in one sentence, and
-    # by then the register supplied all thirty of both. Third copy of one fault.
-    total = len(cards["cards"])
-    named = sum(1 for c in cards["cards"] if c["name_bn"])
-    subtitled = sum(1 for c in cards["cards"] if c.get("subtitle_bn"))
-    out.append(
-        f"<p>{named} of the {total} cards carry a verified Bangla name and "
-        f"{subtitled} carry a verified Bangla subtitle. "
-        + ("Every string here comes from the approved register; nothing on a card "
-           "was translated for the card."
-           if named == total and subtitled == total else
-           f"{total - named} card(s) keep their English name and "
-           f"{total - subtitled} keep their English subtitle, and the gap is "
-           f"recorded in the card registry itself rather than filled.")
-        + "</p>")
-    return "".join(out)
-
-
-# ---------------------------------------------------------------------------
-# Generated chapter — Motion
-#
-# Source: 07_tokens/build/primitive.tokens.json and 07_tokens/css/tokens.css.
-# ---------------------------------------------------------------------------
 
 
 def chapter_motion_en(tok: Tokens) -> str:
@@ -2283,42 +1736,8 @@ def chapter_motion_en(tok: Tokens) -> str:
     return "".join(out)
 
 
-def chapter_motion_bn(tok: Tokens) -> str:
-    out = [block_gap_notice("gb-8")]
-    colour_ms = tok.prim("duration.motion.colour")["$value"]["value"]
-    move_ms = tok.prim("duration.motion.move")["$value"]["value"]
-    def curve(key: str) -> str:
-        nums = ", ".join(f"{n:g}" for n in tok.prim(f"cubicBezier.motion.{key}")["$value"])
-        return f"<code>cubic-bezier({nums})</code>"
-
-    out.append(table(
-        ["Token", "Value"],
-        caption="The motion tokens.",
-        rows=[["<code>--as-duration-colour</code>", f"{colour_ms:g} ms"],
-         ["<code>--as-duration-move</code>", f"{move_ms:g} ms"],
-         ["<code>--as-ease-standard</code>", curve("standard")],
-         ["<code>--as-ease-enter</code>", curve("enter")],
-         ["<code>--as-ease-exit</code>", curve("exit")]]))
-    out.append(
-        "<p>Five tokens, and one rule that holds them together: things that move "
-        "may overshoot, things that only change colour never do. The English "
-        "section sets out where that rule came from and why Material's spring "
-        "system was read and not adopted.</p>")
-    return "".join(out)
-
-
-# ---------------------------------------------------------------------------
-# Markdown chapters
-# ---------------------------------------------------------------------------
-
-def render_markdown(path: Path, bn_key: str | None, print_mode: bool) -> str:
+def render_markdown(path: Path, print_mode: bool) -> str:
     text = path.read_text(encoding="utf-8")
-
-    # Inline placeholders first: they belong inside sentences and table cells.
-    def inline_bn(match):
-        return bn_span(match.group(1))
-
-    text = re.sub(r"\{\{bn:([a-z0-9\-]+)\}\}", inline_bn, text)
 
     # Block placeholders become a marker paragraph, replaced after conversion.
     markers: dict[str, str] = {}
@@ -2333,10 +1752,6 @@ def render_markdown(path: Path, bn_key: str | None, print_mode: bool) -> str:
     def block_sub(match):
         kind = match.group(1)
         name = match.group(2) if match.re.groups > 1 else ""
-        if kind == "gap-notice":
-            return stash(block_gap_notice(bn_key))
-        if kind == "bn-block":
-            return stash(block_bn_block(name))
         if kind == "figure":
             return stash({
                 "marks": block_figure_marks,
@@ -2353,16 +1768,11 @@ def render_markdown(path: Path, bn_key: str | None, print_mode: bool) -> str:
                 "icon-mask-measurement": block_icon_mask_measurement,
                 "icon-visual-parity": block_icon_visual_parity,
                 "publication": block_publication,
-                "voice-strings": block_voice_strings,
-                "bn-strings-buttons": block_bn_strings_buttons,
-                "bn-strings-messages": block_bn_strings_messages,
-                "bangla-provenance": block_bangla_provenance,
-                "bangla-gaps": block_bangla_gaps,
+                "bangla-removed": block_bangla_removed,
                 "font-licences": block_font_licences,
                 "kit-index": block_kit_index,
                 "banned-words": block_banned_words,
                 "banned-latin": block_banned_latin,
-                "bangla-punctuation": block_bangla_punctuation,
                 "sources": block_sources,
             }
             if name == "output-files":
@@ -2370,8 +1780,7 @@ def render_markdown(path: Path, bn_key: str | None, print_mode: bool) -> str:
             return stash(builders[name]())
         raise BuildError(f"{path.name}: unknown placeholder {{{{{kind}:{name}}}}}")
 
-    text = re.sub(r"\{\{(gap-notice)\}\}", block_sub, text)
-    text = re.sub(r"\{\{(figure|data|bn-block):([a-z0-9\-]+)\}\}", block_sub, text)
+    text = re.sub(r"\{\{(figure|data):([a-z0-9\-]+)\}\}", block_sub, text)
 
     # Pulled out before Markdown runs, in document order, so each caption stays
     # with the table it was written above.
@@ -2703,60 +2112,38 @@ def build_document(print_mode: bool) -> str:
         "05": chapter_colour_en, "06": chapter_type_en, "07": chapter_space_en,
         "08": chapter_components_en, "09": chapter_motion_en,
     }
-    generated_bn = {
-        "05": chapter_colour_bn, "06": chapter_type_bn, "07": chapter_space_bn,
-        "08": chapter_components_bn, "09": chapter_motion_bn,
-    }
-
     # --- chapters ---------------------------------------------------------
     chapter_html: list[str] = []
     toc_items: list[str] = []
-    for num, slug, title, bn_key, source in CHAPTERS:
+    for num, slug, title, source in CHAPTERS:
         if source == "file":
             en_body = render_markdown(HERE / "chapters" / f"{num}-{slug}.md",
-                                      bn_key, print_mode)
-            bn_body = render_markdown(HERE / "chapters" / "bn" / f"{num}-{slug}.md",
-                                      bn_key, print_mode)
+                                      print_mode)
         else:
             en_body = generated_en[num](tok)
-            bn_body = generated_bn[num](tok)
-
-        # A chapter with no verified Bangla title says so rather than repeating
-        # the English and letting it look like a translation.
-        bn_title_html = (bn_span(bn_key, large=True) if bn_key
-                         else '<span class="gb-muted">no verified Bangla title</span>')
-        bn_title_plain = BN[bn_key] if bn_key else "no verified Bangla title"
 
         chapter_html.append(
             f'<article class="gb-chapter" id="ch-{num}">'
             f'<header class="gb-chapter__head">'
             f'<p class="gb-chapter__num">Chapter {num}</p>'
-            f'<h2 class="gb-chapter__title">{e(title)}'
-            f'<span class="gb-muted"> · </span>{bn_title_html}</h2>'
+            f'<h2 class="gb-chapter__title">{e(title)}</h2>'
             f'<p class="gb-chapter__stand">{e(CHAPTER_STANDFIRST[num])}</p>'
             f"</header>"
+            # The section keeps data-lang and lang, and both are still
+            # load-bearing: lang="en" is what a screen reader picks a voice from,
+            # and it has to be stated rather than inherited. The Bangla sibling
+            # that sat beside this one carried lang="bn" for the same reason —
+            # without it a screen reader pronounced Bengali with an English engine
+            # (WCAG 2.2 SC 3.1.2, Level AA) and none of the Bangla typography
+            # applied. That section, and the toggle that switched to it, went with
+            # the Bangla on 27 August 2026.
             f'<section class="gb-section" data-lang="en" lang="en" id="ch-{num}-en">'
             f'<p class="gb-section__label">English</p>{en_body}</section>'
-            # BOTH attributes, and both are load-bearing for different reasons.
-            # data-lang drives the language toggle's JavaScript. lang="bn" is
-            # what a screen reader reads and what the stylesheet keys on:
-            # tokens.css scopes every Bangla rule to :lang(bn), [lang="bn"].
-            # With only data-lang, this section inherited html lang="en", so a
-            # screen reader pronounced Bengali with an English engine (WCAG 2.2
-            # SC 3.1.2, Level AA) AND none of the Bangla typography applied — no
-            # Noto Serif Bengali, no measured size multiplier, no 12px floor, no
-            # sub-14px weight bump. It rendered in whatever Bangla font the
-            # reader's OS happened to have, or tofu if it had none.
-            f'<section class="gb-section" data-lang="bn" lang="bn" id="ch-{num}-bn">'
-            f'<p class="gb-section__label">Bangla · {bn_raw("বাংলা")}</p>{bn_body}</section>'
             f"</article>"
         )
         toc_items.append(
             f'<li><a href="#ch-{num}"><span class="gb-toc__num">{num}</span>'
             f'<span class="gb-toc__title">{e(title)} '
-            # lang="bn" here too. Only chapter SECTIONS were tagged at first, so the
-            # contents list — 64 Bangla text nodes — still inherited lang="en".
-            f'<span class="gb-toc__bn" lang="bn">· {e(bn_title_plain)}</span>'
             f'<span class="gb-toc__stand">{e(CHAPTER_STANDFIRST[num])}</span>'
             f"</span></a></li>"
         )
@@ -2830,12 +2217,11 @@ def build_document(print_mode: bool) -> str:
     )
 
     toggle = "" if print_mode else (
-        '<div class="gb-bar-top" role="group" aria-label="Language">'
+        # The bar was a language switch, with two buttons and a group role. One
+        # language needs neither, so what is left is the name — a group of one
+        # control is not a group, and announcing it as one is worse than not.
+        '<div class="gb-bar-top">'
         f'<span class="gb-bar-top__name">{bar_mark} Aninda Studio</span>'
-        '<button type="button" class="gb-langbtn" data-set-lang="en" '
-        'aria-pressed="true">English</button>'
-        f'<button type="button" class="gb-langbtn" data-set-lang="bn" '
-        f'aria-pressed="false">{bn_raw("বাংলা")}</button>'
         "</div>"
     )
     script = "" if print_mode else f"<script>{TOGGLE_JS}</script>"
@@ -2844,7 +2230,6 @@ def build_document(print_mode: bool) -> str:
         '<header class="gb-cover">'
         f'<div class="gb-cover__mark">{cover_mark}</div>'
         "<h1>The Aninda Studio guidebook</h1>"
-        f'<p class="gb-cover__bn">{bn_span("wm-1", large=True)}</p>'
         '<p class="gb-cover__lede">The mark, the colour, the type, the '
         "components, the words, the licences, and the honest list of what is "
         "missing. One file, no network.</p>"
@@ -3035,54 +2420,6 @@ def walk_language_scopes(doc: str):
         yield token, lang
 
 
-def tag_inline_bangla(doc: str) -> tuple[int, int, str]:
-    """Declare the language of every run that differs from its context.
-
-    WCAG 2.2 SC 3.1.2 Language of Parts asks for the language of any part that
-    differs from the language around it, and that cuts BOTH ways. Chapter prose
-    mentions Bangla words inside English sentences constantly, and the Bangla
-    chapters carry English gap notices, section labels and technical terms.
-
-    Three earlier attempts were each wrong, and instructively so:
-      1. Only the chapter sections were tagged, with data-lang="bn" instead of
-         lang="bn" — so a screen reader read Bengali with an English engine and
-         none of the Bangla typography applied.
-      2. Bangla was tagged but English was not, leaving 439 English text nodes
-         inside the Bangla sections declared Bangla: the same defect reversed.
-      3. Scope was tracked with a bare counter that decremented on any closing
-         tag, so the first </p> closed the section and 14 English runs were
-         wrapped where 439 needed it.
-
-    Returns (bangla_runs, english_runs, document).
-    """
-    out: list[str] = []
-    n_bn = n_en = 0
-
-    # An SVG <title> is an accessible name and cannot nest a span, so its language
-    # has to go on the element itself. Eight of them sit inside Bangla sections
-    # with English names, and they are the last place a screen reader would read
-    # English with a Bengali engine.
-    doc = re.sub(r"<title>(?=[^<]*[A-Za-z]{4})", '<title lang="en">', doc)
-
-    for token, lang in walk_language_scopes(doc):
-        if lang is None or lang == "skip" or not token.strip():
-            out.append(token)
-            continue
-        if lang == "bn":
-            def wrap_en(m):
-                nonlocal n_en
-                n_en += 1
-                return f'<span lang="en">{m.group(0)}</span>'
-            out.append(_sub_outside_entities(_ENGLISH_RUN, wrap_en, token))
-        else:
-            def wrap_bn(m):
-                nonlocal n_bn
-                n_bn += 1
-                return f'<span lang="bn">{m.group(0)}</span>'
-            out.append(_sub_outside_entities(_BANGLA_RUN, wrap_bn, token))
-
-    return n_bn, n_en, "".join(out)
-
 def guard_english(documents: dict[str, str]) -> None:
     for label, doc in documents.items():
         text = strip_tags(doc)
@@ -3104,29 +2441,6 @@ def guard_english(documents: dict[str, str]) -> None:
             raise BuildError(
                 f"{label}: an exclamation mark reached the book. Context: "
                 f"…{text[max(0, hit - 70):hit + 70].strip()}…")
-
-
-def verified_bangla_vocabulary() -> set[str]:
-    vocab: set[str] = set()
-    for path in VERIFIED_BN_SOURCES:
-        for run in BENGALI_RUN.findall(path.read_text(encoding="utf-8")):
-            vocab.add(run)
-    for value in BN.values():
-        for run in BENGALI_RUN.findall(value):
-            vocab.add(run)
-    return vocab
-
-
-def guard_bangla(documents: dict[str, str]) -> None:
-    vocab = verified_bangla_vocabulary()
-    for label, doc in documents.items():
-        text = strip_tags(doc)
-        for run in BENGALI_RUN.findall(text):
-            if run not in vocab:
-                raise BuildError(
-                    f"{label}: the Bangla run '{run}' does not appear in any "
-                    "verified source. No Bangla may be written for this book — "
-                    "leave the English and name the gap instead.")
 
 
 def guard_placeholders(documents: dict[str, str]) -> None:
@@ -3198,24 +2512,6 @@ def guard_kit(documents: dict[str, str]) -> None:
     if base64.b64decode(hit.group(1)) != path.read_bytes():
         raise BuildError(
             f"the inlined payload for {display} does not match the file on disk.")
-
-
-def guard_bn_sections(documents: dict[str, str]) -> None:
-    """One book, not two: every chapter must carry both sections in both files."""
-    for label, doc in documents.items():
-        for num, _slug, _title, _bn, _src in CHAPTERS:
-            for lang in ("en", "bn"):
-                if f'id="ch-{num}-{lang}"' not in doc:
-                    raise BuildError(f"{label}: chapter {num} has no {lang} section.")
-        if doc.count('data-lang="bn"') != len(CHAPTERS):
-            raise BuildError(
-                f"{label}: {doc.count('data-lang=\"bn\"')} Bangla sections for "
-                f"{len(CHAPTERS)} chapters.")
-
-
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 
 
 def guard_tables(documents: dict[str, str]) -> None:
@@ -3342,67 +2638,33 @@ def guard_split_entities(documents: dict[str, str]) -> None:
             )
 
 
-def guard_inline_bangla(documents: dict[str, str]) -> None:
-    """Every run must sit in a scope declaring its own language.
-
-    Bangla outside lang="bn" is read by an English speech engine and gets none of
-    the Bangla typography. English inside lang="bn" is the same fault reversed.
-    Both are WCAG 2.2 SC 3.1.2, Level AA.
-    """
-    bn = re.compile(r"[\u0980-\u09FF]")
-    for name, doc in documents.items():
-        bad_bn: list[str] = []
-        bad_en: list[str] = []
-        for token, lang in walk_language_scopes(doc):
-            if lang is None or lang == "skip" or not token.strip():
-                continue
-            if bn.search(token) and lang != "bn":
-                bad_bn.append(token.strip()[:44])
-            # Character references are masked out before looking for English,
-            # exactly as the tagger masks them before inserting a span. `&quot;`
-            # is one double-quote to a reader, not the four English letters
-            # q-u-o-t; without this the guard demands a lang="en" span around
-            # punctuation the tagger is now — correctly — refusing to enter.
-            # The tagger and its guard have disagreed about this document twice
-            # before, so they read the same way by construction.
-            if (lang == "bn" and not bn.search(token)
-                    and re.search(r"[A-Za-z]{4}", _ENTITY.sub(" ", token))):
-                bad_en.append(token.strip()[:44])
-        if bad_bn or bad_en:
-            raise SystemExit(
-                f"{name}: {len(bad_bn)} Bangla run(s) outside lang=\"bn\" and "
-                f"{len(bad_en)} English run(s) inside it. A screen reader would "
-                f"pronounce each in the wrong language, and the Bangla typography "
-                f"is keyed on :lang(bn). Bangla: {bad_bn[:2]} English: {bad_en[:2]}"
-            )
-
 def build_all() -> dict[str, str]:
     docs = {
         OUT_INTERACTIVE.name: build_document(print_mode=False),
         OUT_PRINT.name: build_document(print_mode=True),
     }
 
-    # Tag inline Bangla BEFORE the guards run, so guard_inline_bangla below is
-    # checking the document that actually ships rather than the one before this
-    # pass. Chapter prose mentions Bangla words inside English sentences and those
-    # runs arrive here untagged.
-    for name in list(docs):
-        n_bn, n_en, docs[name] = tag_inline_bangla(docs[name])
-        if n_bn or n_en:
-            print(f"  tagged {n_bn} Bangla and {n_en} English run(s) in {name}")
+    # A pass here used to tag every inline Bangla run with lang="bn" before the
+    # guards ran, so guard_inline_bangla checked the document that actually shipped
+    # rather than the one before tagging. Chapter prose mentioned Bangla words
+    # inside English sentences and those runs arrived untagged.
+    #
+    # With one language there is nothing to tag: the whole document is English and
+    # says so once, on <html>. The three Bangla guards went with it —
+    # guard_bangla checked every run against a verified source, guard_bn_sections
+    # counted one Bangla section per chapter, and guard_inline_bangla enforced
+    # WCAG 2.2 SC 3.1.2 in both directions. The rule they enforced now lives in
+    # the English-standard checker, inverted: Bangla anywhere outside the record is
+    # a failure there, which is one rule instead of four.
     guard_split_entities(docs)
     guard_platform_claims(docs)
 
     guard_own_css()
     guard_placeholders(docs)
     guard_english(docs)
-    guard_bangla(docs)
     guard_no_external(docs)
     guard_tables(docs)
-    guard_bangla_standard_summary()
     guard_kit(docs)
-    guard_bn_sections(docs)
-    guard_inline_bangla(docs)
     return docs
 
 

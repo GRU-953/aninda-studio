@@ -1,21 +1,31 @@
 <!-- Hand-written chapter. build.py reads this file; it never writes it. -->
 
-The studio is called **Aninda Studio** in English and {{bn:wm-1}} in Bangla.
+The studio is called **Aninda Studio**. The name is Bangla, romanised, and
+that is worth one paragraph — it explains a spelling that otherwise looks
+like a mistake.
 
 {{figure:wordmarks}}
 
 ## The one thing that looks like an inconsistency, and is not
 
-The Bangla is **{{bn:wm-2}}**. The Latin is **aninda**. Those are not the same
+The Bangla spelling transliterates as **anindya**. The Latin is **aninda**.
+Those are not the same
 word letter for letter, and a careful reader will notice. Here is the answer in
-one line: {{bn:wm-2}} transliterates as *anindya*, and *aninda* is the ordinary
+one line: *anindya* is the letter-for-letter transliteration, and *aninda* is
+the ordinary
 everyday spelling the name has always been written with in Latin script. It is
 transliteration, not a mistake, and I would rather say so here than let someone
 find it and wonder.
 
-Both forms are correct. Neither is a shortened version of the other. Use the
-Bangla in Bangla text and the Latin in Latin text, and never mix scripts inside
-one word.
+Both forms are correct. Neither is a shortened version of the other.
+
+This system ships English, as of 27 August 2026, so the Latin form is the one
+that appears in everything it builds. The name in Bengali script is not printed
+in this book, and that is this book's own rule rather than squeamishness: the
+Bengali face left with the Bangla, and a Bengali run with no Bengali font prints
+in whatever the reader's machine happens to have — which is the one thing this
+book must not do. `06_type/BANGLA-STANDARD.md` holds the script, the standard
+that governed it, and the reason it was dropped.
 
 ## How to write it
 
@@ -23,9 +33,7 @@ one word.
 | Situation | Write |
 |---|---|
 | Full name, English | Aninda Studio |
-| Full name, Bangla | {{bn:wm-1}} |
 | Short form, English | Aninda |
-| Short form, Bangla | {{bn:wm-2}} |
 | Repository name | `aninda-studio` |
 | The two token packages | `aninda-studio-tokens` |
 | Domain | `anindastudio.com` — chosen, and not registered as of 19 August 2026 |

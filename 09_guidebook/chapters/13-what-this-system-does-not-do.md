@@ -39,7 +39,7 @@ second Bangla reader, and it cannot substitute for one.
 
 The type work has the same shape. HarfBuzz shaping produced no dotted circles,
 no missing glyphs and no stray hasantas across sixteen conjuncts in all ten
-Bangla faces, and pixel analysis confirmed the মাত্রা is continuous. **That proves
+Bangla faces, and pixel analysis confirmed the matra is continuous. **That proves
 nothing is broken. It does not prove the Bangla is good.** Whether Noto Serif
 Bengali's conjuncts read as well-drawn Bangla to someone in Barishal is a
 judgement no measurement can make.
@@ -50,14 +50,14 @@ below.
 
 ## Chromium only
 
-Every rendered measurement in this system — the type metrics, the মাত্রা
+Every rendered measurement in this system — the type metrics, the matra
 continuity, the line-height collision floors, the contrast readings, the focus
 ring — comes from **headless Chromium**, at a device scale factor of 1 for
 measurement and 2 for the specimen images. It runs on macOS here and on Ubuntu in
 CI, from a clean checkout, so the readings are not particular to one machine.
 
 Windows uses DirectWrite. Android has its own stack. Hinting and stem darkening
-differ between them. The findings most likely to move are the sub-pixel মাত্রা
+differ between them. The findings most likely to move are the sub-pixel matra
 results at 11 px and 12 px. Safari and Firefox were not tested at all.
 
 Nothing was tested in print, either. The device-pixel argument that sets the
@@ -101,9 +101,26 @@ be invisible. Saying which would be a guess, and this book will not guess.
 - **This system has one user.** It has never been handed to a second designer to
   build with. Everything about how learnable it is is untested.
 
-## The Bangla gaps in this book, by chapter
+## The half of this system that was removed
 
-{{data:bangla-gaps}}
+This book was bilingual. Every chapter carried an English section and a Bangla
+one, a language toggle switched between them, and no Bangla was ever written for
+it — only strings checked against the Bangla Academy's own dictionary, page by
+page, with the ruling recorded beside each one. Where no approved string existed,
+the book said so rather than inventing one.
+
+It was removed on 27 August 2026, by the owner's decision, and this system now
+ships English.
+
+What was measured before it went is worth keeping, because it is the strongest
+piece of measurement in the book and none of it was guesswork:
+
+{{data:bangla-removed}}
+
+The record itself is `06_type/BANGLA-STANDARD.md`, with the string register in
+`06_type/BANGLA-STRINGS.md` and the face measurements in
+`06_type/MEASUREMENTS.md`. All three are kept, and all three are still held to
+the English standard.
 
 ## What would close these
 

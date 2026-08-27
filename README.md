@@ -55,7 +55,7 @@ and their alert both say the figures are examples rather than readings.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.3 MB) that needs no network, plus a 1.9 MB PDF |
+| `09_guidebook/` | **The guidebook.** 13 chapters in English and Bangla, one self-contained HTML file (15.1 MB) that needs no network, plus a 1.2 MB PDF |
 | `07_tokens/` | The design tokens: DTCG source, and 66 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
 | `04_mark/` | 18 mark, wordmark and icon files |

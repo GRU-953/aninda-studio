@@ -103,13 +103,16 @@ warm.** A sentence is never made friendlier at the cost of being right.
 - Sentence case for everything — headings, buttons, labels.
 - Never rely on colour alone. Every state carries a word and a glyph as well.
 
-## The four interface strings, in both languages
+## The reference strings
 
-These are the reference strings the whole system is written against. The Bangla
-is not a translation of the English; each was written in its own language and
-then checked against the Bangla Academy rules.
+The nine button and message strings the whole system is written against are in
+`06_type/BANGLA-STRINGS.md`, which is now a record rather than a working list.
 
-{{data:voice-strings}}
+This section used to print them in two columns, English and Bangla, because the
+Bangla was not a translation: each was written in its own language and then
+checked against the Bangla Academy's rules. With one language there is no pairing
+left to show, and the strings themselves are ordinary English prose held to the
+rest of this chapter.
 
 ## What this does not mean
 
@@ -117,6 +120,3 @@ then checked against the Bangla Academy rules.
   having less to say.
 - **Not shorter at any cost.** A sentence that saves three words and costs a
   re-read is a bad trade.
-- **Not the same as the Bangla.** The Bangla is written as Bangla. Where the two
-  must agree exactly — a number, a licence name, a file name — they agree.
-  Everywhere else they are written independently.
