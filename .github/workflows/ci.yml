@@ -372,6 +372,14 @@ jobs:
       - name: The emitted Swift package must build and its tests must pass
         # The package is laid out in a temporary copy and built there, so no
         # .build directory lands in the generated tree for the drift gate to find.
+        #
+        # This runner is where the components are compiled for iOS, watchOS, tvOS
+        # and visionOS. The development Mac has the macOS SDK alone, so its local
+        # run reports those four as NOT compiled and this job is the only place
+        # they are — the one gate in this repository that CI proves and a local run
+        # cannot. An API can be available on macOS and unavailable on watchOS:
+        # onHover(perform:) and UIPasteboard both are, and both reached this
+        # package before anything caught them.
         run: python 15_native/build.py --check --require swift
 
   native-android:

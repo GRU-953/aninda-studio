@@ -283,8 +283,8 @@
     }
    ],
    "measured": "30 cards, HTML and CSS only: 1,109 lines and 87 class blocks in 08_components/src/components.css. No SwiftUI, no Compose, no Material role names, no Cupertino equivalents.",
-   "fix": "Part met 26 August 2026. The token layer both platforms need now exists and is compiled. The component layer does not: SwiftUI and Compose implementations are not written, and neither could carry the gate this layer does — SwiftUI is absent from the open-source Linux toolchain and Compose needs the Android SDK. 15_native/LIMITS.md states that boundary rather than letting the strong gate on the token layer imply cover for code that does not exist.",
-   "status": "open"
+   "fix": "Closed 27 August 2026 for the component layer. 16 SwiftUI components are authored against the CSS reference and compile: the package builds and its tests pass under Swift 6.3.3, and a gate refuses any authored file carrying a literal colour or a literal size — the native analogue of the stylesheet guard, proven in both directions by planting a literal and watching it fail. Android takes the idiomatic route instead of a parallel set: Material's own components read colour, type and shape from the theme, so AnindaTheme supplies a ColorScheme built with the PRIMARY constructor and every Material component is themed at once. Reimplementing Compose's Button would discard the ripple, the state layers, the touch-target expansion and the accessibility it already has. Two things remain: the eight patterns are not implemented, and the components are compiled for macOS here and for the other four Apple platforms only by CI, because this machine has one SDK.",
+   "status": "closed"
   },
   {
    "id": "G-MOTION-1",

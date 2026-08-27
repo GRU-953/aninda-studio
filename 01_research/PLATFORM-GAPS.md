@@ -8,7 +8,7 @@ Apple Human Interface Guidelines and App Store Connect, and Google Material 3, A
 
 23 gaps found: **8 blockers**, 8 major, 7 minor.
 
-**13 are now closed**, 8 are open and 2 are deferred with the reason recorded. Of the 8 blockers, **1 remain open**.
+**14 are now closed**, 7 are open and 2 are deferred with the reason recorded. Of the 8 blockers, **1 remain open**.
 
 20 of 23 cite a published requirement, across 14 distinct sources; the rest are rules this kit sets for itself and are marked as such. A closed gap keeps its entry, because the record of what was wrong is the useful part.
 
@@ -28,7 +28,6 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 | `G-ICON-4` | No adaptive icon exists at all | Google | Blocker | **closed** |
 | `G-ICON-6` | No Play Store icon | Google | Blocker | **closed** |
 | `G-STORE-1` | No feature graphic | Google | Blocker | **closed** |
-| `G-NATIVE-2` | No component maps to either platform | Both | Major | open |
 | `G-REC-1` | The type recommendation names a stack that did not ship | This kit's own record | Major | open |
 | `G-REC-4` | The benchmark missed an announcement nine days older than its own check date | This kit's own record | Major | open |
 | `G-COLOUR-2` | No Material 3 role mapping exists | Google | Major | **closed** |
@@ -36,6 +35,7 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 | `G-ICON-5` | No monochrome layer, so themed icons fall back or are machine-generated | Google | Major | **closed** |
 | `G-ICON-7` | No artefact is designated the Mono appearance layer | Apple | Major | **closed** |
 | `G-NATIVE-1` | Tokens reach no Apple or Android surface | Both | Major | **closed** |
+| `G-NATIVE-2` | No component maps to either platform | Both | Major | **closed** |
 | `G-A11Y-1` | Contrast is measured by WCAG relative luminance only; Apple now names APCA as well | Apple | Minor | open |
 | `G-MOTION-1` | Reduced motion removes transitions rather than substituting a fade | Both | Minor | open |
 | `G-REC-2` | A third, stale type answer survives in the directions build | This kit's own record | Minor | open |
@@ -278,13 +278,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-NATIVE-2` — No component maps to either platform
 
-**Major** · Both · open
+**Major** · Both · closed
 
 **What is required.** Apple gives default and minimum control sizes per platform — 44×44 pt default and 28×28 pt minimum on iOS and iPadOS — and asks for roughly 12 pt of padding around bezelled elements and 24 pt around unbezelled ones. Android core app quality requires touch targets of at least 48 dp (Touch_Target_Size), 3:1 contrast for large text and graphics and 4.5:1 for small text (Visual_Contrast), and a content description on every element that is not a TextView (Content_Description). A stylesheet can satisfy none of these on either platform.
 
 **What is here.** 30 cards, HTML and CSS only: 1,109 lines and 87 class blocks in 08_components/src/components.css. No SwiftUI, no Compose, no Material role names, no Cupertino equivalents.
 
-**The fix.** Part met 26 August 2026. The token layer both platforms need now exists and is compiled. The component layer does not: SwiftUI and Compose implementations are not written, and neither could carry the gate this layer does — SwiftUI is absent from the open-source Linux toolchain and Compose needs the Android SDK. 15_native/LIMITS.md states that boundary rather than letting the strong gate on the token layer imply cover for code that does not exist.
+**The fix.** Closed 27 August 2026 for the component layer. 16 SwiftUI components are authored against the CSS reference and compile: the package builds and its tests pass under Swift 6.3.3, and a gate refuses any authored file carrying a literal colour or a literal size — the native analogue of the stylesheet guard, proven in both directions by planting a literal and watching it fail. Android takes the idiomatic route instead of a parallel set: Material's own components read colour, type and shape from the theme, so AnindaTheme supplies a ColorScheme built with the PRIMARY constructor and every Material component is themed at once. Reimplementing Compose's Button would discard the ripple, the state layers, the touch-target expansion and the accessibility it already has. Two things remain: the eight patterns are not implemented, and the components are compiled for macOS here and for the other four Apple platforms only by CI, because this machine has one SDK.
 
 **Sources.**
 

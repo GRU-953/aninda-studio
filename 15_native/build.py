@@ -54,6 +54,36 @@ ANDROID = HERE / "android"
 
 GENERATED = ("GENERATED FILE. Written by 15_native/build.py. Do not hand-edit — "
              "the next build overwrites it.")
+
+# Two kinds of file live under 15_native, and confusing them would delete work.
+#
+# GENERATED — the token layers. Written by this script, swept if this script stops
+# writing them, and never edited by hand.
+#
+# AUTHORED — the SwiftUI bridge, the Compose theme, and the components. These are
+# CODE, not values. 08_components/src/components.css is the precedent: a
+# hand-written source that a generator reads, guards and bundles rather than
+# writes. Deriving a button's layout from a token file would mean inventing a
+# component language, and this system has enough of those.
+#
+# The sweep is scoped to the generated trees ONLY. Everything under an authored
+# root is read and gated, never removed.
+AUTHORED_ROOTS = (
+    "apple/Sources/AnindaTokensUI",
+    "apple/Sources/AnindaComponents",
+    "apple/Sources/AnindaExamples",
+    "android/compose/src/main/kotlin",
+)
+# NOT the stubs. compose/stubs is GENERATED — it is in `files`, so the sweep keeps
+# it — and listing it as authored made the second Kotlin pass collect it twice,
+# once from `files` and once off disk. kotlinc then reported "overload resolution
+# ambiguity between candidates" with the same signature printed twice, which is a
+# confusing way to be told a file was compiled twice.
+
+
+def is_authored(p: Path) -> bool:
+    rel = p.relative_to(HERE).as_posix()
+    return any(rel.startswith(root + "/") for root in AUTHORED_ROOTS)
 THEMES = ("light", "dark", "hc-light", "hc-dark")
 SWIFT_NAME = {"light": "light", "dark": "dark",
               "hc-light": "highContrastLight", "hc-dark": "highContrastDark"}
@@ -273,7 +303,16 @@ def swift_dimensions(data: dict) -> str:
 # =========================================================================
 
 def kt_const(name: str) -> str:
-    return name.upper().replace("-", "_")
+    """SCREAMING_SNAKE, including from camelCase.
+
+    A plain .upper() turns Material's `onSecondaryContainer` into
+    ONSECONDARYCONTAINER, which is not a name anybody can read and is not what the
+    Kotlin that consumes it expects. The boundary between a lower-case letter and
+    an upper-case one is a word boundary, so it becomes an underscore.
+    """
+    import re as _re
+    spaced = _re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name)
+    return spaced.upper().replace("-", "_")
 
 
 def kotlin_tokens(data: dict) -> str:
@@ -466,6 +505,17 @@ def compile_swift(files: dict[Path, str]) -> str:
             q.parent.mkdir(parents=True, exist_ok=True)
             q.write_text(text, encoding="utf-8")
             n += 1
+        # The AUTHORED sources too, read off disk. The package is the generated
+        # token layer PLUS the SwiftUI bridge and the components, and compiling
+        # only half of it would prove only half of it — while reporting that the
+        # package builds.
+        for p in sorted(APPLE.rglob("*.swift")):
+            if not is_authored(p):
+                continue
+            q = root / p.relative_to(APPLE)
+            q.parent.mkdir(parents=True, exist_ok=True)
+            q.write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
+            n += 1
         res = subprocess.run(["swift", "build", "--package-path", str(root)],
                              capture_output=True, text=True)
         if res.returncode != 0:
@@ -492,7 +542,72 @@ def compile_swift(files: dict[Path, str]) -> str:
     return (f"{n} file Swift package builds and tests with {ver} — {detail}")
 
 
+DESTINATIONS = (("macOS", "generic/platform=macOS"),
+                ("iOS", "generic/platform=iOS"),
+                ("watchOS", "generic/platform=watchOS"),
+                ("tvOS", "generic/platform=tvOS"),
+                ("visionOS", "generic/platform=visionOS"))
+
+
+def compile_swift_platforms(root: Path) -> str:
+    """Build for every platform the package declares, and NAME the ones it could not.
+
+    `swift build` compiles for the host and nothing else. The package declares five
+    platforms, and an API can be perfectly available on macOS and unavailable on
+    watchOS — `onHover(perform:)` and `UIPasteboard` both are. A macOS-only build
+    reports success over code that cannot compile for the platform the components
+    are mostly FOR.
+
+    A destination whose SDK is not installed is REPORTED, never skipped in silence.
+    This machine has macOS alone; the macos-15 runner has all five. So a local pass
+    means less than a CI pass here, which is the opposite of the arrangement
+    everywhere else in this repository, and saying so is the only honest way to
+    have it.
+    """
+    if shutil.which("xcodebuild") is None:
+        return "xcodebuild is absent, so only the host platform was compiled"
+    built, missing = [], []
+    # Derived data goes OUTSIDE the tree. Building into it left a .dd directory
+    # inside 15_native/apple that the sweep then deleted file by file, which is a
+    # lot of churn to announce for a build product.
+    dd = tempfile.mkdtemp(prefix="aninda-dd-")
+    for name, dest in DESTINATIONS:
+        res = subprocess.run(
+            ["xcodebuild", "-scheme", "AnindaComponents", "-destination", dest,
+             "-derivedDataPath", dd, "build"],
+            cwd=root, capture_output=True, text=True)
+        out = res.stdout + res.stderr
+        if "BUILD SUCCEEDED" in out:
+            built.append(name)
+        elif "is not installed" in out or "Unable to find a destination" in out:
+            missing.append(name)
+        else:
+            errs = [l.strip() for l in out.splitlines() if ": error:" in l][:6]
+            raise BuildError(
+                f"the components do not build for {name}:\n  "
+                + "\n  ".join(errs or [out[-1200:]]))
+    shutil.rmtree(dd, ignore_errors=True)
+    note = f"components build for {', '.join(built)}"
+    if missing:
+        note += (f" — NOT compiled for {', '.join(missing)}, whose SDKs are not "
+                 f"installed on this machine. Those platforms are compiled by the "
+                 f"macos-15 job in CI and by nothing here")
+    return note
+
+
 def compile_kotlin(files: dict[Path, str]) -> str:
+    """Two compiles, and they prove different things.
+
+    FIRST the framework-free core, on its own. That one is the real claim: this
+    Kotlin needs nothing but a Kotlin compiler, and it is what the token layer's
+    strong gate is made about.
+
+    SECOND the authored Compose sources, against the declared surface in
+    compose/stubs. That proves the theme parses, that every name and arity is
+    consistent, that the token constants exist and are the right type, and — since
+    the stubbed ColorScheme takes all 48 parameters with no defaults — that not one
+    Material role was forgotten. It does not prove they compile against androidx.
+    """
     if shutil.which("kotlinc") is None:
         raise NotEquipped(
             "kotlinc is not on PATH, so the emitted Kotlin cannot be compiled. "
@@ -500,7 +615,10 @@ def compile_kotlin(files: dict[Path, str]) -> str:
     with tempfile.TemporaryDirectory() as tmp:
         paths = []
         for p, text in files.items():
-            if p.suffix != ".kt":
+            # The framework-free core only. The stubs are a declared surface, not
+            # part of the claim this pass makes, and counting them here would
+            # inflate the figure the gate reports.
+            if p.suffix != ".kt" or "compose/stubs" in str(p):
                 continue
             q = Path(tmp) / p.name
             q.write_text(text, encoding="utf-8")
@@ -511,13 +629,44 @@ def compile_kotlin(files: dict[Path, str]) -> str:
         if res.returncode != 0:
             raise BuildError("the emitted Kotlin does not compile:\n"
                              + (res.stderr or res.stdout)[:2000])
+
+        # Second compile: the authored Compose sources, plus the generated token
+        # layer they import, plus the declared surface.
+        stub_paths, compose_paths = [], []
+        for p, text in files.items():
+            if "compose/stubs" in str(p):
+                q = Path(tmp) / "stub" / p.name
+                q.parent.mkdir(parents=True, exist_ok=True)
+                q.write_text(text, encoding="utf-8")
+                stub_paths.append(str(q))
+        for p in sorted(ANDROID.rglob("*.kt")):
+            if is_authored(p):
+                q = Path(tmp) / "authored" / p.name
+                q.parent.mkdir(parents=True, exist_ok=True)
+                q.write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
+                compose_paths.append(str(q))
+        n_compose = 0
+        if compose_paths:
+            res2 = subprocess.run(
+                ["kotlinc", *sorted(stub_paths), *sorted(paths),
+                 *sorted(compose_paths), "-d", str(Path(tmp) / "out2"), "-nowarn"],
+                capture_output=True, text=True)
+            if res2.returncode != 0:
+                raise BuildError(
+                    "the authored Compose sources do not compile against the "
+                    "declared surface:\n" + (res2.stderr or res2.stdout)[:2500])
+            n_compose = len(compose_paths)
         ver = subprocess.run(["kotlinc", "-version"], capture_output=True,
                              text=True)
         # kotlinc reports its version on stderr with an "info:" prefix. Keeping it
         # would put a log level into a generated document.
         v = (ver.stderr or ver.stdout).strip().splitlines()[0]
         v = v.removeprefix("info:").strip()
-    return f"{len(paths)} Kotlin file(s) compile with {v}"
+    core = f"{len(paths)} framework-free Kotlin file(s) compile with {v}"
+    if n_compose:
+        core += (f"; {n_compose} authored Compose file(s) compile against the "
+                 f"declared surface in compose/stubs, NOT against androidx")
+    return core
 
 
 def guard_values_match_source(files: dict[Path, str], data: dict) -> str:
@@ -563,37 +712,176 @@ def guard_values_match_source(files: dict[Path, str], data: dict) -> str:
     return f"{checked} emitted colour values re-derived and matched to their tokens"
 
 
+# The two trees the framework-free claim is actually about. Everything else in
+# 15_native either imports a framework on purpose (the SwiftUI bridge, the
+# components) or is not source at all (Package.swift).
+FRAMEWORK_FREE = ("apple/Sources/AnindaTokens/",
+                  "android/core/src/main/kotlin/")
+
+
 def guard_no_framework_imports(files: dict[Path, str]) -> str:
-    """The strong gate only means something if these files stay importless."""
+    """The strong gate only means something if THOSE files stay importless.
+
+    Scoped, and it has to be. The first version swept every file and tripped on
+    Package.swift for the words "import SwiftUI" inside a COMMENT explaining which
+    targets do import it. A guard that cannot tell a comment from an import, on a
+    file that is not even in the target it protects, fails the build for being
+    right about something it was not asked.
+    """
     banned = ("import SwiftUI", "import UIKit", "import AppKit", "androidx.",
               "import android.")
+    checked = 0
     for p, text in files.items():
-        if p.suffix not in (".swift", ".kt"):
+        rel = p.relative_to(HERE).as_posix()
+        if not any(rel.startswith(t) for t in FRAMEWORK_FREE):
             continue
-        if "/Tests/" in str(p):
-            continue        # XCTest is a framework and a test file may import it
+        checked += 1
         for b in banned:
             if b in text:
                 raise BuildError(
-                    f"{p.relative_to(ROOT)} contains '{b}'. This layer is compiled "
-                    f"by swiftc and kotlinc alone, and a framework import turns a "
-                    f"real gate into one that cannot run.")
-    return "no framework import reached the layer that is compiled here"
+                    f"{p.relative_to(ROOT)} contains '{b}'. This is the layer "
+                    f"compiled by swiftc and kotlinc alone, and a framework import "
+                    f"turns a real gate into one that cannot run.")
+    return (f"no framework import reached the {checked} files the framework-free "
+            f"claim is made about")
+
+
+def guard_authored_uses_tokens() -> str:
+    """No authored component may carry a literal colour or a literal size.
+
+    This is the native analogue of 08_components/build.py's guard_stylesheet, which
+    refuses a hex in the hand-written CSS. The reason is the same and it is not
+    style: a literal is a value nobody measured, sitting in a system whose entire
+    claim is that every value was. One `Color(red: 0.13, ...)` in a button and the
+    contrast figures this repository publishes stop describing what ships.
+
+    What it looks for, and what it deliberately does not. A hex string, an RGB
+    initialiser and a bare number used as a size all fail. A number used as a
+    COUNT, a fraction, a line-height multiplier or an opacity does not — those are
+    not sizes, and refusing them would push authors into inventing tokens for
+    things that are not design decisions. The line between the two is drawn by the
+    property being set, not by the number.
+    """
+    import re
+    HEX = re.compile(r'#[0-9A-Fa-f]{3,8}\b')
+    # A colour built from NUMBERS. Not from a token's own components — the whole
+    # point of AnindaTokensUI is to be the one place that conversion happens, and
+    # `Color(.sRGB, red: c.red, ...)` reading a measured value is the conversion
+    # rather than a violation of it. The first version matched the construct and
+    # failed the bridge for existing.
+    RGB = re.compile(r'(?:\.(?:sRGB|displayP3)\s*,\s*)?red:\s*[\d.]+|'
+                     r'Color\s*\(\s*0x|Color\s*\(\s*"#')
+    # A number given to a property that positions or sizes something.
+    SIZED = re.compile(
+        r'\.(padding|frame|cornerRadius|lineWidth|offset|spacing|size|'
+        r'strokeBorder|inset)\s*\([^)]*?(?<![\w.])(\d+(?:\.\d+)?)(?![\w.])')
+    ALLOW = {"0", "1", "0.0", "1.0", "2"}   # hairlines, zero, and a 2px focus ring
+    problems: list[str] = []
+    n = 0
+    for root, exts in ((APPLE, (".swift",)), (ANDROID, (".kt",))):
+        if not root.is_dir():
+            continue
+        for p in sorted(root.rglob("*")):
+            if p.suffix not in exts or not is_authored(p):
+                continue
+            n += 1
+            for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+                code = line.split("//")[0]
+                if HEX.search(code):
+                    problems.append(f"{p.relative_to(ROOT)}:{i}: a literal colour")
+                if RGB.search(code):
+                    problems.append(f"{p.relative_to(ROOT)}:{i}: a colour built "
+                                    f"from components rather than from a token")
+                for m in SIZED.finditer(code):
+                    if m.group(2) not in ALLOW:
+                        problems.append(
+                            f"{p.relative_to(ROOT)}:{i}: the literal size "
+                            f"{m.group(2)} on .{m.group(1)} — use a token")
+    if problems:
+        raise BuildError(
+            "authored source carries values nobody measured:\n  "
+            + "\n  ".join(problems[:25])
+            + (f"\n  ... and {len(problems) - 25} more" if len(problems) > 25 else ""))
+    return f"{n} authored source file(s) carry no literal colour and no literal size"
+
+
+def guard_component_contract() -> str:
+    """One SwiftUI component per component card, and no orphans either way.
+
+    08_components/_cards.json is the registry the whole system counts from: the
+    README, the site and the Figma plan all read it. If the native library drifts
+    from it — a card with no component, or a component with no card — then the
+    README's "16 SwiftUI components" is a number that happens to be right rather
+    than one that is kept right.
+
+    Both directions, because the interesting failure is the quiet one: adding a
+    card and forgetting the component leaves a documented thing that does not
+    exist, and that is worse than the reverse.
+    """
+    reg = json.loads((ROOT / "08_components" / "_cards.json").read_text())
+    cards = reg["cards"] if isinstance(reg, dict) and "cards" in reg else reg
+    names = {c["name"] for c in cards if c["group"] == "Components"}
+
+    # The registry's names are prose ("Checkbox and radio", "Empty state"); the
+    # files are identifiers. One mapping, stated here rather than guessed by
+    # normalising, because a guess would silently accept a rename.
+    FILE_FOR = {
+        "Button": "Button", "Input": "Input", "Select": "Select",
+        "Checkbox and radio": "Checkbox", "Textarea": "Textarea",
+        "Badge": "Badge", "Card": "Card", "Alert": "Alert", "Dialog": "Dialog",
+        "Table": "Table", "Tabs": "Tabs", "Nav": "Nav",
+        "Breadcrumb": "Breadcrumb", "Toast": "Toast",
+        "Empty state": "EmptyState", "Code block": "CodeBlock",
+    }
+    unmapped = sorted(names - set(FILE_FOR))
+    if unmapped:
+        raise BuildError(
+            f"these component cards have no entry in FILE_FOR: {unmapped}. A card "
+            f"added to the registry needs a component or an explicit reason not to "
+            f"have one.")
+
+    src = APPLE / "Sources" / "AnindaComponents"
+    on_disk = {p.stem for p in src.glob("*.swift")} if src.is_dir() else set()
+    expected = {FILE_FOR[n] for n in names}
+    missing = sorted(expected - on_disk)
+    extra = sorted(on_disk - expected)
+    if missing:
+        raise BuildError(f"the registry lists components with no SwiftUI file: "
+                         f"{missing}")
+    if extra:
+        raise BuildError(f"these SwiftUI files match no component card: {extra}. "
+                         f"A component nothing documents is a component nobody "
+                         f"finds.")
+    return (f"{len(expected)} SwiftUI components, one for each component card in "
+            f"08_components/_cards.json, with nothing orphaned either way")
 
 
 def guard_deprecated_names(files: dict[Path, str]) -> str:
     """background, onBackground and surfaceVariant may appear ONLY in the Material
     adapter, and only as role names there. Criterion 21 forbids them as tokens."""
+    # Scoped to the files that define TOKENS, which is what criterion 21 is about.
+    #
+    # The three names are REQUIRED wherever Material's constructor is spoken to:
+    # the adapter that fills it, the declared surface that stubs it, and the theme
+    # that calls it. Sweeping every file failed the build on the stub's own
+    # parameter list — the guard catching the library for being the library.
+    ADAPTERS = ("Material.kt", "material3.kt", "Theme.kt")
+    checked = 0
     for p, text in files.items():
-        if p.name == "Material.kt":
+        rel = p.relative_to(HERE).as_posix()
+        if p.name in ADAPTERS:
             continue
+        if not any(rel.startswith(t) for t in FRAMEWORK_FREE):
+            continue
+        checked += 1
         for name in ("BACKGROUND", "ON_BACKGROUND", "SURFACE_VARIANT"):
             if name in text.upper().replace("-", "_"):
                 raise BuildError(
                     f"{p.relative_to(ROOT)} carries the deprecated Material name "
                     f"'{name}'. Criterion 21 forbids it as a token name; it is "
-                    f"permitted only as a constructor argument in the adapter.")
-    return "no deprecated Material role name is used as a token name"
+                    f"permitted only where Material's constructor is spoken to.")
+    return (f"no deprecated Material role name is used as a token name "
+            f"in the {checked} files that define tokens")
 
 
 PACKAGE_SWIFT = '''// swift-tools-version: 5.9
@@ -605,12 +893,25 @@ let package = Package(
     platforms: [.iOS(.v17), .macOS(.v14), .watchOS(.v10), .tvOS(.v17), .visionOS(.v1)],
     products: [
         .library(name: "AnindaTokens", targets: ["AnindaTokens"]),
+        .library(name: "AnindaTokensUI", targets: ["AnindaTokensUI"]),
+        .library(name: "AnindaComponents", targets: ["AnindaComponents"]),
     ],
     targets: [
-        // Framework-free on purpose. It imports nothing, so `swift build` and
-        // `swiftc -typecheck` both compile it anywhere Swift runs — which is what
-        // makes the gate on it a real one.
+        // GENERATED, and framework-free on purpose. It imports nothing, so it
+        // compiles anywhere Swift runs — which is what makes the gate on it real.
         .target(name: "AnindaTokens"),
+
+        // AUTHORED from here down. These import SwiftUI, so they compile only
+        // where Apple's SDKs are: on a Mac, and on the macos-15 runner. They are
+        // kept in separate targets so the framework-free claim above stays true of
+        // the target it is made about.
+        .target(name: "AnindaTokensUI", dependencies: ["AnindaTokens"]),
+        .target(name: "AnindaComponents",
+                dependencies: ["AnindaTokens", "AnindaTokensUI"]),
+        .target(name: "AnindaExamples",
+                dependencies: ["AnindaTokens", "AnindaTokensUI",
+                               "AnindaComponents"]),
+
         .testTarget(name: "AnindaTokensTests", dependencies: ["AnindaTokens"]),
     ]
 )
@@ -669,6 +970,8 @@ def build_files(data: dict) -> dict[Path, str]:
     f[ANDROID / "tokens/src/main/res/values/dimens.xml"] = android_dimens_xml(data)
     f[ANDROID / "tokens/src/main/res/values-bn/dimens.xml"] = \
         android_dimens_bn_xml(data)
+    for name, text in compose_stubs(data).items():
+        f[ANDROID / "compose/stubs" / name] = text
     return f
 
 
@@ -703,11 +1006,27 @@ valid Swift and would pass every compiler.
 
 ## What is deliberately not here
 
-- **No SwiftUI, no Compose.** Both layers import nothing. That is what lets a
-  compiler run on them at all: SwiftUI is an Apple-only framework, absent from the
-  open-source Swift toolchain on Linux, and Compose needs the Android SDK. A
-  framework layer would carry a weaker gate, and mixing the two would let this
-  page's strong claim cover code it never tested.
+- **The framework-free claim is about the TOKEN layer, and only that.**
+  `AnindaTokens` and the Kotlin core import nothing, which is what lets a compiler
+  run on them anywhere. `AnindaTokensUI`, `AnindaComponents` and the Compose theme
+  all import a framework on purpose and are kept in separate targets so the claim
+  stays true of the target it is made about.
+- **The components are compiled for macOS here and for nothing else.** The package
+  declares five Apple platforms; this machine has the macOS SDK alone. An API can
+  be available on macOS and unavailable on watchOS — `onHover(perform:)` and
+  `UIPasteboard` both are, and both reached this package before anything caught
+  them. The macos-15 job in CI is the only place the other four are compiled, which
+  makes it the one gate here that CI proves and a local run cannot.
+- **The Compose sources are compiled against a DECLARED SURFACE, not androidx.**
+  The Android SDK is not installed. Compiling against `compose/stubs` proves the
+  Kotlin parses, that every name and arity is consistent, that the token constants
+  exist and are the right type, and — because the stubbed `ColorScheme` takes all
+  48 parameters with no defaults — that not one Material role was forgotten. It
+  does not prove the code compiles against androidx. A stub can differ from the
+  library it imitates, and if it does, this gate passes and a real build fails.
+- **No pattern is implemented.** `AnindaExamples` is a placeholder. The eight
+  patterns are page compositions rather than components, and they are the part of
+  the approved scope that is not done.
 - **No rendered measurement.** Every contrast figure the native layer carries was
   computed from the same rounded 8-bit hexes the stylesheet uses, under the same
   worst-case sweep. No native pixel has been read. The browser harness measures
@@ -765,12 +1084,18 @@ def main(argv: list[str]) -> int:
         files = build_files(data)
         notes = [
             guard_no_framework_imports(files),
+            guard_authored_uses_tokens(),
+            guard_component_contract(),
             guard_deprecated_names(files),
             guard_values_match_source(files, data),
         ]
         for name, fn in (("swift", compile_swift), ("kotlin", compile_kotlin)):
             try:
                 notes.append(fn(files))
+                if name == "swift":
+                    # Only after the package is known to build for the host. There
+                    # is no sense asking about watchOS while macOS is broken.
+                    notes.append(compile_swift_platforms(APPLE))
             except NotEquipped:
                 if name in required:
                     raise
@@ -796,9 +1121,10 @@ def main(argv: list[str]) -> int:
                    for p in root.rglob("*") if p.is_file()]
         skip = ignored(on_disk)
         for p in sorted(on_disk):
-            if p.resolve() not in skip and p not in files:
-                problems.append(f"{p.relative_to(ROOT)} is in the tree and is not "
-                                f"generated by this build")
+            if p.resolve() in skip or is_authored(p) or p in files:
+                continue
+            problems.append(f"{p.relative_to(ROOT)} is in the tree and is not "
+                            f"generated by this build")
         if problems:
             print("--check: the native layer differs from the build:", file=sys.stderr)
             for x in problems:
@@ -814,9 +1140,10 @@ def main(argv: list[str]) -> int:
     skip = ignored(on_disk)
     removed = []
     for p in sorted(on_disk):
-        if p.resolve() not in skip and p not in files:
-            p.unlink()
-            removed.append(p.relative_to(ROOT))
+        if p.resolve() in skip or is_authored(p) or p in files:
+            continue
+        p.unlink()
+        removed.append(p.relative_to(ROOT))
     for p, text in sorted(files.items()):
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(text, encoding="utf-8")
@@ -835,6 +1162,188 @@ def main(argv: list[str]) -> int:
           "it. What that compile does NOT prove is in LIMITS.md.")
     return 0
 
+
+# =========================================================================
+# The declared Compose surface, and the stub compiled against it
+# =========================================================================
+
+def compose_stubs(data: dict) -> dict[str, str]:
+    """Enough of Compose, declared, for kotlinc to compile the authored theme.
+
+    WHY THIS EXISTS, AND WHAT IT IS NOT
+    ===================================
+    The Android SDK is not installed here and installing it is a change to
+    somebody's machine. Without it, `kotlinc` cannot resolve `androidx`, so the
+    Compose sources would ship with NO compiler having looked at them — weaker than
+    the Swift side by a long way, and a weakness that would sit inside a document
+    claiming everything is measured.
+
+    Compiling against a declared surface is the strongest thing available short of
+    the real SDK. It proves the Kotlin parses, that every name and arity the
+    authored code uses is consistent, that the token constants it references exist
+    and are the right type, and — because ColorScheme's stub takes all 48
+    parameters with no defaults — that not one Material role has been forgotten.
+
+    It does NOT prove the code compiles against androidx. A stub can differ from
+    the library it imitates, and if it does, this gate passes and the real build
+    fails. 15_native/LIMITS.md says that in those words rather than these.
+
+    The ColorScheme parameter list is not typed here: it is read from
+    15_native/_proof/material3.roles.json, which took it from ColorScheme.kt on
+    androidx-main. So the stub cannot drift from the list the derivation used, and
+    a Material release that adds a role changes both together or neither.
+    """
+    params = data["material3"]["constructor"]["order"]
+    args = ",\n".join(f"    public val {p}: Color" for p in params)
+    banner = (f"// {GENERATED}\n//\n// A DECLARED SURFACE, not androidx. See "
+              f"compose_stubs() in 15_native/build.py\n// for what compiling "
+              f"against this does and does not prove.\n"
+              f'@file:Suppress("unused", "UNUSED_PARAMETER")\n\n')
+
+    files: dict[str, str] = {}
+
+    files["runtime.kt"] = banner + """package androidx.compose.runtime
+
+// TYPE and TYPE_PARAMETER are what let @Composable sit on a function TYPE, which
+// is how every content lambda in Compose is declared. Without them kotlinc refuses
+// `content: @Composable () -> Unit` — the shape of essentially every composable
+// that takes children.
+@Target(
+    AnnotationTarget.CLASS,
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER,
+    AnnotationTarget.TYPE,
+    AnnotationTarget.TYPE_PARAMETER,
+    AnnotationTarget.PROPERTY,
+)
+@Retention(AnnotationRetention.BINARY)
+public annotation class Composable
+
+public interface CompositionLocal<T> { public val current: T }
+
+public class ProvidableCompositionLocal<T>(private val v: T) : CompositionLocal<T> {
+    override val current: T get() = v
+    public infix fun provides(value: T): Pair<ProvidableCompositionLocal<T>, T> =
+        this to value
+}
+
+public fun <T> staticCompositionLocalOf(default: () -> T):
+    ProvidableCompositionLocal<T> = ProvidableCompositionLocal(default())
+
+@Composable
+public fun CompositionLocalProvider(
+    vararg values: Pair<ProvidableCompositionLocal<*>, Any?>,
+    content: @Composable () -> Unit,
+) { }
+"""
+
+    files["graphics.kt"] = banner + """package androidx.compose.ui.graphics
+
+public class Color(public val value: Long) {
+    public companion object { public val Transparent: Color = Color(0L) }
+}
+"""
+
+    files["unit.kt"] = banner + """package androidx.compose.ui.unit
+
+public class Dp(public val value: Float)
+public val Int.dp: Dp get() = Dp(this.toFloat())
+public val Float.dp: Dp get() = Dp(this)
+
+public class TextUnit(public val value: Float)
+public val Float.sp: TextUnit get() = TextUnit(this)
+public val Int.sp: TextUnit get() = TextUnit(this.toFloat())
+"""
+
+    files["font.kt"] = banner + """package androidx.compose.ui.text.font
+
+public class FontFamily {
+    public companion object { public val Default: FontFamily = FontFamily() }
+}
+
+public class FontWeight(public val weight: Int) {
+    public companion object {
+        public val Normal: FontWeight = FontWeight(400)
+        public val Medium: FontWeight = FontWeight(500)
+        public val SemiBold: FontWeight = FontWeight(600)
+        public val Bold: FontWeight = FontWeight(700)
+    }
+}
+"""
+
+    files["text.kt"] = banner + """package androidx.compose.ui.text
+
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+
+public class TextStyle(
+    public val fontFamily: FontFamily? = null,
+    public val fontWeight: FontWeight? = null,
+    public val fontSize: TextUnit? = null,
+    public val lineHeight: TextUnit? = null,
+)
+"""
+
+    files["shape.kt"] = banner + """package androidx.compose.foundation.shape
+
+import androidx.compose.ui.unit.Dp
+
+public class RoundedCornerShape(public val radius: Dp)
+"""
+
+    files["foundation.kt"] = banner + """package androidx.compose.foundation
+
+import androidx.compose.runtime.Composable
+
+@Composable
+public fun isSystemInDarkTheme(): Boolean = false
+"""
+
+    files["material3.kt"] = banner + """package androidx.compose.material3
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.shape.RoundedCornerShape
+
+// Every parameter, and NO defaults. That is the completeness gate: a role left out
+// is a compile error rather than Material's baseline purple shipped in silence.
+// The list is read from material3.roles.json, which took it from ColorScheme.kt on
+// androidx-main, so the stub cannot drift from the list the derivation used.
+public class ColorScheme(
+""" + args + """,
+)
+
+public class Shapes(
+    public val extraSmall: RoundedCornerShape,
+    public val small: RoundedCornerShape,
+    public val medium: RoundedCornerShape,
+    public val large: RoundedCornerShape,
+    public val extraLarge: RoundedCornerShape,
+)
+
+public class Typography(
+    public val displayLarge: TextStyle, public val displayMedium: TextStyle,
+    public val displaySmall: TextStyle, public val headlineLarge: TextStyle,
+    public val headlineMedium: TextStyle, public val headlineSmall: TextStyle,
+    public val titleLarge: TextStyle, public val titleMedium: TextStyle,
+    public val titleSmall: TextStyle, public val bodyLarge: TextStyle,
+    public val bodyMedium: TextStyle, public val bodySmall: TextStyle,
+    public val labelLarge: TextStyle, public val labelMedium: TextStyle,
+    public val labelSmall: TextStyle,
+)
+
+@Composable
+public fun MaterialTheme(
+    colorScheme: ColorScheme,
+    typography: Typography,
+    shapes: Shapes,
+    content: @Composable () -> Unit,
+) { }
+"""
+    return files
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv[1:]))
