@@ -923,7 +923,7 @@ def package_readme(store: str, items: list[dict], text_rows, text_rows_bn) -> st
     mine = [i for i in items if i["root"].name.endswith(
         "apple-app-store" if is_apple else "google-play")]
     rows = "\n".join(
-        f"| `{i['path']}` | {i['w']} x {i['h']} | {i['bytes']:,} | {i['purpose']}|"
+        f"| `{i['path']}` | {i['w']} x {i['h']} | {i['purpose']}|"
         for i in sorted(mine, key=lambda x: x["path"]))
     lang = "English and Bangla" if True else ""
     return f"""<!-- {DO_NOT_EDIT} -->
@@ -939,8 +939,8 @@ incomplete as a submission, and `CHECKLIST.md` says which is which.
 
 ## What is in here
 
-| File | Pixels | Bytes | What it is |
-|---|---|---|---|
+| File | Pixels | What it is |
+|---|---|---|
 {rows}
 
 ## The text
@@ -1047,7 +1047,14 @@ def manifest(store: str, items: list[dict], rows, rows_bn) -> str:
                          "space its numbers are in. It does not claim the renderer "
                          "produced sRGB values, and no Display P3 asset exists, so no "
                          "P3 claim is made for any platform."),
-        "files": [{k: i[k] for k in ("path", "w", "h", "bytes", "alpha", "purpose")
+        # No per-file byte count. A PNG's size depends on the rasteriser that
+        # made it, so this document said 470 bytes on macOS and something else on
+        # Ubuntu — and it is handed to somebody as the description of a package
+        # they will upload, which makes a machine-specific figure worse here than
+        # anywhere else in this repository. The one size that is load-bearing is
+        # the Play icon's 1024 KB ceiling, and guard_max_bytes() enforces that at
+        # build time against the published limit rather than reporting it.
+        "files": [{k: i[k] for k in ("path", "w", "h", "alpha", "purpose")
                    if k in i} | {"spec": VERIFIED[i["cite"]]["spec"],
                                  "source": VERIFIED[i["cite"]]["url"],
                                  "checked": VERIFIED[i["cite"]]["checked"]}

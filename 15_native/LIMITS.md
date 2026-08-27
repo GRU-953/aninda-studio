@@ -6,7 +6,7 @@ Written by `15_native/build.py`. This page exists because the gate on this layer
 unusually strong, and a strong gate invites a reader to assume cover it does not
 give.
 
-## What was actually run
+## What the build asserted
 
 - no framework import reached the 4 files the framework-free claim is made about
 - 37 authored source file(s) carry no literal colour and no literal size
@@ -15,9 +15,13 @@ give.
 - 2 platform-limited API(s) are wrapped only in apple/Sources/AnindaTokensUI/Theme.swift, and every component calls the wrapper rather than the API
 - no deprecated Material role name is used as a token name in the 3 files that define tokens
 - 160 emitted colour values re-derived and matched to their tokens
-- 30 file Swift package builds and tests with Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101) — Executed 3 tests, with 0 failures (0 unexpected)
-- components and patterns build for macOS — NOT compiled for iOS, watchOS, tvOS, visionOS, whose SDKs are not installed on this machine. Those platforms are compiled by the macos-15 job in CI and by nothing here
-- 2 framework-free Kotlin file(s) compile with kotlinc-jvm 2.4.10 (JRE 26.0.2); 11 authored Compose file(s) compile against the declared surface in compose/stubs, NOT against androidx
+
+The compile record — which compilers ran, at which versions, and which platforms
+this machine could build for — is printed by the build and deliberately not
+written here. It describes the machine rather than the layer, and it cannot be the
+same on two machines: a runner with every Apple SDK installed compiles five
+platforms where a development machine compiles one. Committing that figure would
+mean this file could never be diffed, or could only be diffed on one computer.
 
 ## What a compile proves
 

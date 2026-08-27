@@ -1158,7 +1158,28 @@ def build_files(data: dict) -> dict[Path, str]:
     return f
 
 
+# Notes that report THIS RUN rather than a property of the layer. They are
+# printed and they are NOT written into LIMITS.md, because that file is committed
+# and diffed byte for byte: a note naming "Apple Swift version 6.3.3
+# (swiftlang-6.3.3.1.3 clang-2100.1.1.101)" or "(JRE 26.0.2)" cannot match on a
+# runner with a different toolchain, and the platform note is DIFFERENT BY DESIGN
+# on a machine with all five SDKs — which is the macos-15 job, the one place the
+# other four platforms are compiled at all.
+#
+# CI found this twice in one afternoon: both native jobs failed with
+# "15_native/LIMITS.md differs from the build" while every gate inside them passed.
+# The compile record belongs on stdout, where it is read once by whoever ran it.
+RUN_SPECIFIC = ("builds and tests with", "compile with kotlinc",
+                "build for", "NOT COMPILED HERE", "xcodebuild is absent")
+
+
+def is_run_specific(note: str) -> bool:
+    return any(marker in note for marker in RUN_SPECIFIC)
+
+
 def limits(notes: list[str]) -> str:
+    # Only the notes that are true of the LAYER, not of the machine.
+    notes = [n for n in notes if not is_run_specific(n)]
     return f"""<!-- {GENERATED} -->
 
 # What the native layer proves, and what it does not
@@ -1167,9 +1188,16 @@ Written by `15_native/build.py`. This page exists because the gate on this layer
 unusually strong, and a strong gate invites a reader to assume cover it does not
 give.
 
-## What was actually run
+## What the build asserted
 
 {chr(10).join(f'- {n}' for n in notes)}
+
+The compile record — which compilers ran, at which versions, and which platforms
+this machine could build for — is printed by the build and deliberately not
+written here. It describes the machine rather than the layer, and it cannot be the
+same on two machines: a runner with every Apple SDK installed compiles five
+platforms where a development machine compiles one. Committing that figure would
+mean this file could never be diffed, or could only be diffed on one computer.
 
 ## What a compile proves
 
