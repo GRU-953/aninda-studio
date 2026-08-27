@@ -76,9 +76,22 @@ valid Swift and would pass every compiler.
   were read from, so a divergence is attributable and dated; and a pattern may use
   only a Material composable corresponding to one of the sixteen component cards,
   which is why there is no icon set, no navigation library and no `LazyColumn`
-  here. **The real fix is not a better stub.** `ubuntu-24.04` carries the Android
-  SDK, so a Gradle job compiling against real androidx would replace this gate
-  rather than reinforce it. That is not built.
+  here.
+
+  **It is no longer the only check on that code.** A Gradle job on `ubuntu-24.04`
+  compiles the Compose theme and the eight patterns against REAL androidx —
+  Material 3 from the stable channel, by way of `compose-bom`. The stub is what a
+  developer machine without the Android SDK can run; the Gradle gate is what says
+  whether the code actually builds. Where the two disagree, the Gradle gate is
+  right, and CI is the only place it runs.
+- **The Gradle gate touches the network, and this is the only thing here that
+  does.** Every other build script in this repository reads the tree and nothing
+  else. Resolution is pinned by VERSION and by channel, and the gate runs in CI
+  alone — but NOT pinned by content: `gradle/verification-metadata.xml`, a sha256
+  per artefact, does not exist yet, because producing it needs a JDK no machine
+  this system is developed on has. An artefact republished under a pinned version
+  would be taken. That is the same standing as `requirements.txt`, and it is
+  written down rather than assumed away.
 - **The patterns are compiled for five platforms and laid out for none.** Eight
   screens exist on both native platforms and every one of them compiles, but a
   compile is not a layout. Nothing here has measured a pattern on a screen, and

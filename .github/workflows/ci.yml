@@ -395,9 +395,16 @@ jobs:
           python-version: '3.13'
       - name: The emitted Kotlin must compile
         # Framework-free by design: no androidx import, so kotlinc alone compiles
-        # it. A Compose layer would need the Android SDK and a weaker gate, and
-        # 15_native/LIMITS.md says so rather than letting this one imply cover.
+        # it. The Compose half is checked by the next step, against the real
+        # library rather than the declared surface this one uses.
         run: python 15_native/build.py --check --require kotlin
+
+      - name: The Compose sources must compile against real androidx
+        # THE ONLY GATE HERE THAT TOUCHES THE NETWORK. Every version is pinned with
+        # its channel, and Material 3 is taken from stable rather than the 1.5.0
+        # alpha where much of Expressive lives. A local run reports the refusal and
+        # the install command instead of printing ok.
+        run: python 15_native/build.py --check --require gradle
 
   render:
     runs-on: ubuntu-latest

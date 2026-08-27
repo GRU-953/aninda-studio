@@ -148,6 +148,17 @@ run "15_native/material3.py" $PY 15_native/material3.py --check
 # Both compilers, because this machine has both. Each CI job can only prove one,
 # so a local pass here is stronger than either of them on its own.
 run "15_native/build.py"      $PY 15_native/build.py --check --require swift,kotlin
+# The Compose sources against REAL androidx. This asks for gradle, which no machine
+# here has — `java` on macOS without a JDK is a stub that prints an error — so this
+# prints the refusal and the install command rather than ok. It is the second gate
+# CI proves and a local run cannot, after the Apple platform sweep, and both say so
+# out loud rather than letting a green local run imply cover they do not give.
+printf '%-46s ' "compose against androidx"
+if $PY 15_native/build.py --check --require gradle >/dev/null 2>&1; then
+  echo "ok"
+else
+  echo "NOT CHECKED HERE — needs gradle and a JDK; CI runs it on ubuntu-24.04"
+fi
 run "14_delivery/build.py"    $PY 14_delivery/build.py --check
 run "10_assets/build.py"      $PY 10_assets/build.py --check
 run "guidebook PDF vs the book" $PY 09_guidebook/scripts/pdf.py --check
