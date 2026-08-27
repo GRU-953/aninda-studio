@@ -27,13 +27,25 @@ MARKS = ASSETS / "marks"
 
 THEMES = ("light", "dark", "hc-light", "hc-dark")
 
-# The mark's own size floor. Derived here, not taken from the mark manifest,
-# which states the stroke rule and the safe field but no minimum size.
-#
-# At 16 px the heavy stroke (15 of 100 units) renders at 2.4 px and the circle's
-# counter — the enclosed space inside it — is about 5.6 px across. Below that the
-# counter closes and the mark reads as a filled blob.
-MARK_FLOOR_PX = 16
+def mark_floor_px() -> float:
+    """The mark's size floor, READ from the manifest rather than typed here.
+
+    It was `mark_floor_px() = 16`, a constant in this consumer with its derivation in
+    a comment — so the number deciding whether an asset may be made lived beside
+    the code that refuses, and not with the artwork it describes. That was gap
+    G-REC-3, and the fix it asked for was "computed rather than typed".
+
+    04_mark/build.py now computes it from three figures already in that manifest:
+    the heavy stroke, the grid, and the circle's radius. What closes first at small
+    sizes is the circle's COUNTER — the enclosed space inside the bowl — and the
+    build reports it at 6.56 px at the floor. The comment that used to sit here
+    said "about 5.6 px"; nobody had recomputed it, which is the argument for not
+    keeping arithmetic in prose.
+    """
+    path = MARKS / "manifest.json"
+    if not path.exists():
+        raise NotEquipped(f"{path} is missing. This skill needs its assets/marks folder.")
+    return float(json.loads(path.read_text("utf-8"))["minimum_px"]["value"])
 
 # The stroke rule is READ from assets/marks/manifest.json, not typed here. See
 # stroke_rule() below. It used to be the constant `STROKE_SWITCH_PX = 24` with a
@@ -460,13 +472,13 @@ def guard_no_shadow(shadow: bool) -> None:
 
 
 def guard_mark_size(size: float, weight: str) -> None:
-    if size < MARK_FLOOR_PX:
+    if size < mark_floor_px():
         raise Refused(
-            f"The mark may not be made smaller than {MARK_FLOOR_PX} px.",
-            f"Asked for {size:g} px. At {MARK_FLOOR_PX} px the heavy stroke renders at 2.4 px and "
+            f"The mark may not be made smaller than {mark_floor_px():g} px.",
+            f"Asked for {size:g} px. At {mark_floor_px():g} px the heavy stroke renders at 2.4 px and "
             "the circle's counter is about 5.6 px across. Below that the counter closes and the "
             "mark reads as a filled blob.",
-            f"Use --size {MARK_FLOOR_PX} or larger. For anything smaller than a favicon, use no "
+            f"Use --size {mark_floor_px()} or larger. For anything smaller than a favicon, use no "
             "mark at all rather than an unreadable one.",
         )
     strokes = stroke_rule()
@@ -614,11 +626,11 @@ def make_icon(args) -> dict:
         }
 
     size = int(args.size)
-    if size < MARK_FLOOR_PX:
+    if size < mark_floor_px():
         raise Refused(
-            f"An icon may not be made smaller than {MARK_FLOOR_PX} px.",
+            f"An icon may not be made smaller than {mark_floor_px():g} px.",
             f"Asked for {size} px. The mark inside it would fall below its own floor.",
-            f"Use --size {MARK_FLOOR_PX} or larger.",
+            f"Use --size {mark_floor_px()} or larger.",
         )
     published = {192: "icon-192.svg", 512: "icon-512.svg", 1024: "icon-1024.svg", 1088: "icon-1088-watch.svg"}
     # THE STROKE RULE APPLIES HERE TOO. It did not, and that is why the studio's
@@ -656,11 +668,11 @@ def make_icon(args) -> dict:
 
 def make_tile(args) -> dict:
     size = int(args.size)
-    if size < MARK_FLOOR_PX:
+    if size < mark_floor_px():
         raise Refused(
-            f"A tile may not be made smaller than {MARK_FLOOR_PX} px.",
+            f"A tile may not be made smaller than {mark_floor_px():g} px.",
             f"Asked for {size} px. The mark inside it would fall below its own floor.",
-            f"Use --size {MARK_FLOOR_PX} or larger.",
+            f"Use --size {mark_floor_px()} or larger.",
         )
     strokes = stroke_rule()
     svg = resized(read_mark("tile-web.svg"), size, size)
@@ -756,7 +768,7 @@ def do_list(semantic) -> dict:
         "grounds": ", ".join(surface_roles(semantic)),
         "the mark may be drawn in": ", ".join(MARK_COLOUR_ROLES),
         "mark weights": "regular (stroke 9, at 24 px and above), heavy (stroke 15, below 24 px)",
-        "mark size floor": f"{MARK_FLOOR_PX} px",
+        "mark size floor": f"{mark_floor_px():g} px",
         "wordmark scripts": "latin, bangla",
         "published icon sizes": "192, 512, 1024, 1088 (watchOS)",
         "the one exception": (

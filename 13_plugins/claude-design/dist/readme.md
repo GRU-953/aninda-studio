@@ -3,7 +3,7 @@
 Generated. The source of truth is the repository:
 <https://github.com/GRU-953/aninda-studio>
 
-- 18 preview cards in `guidelines/`
+- 17 preview cards in `guidelines/`
 - 4 colour ramps of 11 steps in `tokens/`
 - 4 themes: light, dark, high-contrast light, high-contrast dark
 - 1 stylesheet, `styles.css`, holding the tokens, the component layer and the

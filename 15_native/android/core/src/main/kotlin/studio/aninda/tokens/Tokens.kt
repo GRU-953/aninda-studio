@@ -150,28 +150,6 @@ public object AnindaTarget {
     public const val ANDROID_MIN: Int = 48
 }
 
-/**
- * Bangla is set smaller than Latin so the two look the same size, and the
- * multipliers were measured on rendered specimens rather than estimated.
- *
- * Material classifies Bangla as a MEDIUM language-height script, needing
- * roughly 7 per cent taller line heights at the same nominal size. These
- * figures are not that measurement and are not offered as agreeing with
- * it: this system's Bangla leading is 1.6 against Latin's 1.55, which is
- * +3.2 per cent, and the Bangla is also set at x0.816 — so its absolute
- * line box is smaller, not larger. Both numbers are published; neither
- * confirms the other.
- */
-public object AnindaBangla {
-    public const val CAPTION: Float = 0.815f
-    public const val BODY: Float = 0.816f
-    public const val HEADING: Float = 0.817f
-    public const val TITLE: Float = 0.822f
-    public const val DISPLAY: Float = 0.825f
-    public const val MINIMUM_SP: Int = 12
-    public const val WEIGHT_BUMP_BELOW_SP: Int = 14
-}
-
 public object AnindaMotion {
     public const val COLOUR_MS: Int = 120
     public const val MOVE_MS: Int = 220

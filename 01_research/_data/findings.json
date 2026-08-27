@@ -32,6 +32,14 @@
       "half_right": 0,
       "by": "the palette-replacement pass",
       "note": "One entry, raised while replacing the brand palette. The instance was removed in the same commit; the gate that would have caught it does not exist and the entry stays open for that reason."
+    },
+    {
+      "date": "28 August 2026",
+      "covered": 1,
+      "already_fixed": 0,
+      "half_right": 0,
+      "by": "the English-only pass",
+      "note": "One entry: the method finding the platform-gap register had been pointing at since 26 August without it existing."
     }
   ],
   "_preamble": "# Open findings — carried forward\n\n<!-- This file ships, so it is held to 02_strategy/ENGLISH-STANDARD.md like any\n other prose here — including the banned-word list. Four banned words arrived\n in it when the findings were copied in verbatim from the reviewers' own\n wording, and CI's lint job caught them. If you paste a finding in, reword it.\n A findings record that breaks the rule it records findings about is a poor\n advertisement for the rule. -->\n\nRound 1 of the convergence review raised 59 findings across six independent\nlenses, each adversarially verified before it counted. The blockers and majors\nwere fixed. These minors were judged not worth the change at the time, and are\nrecorded here rather than dropped, because an unwritten known fault becomes an\nunknown one within a week.\n\nEach is real and reproducible. None affects correctness of the design system's\noutput. If you disagree with a judgement, the finding is here to be picked up.\n",
@@ -1706,13 +1714,33 @@
       "body": "This repository's rule is that no Bangla is written for it: only strings checked against the Bangla Academy standard appear, and where none exists the English stands with the gap named. 09_guidebook/build.py enforces it — it hard-fails on any unverified Bangla run — and 08_components/build.py records its gaps in _cards.json.\n\nA colour direction spec carries label_bn for every family and for the direction itself, and nothing checks those. When the palette was replaced on 26 August 2026 the new spec was written with Bangla names that had never been verified — প্রাকৃতিক নীল, প্রাকৃতিক ধূসর and the rest. They reached the palette proof and would have reached the guidebook had a second fault not been masking them.\n\nThe instance is removed: natural.json now carries empty Bangla labels and a note saying the colours are not yet named in Bangla. The DOOR is still open. Any future direction can carry unverified Bangla and no gate will notice.\n\nSmallest fix: have 05_colour/engine.py check every label_bn in a spec against 06_type/bangla-strings.json, and refuse a string that is not on the list. That puts the rule where the value enters rather than where it is displayed.",
       "verdict": {
         "id": "R7-1",
-        "status": "open",
+        "status": "stale",
         "severity_now": "major",
-        "verified_on": "27 August 2026",
+        "verified_on": "28 August 2026",
         "passes": [
-          "27 August 2026"
+          "27 August 2026",
+          "28 August 2026"
         ],
-        "note": "Measured: `grep -c 'label_bn' 05_colour/directions/natural.json` returns four family labels plus the direction's own name_bn, and `grep -rn 'label_bn' 05_colour/engine.py` shows the value is read and carried into the proof with no check against the verified list. The guidebook's own guard runs on rendered prose, which is downstream of this and cannot see a label that never reaches a page."
+        "note": "Fixed 28 August 2026, by inverting the rule rather than by adding a check at the door the finding named. The finding was right that the Bangla rule was enforced where words were SHOWN and not where they ENTERED — and with Bangla removed entirely, the question is no longer 'was this string checked?' but 'why is there Bangla here?'. That has no entry door to leave unguarded.\n\nThe English-standard checker now FAILS on Bengali script anywhere outside two retained record documents and the studio's own name. The name is allowed as a STRING rather than by exempting the six files that mention it, because six exemptions for one word would each also license any other Bangla in that file.",
+        "evidence": "$ ./.venv/bin/python 13_plugins/claude-code/skills/aninda-review/scripts/check.py 01_research  ->  0 failures (Bangla in a retained record). The same checker on a file with an unrecorded Bengali run fails with 'Bangla in a system that ships English'. BANGLA_PENDING in that file, which listed the paths still carrying Bangla mid-removal, is empty."
+      }
+    },
+    {
+      "id": "R8-1",
+      "round": 8,
+      "heading": "The research method read guideline pages and not the feeds where the two stores announce things, so an announcement nine days old was missed",
+      "file": "01_research/_data/external-sources.json",
+      "body": "Apple announced new App Store creative asset slots on 5 August 2026 — product page header, search results creative, In-App Events, with a new asset best practices page carrying Figma, Photoshop and Pixelmator templates. The benchmark was checked on 14 August 2026 and did not mention them. Google's Play icon design specification, updated 15 June 2026, was missed the same way.\n\nTHE FAULT IS STRUCTURAL RATHER THAN CARELESS, and that is the part worth recording. The check read the HUMAN INTERFACE GUIDELINES and the MATERIAL pages — the documents that describe how a thing should look — and not the developer news feed or the distribution pages, which are where both companies announce that a NEW thing exists. A guideline page says what to do with a slot; it does not say a slot has been added. Reading only the first kind of page cannot find the second kind of change, however carefully it is done.\n\nSmallest fix: carry both feeds as sources, which is done — developer.apple.com/design/whats-new/ and the two distribution pages are in external-sources.json with their read dates. The durable fix is the distinction itself: a source list needs pages that announce as well as pages that describe.",
+      "verdict": {
+        "id": "R8-1",
+        "status": "stale",
+        "severity_now": "major",
+        "verified_on": "28 August 2026",
+        "passes": [
+          "28 August 2026"
+        ],
+        "note": "Recorded and fixed on the same day, because the gap register had carried the fix since 26 August 2026 and the finding it asked for was never written. A gap that says 'recorded as a method finding' and points at no finding is exactly the kind of half-closed entry this register exists to prevent.",
+        "evidence": "$ ./.venv/bin/python -c \"import json; [print(x['authority'], x['url']) for x in json.load(open('01_research/_data/external-sources.json'))['sources'] if 'whats-new' in x['url'] or 'asset-best' in x['url'] or 'icon-design' in x['url']]\"\n  Apple developer.apple.com/app-store/asset-best-practices/\n  Apple developer.apple.com/design/whats-new/\n  Google developer.android.com/distribute/google-play/resources/icon-design-specifications"
       }
     }
   ]

@@ -212,14 +212,14 @@ missing, the plugin says which and makes nothing.
 | Thing | How many | Notes |
 | --- | --- | --- |
 | Variable collections | 2 | `Primitives` with one mode, `Theme` with four. |
-| Variables | 108 | 88 primitives, 20 semantic roles. |
+| Variables | 99 | 79 primitives, 20 semantic roles. |
 | Variable aliases | 40 | 11 roles across four themes point at a primitive rather than repeating its value. |
 | Paint styles | 20 | One per semantic role, bound to the `Theme` variable so it follows the mode. |
-| Text styles | 16 | Seven Latin, seven Bangla, two monospaced. |
+| Text styles | 9 | Seven Latin and two monospaced. Seven Bangla styles went with the Bangla on 27 August 2026. |
 | Effect styles | 1 | The focus ring. |
 | Grid styles | 2 | A twelve-column layout and an 8 px square grid. |
-| Marks | 10 | Every SVG in `04_mark/svg`, plus a two-weight `Mark` component set. |
-| Components | 11 | Button, Input and Badge as variant sets, and a Card. |
+| Marks | 22 | Every SVG in `04_mark/svg`, plus a two-weight `Mark` component set. |
+| Components | 9 | Button, Input and Badge as variant sets, and a Card. Button had a Script property with a Latin and a Bangla variant per tone; one language needs no such property. |
 | Card frames | 30 | One per card in `08_components/_cards.json`. |
 | Pages | 3 | Marks, Components, Cards. |
 

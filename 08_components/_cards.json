@@ -2,11 +2,6 @@
   "_generator": "08_components/build.py",
   "_warning": "GENERATED FILE. Do not hand-edit — the next build overwrites it.",
   "_note": "width and height are the declared design canvas for a card, not a measured render height. The cards are fluid; check.py measures them at 360, 768 and 1280 CSS px.",
-  "_bangla_gaps": {
-    "note": "Bangla appears only where an approved string exists. Two files, and they are not interchangeable: 06_type/BANGLA-STANDARD.md governs — it holds the Bangla Academy spelling rules with their primary sources, and the 31 strings reviewed against them — while 06_type/bangla-strings.json is the register of 94 approved keys written under those rules, each carrying the rule number or dictionary page it rests on, and it is the file these cards actually read. The fields listed here are empty because neither holds an entry for them. Writing new Bangla to fill them is not allowed, so they stay in English and are named here instead, for review.",
-    "name_bn": [],
-    "subtitle_bn": []
-  },
   "_fonts": [
     {
       "file": "fonts/literata-subset.woff2",
@@ -14,16 +9,7 @@
       "source": "06_type/candidates/latin/literata/Literata[opsz,wght].ttf",
       "licence": "SIL OFL 1.1",
       "licence_file": "fonts/literata-OFL.txt",
-      "bytes": 82024,
-      "renamed": false
-    },
-    {
-      "file": "fonts/notoserifbengali-subset.woff2",
-      "family": "Noto Serif Bengali",
-      "source": "06_type/candidates/bangla/notoserifbengali/NotoSerifBengali[wdth,wght].ttf",
-      "licence": "SIL OFL 1.1",
-      "licence_file": "fonts/notoserifbengali-OFL.txt",
-      "bytes": 108804,
+      "bytes": 81832,
       "renamed": false
     },
     {
@@ -55,300 +41,240 @@
     {
       "path": "cards/foundations/colour.html",
       "name": "Colour",
-      "name_bn": "রং",
       "group": "Foundations",
       "subtitle": "Every colour role across four themes, each with the contrast ratio it was measured at and the criterion it was measured against, over the seven surfaces they are measured against.",
-      "subtitle_bn": "চার থিমে প্রতিটি রঙের ভূমিকা — প্রতিটির মাপা কনট্রাস্ট অনুপাত আর কোন মানদণ্ডে মাপা হয়েছে",
       "width": 1280,
       "height": 2400
     },
     {
       "path": "cards/foundations/typography.html",
       "name": "Typography",
-      "name_bn": "হরফ",
       "group": "Foundations",
       "subtitle": "One scale of a perfect fourth, two scripts, a measured multiplier for Bangla and a floor it never goes below.",
-      "subtitle_bn": "পারফেক্ট ফোর্থ অনুপাতে একটি স্কেল, দুই লিপি, বাংলার জন্য মেপে নেওয়া গুণক আর যে মাপের নিচে হরফ কখনো নামে না",
       "width": 1280,
       "height": 1900
     },
     {
       "path": "cards/foundations/space-and-shape.html",
       "name": "Space and shape",
-      "name_bn": "ফাঁক ও আকার",
       "group": "Foundations",
       "subtitle": "A 4 px scale in ten steps, and four radii. Everything in the system sits on one of them.",
-      "subtitle_bn": "দশ ধাপে ৪ পিক্সেলের একটি স্কেল আর চার রকম কোণের বাঁক — পদ্ধতির সবকিছু এর কোনো একটির উপর বসে",
       "width": 1280,
       "height": 1500
     },
     {
       "path": "cards/foundations/motion.html",
       "name": "Motion",
-      "name_bn": "গতি",
       "group": "Foundations",
       "subtitle": "Two durations and three easing curves. Things that move may overshoot; things that only change colour never do.",
-      "subtitle_bn": "দুটি সময়কাল আর তিনটি ইজিং বাঁক — যা নড়ে তা একটু বেশি এগিয়ে ফিরে আসতে পারে, যার শুধু রং বদলায় তা কখনো নয়",
       "width": 1280,
       "height": 1500
     },
     {
       "path": "cards/foundations/the-marks.html",
       "name": "The marks",
-      "name_bn": "চিহ্ন",
       "group": "Foundations",
       "subtitle": "The mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
-      "subtitle_bn": "চিহ্ন দুই ওজনে — currentColor দিয়ে আঁকা, তাই যে থিমে বসে সেই থিমের রং নিয়ে নেয়",
       "width": 1280,
       "height": 1400
     },
     {
       "path": "cards/foundations/accessibility.html",
       "name": "Accessibility",
-      "name_bn": "অভিগম্যতা",
       "group": "Foundations",
       "subtitle": "Target sizes with the guidance each one comes from, the anatomy of the focus ring, and what happens in forced colours &mdash; the mode where the operating system replaces every colour with its own.",
-      "subtitle_bn": "ছোঁয়ার জায়গার মাপ আর তার নির্দেশনার উৎস, ফোকাস রিঙের গড়ন, আর ফোর্সড কালার্স মোডে কী হয় — যেখানে অপারেটিং সিস্টেম নিজের রং বসিয়ে সব রং বদলে দেয়",
       "width": 1280,
       "height": 1700
     },
     {
       "path": "cards/components/button.html",
       "name": "Button",
-      "name_bn": "বাটন",
       "group": "Components",
       "subtitle": "Four kinds, two sizes and an icon-only form, each with a label that says what will happen.",
-      "subtitle_bn": "চার রকম, দুই মাপ আর শুধু আইকনের একটি রূপ — প্রতিটির লেখা বলে দেয় কী ঘটবে",
       "width": 1280,
       "height": 1500
     },
     {
       "path": "cards/components/input.html",
       "name": "Input",
-      "name_bn": "ইনপুট",
       "group": "Components",
       "subtitle": "A label, an optional hint, and an error that says what happened and then what to do next.",
-      "subtitle_bn": "ঘরের নাম, দরকারে একটি ইঙ্গিত, আর ভুল হলে যে বার্তা বলে কী হয়েছে আর তারপর কী করতে হবে",
       "width": 1280,
       "height": 1500
     },
     {
       "path": "cards/components/select.html",
       "name": "Select",
-      "name_bn": "বাছাই তালিকা",
       "group": "Components",
       "subtitle": "A native select with a drawn arrow, so the arrow follows the theme instead of the operating system.",
-      "subtitle_bn": "ব্রাউজারের নিজের সিলেক্ট, তিরটি আঁকা — তাই তির অপারেটিং সিস্টেমের নয়, থিমের রং নেয়",
       "width": 1280,
       "height": 1300
     },
     {
       "path": "cards/components/checkbox-radio.html",
       "name": "Checkbox and radio",
-      "name_bn": "চেকবক্স ও রেডিও",
       "group": "Components",
       "subtitle": "Native controls at 24 px, wrapped in a label so the words are part of the target.",
-      "subtitle_bn": "ব্রাউজারের নিজের চেকবক্স ও রেডিও, ২৪ পিক্সেল মাপে — লেখাটিও সঙ্গে জোড়া, তাই লেখায় ছুঁলেও কাজ হয়",
       "width": 1280,
       "height": 1500
     },
     {
       "path": "cards/components/textarea.html",
       "name": "Textarea",
-      "name_bn": "লেখার ঘর",
       "group": "Components",
       "subtitle": "You can drag it taller but never wider, so the line length stays comfortable to read.",
-      "subtitle_bn": "টেনে লম্বা করা যায়, চওড়া নয় — তাই লাইনের মাপ পড়ার মতো আরামেই থাকে",
       "width": 1280,
       "height": 1300
     },
     {
       "path": "cards/components/badge.html",
       "name": "Badge",
-      "name_bn": "ব্যাজ",
       "group": "Components",
       "subtitle": "Five meanings, each carrying a glyph and a word so the colour is the third signal and never the only one.",
-      "subtitle_bn": "পাঁচটি অর্থ, প্রতিটির সঙ্গে একটি প্রতীক ও একটি শব্দ — রং এখানে তৃতীয় সংকেত, কখনো একমাত্র নয়",
       "width": 1280,
       "height": 1200
     },
     {
       "path": "cards/components/card.html",
       "name": "Card",
-      "name_bn": "কার্ড",
       "group": "Components",
       "subtitle": "A surface a step brighter than the page, with a shadow in the light theme and none in the dark ones.",
-      "subtitle_bn": "পাতার চেয়ে এক ধাপ উজ্জ্বল একটি তল — আলো থিমে ছায়া পড়ে, অন্ধকার থিমে পড়ে না",
       "width": 1280,
       "height": 1200
     },
     {
       "path": "cards/components/alert.html",
       "name": "Alert",
-      "name_bn": "বার্তা",
       "group": "Components",
       "subtitle": "Four kinds. Each says what happened, then what happens next, and never blames the reader.",
-      "subtitle_bn": "চার রকম — প্রতিটি বলে কী হয়েছে, তারপর কী হবে, আর কখনো পাঠককে দোষ দেয় না",
       "width": 1280,
       "height": 1600
     },
     {
       "path": "cards/components/dialog.html",
       "name": "Dialog",
-      "name_bn": "ডায়ালগ",
       "group": "Components",
       "subtitle": "A real dialog element over a dimmed backdrop, with the destructive action named rather than called OK.",
-      "subtitle_bn": "ব্রাউজারের নিজের ডায়ালগ উপাদান, পিছনে আবছা পর্দা — যে কাজ আর ফেরানো যায় না তার নাম লেখা থাকে, শুধু OK নয়",
       "width": 1280,
       "height": 1200
     },
     {
       "path": "cards/components/table.html",
       "name": "Table",
-      "name_bn": "টেবিল",
       "group": "Components",
       "subtitle": "Row headers, a caption saying what the numbers are, and a sideways scroll when the table is wider than the space.",
-      "subtitle_bn": "সারির শিরোনাম, সংখ্যাগুলো কীসের তা বলা এক লাইনের পরিচয়, আর জায়গার চেয়ে চওড়া হলে পাশে সরিয়ে দেখা",
       "width": 1280,
       "height": 1200
     },
     {
       "path": "cards/components/tabs.html",
       "name": "Tabs",
-      "name_bn": "ট্যাব",
       "group": "Components",
       "subtitle": "The selected tab is bold, underlined and marked with aria-selected. Three signals, one of which is a colour.",
-      "subtitle_bn": "বাছাই করা ট্যাব মোটা হরফে, নিচে দাগ, আর aria-selected দিয়ে চিহ্নিত — তিনটি সংকেত, তার একটি রং",
       "width": 1280,
       "height": 1200
     },
     {
       "path": "cards/components/nav.html",
       "name": "Nav",
-      "name_bn": "নেভিগেশন",
       "group": "Components",
       "subtitle": "Vertical and horizontal. The current item carries a bar, a heavier weight and aria-current.",
-      "subtitle_bn": "খাড়া আর আড়াআড়ি — এখন যেখানে আছেন সেই অংশে একটি দাগ, ভারী হরফ আর aria-current",
       "width": 1280,
       "height": 1200
     },
     {
       "path": "cards/components/breadcrumb.html",
       "name": "Breadcrumb",
-      "name_bn": "পথরেখা",
       "group": "Components",
       "subtitle": "The last item is not a link, because you are already on it.",
-      "subtitle_bn": "শেষ ধাপটি লিংক নয়, কারণ আপনি এখন সেখানেই আছেন",
       "width": 1280,
       "height": 1000
     },
     {
       "path": "cards/components/toast.html",
       "name": "Toast",
-      "name_bn": "টোস্ট",
       "group": "Components",
       "subtitle": "A short message with a dismiss button that has a name of its own, not only a cross.",
-      "subtitle_bn": "ছোটো একটি বার্তা, সরানোর বাটনটির নিজের নাম আছে — শুধু একটি ক্রস নয়",
       "width": 1280,
       "height": 1200
     },
     {
       "path": "cards/components/empty-state.html",
       "name": "Empty state",
-      "name_bn": "যখন কিছু নেই",
       "group": "Components",
       "subtitle": "Says what is missing, and then exactly what to do about it.",
-      "subtitle_bn": "কী নেই তা বলে, তারপর ঠিক কী করতে হবে সেটাও বলে",
       "width": 1280,
       "height": 1300
     },
     {
       "path": "cards/components/code-block.html",
       "name": "Code block",
-      "name_bn": "কোড ব্লক",
       "group": "Components",
       "subtitle": "Aninda Mono, a horizontal scroll rather than a wrap, and a copy button that says what it copies.",
-      "subtitle_bn": "Aninda Mono হরফে, লাইন ভাঙে না — পাশে সরে যায়, আর কপি বাটনটি বলে কী কপি হবে",
       "width": 1280,
       "height": 1100
     },
     {
       "path": "cards/patterns/sign-in.html",
       "name": "Sign in",
-      "name_bn": "প্রবেশ",
       "group": "Patterns",
       "subtitle": "One card, two fields, and an option for someone who has no password.",
-      "subtitle_bn": "একটি কার্ড, দুটি ঘর, আর যার পাসওয়ার্ড নেই তার জন্যও একটি উপায়",
       "width": 1280,
       "height": 1500
     },
     {
       "path": "cards/patterns/settings.html",
       "name": "Settings",
-      "name_bn": "সেটিংস",
       "group": "Patterns",
       "subtitle": "Grouped in fieldsets, with the destructive action kept apart and named.",
-      "subtitle_bn": "ঘরগুলো দলে সাজানো, আর যে কাজ আর ফেরানো যায় না সেটি আলাদা রাখা, নাম ধরে লেখা",
       "width": 1280,
       "height": 1900
     },
     {
       "path": "cards/patterns/dashboard.html",
       "name": "Dashboard",
-      "name_bn": "ড্যাশবোর্ড",
       "group": "Patterns",
       "subtitle": "Four figures, one table, and a note saying where the numbers came from.",
-      "subtitle_bn": "চারটি সংখ্যা, একটি টেবিল, আর সংখ্যাগুলো কোথা থেকে এসেছে তা বলা একটি লাইন",
       "width": 1280,
       "height": 1900
     },
     {
       "path": "cards/patterns/docs-page.html",
       "name": "Docs page",
-      "name_bn": "নির্দেশিকার পাতা",
       "group": "Patterns",
       "subtitle": "Breadcrumb, page navigation and prose held to a readable line length.",
-      "subtitle_bn": "পথরেখা, পাতার ভিতরের নেভিগেশন, আর পড়ার মতো মাপে ধরে রাখা লেখা",
       "width": 1280,
       "height": 1900
     },
     {
       "path": "cards/patterns/landing.html",
       "name": "Landing",
-      "name_bn": "প্রথম পাতা",
       "group": "Patterns",
       "subtitle": "A claim, the reason to believe it, and two ways forward.",
-      "subtitle_bn": "একটি দাবি, সেটি বিশ্বাস করার কারণ, আর এগিয়ে যাওয়ার দুটি পথ",
       "width": 1280,
       "height": 1900
     },
     {
       "path": "cards/patterns/pricing.html",
       "name": "Pricing",
-      "name_bn": "দাম",
       "group": "Patterns",
       "subtitle": "Three plans, with the recommended one marked by a badge and a word.",
-      "subtitle_bn": "তিনটি প্যাকেজ, সুপারিশ করা প্যাকেজটির গায়ে একটি ব্যাজ আর একটি শব্দ",
       "width": 1280,
       "height": 1600
     },
     {
       "path": "cards/patterns/not-found.html",
       "name": "Not found",
-      "name_bn": "পাতা পাওয়া যায়নি",
       "group": "Patterns",
       "subtitle": "Says the page is missing, then offers the pages most people were looking for.",
-      "subtitle_bn": "পাতাটি নেই তা জানায়, তারপর মানুষ যেসব পাতা সবচেয়ে বেশি খোঁজেন সেগুলো দেখায়",
       "width": 1280,
       "height": 1300
     },
     {
       "path": "cards/patterns/form-with-validation.html",
       "name": "Form with validation",
-      "name_bn": "যাচাইসহ ফর্ম",
       "group": "Patterns",
       "subtitle": "A summary at the top, an error under each field, and nothing lost.",
-      "subtitle_bn": "উপরে এক জায়গায় সব ভুলের তালিকা, প্রতিটি ঘরের নিচে তার নিজের ভুল, আর কিছুই হারায় না",
       "width": 1280,
       "height": 1700
     }

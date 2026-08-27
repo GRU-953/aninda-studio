@@ -34,7 +34,6 @@
   "families": {
     "ground": {
       "label": "Estuary",
-      "label_bn": "\u09ae\u09cb\u09b9\u09a8\u09be",
       "kind": "brand",
       "note": "The ground, and the source of every surface tint and every text role.",
       "hue_oklch": 176.896,
@@ -70,7 +69,6 @@
     },
     "accent": {
       "label": "Tidewater",
-      "label_bn": "\u099c\u09cb\u09af\u09bc\u09be\u09b0",
       "kind": "brand",
       "note": "A cyan-teal one hue-step off the ground. Carries links, focus and the primary action.",
       "hue_oklch": 208.996,
@@ -106,7 +104,6 @@
     },
     "success": {
       "label": "Silt",
-      "label_bn": "\u09aa\u09b2\u09bf",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 152.008,
@@ -142,7 +139,6 @@
     },
     "warning": {
       "label": "Kans",
-      "label_bn": "\u0995\u09be\u09b6",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 73.298,
@@ -178,7 +174,6 @@
     },
     "danger": {
       "label": "Laterite",
-      "label_bn": "\u09b2\u09be\u09b2 \u09ae\u09be\u099f\u09bf",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 31.189,
@@ -214,7 +209,6 @@
     },
     "info": {
       "label": "Monsoon",
-      "label_bn": "\u09ac\u09b0\u09cd\u09b7\u09be",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 245.674,
@@ -253,7 +247,6 @@
     "light": {
       "key": "light",
       "label": "Light",
-      "label_bn": "\u0986\u09b2\u09cb",
       "polarity": "light",
       "high_contrast": false,
       "text_target": 4.5,
@@ -557,7 +550,6 @@
     "dark": {
       "key": "dark",
       "label": "Dark",
-      "label_bn": "\u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
       "polarity": "dark",
       "high_contrast": false,
       "text_target": 4.5,
@@ -856,7 +848,6 @@
     "hc-light": {
       "key": "hc-light",
       "label": "High contrast, light",
-      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0986\u09b2\u09cb",
       "polarity": "light",
       "high_contrast": true,
       "text_target": 7.0,
@@ -1156,7 +1147,6 @@
     "hc-dark": {
       "key": "hc-dark",
       "label": "High contrast, dark",
-      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
       "polarity": "dark",
       "high_contrast": true,
       "text_target": 7.0,

@@ -74,7 +74,15 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 TOKENS = ROOT / "07_tokens" / "build"
-PALETTE_PROOF = ROOT / "05_colour" / "generated" / "natural.proof.json"
+# The direction is READ from the token set, never named here. This file is
+# DOWNSTREAM of 07_tokens — it already loads those token files below and exits 2 if
+# they are absent — so a name re-declared here can disagree with the tokens it just
+# read. That is exactly the fault that produced KeyError: 'warning' in the guidebook
+# and shipped a whole Estuary Material scheme from 15_native/material3.py.
+def _direction() -> str:
+    prim = json.loads(
+        (TOKENS / "primitive.tokens.json").read_text(encoding="utf-8"))
+    return prim["$extensions"]["studio.aninda"]["direction"]
 FONTS = ROOT / "06_type" / "candidates"
 OUT = HERE / "svg"
 RASTER = HERE / "png"
@@ -83,7 +91,12 @@ GRID = 100.0
 STROKE_REGULAR = 9.0     # at STROKE_SWITCH_PX and above
 STROKE_HEAVY = 15.0      # below it
 STROKE_SWITCH_PX = 24    # the size the weight changes at
-SAFE = 90.0              # essential shapes live inside 90 of the 100 units
+SAFE = 90.0
+
+# The floor the mark is not drawn below. The COUNTER closing is what decides it —
+# see icon_policy.minimum_px in the manifest, which computes the two figures from
+# the stroke, the grid and the radius rather than restating them.
+MARK_FLOOR_PX = 16.0              # essential shapes live inside 90 of the 100 units
 
 # Android's adaptive icon is a different canvas with a different rule, and both
 # numbers are Google's rather than this kit's: every layer is 108x108 dp, the outer
@@ -97,10 +110,12 @@ ANDROID_SAFE = 66.0
 TILE_RADIUS_PCT: float | None = None
 
 LATIN_FONT = FONTS / "latin" / "literata" / "Literata[opsz,wght].ttf"
-BANGLA_FONT = FONTS / "bangla" / "notoserifbengali" / "NotoSerifBengali[wdth,wght].ttf"
+
+# The files that carry NO colour of their own and draw in currentColor. Named once
+# so the guard and the writer cannot disagree, and checked in both directions.
+RECOLOURABLE = ("mark-regular.svg", "mark-heavy.svg", "wordmark-latin.svg")
 
 WORD_LATIN = "aninda studio"
-WORD_BANGLA = "অনিন্দ্য স্টুডিও"
 
 # The Latin wordmark's own axis settings. Named here because the ligature gate
 # proves shaping under the same conditions the artwork is drawn at, and a second
@@ -336,13 +351,15 @@ def shaping_gates() -> list[str]:
     # G1 — the library is present and reports a version.
     notes.append(f"uharfbuzz present, HarfBuzz {hb.version_string()}")
 
-    # G2/G3 — coverage and shaping, via a positive control on real strings.
-    for text, font, label in ((WORD_BANGLA, BANGLA_FONT, "Bangla wordmark"),
-                              (WORD_LATIN, LATIN_FONT, "Latin wordmark")):
-        _, adv, n = shape_to_path(text, font, 100.0)
-        if adv <= 0:
-            raise Fail(f"{label}: shaping produced zero advance width")
-        notes.append(f"{label}: {len(text)} code points → {n} glyphs, advance {adv:.1f}")
+    # G2 — coverage and a non-zero advance, on the string that is actually drawn.
+    # A Bangla arm ran here until 28 August 2026, proving coverage of a face for a
+    # wordmark this build no longer writes. A gate that measures an artefact nobody
+    # ships is not a weaker gate, it is a misleading one.
+    _, adv, n_glyphs = shape_to_path(WORD_LATIN, LATIN_FONT, 100.0)
+    if adv <= 0:
+        raise Fail("Latin wordmark: shaping produced zero advance width")
+    notes.append(f"Latin wordmark: {len(WORD_LATIN)} code points → {n_glyphs} "
+                 f"glyphs, advance {adv:.1f}")
 
     # G4 — a ligature actually formed, which is what proves GSUB is applied.
     # Two assertions per probe, and the second is the one that carries the weight.
@@ -516,6 +533,21 @@ def icon_placement(stroke: float, grid: float = GRID,
     return scale, tx, ty, note
 
 
+def _declared_aspect(doc: str) -> float:
+    """Width over height, from the file's own attributes.
+
+    Read off the document rather than passed in, because the writer already states
+    it and a second copy in the check would be a second thing to keep in step.
+    Falls back to 1.0 rather than raising: a file with no width is square by
+    construction here, and a wrong aspect shows up as a failed band anyway.
+    """
+    w = re.search(r'<svg[^>]*\swidth="([\d.]+)"', doc)
+    h = re.search(r'<svg[^>]*\sheight="([\d.]+)"', doc)
+    if not (w and h) or float(h.group(1)) == 0:
+        return 1.0
+    return float(w.group(1)) / float(h.group(1))
+
+
 def render_check(docs: dict[str, str], place: dict[float, tuple[float, float, float]],
                  a_scale: float) -> list[str]:
     """Render each icon artefact over a garish background and measure what covers it.
@@ -544,8 +576,16 @@ def render_check(docs: dict[str, str], place: dict[float, tuple[float, float, fl
     # page. This is checked by reading the file rather than by rendering, because
     # the failure is in the file and a render inside a page that patches it looks
     # perfectly fine.
-    for name in ("mark-regular.svg", "mark-heavy.svg",
-                 "wordmark-latin.svg", "wordmark-bangla.svg"):
+    # Hoisted to a module constant and checked BOTH WAYS, because this list held
+    # "wordmark-bangla.svg" and the moment that file stopped being written the
+    # lookup below became a KeyError — a traceback instead of a message, from a
+    # guard whose whole job is to produce a message.
+    missing = [x for x in RECOLOURABLE if x not in docs]
+    if missing:
+        raise Fail(
+            f"RECOLOURABLE names {', '.join(missing)}, which this build no longer "
+            f"writes. Update the list in the same commit as the file.")
+    for name in RECOLOURABLE:
         head = docs[name][:400]
         if "style=\"color:" in head.split("<title>")[0]:
             raise Fail(
@@ -556,7 +596,20 @@ def render_check(docs: dict[str, str], place: dict[float, tuple[float, float, fl
             )
         if "currentColor" not in head:
             raise Fail(f"{name} is not drawn in currentColor, so it cannot recolour")
-    notes.append(f"4 recolourable files carry no root colour and draw in currentColor")
+    # And the other direction: everything that is NOT recolourable must carry a
+    # root colour. Without this half, a new file could silently join the wrong
+    # class and nothing would say so.
+    for name, doc in sorted(docs.items()):
+        if name in RECOLOURABLE:
+            continue
+        if 'style="color:' not in doc.split("<title>")[0]:
+            raise Fail(
+                f"{name} is not in RECOLOURABLE and carries no root colour, so it "
+                f"has no defined appearance of its own. Either give it one or add "
+                f"it to RECOLOURABLE with the reason.")
+    notes.append(f"{len(RECOLOURABLE)} recolourable files carry no root colour and "
+                 f"draw in currentColor; the other {len(docs) - len(RECOLOURABLE)} "
+                 f"each declare one")
 
     PROBE = (255, 0, 255)
     # Three kinds of artefact, three bands.
@@ -588,16 +641,68 @@ def render_check(docs: dict[str, str], place: dict[float, tuple[float, float, fl
                                             "no ground; the alpha carries the shape — Android foreground"),
         "icon-android-monochrome-108.svg": (90.7, 92.7,
                                             "no ground; the alpha carries the shape — Android monochrome"),
+        # The three treatment plates. Predictable by construction rather than by
+        # guesswork: each carries a rect identical to one already measured here, and
+        # the ARTWORK's colour cannot change which pixels stay magenta.
+        "icon-1024-black-on-white.svg": (2.0, 12.0, "rounded — black on white"),
+        "icon-1024-white-on-black.svg": (2.0, 12.0, "rounded — white on black"),
+        "icon-square-1024-black-on-white.svg": (0.0, 0.5,
+                                                "square and fully opaque — black on white"),
+        # The three wordmark plates. MEASURED, not predicted: a plate is 2.84 times
+        # wider than it is tall, and the harness viewport rounds to whole pixels, so
+        # a fraction of a pixel letterboxes at one edge and the figure cannot be
+        # derived from the square files.
+        "wordmark-latin-colour-on-white.svg": (0.0, 1.5,
+                                               "flat plate, no corner radius — four colours on white"),
+        "wordmark-latin-black-on-white.svg": (0.0, 1.5,
+                                              "flat plate, no corner radius — black on white"),
+        "wordmark-latin-white-on-black.svg": (0.0, 1.5,
+                                              "flat plate, no corner radius — white on black"),
     }
+
+    # THE TABLE ABOVE IS ITERATED, NOT `docs` — so a file absent from it was never
+    # measured at all, and said nothing about being skipped. Three plates were
+    # added on 28 August 2026 and passed every gate in this build while nobody had
+    # looked at a single pixel of them.
+    #
+    # This derives what MUST have a band from what was actually written: anything
+    # whose name marks it as an icon or a tile, and anything carrying a ground. The
+    # expression yields exactly the keys above, so it lands with no behaviour change
+    # and thereafter no grounded artefact can be added without a measurement.
+    needs_band = {name for name, doc in docs.items()
+                  if name.startswith(("icon", "tile", "wordmark-latin-colour-on",
+                                      "wordmark-latin-black", "wordmark-latin-white"))
+                  or "<rect" in doc.lower()}
+    unmeasured = sorted(needs_band - set(expectations))
+    orphaned = sorted(set(expectations) - set(docs))
+    if unmeasured or orphaned:
+        raise Fail(
+            "the background-percentage table does not match what was written:\n  "
+            + "\n  ".join(
+                [f"{x}: written, and no band declared — it would be rendered by "
+                 f"nothing and reported as nothing" for x in unmeasured]
+                + [f"{x}: a band is declared and this build does not write it"
+                   for x in orphaned]))
     with sync_playwright() as p:
         try:
             browser = p.chromium.launch()
         except Exception as e:
             raise NotEquipped(f"chromium unavailable: {e}") from e
         for name, (lo, hi, why) in expectations.items():
-            page = browser.new_page(viewport={"width": 256, "height": 256})
+            # THE VIEWPORT FOLLOWS THE ARTEFACT. It was a fixed 256x256 square,
+            # which is right for every square file here and wrong for a plate: a
+            # wordmark plate is 2.84 times wider than it is tall, so rendering it
+            # into a square left 64.1 per cent of the frame as letterboxing and the
+            # gate read that as background showing. The probe measures how much of
+            # the FRAME is uncovered, so the frame has to be the artefact's own
+            # shape or the figure is about the harness rather than the artwork.
+            aspect = _declared_aspect(docs[name])
+            vw = 256
+            vh = max(1, round(256 / aspect))
+            page = browser.new_page(viewport={"width": vw, "height": vh})
             doc = docs[name].replace(
-                "<svg ", '<svg style="width:256px;height:256px;display:block" ', 1)
+                "<svg ",
+                f'<svg style="width:{vw}px;height:{vh}px;display:block" ', 1)
             page.set_content(f'<body style="margin:0;background:rgb(255,0,255)">{doc}</body>')
             page.wait_for_timeout(250)
             im = Image.open(io.BytesIO(page.screenshot())).convert("RGB")
@@ -853,9 +958,17 @@ def main() -> int:
     # bowl and then the stem. Read from the palette proof rather than typed, so the
     # mark cannot drift from the brand it is drawn in.
     try:
-        palette = json.loads(PALETTE_PROOF.read_text())
+        proof = (ROOT / "05_colour" / "generated"
+                 / f"{_direction()}.proof.json")
+        palette = json.loads(proof.read_text())
     except FileNotFoundError as e:
-        print(f"could not run: {e}. Run 05_colour/engine.py first.", file=sys.stderr)
+        print(f"could not run: {e}. Run 05_colour/engine.py and 07_tokens/build.py "
+              f"first.", file=sys.stderr)
+        return 2
+    except KeyError as e:
+        print(f"could not run: the token set does not record which direction it "
+              f"came from ({e}). 07_tokens/build.py writes that into "
+              f"primitive.tokens.json's $extensions block.", file=sys.stderr)
         return 2
     BRAND_ORDER = ("accent", "success", "danger", "ground")
     brand = []
@@ -929,27 +1042,62 @@ def main() -> int:
                   "Aninda Studio — the mark in the four primary colours"))
 
     # --- wordmarks, from real shaped outlines ------------------------------
-    for name, text, font, var in (
-        ("wordmark-latin", WORD_LATIN, LATIN_FONT, LATIN_WORDMARK_AXES),
-        ("wordmark-bangla", WORD_BANGLA, BANGLA_FONT, {"wght": 500}),
-    ):
-        try:
-            body, adv, _ = shape_to_path(text, font, 100.0, var)
-            colour_body, _, _ = shape_to_path(text, font, 100.0, var, brand)
-        except (Fail, NotEquipped) as e:
-            print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
-            return 1
-        write(f"{name}.svg",
-              svg_doc(f'<g fill="currentColor">{body}</g>', adv, 140.0, ink,
-                      f"Aninda Studio — wordmark, {text}",
-                      view=f"0 -100 {adv:g} 140", recolourable=True))
-        # The four-colour wordmark. Each letter takes the next primary in turn, the
-        # way Google's own wordmark carries its colours across letters rather than
-        # inside one glyph. It is NOT recolourable: the colours are the point.
-        write(f"{name}-colour.svg",
-              svg_doc(colour_body, adv, 140.0, brand[0],
-                      f"Aninda Studio — wordmark in the four primary colours, {text}",
-                      view=f"0 -100 {adv:g} 140"))
+    # One wordmark. A Bangla sibling stood beside it until 27 August 2026, shaped
+    # from the same HarfBuzz path with its own axis settings.
+    try:
+        body, adv, _ = shape_to_path(WORD_LATIN, LATIN_FONT, 100.0,
+                                     LATIN_WORDMARK_AXES)
+        colour_body, _, _ = shape_to_path(WORD_LATIN, LATIN_FONT, 100.0,
+                                          LATIN_WORDMARK_AXES, brand)
+    except (Fail, NotEquipped) as e:
+        print(f"FAILED — nothing written:\n  {e}", file=sys.stderr)
+        return 1
+    write("wordmark-latin.svg",
+          svg_doc(f'<g fill="currentColor">{body}</g>', adv, 140.0, ink,
+                  f"Aninda Studio — wordmark, {WORD_LATIN}",
+                  view=f"0 -100 {adv:g} 140", recolourable=True))
+    # The four-colour wordmark. Each letter takes the next primary in turn, the way
+    # Google's own wordmark carries its colours across letters rather than inside
+    # one glyph. It is NOT recolourable: the colours are the point.
+    write("wordmark-latin-colour.svg",
+          svg_doc(colour_body, adv, 140.0, brand[0],
+                  f"Aninda Studio — wordmark in the four primary colours",
+                  view=f"0 -100 {adv:g} 140"))
+
+    # --- the wordmark on a plate, three treatments -------------------------
+    # A plate is the wordmark with a ground behind it, for handing to somebody who
+    # needs one file rather than a transparent asset and a surface to put it on.
+    #
+    # The padding is 70 units, which is HALF THE WORDMARK'S OWN DRAWN HEIGHT —
+    # the manifest's clear-space rule ("half the mark's own height on all four
+    # sides") applied to the wordmark rather than to the mark. Derived, not chosen.
+    #
+    # No corner radius on any of them. TILE_RADIUS_PCT is 24 units per 100 of an
+    # ICON's side; a plate 2.84 times wider than it is tall has no side, so any
+    # radius here would be a number invented for the occasion.
+    PAD = 140.0 / 2
+    pw, ph = adv + 2 * PAD, 140.0 + 2 * PAD
+    plate_view = f"{-PAD:g} {-100 - PAD:g} {pw:g} {ph:g}"
+
+    def plate(fill: str, artwork: str, body_html: str) -> str:
+        rect = (f'<rect x="{-PAD:g}" y="{-100 - PAD:g}" width="{pw:g}" '
+                f'height="{ph:g}" fill="{fill}"/>')
+        return rect + body_html
+
+    write("wordmark-latin-colour-on-white.svg",
+          svg_doc(plate(PURE_WHITE, brand[0], colour_body), pw, ph, brand[0],
+                  "Aninda Studio — wordmark in the four primary colours on white",
+                  view=plate_view))
+    write("wordmark-latin-black-on-white.svg",
+          svg_doc(plate(PURE_WHITE, PURE_BLACK,
+                        f'<g fill="currentColor">{body}</g>'),
+                  pw, ph, PURE_BLACK,
+                  "Aninda Studio — wordmark, black on white", view=plate_view))
+    write("wordmark-latin-white-on-black.svg",
+          svg_doc(plate(PURE_BLACK, PURE_WHITE,
+                        f'<g fill="currentColor">{body}</g>'),
+                  pw, ph, PURE_WHITE,
+                  "Aninda Studio — wordmark, white on black", view=plate_view))
 
     # --- the web tile: rounded, because a browser will not round it for you --
     s, tx, ty = place[STROKE_HEAVY]
@@ -1025,6 +1173,41 @@ def main() -> int:
         write(f"{name}.svg",
               svg_doc(rounded_body, size, size, paper,
                       f"Aninda Studio — {what}", view=f"0 0 {GRID:g} {GRID:g}"))
+
+    # --- the icon in three treatments, both corner shapes -------------------
+    # The owner asked for the coloured version on pure white and both monochromes,
+    # black on white and white on black, across both corner shapes. Four of those
+    # six cells already existed under platform names: icon-1024 is colour on white
+    # rounded, icon-apple-1024 is colour on white square, and icon-apple-1024-dark
+    # is white on black square. Building a second file for any of those would put
+    # byte-identical artwork under two names.
+    #
+    # These three fill the cells that were genuinely empty. The square black-on-
+    # white is the one file here that NO platform asks for and no build consumes:
+    # Apple authors no light-monochrome appearance, Android's monochrome layer is
+    # alpha-driven and already exists, and browsers get the rounded one. It is
+    # built because a published matrix with one hole invites somebody to fill it by
+    # hand, outside this build and outside every gate.
+    def rounded_plate(ground: str, artwork: str) -> str:
+        return (f'<rect width="{GRID:g}" height="{GRID:g}" '
+                f'rx="{TILE_RADIUS_PCT:g}" ry="{TILE_RADIUS_PCT:g}" '
+                f'fill="{ground}"/>'
+                f'<g style="color:{artwork}" '
+                f'transform="translate({tx:.4f},{ty:.4f}) '
+                f'scale({s:.6f})">{mark_paths(STROKE_REGULAR)}</g>')
+
+    write("icon-1024-black-on-white.svg",
+          svg_doc(rounded_plate(PURE_WHITE, PURE_BLACK), 1024, 1024, PURE_BLACK,
+                  "Aninda Studio — the icon, black on white, rounded",
+                  view=f"0 0 {GRID:g} {GRID:g}"))
+    write("icon-1024-white-on-black.svg",
+          svg_doc(rounded_plate(PURE_BLACK, PURE_WHITE), 1024, 1024, PURE_WHITE,
+                  "Aninda Studio — the icon, white on black, rounded",
+                  view=f"0 0 {GRID:g} {GRID:g}"))
+    write("icon-square-1024-black-on-white.svg",
+          svg_doc(square(PURE_WHITE, PURE_BLACK), 1024, 1024, PURE_BLACK,
+                  "Aninda Studio — the icon, black on white, square",
+                  view=f"0 0 {GRID:g} {GRID:g}"))
 
     # --- Apple: square, unmasked, three authored appearances ----------------
     # Apple's own material gives three different counts and all three are right in
@@ -1213,6 +1396,34 @@ def main() -> int:
                                  "smaller consequence, and it is recorded rather "
                                  "than hidden."),
             }],
+        },
+        # THE MARK'S OWN SIZE FLOOR, computed here rather than typed anywhere.
+        #
+        # It lived as MARK_FLOOR_PX = 16 in a plugin script, with its derivation in
+        # a comment — so the number that decides whether an asset may be made was
+        # a constant in a consumer rather than a property of the artwork. That was
+        # gap G-REC-3, and "computed rather than typed" was the fix it asked for.
+        #
+        # Every input is already in this manifest: the heavy stroke, the grid, and
+        # the circle's radius. At the floor the heavy stroke renders at
+        # stroke/grid x size px, and what closes first is the circle's COUNTER —
+        # the enclosed space inside it — which is the diameter minus one stroke.
+        # Below about 5.5 px of counter the bowl fills in and the mark reads as a
+        # blob rather than an a.
+        "minimum_px": {
+            "value": MARK_FLOOR_PX,
+            "counter_px_at_floor": round(
+                (2 * CIRCLE["r"] - STROKE_HEAVY) * MARK_FLOOR_PX / GRID, 2),
+            "heavy_stroke_px_at_floor": round(
+                STROKE_HEAVY * MARK_FLOOR_PX / GRID, 2),
+            "rule": (f"The mark is not drawn below {MARK_FLOOR_PX:g} px. At that "
+                     f"size the heavy stroke renders at "
+                     f"{STROKE_HEAVY * MARK_FLOOR_PX / GRID:.2f} px and the "
+                     f"circle's counter at "
+                     f"{(2 * CIRCLE['r'] - STROKE_HEAVY) * MARK_FLOOR_PX / GRID:.2f} "
+                     f"px. Below it the counter closes."),
+            "derived_from": ("strokes.heavy, grid and geometry.circle.r in this "
+                             "same file — no input is typed twice"),
         },
         "clear_space": "half the mark's own height on all four sides",
         "safe_field": SAFE,

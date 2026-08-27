@@ -1,14 +1,16 @@
 {
   "$comment": "What a clean run of the plugin should report. It is written by build.mjs from the same plan code the plugin runs, so comparing it against the receipt the plugin prints is a comparison of two numbers, not a reading of two documents. There is no date in this file on purpose: it is a pure function of the tokens, and the SHA-256 below changes only when they do.",
   "generatedBy": "13_plugins/figma/build.mjs",
-  "tokensSha256": "687479cdedb015052c9ac122cc1d24fdfbb05782dec8090cb2fd82e0b78336bc",
+  "tokensSha256": "65e85d8be57e4d91ed0f983de727cded9ab549e6a1ea65df7a5a5b3daa615e14",
   "sources": {
-    "07_tokens/build/primitive.tokens.json": "ed3704900dbb4c968130313529ed7379eb004c5dffe28a8a43ef8473a59b62aa",
+    "07_tokens/build/primitive.tokens.json": "694e01c4b541e2b229486a618f10447626bbc8cee3316a131eae54155dffb22e",
     "07_tokens/build/semantic.light.tokens.json": "1a71d9d53e38ba681117a1c4407a37aba85da9f40767c368de1e9ff809476e30",
     "07_tokens/build/semantic.dark.tokens.json": "d16e8ea901c4f3be6e2fb1eda7c1232373a8a7c2b29345df6d9e3026d555ef12",
     "07_tokens/build/semantic.hc-light.tokens.json": "54d314c37822a7b828e7089ea46e041a7a9e046c9433017f549e62344ff0afcf",
     "07_tokens/build/semantic.hc-dark.tokens.json": "7322257ce9d44d444c9b37522e235eafdd0eec56d77589743a1d937056095707",
     "07_tokens/build/forced-colors.map.json": "67edc31c169e93e66a4ef9fd669cd2a48b085c8bf129b592789587c32e9e4ebf",
+    "04_mark/svg/icon-1024-black-on-white.svg": "6c15da73bdf826300654ab28316a99a15c3a9973acc227e7b9b5c85439741f0b",
+    "04_mark/svg/icon-1024-white-on-black.svg": "2d26c9cb1a666a4307c325c3660f746517a1070fc1d0a01c29a74c13a8b30e0c",
     "04_mark/svg/icon-1024.svg": "af33d6c0dd85937750e1144752fd9c9e83985a201e34efdd1b693b0872cf8764",
     "04_mark/svg/icon-192.svg": "39079967eb38d06e3463fb76be40150dc4bcf58ccac11bb3a80c7355e0be28af",
     "04_mark/svg/icon-512.svg": "fb90854fe89cdff0e81f527d7fcfea6df0e819670281e4f1c54bee0c34c5a571",
@@ -19,32 +21,24 @@
     "04_mark/svg/icon-apple-1024-mono.svg": "564c9fd27bc8ef6e3da619db696a08d5523cdf1b493869f66f09e42d76e44aa9",
     "04_mark/svg/icon-apple-1024.svg": "adaadf34cd1c4a757b36ac91e341ad0d4c61ec630994bd4d9fbf09a72f0ccaf5",
     "04_mark/svg/icon-apple-1088-watch.svg": "73a1414603bd28d84df5684b7c4766cafed42728d0fdf129ffdae46895553892",
+    "04_mark/svg/icon-square-1024-black-on-white.svg": "c51fc39c5b22c279fbaa3e7b82d70e2452ecd8042f806aa3c0e7e518356d5d70",
     "04_mark/svg/mark-colour.svg": "5ca73a525796d4c80e2b26e59c6e7b93a08f087d45c89a640aaf092d71dee990",
     "04_mark/svg/mark-heavy.svg": "43544b56cd14e0d65fdb63a68d0e2113ae4428f1bdf73cdc4b4016d0f7423fbc",
     "04_mark/svg/mark-regular.svg": "dae564226af690e7dd0a00d14a4a56c80535ec2a8284b7c8b9cd181082220787",
     "04_mark/svg/tile-web.svg": "f2e3ee3732074aeab2466daf1d603c62aeea0bfa72d7f97515469c6aa3617b9f",
-    "04_mark/svg/wordmark-bangla-colour.svg": "f763f2376356ab1b6295aa37839ead23ab330a53c59c5e08ec296abc3e3e390d",
-    "04_mark/svg/wordmark-bangla.svg": "6b42edde179882a29c3147a78e333ef3e341fbd16913ec8fd70519599d8b464d",
-    "04_mark/svg/wordmark-latin-colour.svg": "9d014a6f050f1e996dcf1f6ad3c1aa0bb3ba18871198ca43262b4634fe5c3bda",
+    "04_mark/svg/wordmark-latin-black-on-white.svg": "3e5b71af6c4399a7cb73e658f925cbda914898ec1817c52432366dda92e9f391",
+    "04_mark/svg/wordmark-latin-colour-on-white.svg": "78c0deddf3cd11f0bb67a20c36ee4b96756aaa3df6b38284d62de12a3618d662",
+    "04_mark/svg/wordmark-latin-colour.svg": "8aaff9f19dd12ee4ff26065c509b476d0cae18589f3a146abcc5b95e7ae7e69f",
+    "04_mark/svg/wordmark-latin-white-on-black.svg": "5f517c74be71ec0dfdeef898ff4548e9116974270bfdf3fdb574e2a8fe2a719b",
     "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
-    "04_mark/manifest.json": "436b51961fb83be02995ae2a4cc01809c59772d1fd31b90b8f3aa0ae6fdf1432",
-    "08_components/_cards.json": "629aece00fb080d8bac0bacdb99547be9f378159d187c9760f50448a79d550b9"
+    "04_mark/manifest.json": "28c58bde27a9952d7a76f58d278a28cbf5a29832d4da14261530f2d4334d19c6",
+    "08_components/_cards.json": "8415b67d1849878c3a1b40e0fa4bc788b5a3e1c3ab631a0401a294853f7f05a6"
   },
   "fontsRequired": [
     {
       "family": "Literata",
       "style": "Regular",
       "usedFor": "every Latin text style"
-    },
-    {
-      "family": "Noto Serif Bengali",
-      "style": "Regular",
-      "usedFor": "Bangla text styles"
-    },
-    {
-      "family": "Noto Serif Bengali",
-      "style": "Medium",
-      "usedFor": "Bangla text styles"
     },
     {
       "family": "Aninda Mono",
@@ -59,18 +53,18 @@
   ],
   "expected": {
     "collections": 2,
-    "variables": 108,
-    "primitiveVariables": 88,
+    "variables": 99,
+    "primitiveVariables": 79,
     "themeVariables": 20,
     "themeModes": 4,
     "variableAliases": 40,
     "paintStyles": 20,
-    "textStyles": 16,
+    "textStyles": 9,
     "effectStyles": 1,
     "gridStyles": 2,
-    "marks": 18,
+    "marks": 22,
     "markSetVariants": 2,
-    "components": 11,
+    "components": 9,
     "componentSets": 3,
     "cardFrames": 30,
     "pages": 3
@@ -106,7 +100,7 @@
   "knownGaps": [
     {
       "what": "Latin and monospaced text styles carry no line height.",
-      "why": "The token set defines number/lineHeight/bangla and nothing for Latin. Figma’s automatic line height is used rather than a number I would have had to invent."
+      "why": "The token set defines no line height at all. There was one, for Bangla, and it went with the Bangla. Figma’s automatic line height is used rather than a number I would have had to invent."
     }
   ]
 }

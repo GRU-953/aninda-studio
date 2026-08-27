@@ -6,7 +6,36 @@
 
 ---
 
-## The recommendation
+## This recommendation was not the one that shipped
+
+**Superseded. Read this section before the rest of the document.**
+
+This page recommended **Inter + Noto Sans Bengali + JetBrains Mono** on 14 August
+2026, and the system shipped **Literata + Noto Serif Bengali + Aninda Mono** — this
+document's own *"More editorial"* row, at a multiplier of ×0.816 rather than the
+recommended ×0.872. The reversal was visible only in `07_tokens/build.py` and
+nowhere in prose, so a reader following this page was sent to the wrong stack for
+two weeks. That was gap **G-REC-1**.
+
+Why the editorial pairing won: Literata carries an optical-size axis from 7 to 72,
+so its letterforms are redrawn for the size rather than scaled, and its x-height is
+nearly flat across that range — which is what held the Bangla multiplier almost
+constant across the whole scale. The recommendation below preferred Inter partly to
+avoid a Reserved Font Name rename, and that cost was paid anyway: the monospace
+face is a subset of IBM Plex Mono, `Plex` is a Reserved Font Name, and subsetting
+is a modification under OFL 1.1 clause 3, so it ships as **Aninda Mono**.
+
+And since 27 August 2026 there is no Bengali face at all. The system ships English,
+so the stack is **Literata + Aninda Mono** — two faces, not three. Every Bangla
+figure in this document is a record of measurements taken while the system was
+bilingual, and they are kept because they are the evidence for choosing Literata.
+
+The rest of this page is left exactly as it was written. A recommendation that was
+not taken is worth more intact than tidied.
+
+---
+
+## The recommendation as written on 14 August 2026
 
 # Inter + Noto Sans Bengali + JetBrains Mono
 

@@ -177,10 +177,6 @@ def static_vars(prim: dict) -> dict[str, str]:
     for k, tok in prim["cubicBezier"]["motion"].items():
         out[f"{P}ease-{k}"] = fmt(tok["$value"])
     out[f"{P}scale-ratio"] = fmt(prim["number"]["scale"]["ratio"]["$value"])
-    for k, tok in prim["number"]["scale"]["bangla"].items():
-        if not k.startswith("$"):
-            out[f"{P}bangla-scale-{k}"] = fmt(tok["$value"])
-    out[f"{P}bangla-line-height"] = fmt(prim["number"]["lineHeight"]["bangla"]["$value"])
     return out
 
 
@@ -227,30 +223,41 @@ def build(prim: dict, sem: dict[str, dict], forced: dict) -> str:
                  + block(":root, [data-theme]", fmap, "    ").replace("\n", "\n  ")[:-2]
                  + "}\n")
 
-    parts.append("\n/* 6. Reduced motion, honoured at the root. */\n"
+    # A MOVEMENT IS REMOVED. A CROSS-FADE IS NOT.
+    #
+    # Both durations used to collapse to 1 ms here, and that is not what either
+    # platform asks for. Apple lists REPLACING transitions among the practices for
+    # Reduce Motion, not deleting them; Material expresses the same split
+    # numerically, with every effects damping at exactly 1.0 — critically damped,
+    # never overshooting — while spatial damping sits below it. The reduced case is
+    # the effects half surviving and the spatial half going.
+    #
+    # This system already argued exactly that in print, in the guidebook's motion
+    # chapter: "things that move may overshoot; things that only change colour never
+    # do. That is why --as-duration-colour and --as-duration-move are two tokens and
+    # not one." The stylesheet had simply not been doing what the book said.
+    #
+    # The colour duration is INTERPOLATED from the primitive, never typed, so it
+    # cannot drift from the value the rest of the sheet uses. It is stated rather
+    # than left to inherit for three reasons: it records the decision where a reader
+    # looks for it, it survives a later override further down the tree, and it gives
+    # the gates a property to READ under reduce rather than an absence to interpret.
+    colour_ms = prim["duration"]["motion"]["colour"]["$value"]["value"]
+    parts.append("\n/* 6. Reduced motion. A movement is removed; the cross-fade is not. */\n"
                  "@media (prefers-reduced-motion: reduce) {\n"
                  "  :root {\n"
-                 f"    {P}duration-colour: 1ms;\n"
                  f"    {P}duration-move: 1ms;\n"
+                 f"    {P}duration-colour: {colour_ms:g}ms;\n"
                  "  }\n}\n")
 
-    # Bangla is not Latin set in a different font. It needs its own size, its own
-    # leading and its own floor, and it must never be uppercased, letter-spaced or
-    # synthetically emboldened — all three destroy the মাত্রা or the conjuncts.
-    parts.append(f"""
-/* 7. Bangla. `clamp()` applies the measured multiplier but refuses to go below the
-   floor, so the rule and its exception live in one declaration instead of relying
-   on anyone remembering the exception. */
-:lang(bn), [lang="bn"] {{
-  font-family: var({P}font-bangla);
-  line-height: var({P}bangla-line-height);
-  font-size: clamp(var({P}text-bangla-min), calc(1em * var({P}bangla-scale-body)), 100em);
-  text-transform: none;
-  letter-spacing: normal;
-  font-synthesis-weight: none;
-  font-synthesis-style: none;
-}}
-""")
+    # SECTION 7 WAS THE BANGLA BLOCK, and it was the best-argued rule in this
+    # file: one `clamp()` carrying the measured multiplier AND its floor, so nobody
+    # had to remember the exception, plus text-transform, letter-spacing and both
+    # font-synthesis properties held down because all four destroy either the
+    # matra or the conjuncts. It left with the Bangla on 27 August 2026.
+    #
+    # Nothing replaced it, and nothing should: the rule existed because two scripts
+    # at one nominal size do not look the same size. One script has no such problem.
     return "".join(parts)
 
 

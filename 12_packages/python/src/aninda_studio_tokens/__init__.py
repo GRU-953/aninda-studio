@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 THEMES = ['light', 'dark', 'hc-light', 'hc-dark']
 
 _DATA = Path(__file__).parent / "data"

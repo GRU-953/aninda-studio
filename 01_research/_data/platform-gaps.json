@@ -1,6 +1,6 @@
 {
   "_generator": "Hand-maintained input for scripts/gaps.py, which writes 01_research/PLATFORM-GAPS.md. Every gap names the requirement, the source it comes from with the date it was read, what was measured in this tree, and the fix. A gap with no source is one this system sets for itself, and says so.",
-  "assessed_on": "26 August 2026",
+  "assessed_on": "2026-08-28",
   "against": "Apple Human Interface Guidelines and App Store Connect, and Google Material 3, Android developer documentation and Google Play Console, all read on 26 August 2026.",
   "gaps": [
     {
@@ -304,8 +304,8 @@
         }
       ],
       "measured": "Benchmark criterion 20, part met: nothing moves, blurs or changes depth either way, but under prefers-reduced-motion both duration tokens fall to 1 ms and the colour transitions are removed rather than cross-faded.",
-      "fix": "Substitute a fade rather than collapsing the duration.",
-      "status": "open"
+      "fix": "Closed 28 August 2026. Under prefers-reduced-motion the MOVEMENT duration collapses to 1 ms and the COLOUR duration is held at its full measured value, interpolated from duration.motion.colour rather than typed. That is the substitution both platforms ask for: Apple lists replacing transitions among the practices, and Material's own numbers say the same thing — every effects damping in its scheme is exactly 1.0, never overshooting, while spatial damping sits below it.\n\nThe guidebook had ALREADY ARGUED this in print — 'things that move may overshoot; things that only change colour never do. That is why --as-duration-colour and --as-duration-move are two tokens and not one' — in a chapter whose next paragraph said both durations collapsed. The stylesheet was not doing what the book said.\n\nThree gates asserted the old behaviour and would have gone on passing after it changed, so all three were rewritten to prove the new one. 00_sandbox/measure.py now reads a movement probe AND a colour probe, fails an UNSET property rather than accepting it, and checks the media query actually changed something: 'movement 0.22s -> 0.001s, cross-fade held at 0.12s'. 11_site/check.py's unset-property hole (finding R2-14) is closed in the same way. And the review checker now FAILS a reduced-motion block that flattens every transition on a wildcard selector — which is exactly what references/motion.md shipped, two lines under a sentence saying a colour change may stay.",
+      "status": "closed"
     },
     {
       "id": "G-ICON-7",
@@ -367,8 +367,8 @@
       "requirement": "One name for one thing.",
       "sources": [],
       "measured": "06_type/RECOMMENDATION.md recommends Inter, Noto Sans Bengali and JetBrains Mono. 07_tokens/build.py ships Literata, Noto Serif Bengali and Aninda Mono. No document records the reversal; it is visible only in the generator.",
-      "fix": "Record the reversal and its reason where the recommendation is, so a reader is not sent to the wrong stack.",
-      "status": "open"
+      "fix": "Closed 28 August 2026. 06_type/RECOMMENDATION.md opens with a superseded notice naming what shipped instead and why: Literata's optical-size axis runs 7 to 72 and its x-height is nearly flat across it, which is what held the Bangla multiplier almost constant. The recommendation preferred Inter partly to avoid a Reserved Font Name rename, and that cost was paid anyway — the monospace face ships as Aninda Mono because Plex is reserved and subsetting is a modification under OFL 1.1 clause 3. The rest of the page is left exactly as written: a recommendation that was not taken is worth more intact than tidied.",
+      "status": "closed"
     },
     {
       "id": "G-REC-2",
@@ -391,8 +391,8 @@
       "requirement": "A consumer reading the manifest should find every rule the manifest is about.",
       "sources": [],
       "measured": "04_mark/manifest.json states the stroke rule and the safe field but no minimum size. The 16 px floor lives in a plugin script, and its own reference document acknowledges the split.",
-      "fix": "Carry the floor in the manifest, computed rather than typed.",
-      "status": "open"
+      "fix": "Closed 28 August 2026, and COMPUTED rather than typed, which is what the fix asked for. 04_mark/manifest.json now carries minimum_px with the floor, the heavy stroke's rendered width at it, and the circle's counter — each derived from strokes.heavy, grid and geometry.circle.r, all already in that file. asset.py reads it instead of declaring MARK_FLOOR_PX = 16.\n\nComputing it corrected the arithmetic: the comment that had carried the derivation said the counter was 'about 5.6 px' at the floor, and it is 6.56. Nobody had recomputed it, which is the argument against keeping arithmetic in prose.",
+      "status": "closed"
     },
     {
       "id": "G-REC-4",
@@ -408,8 +408,8 @@
         }
       ],
       "measured": "Apple announced new App Store creative asset slots on 5 August 2026. The benchmark was checked on 14 August 2026 and does not mention them. The Play icon design specification, updated 15 June 2026, was missed the same way.",
-      "fix": "The fault is structural rather than careless: the check read guideline pages and not the developer news feed or the distribution pages. Both are now sources, and the omission is recorded as a method finding rather than quietly patched.",
-      "status": "open"
+      "fix": "Closed 28 August 2026. Both feeds are sources: developer.apple.com/design/whats-new/ and the two distribution pages, each with a read date, in 01_research/_data/external-sources.json — 64 sources in all.\n\nAnd the method finding this entry had been promising since 26 August now exists, as R8-1. It did not, which is why this gap stayed open while its fix was already in the tree: the register said the omission was 'recorded as a method finding' and pointed at nothing. The distinction R8-1 draws is the durable part — a guideline page says what to do with a slot and never says a slot has been added, so a source list needs pages that ANNOUNCE as well as pages that DESCRIBE.",
+      "status": "closed"
     }
   ]
 }

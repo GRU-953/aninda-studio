@@ -1387,32 +1387,19 @@ def chapter_type_en(tok: Tokens) -> str:
         "Sizes are in rem, so they follow the reader's own text-size setting. The "
         "pixel column assumes the browser default of 16 px.</p>")
     scale_names = ["caption", "body", "lead", "h3", "h2", "h1", "display"]
-    bn_scale_for = {"caption": "caption", "body": "body", "lead": "body",
-                    "h3": "heading", "h2": "heading", "h1": "title",
-                    "display": "display"}
     rows = []
-    bn_min = tok.prim("dimension.type.bangla-min")["$value"]["value"]
     for name in scale_names:
         rem = tok.prim(f"dimension.type.{name}")["$value"]["value"]
-        px = rem * 16
-        mult_key = bn_scale_for[name]
-        mult = tok.prim(f"number.scale.bangla.{mult_key}")["$value"]
-        bn_px = px * mult
-        clamped = bn_px < bn_min
-        bn_cell = f"{max(bn_px, bn_min):.1f} px"
-        if clamped:
-            bn_cell += f' <span class="gb-muted">(clamped up from {bn_px:.1f})</span>'
         rows.append([
             f"<code>--as-text-{e(name)}</code>",
             f"{rem:g} rem",
-            f"{px:.1f} px",
-            f"×{mult}",
-            bn_cell,
+            f"{rem * 16:.1f} px",
         ])
-    out.append(table(["Token", "Size", "At 16 px root", "Bangla multiplier",
-                      "Bangla size"], rows,
-                     caption="The type scale in rem and at a 16 px root, with the "
-                             "measured Bangla multiplier for each step."))
+    out.append(table(["Token", "Size", "At 16 px root"], rows,
+                     caption="The type scale in rem and at a 16 px root. Two "
+                             "further columns carried the measured Bangla "
+                             "multiplier and the size it produced; the derivation "
+                             "they came from is in the last chapter."))
 
     out.append("<h2>The families this one was chosen over</h2>")
     rows = []
@@ -1427,9 +1414,12 @@ def chapter_type_en(tok: Tokens) -> str:
             f"×{p['bangla_size_multiplier_at_16']}",
             "yes" if p["varies_with_size"] else "no",
         ])
-    out.append(table(["Pairing", "Latin", "Bangla", "Multiplier at 16 px",
+    out.append(table(["Pairing", "Latin", "Bengali face", "Multiplier at 16 px",
                       "Varies with size"], rows,
-                     caption="Eight pairings measured out of thirty families."))
+                     caption="Eight pairings measured out of thirty families. This "
+                             "is a record of a choice made while the system was "
+                             "bilingual: the multiplier column is why Literata won, "
+                             "and it was a Bangla measurement."))
     out.append(
         "<p>The obvious editorial pairing was Newsreader with Noto Serif Bengali, "
         "and the measurements rejected it: at ×0.708 the Bangla column is visibly "
@@ -1718,21 +1708,31 @@ def chapter_motion_en(tok: Tokens) -> str:
         "false.</strong></p>")
 
     out.append("<h2>Reduced motion</h2>")
+    colour_ms = tok.prim("duration.motion.colour")["$value"]["value"]
     out.append(
-        "<p>When the reader has asked their system for reduced motion, both "
-        "durations collapse to 1 ms at the root. Nothing is left half-animated "
-        "and nothing needs a second rule further down the tree.</p>")
+        "<p>When the reader has asked their system for reduced motion, the "
+        "<strong>movement</strong> duration collapses and the <strong>colour</strong> "
+        "duration does not. That is the whole rule, and it is why these are two "
+        "tokens rather than one.</p>")
     out.append(
-        "<pre class=\"gb-code\"><code>@media (prefers-reduced-motion: reduce) {\n"
-        "  :root {\n"
-        "    --as-duration-colour: 1ms;\n"
-        "    --as-duration-move: 1ms;\n"
-        "  }\n}</code></pre>")
+        f"<pre class=\"gb-code\"><code>@media (prefers-reduced-motion: reduce) {{\n"
+        f"  :root {{\n"
+        f"    --as-duration-move: 1ms;\n"
+        f"    --as-duration-colour: {colour_ms:g}ms;\n"
+        f"  }}\n}}</code></pre>")
     out.append(
-        "<p>The substitution rule, inherited from Apple's own reduced-motion "
-        "techniques, is to replace a movement with a <strong>fade</strong> — "
-        "never a spatial move and never a blur, and never an animation into or "
-        "out of a blur.</p>")
+        "<p>Apple asks for a movement to be <strong>replaced</strong> rather than "
+        "deleted, and Material says the same thing in numbers: every effects damping "
+        "in its scheme is exactly 1.0 — critically damped, never overshooting — while "
+        "spatial damping sits below it. The reduced case is the effects half "
+        "surviving.</p>")
+    out.append(note(
+        "<p><strong>Both durations used to collapse here, and this chapter said so "
+        "in a paragraph two lines above the one that described the correct rule.</strong> "
+        "Removing a transition is not reducing motion: it replaces a smooth change "
+        "with a jump, which is harsher than the change it was meant to soften. Fixed "
+        "on 28 August 2026, and the three gates that had asserted the old behaviour "
+        "were rewritten to prove the new one rather than left to pass either way.</p>"))
     return "".join(out)
 
 

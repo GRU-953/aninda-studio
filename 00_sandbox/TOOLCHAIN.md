@@ -62,23 +62,27 @@ same underlying library (HarfBuzz) with no system install.
 
 ### The proof it works
 
-Shaping the Bangla wordmark **অনিন্দ্য** through `uharfbuzz`:
+Shaping `office` through `uharfbuzz`, at the wordmark's own axis settings:
 
 ```
-codepoints:     8   অ ন ি ন ্ দ ্ য
-shaped glyphs:  5
-script: Beng · direction: ltr
-glyph → cluster: [(121, 0), (168, 1), (152, 1), (467, 3), (218, 7)]
+office          6 code points -> 4 glyphs
+                shaped ids [380, 505, 277, 291]
+                naive cmap  [380, 315, 315, 330, 277, 291]
 ```
 
-Two things are visible in that output, and both are the things naive code gets wrong:
+Two things are visible there, and both are what naive code gets wrong:
 
-1. **The conjunct formed.** Clusters 3–7 (`ন ্ দ ্ য`) collapsed into a single glyph, 467. Eight
-   code points became five glyphs. Without shaping you would get eight separate letters and a
-   word no Bangla reader would accept.
-2. **The vowel sign reordered.** Cluster 1 is `ন` followed by `ি`, but two glyphs come out of it
-   and the pre-base form is placed first — the vowel is drawn to the **left** of the consonant it
-   belongs to, which is how Bangla is actually written.
+1. **The ligature formed.** `ffi` collapsed into one glyph, 505, so six code points became four.
+   Without shaping you get six separate letters.
+2. **That glyph is unreachable by lookup.** Nothing maps to 505: Literata's cmap has no entry for
+   U+FB03. So it can only have arrived through a GSUB substitution, which is the part that
+   actually proves the shaper ran. A ligature with its own code point — `fi`, at U+FB01 — would
+   collapse identically and prove nothing.
+
+This proof was Bangla until 27 August 2026, and it was a stronger one: a conjunct forming and a
+pre-base vowel reordering to the left of its consonant are failures that change MEANING, where a
+missing Latin ligature only looks wrong. `04_mark/manifest.json` records both what the
+replacement proves and what it no longer does.
 
 Outlines then come out of `fontTools` as SVG path data (`SVGPathPen`), giving the same result
 Inkscape's export produced.

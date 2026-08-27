@@ -14,15 +14,37 @@ Honour `prefers-reduced-motion: reduce`. When it is set, remove movement — do 
 merely shorten it. A colour change may stay; a slide, a scale, a spin or a
 parallax must not.
 
+**Do not do this**, which is the snippet that used to sit here:
+
 ```css
 @media (prefers-reduced-motion: reduce) {
   * {
-    animation-duration: 1ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 1ms !important;
+    transition-duration: 1ms !important;   /* kills the cross-fade too */
   }
 }
 ```
+
+It contradicts the paragraph above it. A wildcard flattens every transition on the
+page, including the colour change the rule explicitly allows — so a hover that was
+a gentle tint becomes a snap, which is a harsher change than the one being
+softened. Apple asks for transitions to be REPLACED rather than deleted, and
+Material's own numbers say the same thing in a different form: its effects damping
+is exactly 1.0 and never overshoots, while spatial damping sits below 1.0. The
+reduced case is the effects half surviving.
+
+Two durations, and only one of them collapses:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --as-duration-move: 1ms;      /* a movement is removed */
+    --as-duration-colour: 120ms;  /* a cross-fade is not */
+  }
+}
+```
+
+That is what `assets/css/tokens.css` ships, and the value is emitted from the token
+rather than typed.
 
 An animation that flashes more than three times a second is a seizure risk and is
 forbidden outright — WCAG 2.2 success criterion 2.3.1 Three Flashes or Below

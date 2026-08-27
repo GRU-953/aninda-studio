@@ -78,18 +78,6 @@
   padding-inline-start: var(--as-space-4);
 }
 
-/* Bangla below 14px renders its মাত্রা — the headline stroke that runs along the
-   top of the letters — too pale to read. The token file clamps Bangla to a 12px
-   floor; below 14px it also needs one step more weight. Measured at
-   device_scale_factor 1: 12px at weight 400 leaves the মাত্রা at luminance 123,
-   which reads as grey rather than black; 12px at weight 500 holds at 108.
-   Body size (16px × 0.816 = 13.1px) and caption size both land under 14px, so
-   both gain a weight step. Anything at lead size or larger is exempted with
-   .as-bn-large. */
-.as-root [lang="bn"]:not(.as-bn-large) {
-  font-weight: 500;
-}
-
 /* =========================================================================
    2. Text
    ========================================================================= */
@@ -966,8 +954,9 @@
 /* No text-transform and no caps tracking. The rule is sentence case for
    everything — 09_guidebook/chapters/10-voice.md, 02_strategy/ENGLISH-STANDARD.md
    and the plugin's references/typography.md all state it, one of them with the
-   reason: capitals are harder to read and Bangla has none, so an all-capitals
-   house style would have nothing to translate into. This rule said
+   reason: the word shapes a reader recognises without spelling out are made by
+   ascenders and descenders, and capitals flatten them into one rectangle. This
+   rule said
    `text-transform: uppercase; letter-spacing: 0.08em` and manufactured
    FOUNDATIONS from the sentence-case string "Foundations" on all thirty cards and
    on both site pages — in the first words a reader sees. Because the caps came
@@ -980,9 +969,7 @@
 }
 
 .as-doc-title { font-size: var(--as-text-h2); line-height: 1.1; font-weight: 700; }
-.as-doc-title-bn { font-size: var(--as-text-h3); line-height: 1.4; color: var(--as-ink-muted); }
 .as-doc-sub { font-size: var(--as-text-lead); line-height: 1.4; color: var(--as-ink-muted); max-inline-size: 68ch; }
-.as-doc-sub-bn { color: var(--as-ink-muted); max-inline-size: 68ch; }
 
 .as-doc-themes {
   display: flex;

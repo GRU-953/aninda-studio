@@ -94,16 +94,24 @@ Three things are never done to it:
 
 | File | What it is | Advance |
 | --- | --- | --- |
-| `wordmark-latin.svg` | "Aninda Studio", 13 code points, 13 glyphs | 653.2 |
-| `wordmark-bangla.svg` | "অনিন্দ্য স্টুডিও", 16 code points shaped to 11 glyphs | 520.1 |
+| `wordmark-latin.svg` | "aninda studio", 13 code points, 13 glyphs. Recolourable. | 653.2 |
+| `wordmark-latin-colour.svg` | The same, one primary per letter. Not recolourable. | 653.2 |
+| `wordmark-latin-colour-on-white.svg` | Four colours on a pure white plate. | 793.2 |
+| `wordmark-latin-black-on-white.svg` | Black on a pure white plate. | 793.2 |
+| `wordmark-latin-white-on-black.svg` | White on a pure black plate. | 793.2 |
 
-The Bangla wordmark is **shaped, not naively drawn**: 15 code points form 11
-glyphs through conjunct formation. The build proves this with a negative control
-— an unshaped run gives 16 glyphs, a shaped run gives 11, and the two differing
-is the proof that shaping happened. Both are outlines, so neither needs a font
-installed.
+A **plate** is the wordmark with a ground behind it, for handing to somebody who
+needs one file rather than a transparent asset and a surface to put it on. The
+padding is half the wordmark's own drawn height, which is the clear-space rule
+applied to the wordmark; it is derived, not chosen. None of them carries a corner
+radius: the tile radius is 24 units per 100 of an **icon's** side, and a plate
+2.84 times wider than it is tall has no side to take a proportion of.
 
-Never re-typeset either wordmark from live text. The conjuncts are the point.
+A Bangla wordmark stood beside these until 27 August 2026, shaped through HarfBuzz
+with a negative control proving the conjuncts formed. It went with the Bangla.
+
+All of them are outlines, so none needs a font installed. Never re-typeset a
+wordmark from live text.
 
 ---
 

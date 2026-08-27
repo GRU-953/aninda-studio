@@ -10,7 +10,7 @@ description: >-
 # Aninda Studio
 
 A studio of one, working in two scripts. This project holds the whole visual
-system: 18 preview cards, the design tokens they are built from, the
+system: 17 preview cards, the design tokens they are built from, the
 component stylesheet, and the identity artwork.
 
 ## What is here
@@ -21,7 +21,7 @@ component stylesheet, and the identity artwork.
 - **Foundations** — Accessibility
 - **Motion** — Duration and easing
 - **Space and shape** — Shape and targets, Space scale
-- **Type** — Bangla, Scale
+- **Type** — Scale
 
 ## The rules that matter
 

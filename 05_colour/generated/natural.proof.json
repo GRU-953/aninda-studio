@@ -76,7 +76,6 @@
   "families": {
     "ground": {
       "label": "Natural Gray",
-      "label_bn": "",
       "kind": "brand",
       "note": "Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text \u2014 so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor.",
       "hue_oklch": 67.68,
@@ -112,7 +111,6 @@
     },
     "accent": {
       "label": "Natural Blue",
-      "label_bn": "",
       "kind": "brand",
       "note": "Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA.",
       "hue_oklch": 227.242,
@@ -148,7 +146,6 @@
     },
     "success": {
       "label": "Natural Green",
-      "label_bn": "",
       "kind": "brand",
       "note": "Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA.",
       "hue_oklch": 151.991,
@@ -184,7 +181,6 @@
     },
     "danger": {
       "label": "Natural Red",
-      "label_bn": "",
       "kind": "brand",
       "note": "Primary. A warm terracotta. Measured 5.69:1 on white at its anchor \u2014 it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp.",
       "hue_oklch": 36.01,
@@ -223,7 +219,6 @@
     "light": {
       "key": "light",
       "label": "Light",
-      "label_bn": "\u0986\u09b2\u09cb",
       "polarity": "light",
       "high_contrast": false,
       "text_target": 4.5,
@@ -529,7 +524,6 @@
     "dark": {
       "key": "dark",
       "label": "Dark",
-      "label_bn": "\u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
       "polarity": "dark",
       "high_contrast": false,
       "text_target": 4.5,
@@ -831,7 +825,6 @@
     "hc-light": {
       "key": "hc-light",
       "label": "High contrast, light",
-      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0986\u09b2\u09cb",
       "polarity": "light",
       "high_contrast": true,
       "text_target": 7.0,
@@ -1134,7 +1127,6 @@
     "hc-dark": {
       "key": "hc-dark",
       "label": "High contrast, dark",
-      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
       "polarity": "dark",
       "high_contrast": true,
       "text_target": 7.0,

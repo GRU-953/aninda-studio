@@ -54,10 +54,11 @@ PAGE = """<!doctype html><html><head><meta charset="utf-8">
   body { margin:0; background: var(--as-surface-base); color: var(--as-ink); }
   #island { background: var(--as-surface-base); color: var(--as-ink); padding: 8px; }
   #probe { background: #ff00ff; color: #00ff00; border: 2px solid #123456; }
-  #anim { transition-duration: var(--as-duration-move); }
+  #anim { transition-property: transform; transition-duration: var(--as-duration-move); }
+  #fade { transition-property: background-color; transition-duration: var(--as-duration-colour); }
 </style></head><body>
-<div id="island"><span id="t">অনিন্দ্য স্টুডিও — aninda studio</span></div>
-<div id="probe">probe</div><div id="anim">anim</div>
+<div id="island"><span id="t">aninda studio</span></div>
+<div id="probe">probe</div><div id="anim">anim</div><div id="fade">fade</div>
 </body></html>"""
 
 
@@ -98,6 +99,26 @@ def snapshot(page, names: list[str]) -> dict[str, str]:
            return o; }""", names)
 
 
+def _ms(value: str) -> float:
+    """A CSS duration in milliseconds. `0.12s` and `120ms` are the same number."""
+    v = value.strip()
+    if v.endswith("ms"):
+        return float(v[:-2])
+    if v.endswith("s"):
+        return float(v[:-1]) * 1000
+    return float(v or 0)
+
+
+def ms_of(value: str) -> float:
+    """A CSS duration in milliseconds. `0.12s` and `120ms` are the same number."""
+    v = value.strip()
+    if v.endswith("ms"):
+        return float(v[:-2])
+    if v.endswith("s"):
+        return float(v[:-1]) * 1000
+    return float(v or 0)
+
+
 def main() -> int:
     try:
         from playwright.sync_api import sync_playwright
@@ -117,7 +138,7 @@ def main() -> int:
 
     names = ([f"--as-surface-{s}" for s in SURFACES]
              + [f"--as-{r}" for r in ROLES]
-             + ["--as-duration-move", "--as-shadow-float"])
+             + ["--as-duration-move", "--as-duration-colour", "--as-shadow-float"])
 
     problems: list[str] = []
     notes: list[str] = []
@@ -212,14 +233,61 @@ def main() -> int:
                              f"no brand hex survives")
         c.close()
 
-        # --- 6. reduced motion ------------------------------------------------
+        # --- 6. reduced motion: a movement removed, a cross-fade kept ---------
+        #
+        # This asserted ONE thing — that the duration fell to about zero — and it
+        # would have gone on passing unchanged after the behaviour it was written
+        # for was replaced. Four assertions now, and the interesting half is the one
+        # that must NOT be zero.
+        prim = json.loads(
+            (ROOT / "07_tokens" / "build" / "primitive.tokens.json").read_text())
+        want_ms = prim["duration"]["motion"]["colour"]["$value"]["value"]
         c, pg = ctx(reduced_motion="reduce")
-        dur = pg.evaluate("getComputedStyle(document.getElementById('anim')).transitionDuration")
-        if not (dur.startswith("0") or dur in ("1ms", "0.001s")):
-            problems.append(f"prefers-reduced-motion: reduce left transition-duration at {dur}")
-        else:
-            notes.append(f"reduced motion → transition-duration {dur}")
+        read = pg.evaluate("""() => ({
+            move: getComputedStyle(document.getElementById('anim')).transitionDuration,
+            fade: getComputedStyle(document.getElementById('fade')).transitionDuration,
+            moveVar: getComputedStyle(document.documentElement)
+                .getPropertyValue('--as-duration-move').trim(),
+            fadeVar: getComputedStyle(document.documentElement)
+                .getPropertyValue('--as-duration-colour').trim(),
+        })""")
         c.close()
+        # An UNSET property must FAIL rather than pass. Its computed duration would
+        # be 0s, which is exactly what the old check accepted as success.
+        if not read["moveVar"] or not read["fadeVar"]:
+            problems.append(
+                f"under reduce, --as-duration-move is {read['moveVar']!r} and "
+                f"--as-duration-colour is {read['fadeVar']!r}; an empty one means "
+                f"this check measured nothing")
+        # NUMERICALLY, not by string prefix. "0.12s" starts with "0" and is
+        # 120 ms — the correct value — so a prefix test called the right answer a
+        # failure. A duration is a number and has to be compared as one.
+        elif ms_of(read["move"]) > 1:
+            problems.append(f"reduce left the MOVEMENT running at {read['move']}")
+        elif ms_of(read["fade"]) <= 1:
+            problems.append(
+                f"reduce collapsed the CROSS-FADE to {read['fade']}. Removing a "
+                f"transition is not reducing motion: it replaces a smooth change "
+                f"with a jump, which is harsher than the change it was softening.")
+        elif abs(ms_of(read["fade"]) - want_ms) > 1:
+            problems.append(
+                f"the cross-fade runs at {read['fade']} under reduce and the token "
+                f"says {want_ms:g}ms")
+        else:
+            # Liveness: the media query must have DONE something, or every
+            # assertion above would pass on a page that ignored it entirely.
+            c2, pg2 = ctx(reduced_motion="no-preference")
+            rest = pg2.evaluate(
+                "getComputedStyle(document.getElementById('anim')).transitionDuration")
+            c2.close()
+            if rest == read["move"]:
+                problems.append(
+                    f"the movement duration is {rest} with and without reduce, so "
+                    f"the media query changed nothing")
+            else:
+                notes.append(
+                    f"reduced motion: movement {rest} → {read['move']}, cross-fade "
+                    f"held at {read['fade']}")
 
         # --- 7. claim versus render, the one that closes the loop -------------
         checked = 0

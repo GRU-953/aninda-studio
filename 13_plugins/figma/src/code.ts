@@ -1102,27 +1102,12 @@ async function passCardFrames(plan: Plan, receipt: Receipt, styles: StyleIndex):
       { text: card.group, style: 'Latin/Caption', role: 'color/ink/muted' },
       { text: card.name, style: 'Latin/H2', role: 'color/ink/default' },
     ];
-    if (card.nameBangla) lines.push({ text: card.nameBangla, style: 'Bangla/H2', role: 'color/ink/default' });
     if (card.subtitle) lines.push({ text: card.subtitle, style: 'Latin/Lead', role: 'color/ink/muted' });
-    if (card.subtitleBangla) {
-      lines.push({ text: card.subtitleBangla, style: 'Bangla/Lead', role: 'color/ink/muted' });
-    }
     lines.push({ text: card.path, style: 'Mono/Caption', role: 'color/ink/muted' });
 
-    const gaps: string[] = [];
-    if (!card.nameBangla) gaps.push('name');
-    if (!card.subtitleBangla) gaps.push('subtitle');
-    if (gaps.length > 0) {
-      lines.push({
-        text: `No verified Bangla exists yet for the ${gaps.join(' or the ')} of this card, so the space is left empty rather than filled with new wording.`,
-        style: 'Latin/Caption',
-        role: 'color/ink/muted',
-      });
-      receipt.skipped.push({
-        what: `The Bangla ${gaps.join(' and ')} on the "${card.name}" card frame`,
-        why: 'BANGLA-STANDARD.md holds no verified string for it, and writing new Bangla here is not allowed.',
-      });
-    }
+    // A card frame carried its Bangla name and subtitle here, and reported in the
+    // receipt when the string register held none — so a gap was visible in Figma
+    // rather than silently absent. Both went with the Bangla on 27 August 2026.
 
     for (const line of lines) {
       const text = await makeText(line.text, line.style, line.role, styles, receipt);

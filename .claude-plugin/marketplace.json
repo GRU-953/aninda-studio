@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "The Aninda Studio brand and design system, as a Claude Code plugin.",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "plugins": [
     {
       "name": "aninda-studio",
       "source": "./13_plugins/claude-code",
       "description": "The Aninda Studio brand and design system as three skills: make one asset to the rules, set up or upgrade a whole repository, and check something that already exists against the system and WCAG 2.2 AA.",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "author": {
         "name": "Aninda Sundar Howlader",
         "email": "aninda.sh15@gmail.com"

@@ -25,6 +25,9 @@
       "icon-1024.svg": 9.0,
       "icon-512.svg": 9.0,
       "icon-192.svg": 9.0,
+      "icon-1024-black-on-white.svg": 9.0,
+      "icon-1024-white-on-black.svg": 9.0,
+      "icon-square-1024-black-on-white.svg": 9.0,
       "icon-apple-1024.svg": 9.0,
       "icon-apple-1088-watch.svg": 9.0,
       "icon-apple-1024-dark.svg": 9.0,
@@ -56,6 +59,13 @@
         "what_is_lost": "The stakes. A Latin ligature is cosmetic, so a shaper failing here produces ugly type rather than wrong words. The Bangla gate caught a failure that changed meaning. This is a weaker proof of a smaller consequence, and it is recorded rather than hidden."
       }
     ]
+  },
+  "minimum_px": {
+    "value": 16.0,
+    "counter_px_at_floor": 6.56,
+    "heavy_stroke_px_at_floor": 2.4,
+    "rule": "The mark is not drawn below 16 px. At that size the heavy stroke renders at 2.40 px and the circle's counter at 6.56 px. Below it the counter closes.",
+    "derived_from": "strokes.heavy, grid and geometry.circle.r in this same file \u2014 no input is typed twice"
   },
   "clear_space": "half the mark's own height on all four sides",
   "safe_field": 90.0,
@@ -124,12 +134,16 @@
     "mark-colour.svg",
     "wordmark-latin.svg",
     "wordmark-latin-colour.svg",
-    "wordmark-bangla.svg",
-    "wordmark-bangla-colour.svg",
+    "wordmark-latin-colour-on-white.svg",
+    "wordmark-latin-black-on-white.svg",
+    "wordmark-latin-white-on-black.svg",
     "tile-web.svg",
     "icon-1024.svg",
     "icon-512.svg",
     "icon-192.svg",
+    "icon-1024-black-on-white.svg",
+    "icon-1024-white-on-black.svg",
+    "icon-square-1024-black-on-white.svg",
     "icon-apple-1024.svg",
     "icon-apple-1088-watch.svg",
     "icon-apple-1024-dark.svg",
@@ -141,7 +155,6 @@
   "contact_sheet": "proof.svg \u2014 generated from the same strings written to 04_mark/svg, with every caption read out of the artwork",
   "checks": [
     "uharfbuzz present, HarfBuzz 14.3.0",
-    "Bangla wordmark: 16 code points \u2192 11 glyphs, advance 520.1",
     "Latin wordmark: 13 code points \u2192 13 glyphs, advance 653.2",
     "ligature formed: office, 6 code points \u2192 4 glyphs, one of them gid 505, which no code point maps to",
     "ligature formed: difficult, 9 code points \u2192 7 glyphs, one of them gid 505, which no code point maps to",
@@ -150,7 +163,7 @@
     "icon at stroke 9: mark 65.0\u00d773.0 scaled \u00d70.9208, worst corner exactly on the 45-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 90-unit field",
     "icon at stroke 15: mark 71.0\u00d779.0 scaled \u00d70.8473, worst corner exactly on the 45-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 90-unit field",
     "icon at stroke 9 on the 108-unit grid: mark 65.0\u00d773.0 scaled \u00d70.6752, worst corner exactly on the 33-unit inscribed circle \u2014 the scale is derived from the mark's own diagonal, so this is a fit by construction; what is tested is that all four corners also land inside the 66-unit field",
-    "4 recolourable files carry no root colour and draw in currentColor",
+    "3 recolourable files carry no root colour and draw in currentColor; the other 19 each declare one",
     "tile-web.svg: 4.7% background showing \u2014 rounded",
     "icon-1024.svg: 4.7% background showing \u2014 rounded \u2014 the web icon",
     "icon-512.svg: 4.7% background showing \u2014 rounded",
@@ -162,8 +175,14 @@
     "icon-apple-1024-mono.svg: 82.6% background showing \u2014 no ground; the alpha carries the shape \u2014 Apple, Mono",
     "icon-android-foreground-108.svg: 91.7% background showing \u2014 no ground; the alpha carries the shape \u2014 Android foreground",
     "icon-android-monochrome-108.svg: 91.7% background showing \u2014 no ground; the alpha carries the shape \u2014 Android monochrome",
+    "icon-1024-black-on-white.svg: 4.7% background showing \u2014 rounded \u2014 black on white",
+    "icon-1024-white-on-black.svg: 4.7% background showing \u2014 rounded \u2014 white on black",
+    "icon-square-1024-black-on-white.svg: 0.0% background showing \u2014 square and fully opaque \u2014 black on white",
+    "wordmark-latin-colour-on-white.svg: 0.0% background showing \u2014 flat plate, no corner radius \u2014 four colours on white",
+    "wordmark-latin-black-on-white.svg: 0.0% background showing \u2014 flat plate, no corner radius \u2014 black on white",
+    "wordmark-latin-white-on-black.svg: 0.0% background showing \u2014 flat plate, no corner radius \u2014 white on black",
     "under a circle inscribed in the frame, icon-1024.svg and icon-apple-1024.svg are the same image in all 65536 pixels \u2014 the corner rounding lies entirely outside the circle watchOS and visionOS mask to, and the artwork inside it has not drifted between the two files",
     "visual parity: the mark fills 59.850x67.216 per cent of the Apple frame and 60.958x68.461 per cent of Android's visible 72 dp viewport \u2014 a difference of 1.11 and 1.24 percentage points. The corner shape differs between the platforms by decision; the size does not",
-    "contact sheet: 18 artefacts nested from the same strings written to 04_mark/svg, every caption read out of the artwork"
+    "contact sheet: 22 artefacts nested from the same strings written to 04_mark/svg, every caption read out of the artwork"
   ]
 }

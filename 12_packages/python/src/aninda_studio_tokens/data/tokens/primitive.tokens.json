@@ -210,7 +210,7 @@
             }
           }
         },
-        "$description": "Natural Gray () — Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text — so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor.",
+        "$description": "Natural Gray — Primary. A warm stone grey, and the source of every surface tint, every border and the quieter text. It also carries warning, because the palette has no amber and a stone caution reads as attention rather than as an error. Measured: at its own anchor value it is 3.92:1 on white, which clears the 3:1 non-text floor and does NOT clear 4.5:1 for text — so any text role taken from this family is a darker step of it, chosen by measurement rather than by the anchor.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 67.68,
@@ -419,7 +419,7 @@
             }
           }
         },
-        "$description": "Natural Blue () — Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA.",
+        "$description": "Natural Blue — Primary. A muted deep ocean blue. Carries links, focus and the primary action, and information. Measured 9.70:1 on white at its anchor, which clears AAA.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 227.242,
@@ -628,7 +628,7 @@
             }
           }
         },
-        "$description": "Natural Green () — Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA.",
+        "$description": "Natural Green — Primary. A deep evergreen. Measured 7.98:1 on white at its anchor, which clears AAA.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 151.991,
@@ -837,7 +837,7 @@
             }
           }
         },
-        "$description": "Natural Red () — Primary. A warm terracotta. Measured 5.69:1 on white at its anchor — it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp.",
+        "$description": "Natural Red — Primary. A warm terracotta. Measured 5.69:1 on white at its anchor — it clears AA and not AAA, so the high-contrast themes take a deeper step of this ramp.",
         "$extensions": {
           "studio.aninda": {
             "hueOklch": 36.01,
@@ -1068,30 +1068,6 @@
           "unit": "rem"
         },
         "$description": "67.34px at a 16px root — step +5 of a 1.333 scale"
-      },
-      "bangla-min": {
-        "$value": {
-          "value": 12,
-          "unit": "px"
-        },
-        "$description": "Hard floor for Bangla — never apply the multiplier past it. At 12px the মাত্রা renders at luminance 123 on white at weight 400, which reads as grey rather than ink; at weight 500 it is 108 and holds. So this floor is only safe together with the weight bump.",
-        "$extensions": {
-          "studio.aninda": {
-            "measuredAt": "device_scale_factor=1",
-            "luminanceByWeight": {
-              "400": 123,
-              "500": 108,
-              "600": 90
-            }
-          }
-        }
-      },
-      "bangla-weight-bump-below": {
-        "$value": {
-          "value": 14,
-          "unit": "px"
-        },
-        "$description": "Below this size, step Bangla up one weight. Measured: 12px/400 fails at luminance 123, 12px/500 holds at 108, 13px/400 already holds at 94. The threshold is set at 14 rather than 13 because the relationship is not monotonic — it depends on how the stroke lands on the pixel grid — and one size of margin is cheap."
       }
     }
   },
@@ -1101,35 +1077,6 @@
       "ratio": {
         "$value": 1.333,
         "$description": "A perfect fourth. The jumps are large on purpose: hierarchy is unmistakable and fewer levels are needed to express it."
-      },
-      "bangla": {
-        "$description": "How much to shrink Bangla so it looks the same size as Latin. Measured on rendered specimens, not estimated. Bangla's reading height is about 0.62 em against Latin's 0.51, so equal nominal sizes do not look equal. These barely move across the scale because Literata's x-height is nearly flat across its optical range — a face without that property would need a wider spread.",
-        "caption": {
-          "$value": 0.815,
-          "$description": "Bangla multiplier at caption size"
-        },
-        "body": {
-          "$value": 0.816,
-          "$description": "Bangla multiplier at body size"
-        },
-        "heading": {
-          "$value": 0.817,
-          "$description": "Bangla multiplier at heading size"
-        },
-        "title": {
-          "$value": 0.822,
-          "$description": "Bangla multiplier at title size"
-        },
-        "display": {
-          "$value": 0.825,
-          "$description": "Bangla multiplier at display size"
-        }
-      }
-    },
-    "lineHeight": {
-      "bangla": {
-        "$value": 1.6,
-        "$description": "Bangla needs more leading than Latin: the মাত্রা sits above the letters and the vowel signs hang below, so lines collide sooner. Collision measured at 1.25."
       }
     }
   },
@@ -1141,19 +1088,7 @@
         "Georgia",
         "serif"
       ],
-      "$description": "Literata, by Veronika Burian and José Scaglione (TypeTogether). An optical-size axis from 7 to 72, so the letterforms are redrawn for the size rather than merely scaled. Its x-height is almost flat across that range (0.5166 to 0.5130 em), which is why the Bangla multiplier below barely moves.",
-      "$extensions": {
-        "studio.aninda": {
-          "licence": "SIL OFL 1.1"
-        }
-      }
-    },
-    "bangla": {
-      "$value": [
-        "Noto Serif Bengali",
-        "serif"
-      ],
-      "$description": "Never uppercased, never letter-spaced, never synthetically emboldened. A serif Bangla answers Bengali's own letterpress tradition rather than importing a Latin UI convention.",
+      "$description": "Literata, by Veronika Burian and José Scaglione (TypeTogether). An optical-size axis from 7 to 72, so the letterforms are redrawn for the size rather than merely scaled. Its x-height is almost flat across that range (0.5166 to 0.5130 em).",
       "$extensions": {
         "studio.aninda": {
           "licence": "SIL OFL 1.1"

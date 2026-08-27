@@ -269,28 +269,8 @@ def swift_dimensions(data: dict) -> str:
           "    /// The root this scale is expressed against.",
           "    public static let rootPoints: Double = 16.0"]
     for k, v in d["type"].items():
-        if k in ("bangla-min", "bangla-weight-bump-below"):
-            continue
         L.append(f"    /// {v * 16:.2f} pt at a 16 pt root")
         L.append(f"    public static let {swift_ident(k)}: Double = {v:g}")
-    L += ["}", "",
-          "/// Bangla is set smaller than Latin so the two look the same size, and",
-          "/// the multipliers were measured on rendered specimens rather than",
-          "/// estimated. Below `weightBumpBelowPoints` the weight steps up, because",
-          "/// the matra thins out on the pixel grid before the glyph does — the two",
-          "/// rules only work together.",
-          "public enum AnindaBangla {"]
-    for k, v in d["number"].items():
-        if k.startswith("scale-bangla-"):
-            L.append(f"    public static let {swift_ident(k[13:])}: Double = {v:g}")
-    L.append(f"    public static let minimumPoints: Double = "
-             f"{d['type'].get('bangla-min', 12):g}")
-    L.append(f"    public static let weightBumpBelowPoints: Double = "
-             f"{d['type'].get('bangla-weight-bump-below', 14):g}")
-    for k, v in d["number"].items():
-        if k.startswith("lineHeight-"):
-            L.append(f"    public static let {swift_ident(k[11:])}LineHeight: "
-                     f"Double = {v:g}")
     L += ["}", "", "public enum AnindaMotion {"]
     for k, v in d["duration"].items():
         L.append(f"    public static let {swift_ident(k[7:])}Milliseconds: "
@@ -352,27 +332,6 @@ def kotlin_tokens(data: dict) -> str:
     L += ["}", "", "public object AnindaTarget {"]
     for k, v in d["target"].items():
         L.append(f"    public const val {kt_const(k)}: Int = {int(v)}")
-    L += ["}", "",
-          "/**",
-          " * Bangla is set smaller than Latin so the two look the same size, and the",
-          " * multipliers were measured on rendered specimens rather than estimated.",
-          " *",
-          " * Material classifies Bangla as a MEDIUM language-height script, needing",
-          " * roughly 7 per cent taller line heights at the same nominal size. These",
-          " * figures are not that measurement and are not offered as agreeing with",
-          " * it: this system's Bangla leading is 1.6 against Latin's 1.55, which is",
-          " * +3.2 per cent, and the Bangla is also set at x0.816 — so its absolute",
-          " * line box is smaller, not larger. Both numbers are published; neither",
-          " * confirms the other.",
-          " */",
-          "public object AnindaBangla {"]
-    for k, v in d["number"].items():
-        if k.startswith("scale-bangla-"):
-            L.append(f"    public const val {kt_const(k[13:])}: Float = {v:g}f")
-    L.append(f"    public const val MINIMUM_SP: Int = "
-             f"{int(d['type'].get('bangla-min', 12))}")
-    L.append(f"    public const val WEIGHT_BUMP_BELOW_SP: Int = "
-             f"{int(d['type'].get('bangla-weight-bump-below', 14))}")
     L += ["}", "", "public object AnindaMotion {"]
     for k, v in d["duration"].items():
         L.append(f"    public const val {kt_const(k[7:])}_MS: Int = {int(v)}")
@@ -441,42 +400,21 @@ def android_dimens_xml(data: dict) -> str:
         L.append(f'    <dimen name="aninda_focus_{k.replace("-", "_")}">'
                  f"{int(v)}dp</dimen>")
     for k, v in d["type"].items():
-        if k.startswith("bangla"):
-            continue
         L.append(f'    <dimen name="aninda_text_{k}">{v * 16:.2f}sp</dimen>')
     L.append("</resources>")
     return "\n".join(L) + "\n"
 
 
-def android_dimens_bn_xml(data: dict) -> str:
-    """values-bn. Android's own locale mechanism carries the Bangla ramp, so a
-    Bangla layout gets the measured sizes without any code asking which script it
-    is rendering."""
-    d = dimensions(data)
-    mult = {k[13:]: v for k, v in d["number"].items()
-            if k.startswith("scale-bangla-")}
-    band = {"caption": "caption", "body": "body", "lead": "heading",
-            "h3": "heading", "h2": "title", "h1": "title", "display": "display"}
-    floor = d["type"].get("bangla-min", 12)
-    L = ['<?xml version="1.0" encoding="utf-8"?>',
-         f"<!-- {GENERATED}",
-         "     Bangla sizes, applied by Android's own locale mechanism. Each is the",
-         "     Latin size times the measured multiplier for its band, and none falls",
-         f"     below the {floor:g} sp floor. -->",
-         "<resources>"]
-    for k, v in d["type"].items():
-        if k.startswith("bangla"):
-            continue
-        m = mult.get(band.get(k, "body"), 0.816)
-        size = max(v * 16 * m, floor)
-        L.append(f'    <dimen name="aninda_text_{k}">{size:.2f}sp</dimen>')
-    L.append("</resources>")
-    return "\n".join(L) + "\n"
+# values-bn WAS WRITTEN HERE, and it was a good idea for the reason it recorded:
+# Android's own locale mechanism carries a script's sizes, so a Bangla layout got
+# the measured sizes without any code asking which script it was rendering. One
+# locale folder instead of a branch at every call site.
+#
+# It went with the Bangla on 27 August 2026. The folder is `git rm`-ed rather than
+# emptied — an Android resource directory that exists and holds nothing is a
+# different thing from one that does not exist, and the drift sweep reports an
+# orphan either way.
 
-
-# =========================================================================
-# The gates that actually compile
-# =========================================================================
 
 def stage_apple(files: dict[Path, str], root: Path) -> int:
     """Lay the Apple package out under `root`: generated files plus authored ones.
@@ -1127,10 +1065,6 @@ final class AnindaTokensTests: XCTestCase {{
         }}
     }}
 
-    func testBanglaFloorIsBelowItsSmallestStep() {{
-        XCTAssertLessThanOrEqual(AnindaBangla.minimumPoints,
-                                 AnindaType.caption * AnindaType.rootPoints)
-    }}
 }}
 '''
 
@@ -1151,8 +1085,6 @@ def build_files(data: dict) -> dict[Path, str]:
     f[ANDROID / "tokens/src/main/res/values-night/colors.xml"] = \
         android_colors_xml(data, "dark")
     f[ANDROID / "tokens/src/main/res/values/dimens.xml"] = android_dimens_xml(data)
-    f[ANDROID / "tokens/src/main/res/values-bn/dimens.xml"] = \
-        android_dimens_bn_xml(data)
     for name, text in compose_stubs(data).items():
         f[ANDROID / "compose/stubs" / name] = text
     return f

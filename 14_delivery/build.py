@@ -474,48 +474,14 @@ STORE_TEXT = {
 # it "Bangla", which is this studio's own term. Only vocabulary already verified
 # in 06_type/bangla-strings.json and the READMEs is used; where no verified term
 # exists the English stands, which is the rule this kit already follows.
-STORE_TEXT_BN = {
-    "play": {
-        "title": ("অনিন্দ্য স্টুডিও", 30),
-        "short_description": ("সত্যিকারের জীবনের জন্য সহজ অ্যাপ।", 80),
-        "full_description": (
-            "অনিন্দ্য স্টুডিও — এক জন মানুষ, সত্যিকারের জীবনের জন্য সহজ অ্যাপ।\n\n"
-            "এখানের সব কিছু এমন একটি ডিজাইন পদ্ধতির উপর গড়া, যেখানে প্রতিটি দাবি "
-            "মেপে দেখা হয়েছে, শুধু বলা হয়নি। প্রতিটি রঙের জোড়া যে যে পৃষ্ঠের উপর "
-            "বসতে পারে, সবগুলোর সঙ্গে সত্যিকারের ব্রাউজারে মেপে দেখা হয়েছে — আর "
-            "প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি, সবচেয়ে ভালোটি নয়। কোনো কিছুর "
-            "সীমা থাকলে সেটাও লেখা আছে।\n\n"
-            "পদ্ধতিটি দুই ভাষার। বাংলা আর ইংরেজি — দুটোই সমান গুরুত্ব পায়। বাংলা "
-            "হরফের মাপ চোখে দেখে বসানো হয়নি, মেপে নেওয়া হয়েছে: তার নিজের মাপের "
-            "ধাপ আছে, নিজের সর্বনিম্ন সীমা আছে, আর ছোটো মাপে একটি ওজনের ধাপও আছে।\n\n"
-            "এই তালিকাটি স্টুডিওর পরিচয়। এখনো কোনো অ্যাপ প্রকাশ করা হয়নি।",
-            4000),
-    },
-    "apple": {
-        "name": ("অনিন্দ্য স্টুডিও", 30),
-        # 23 code points against Apple's 30. The fuller phrase, "সত্যিকারের জীবনের
-        # জন্য সহজ অ্যাপ", is 32 and was refused by guard_text_limits.
-        "subtitle": ("রোজকার জীবনের সহজ অ্যাপ", 30),
-        "promotional_text": (
-            "একটি ডিজাইন পদ্ধতি, যেখানে প্রতিটি রঙের জোড়া প্রতিটি পৃষ্ঠের সঙ্গে "
-            "মেপে দেখা হয়েছে — আর প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি।",
-            170),
-        "description": (
-            "অনিন্দ্য স্টুডিও — এক জন মানুষ, সত্যিকারের জীবনের জন্য সহজ অ্যাপ।\n\n"
-            "এখানের সব কিছু এমন একটি ডিজাইন পদ্ধতির উপর গড়া, যেখানে প্রতিটি দাবি "
-            "মেপে দেখা হয়েছে, শুধু বলা হয়নি। প্রতিটি রঙের জোড়া যে যে পৃষ্ঠের উপর "
-            "বসতে পারে, সবগুলোর সঙ্গে সত্যিকারের ব্রাউজারে মেপে দেখা হয়েছে — আর "
-            "প্রকাশ করা হয়েছে সবচেয়ে খারাপ ফলাফলটি, সবচেয়ে ভালোটি নয়।\n\n"
-            "পদ্ধতিটি দুই ভাষার। বাংলা আর ইংরেজি — দুটোই সমান গুরুত্ব পায়।\n\n"
-            "এই তালিকাটি স্টুডিওর পরিচয়। এখনো কোনো অ্যাপ প্রকাশ করা হয়নি।",
-            4000),
-        # 88 UTF-8 bytes against Apple's 100. The longer draft was 42 code points
-        # and 116 bytes: it fits the "100 characters" reading and fails the "100
-        # bytes" one, which is exactly the conflict recorded in MANIFEST.json and
-        # exactly why both counts are gated.
-        "keywords": ("ডিজাইন,টোকেন,বাংলা,হরফ,কনট্রাস্ট", 100),
-    },
-}
+# BOTH STORES RECEIVED BANGLA METADATA HERE, and one of them lists Bangla as a
+# supported localisation language — Apple added it on 30 March 2026, under that name
+# rather than "Bengali". Very few studios ship it.
+#
+# It went with the rest of the Bangla on 27 August 2026. What the removal costs is
+# worth naming rather than quietly dropping: an English-only listing reaches fewer
+# readers in the one market this studio is named after.
+#
 
 
 def guard_text_limits(store: str, fields: dict, label: str) -> list[dict]:
@@ -901,7 +867,7 @@ so overwriting one turns `--check` red. Nothing below asks you to overwrite them
 """
 
 
-def package_readme(store: str, items: list[dict], text_rows, text_rows_bn) -> str:
+def package_readme(store: str, items: list[dict], text_rows) -> str:
     is_apple = store == "apple"
     name = "Apple App Store" if is_apple else "Google Play"
     captures = "14_delivery/_captures/apple/" if is_apple else "14_delivery/_captures/google/"
@@ -1025,7 +991,7 @@ a gate that cannot run is not a gate.
 """
 
 
-def manifest(store: str, items: list[dict], rows, rows_bn) -> str:
+def manifest(store: str, items: list[dict], rows) -> str:
     is_apple = store == "apple"
     root = APPLE if is_apple else PLAY
     mine = [i for i in items if i["root"] == root]
@@ -1059,7 +1025,7 @@ def manifest(store: str, items: list[dict], rows, rows_bn) -> str:
                                  "source": VERIFIED[i["cite"]]["url"],
                                  "checked": VERIFIED[i["cite"]]["checked"]}
                   for i in sorted(mine, key=lambda x: x["path"])],
-        "text": {"en": rows, "bn": rows_bn},
+        "text": rows,
         "sources": {k: VERIFIED[k] for k in cites},
         "recorded_conflicts": RECORDED_CONFLICTS[store],
         "not_shipped": NOT_SHIPPED[store],
@@ -1146,7 +1112,7 @@ NOT_SHIPPED = {
 }
 
 
-def metadata_markdown(store: str, rows, rows_bn) -> str:
+def metadata_markdown(store: str, rows) -> str:
     def block(label, rs):
         out = [f"## {label}", ""]
         for r in rs:
@@ -1159,7 +1125,7 @@ def metadata_markdown(store: str, rows, rows_bn) -> str:
                       f"— listing text", "",
                       "Both counts are given because neither store publishes which "
                       "unit it counts. The larger of the two must fit.", "",
-                      *block("English", rows), *block("Bangla · বাংলা", rows_bn)])
+                      *block("English", rows)])
 
 
 # =========================================================================
@@ -1179,25 +1145,23 @@ def build() -> dict[Path, bytes]:
     out = render_all(A, items)
 
     rows = {s: guard_text_limits(s, STORE_TEXT[s], s) for s in ("apple", "play")}
-    rows_bn = {s: guard_text_limits(s, STORE_TEXT_BN[s], f"{s} bn")
-               for s in ("apple", "play")}
 
     out[PLAY / "app-res/mipmap-anydpi-v26/ic_launcher.xml"] = \
         LAUNCHER_XML.encode("utf-8")
 
     for store, root, key in (("apple", APPLE, "apple"), ("google", PLAY, "play")):
         out[root / "MANIFEST.json"] = manifest(
-            store, items, rows[key], rows_bn[key]).encode("utf-8")
+            store, items, rows[key]).encode("utf-8")
         out[root / "README.md"] = package_readme(
-            store, items, rows[key], rows_bn[key]).encode("utf-8")
+            store, items, rows[key]).encode("utf-8")
         out[root / "CHECKLIST.md"] = package_checklist(store).encode("utf-8")
         out[root / "metadata/metadata.json"] = (json.dumps(
             {"_generator": GENERATOR, "_warning": DO_NOT_EDIT,
              "limits_source": VERIFIED[f"{key}-listing-text"],
-             "en": rows[key], "bn": rows_bn[key]},
+             "fields": rows[key]},
             indent=1, ensure_ascii=False) + "\n").encode("utf-8")
         out[root / "metadata/metadata.md"] = metadata_markdown(
-            store, rows[key], rows_bn[key]).encode("utf-8")
+            store, rows[key]).encode("utf-8")
     return out
 
 

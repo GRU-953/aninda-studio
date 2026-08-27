@@ -2,13 +2,13 @@
 
 GENERATED FILE. Written by `scripts/gaps.py` from `01_research/_data/platform-gaps.json`. Do not hand-edit — the next build overwrites it. Change the data and re-run.
 
-**Assessed:** 26 August 2026.
+**Assessed:** 2026-08-28.
 
 Apple Human Interface Guidelines and App Store Connect, and Google Material 3, Android developer documentation and Google Play Console, all read on 26 August 2026.
 
 23 gaps found: **8 blockers**, 8 major, 7 minor.
 
-**15 are now closed**, 6 are open and 2 are deferred with the reason recorded. Of the 8 blockers, **1 remain open**.
+**19 are now closed**, 2 are open and 2 are deferred with the reason recorded. Of the 8 blockers, **1 remain open**.
 
 20 of 23 cite a published requirement, across 14 distinct sources; the rest are rules this kit sets for itself and are marked as such. A closed gap keeps its entry, because the record of what was wrong is the useful part.
 
@@ -28,19 +28,19 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 | `G-ICON-4` | No adaptive icon exists at all | Google | Blocker | **closed** |
 | `G-ICON-6` | No Play Store icon | Google | Blocker | **closed** |
 | `G-STORE-1` | No feature graphic | Google | Blocker | **closed** |
-| `G-REC-1` | The type recommendation names a stack that did not ship | This kit's own record | Major | open |
-| `G-REC-4` | The benchmark missed an announcement nine days older than its own check date | This kit's own record | Major | open |
 | `G-COLOUR-2` | No Material 3 role mapping exists | Google | Major | **closed** |
 | `G-COLOUR-3` | Material needs secondary and tertiary groups; the brand premise forbids a second expressive colour | Google | Major | **closed** |
 | `G-ICON-5` | No monochrome layer, so themed icons fall back or are machine-generated | Google | Major | **closed** |
 | `G-ICON-7` | No artefact is designated the Mono appearance layer | Apple | Major | **closed** |
 | `G-NATIVE-1` | Tokens reach no Apple or Android surface | Both | Major | **closed** |
 | `G-NATIVE-2` | No component maps to either platform | Both | Major | **closed** |
+| `G-REC-1` | The type recommendation names a stack that did not ship | This kit's own record | Major | **closed** |
+| `G-REC-4` | The benchmark missed an announcement nine days older than its own check date | This kit's own record | Major | **closed** |
 | `G-A11Y-1` | Contrast is measured by WCAG relative luminance only; Apple now names APCA as well | Apple | Minor | open |
-| `G-MOTION-1` | Reduced motion removes transitions rather than substituting a fade | Both | Minor | open |
-| `G-REC-3` | The mark's minimum size is not in the mark's own manifest | This kit's own record | Minor | open |
 | `G-A11Y-2` | Accessibility Nutrition Labels are unaddressed | Apple | Minor | deferred |
+| `G-MOTION-1` | Reduced motion removes transitions rather than substituting a fade | Both | Minor | **closed** |
 | `G-REC-2` | A third, stale type answer survives in the directions build | This kit's own record | Minor | **closed** |
+| `G-REC-3` | The mark's minimum size is not in the mark's own manifest | This kit's own record | Minor | **closed** |
 | `G-STORE-3` | No raster declares its colour space | Both | Minor | **closed** |
 | `G-STORE-4` | No notification icon | Google | Minor | deferred |
 
@@ -297,13 +297,17 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-MOTION-1` — Reduced motion removes transitions rather than substituting a fade
 
-**Minor** · Both · open
+**Minor** · Both · closed
 
 **What is required.** Apple: "When this setting is active, ensure your app or game responds by reducing automatic and repetitive animations, including zooming, scaling, and peripheral motion," and lists replacing transitions among the practices for doing so. Material expresses the same split in its motion scheme: every effects damping is 1.0 and never overshoots, while spatial motion does — so the reduced case is the effects half, not the absence of both.
 
 **What is here.** Benchmark criterion 20, part met: nothing moves, blurs or changes depth either way, but under prefers-reduced-motion both duration tokens fall to 1 ms and the colour transitions are removed rather than cross-faded.
 
-**The fix.** Substitute a fade rather than collapsing the duration.
+**The fix.** Closed 28 August 2026. Under prefers-reduced-motion the MOVEMENT duration collapses to 1 ms and the COLOUR duration is held at its full measured value, interpolated from duration.motion.colour rather than typed. That is the substitution both platforms ask for: Apple lists replacing transitions among the practices, and Material's own numbers say the same thing — every effects damping in its scheme is exactly 1.0, never overshooting, while spatial damping sits below it.
+
+The guidebook had ALREADY ARGUED this in print — 'things that move may overshoot; things that only change colour never do. That is why --as-duration-colour and --as-duration-move are two tokens and not one' — in a chapter whose next paragraph said both durations collapsed. The stylesheet was not doing what the book said.
+
+Three gates asserted the old behaviour and would have gone on passing after it changed, so all three were rewritten to prove the new one. 00_sandbox/measure.py now reads a movement probe AND a colour probe, fails an UNSET property rather than accepting it, and checks the media query actually changed something: 'movement 0.22s -> 0.001s, cross-fade held at 0.12s'. 11_site/check.py's unset-property hole (finding R2-14) is closed in the same way. And the review checker now FAILS a reduced-motion block that flattens every transition on a wildcard selector — which is exactly what references/motion.md shipped, two lines under a sentence saying a colour change may stay.
 
 **Sources.**
 
@@ -348,25 +352,27 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-REC-1` — The type recommendation names a stack that did not ship
 
-**Major** · This kit's own record · open
+**Major** · This kit's own record · closed
 
 **What is required.** One name for one thing.
 
 **What is here.** 06_type/RECOMMENDATION.md recommends Inter, Noto Sans Bengali and JetBrains Mono. 07_tokens/build.py ships Literata, Noto Serif Bengali and Aninda Mono. No document records the reversal; it is visible only in the generator.
 
-**The fix.** Record the reversal and its reason where the recommendation is, so a reader is not sent to the wrong stack.
+**The fix.** Closed 28 August 2026. 06_type/RECOMMENDATION.md opens with a superseded notice naming what shipped instead and why: Literata's optical-size axis runs 7 to 72 and its x-height is nearly flat across it, which is what held the Bangla multiplier almost constant. The recommendation preferred Inter partly to avoid a Reserved Font Name rename, and that cost was paid anyway — the monospace face ships as Aninda Mono because Plex is reserved and subsetting is a modification under OFL 1.1 clause 3. The rest of the page is left exactly as written: a recommendation that was not taken is worth more intact than tidied.
 
 **Sources.** None. This is a rule this kit sets for itself, and no platform is cited for it.
 
 ### `G-REC-4` — The benchmark missed an announcement nine days older than its own check date
 
-**Major** · This kit's own record · open
+**Major** · This kit's own record · closed
 
 **What is required.** A benchmark that claims a check date must actually cover what was published before it.
 
 **What is here.** Apple announced new App Store creative asset slots on 5 August 2026. The benchmark was checked on 14 August 2026 and does not mention them. The Play icon design specification, updated 15 June 2026, was missed the same way.
 
-**The fix.** The fault is structural rather than careless: the check read guideline pages and not the developer news feed or the distribution pages. Both are now sources, and the omission is recorded as a method finding rather than quietly patched.
+**The fix.** Closed 28 August 2026. Both feeds are sources: developer.apple.com/design/whats-new/ and the two distribution pages, each with a read date, in 01_research/_data/external-sources.json — 64 sources in all.
+
+And the method finding this entry had been promising since 26 August now exists, as R8-1. It did not, which is why this gap stayed open while its fix was already in the tree: the register said the omission was 'recorded as a method finding' and pointed at nothing. The distinction R8-1 draws is the durable part — a guideline page says what to do with a slot and never says a slot has been added, so a source list needs pages that ANNOUNCE as well as pages that DESCRIBE.
 
 **Sources.**
 
@@ -386,13 +392,15 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-REC-3` — The mark's minimum size is not in the mark's own manifest
 
-**Minor** · This kit's own record · open
+**Minor** · This kit's own record · closed
 
 **What is required.** A consumer reading the manifest should find every rule the manifest is about.
 
 **What is here.** 04_mark/manifest.json states the stroke rule and the safe field but no minimum size. The 16 px floor lives in a plugin script, and its own reference document acknowledges the split.
 
-**The fix.** Carry the floor in the manifest, computed rather than typed.
+**The fix.** Closed 28 August 2026, and COMPUTED rather than typed, which is what the fix asked for. 04_mark/manifest.json now carries minimum_px with the floor, the heavy stroke's rendered width at it, and the circle's counter — each derived from strokes.heavy, grid and geometry.circle.r, all already in that file. asset.py reads it instead of declaring MARK_FLOOR_PX = 16.
+
+Computing it corrected the arithmetic: the comment that had carried the derivation said the counter was 'about 5.6 px' at the floor, and it is 6.56. Nobody had recomputed it, which is the argument against keeping arithmetic in prose.
 
 **Sources.** None. This is a rule this kit sets for itself, and no platform is cited for it.
 

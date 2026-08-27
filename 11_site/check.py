@@ -229,6 +229,16 @@ HOVER_JS = r"""
 """
 
 
+def _ms(value: str) -> float:
+    """A CSS duration in milliseconds. `0.12s` and `120ms` are the same number."""
+    v = value.strip()
+    if v.endswith("ms"):
+        return float(v[:-2])
+    if v.endswith("s"):
+        return float(v[:-1]) * 1000
+    return float(v or 0)
+
+
 def main() -> int:
     try:
         from playwright.sync_api import sync_playwright
@@ -402,12 +412,30 @@ def main() -> int:
         pg = ctx.new_page()
         pg.goto((HERE / "index.html").as_uri())
         pg.wait_for_timeout(300)
-        d = pg.evaluate("getComputedStyle(document.documentElement)"
-                        ".getPropertyValue('--as-duration-move').trim()")
-        if d and not d.startswith(("1ms", "0")):
-            problems.append(f"prefers-reduced-motion left the move duration at {d}")
+        r = pg.evaluate("""() => {
+            const s = getComputedStyle(document.documentElement);
+            return {move: s.getPropertyValue('--as-duration-move').trim(),
+                    fade: s.getPropertyValue('--as-duration-colour').trim()};
+        }""")
+        # THE UNSET HOLE, closed. This read one property and tested `if d and ...`,
+        # so an ABSENT property took the else branch and reported "reduced motion
+        # honoured (move duration unset)" — a pass, for a page that had never
+        # defined the thing being checked. Recorded as finding R2-14.
+        #
+        # And it now checks both halves. A movement is removed under reduce; a
+        # cross-fade is NOT, because replacing a smooth change with a jump is
+        # harsher than the change it was meant to soften.
+        if not r["move"] or not r["fade"]:
+            problems.append(
+                f"under reduce the site defines --as-duration-move as {r['move']!r} "
+                f"and --as-duration-colour as {r['fade']!r}; an empty one means this "
+                f"check measured nothing")
+        elif _ms(r["move"]) > 1:
+            problems.append(f"reduce left the movement running at {r['move']}")
+        elif _ms(r["fade"]) <= 1:
+            problems.append(f"reduce collapsed the cross-fade to {r['fade']}")
         else:
-            notes.append(f"reduced motion honoured (move duration {d or 'unset'})")
+            notes.append(f"reduced motion: movement {r['move']}, cross-fade {r['fade']}")
         ctx.close()
 
         # --- structure, once ---------------------------------------------------
@@ -421,9 +449,10 @@ def main() -> int:
             skip: !!document.querySelector('a[href^="#"]'),
             main: document.querySelectorAll('main').length,
             title: document.title,
-            bnWithoutLang: [...document.querySelectorAll('*')].filter(el =>
-                [...el.childNodes].some(n => n.nodeType === 3 && /[ঀ-৿]/.test(n.textContent))
-                && !el.closest('[lang="bn"]')).length,
+            bengali: [...document.querySelectorAll('*')].flatMap(el =>
+                [...el.childNodes].filter(n => n.nodeType === 3
+                    && /[\u0980-\u09FF]/.test(n.textContent))
+                    .map(n => n.textContent.trim().slice(0, 40))),
             external: [...document.querySelectorAll('[src],[href]')]
                 .map(e => e.getAttribute('src') || e.getAttribute('href'))
                 .filter(u => u && !u.startsWith('data:') && !u.startsWith('#')
@@ -437,9 +466,16 @@ def main() -> int:
             problems.append("index.html has no <main> landmark")
         if not s["skip"]:
             problems.append("index.html has no skip link")
-        if s["bnWithoutLang"]:
-            problems.append(f"{s['bnWithoutLang']} elements contain Bangla text but are not "
-                            f"inside lang=\"bn\" — a screen reader will read them in English")
+        # This site is English. The old form of this check asked whether Bangla was
+        # inside lang="bn"; with none shipping, the question is why any is here at
+        # all. Read off the RENDERED DOM, which is the only place that can see text
+        # a stylesheet or a script put on the page.
+        if s["bengali"]:
+            problems.append(
+                f"index.html renders Bengali script in {len(s['bengali'])} text "
+                f"node(s) — {s['bengali'][:3]} — and this site ships English. There "
+                f"is no Bengali face in the subsets and no :lang(bn) block, so it "
+                f"would render in whatever the reader's machine happens to have.")
         notes.append(f"structure: <h1>×{s['h1']}, lang={s['lang']!r}, <main> present, skip link present")
         notes.append(f"external references: {s['external'] or 'none — the page works offline'}")
         ctx.close()
@@ -450,7 +486,7 @@ def main() -> int:
     print()
     print("This script CANNOT check: whether a screen reader makes sense of the page; "
           "whether real Windows High Contrast behaves like Chromium's emulation; "
-          "whether the Bangla reads well; or whether the page is any good to use.")
+          "or whether the page is any good to use.")
 
     if problems:
         print(f"\n{len(problems)} problem(s):", file=sys.stderr)

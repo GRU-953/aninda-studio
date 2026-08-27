@@ -129,7 +129,6 @@ ASSETS_TO_COPY = [
 
 FONT_FILES = [
     ("Literata", "literata-subset.woff2", "400 700"),
-    ("Noto Serif Bengali", "notoserifbengali-subset.woff2", "400 700"),
     ("Aninda Mono", "anindamono-subset.woff2", "400"),
 ]
 
@@ -145,78 +144,12 @@ class BuildError(Exception):
 # Nothing outside those two files may appear in Bangla.
 # =========================================================================
 
-BN = {
-    "wm-1": "অনিন্দ্য স্টুডিও",
-    "th-1": "আলো",
-    "th-2": "অন্ধকার",
-    "th-3": "বেশি কনট্রাস্ট",
-    "gb-1": "স্বাগতম",
-    "gb-3": "চিহ্ন",
-    "gb-4": "রং",
-    "gb-5": "হরফ",
-    "gb-6": "ফাঁক ও আকার",
-    "gb-7": "উপাদান",
-    "gb-8": "গতি",
-    "gb-10": "যা এই পদ্ধতি করে না",
-    "vc-1": (
-        "আমি ছোটো, যত্নে গড়া সফটওয়্যার বানাই। কোনো কিছুর সীমা থাকলে সেটা "
-        "এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না।"
-    ),
-    "bt-5": "কোডটি কপি করুন",
-}
 
 # The ids above came from the first verified table. 06_type/bangla-strings.json
 # was written afterwards and holds 94 approved strings under readable keys —
 # `ui.copy`, `theme.hc-dark`, `card.button.name` and so on — each carrying the
 # rule number or dictionary page it rests on.
 #
-# Merging it here rather than copying strings across is deliberate: two copies of
-# a translation drift, and the one that drifts is always the one nobody is
-# looking at. A key present in both keeps the value from the file, because the
-# file is the maintained source.
-_STRINGS_FILE = ROOT / "06_type" / "bangla-strings.json"
-if _STRINGS_FILE.exists():
-    for _key, _entry in json.loads(_STRINGS_FILE.read_text(encoding="utf-8")).items():
-        if _entry.get("bn"):
-            BN[_key] = _entry["bn"]
-
-# What still has no Bangla, reported honestly at the end of every build.
-#
-# The card entries are COUNTED from _cards.json rather than described, because
-# the first version of this list was written by hand and went stale the moment
-# the verified strings arrived: it still claimed twenty-five card names were
-# missing when every one of them had been filled in. A hand-written list of
-# what is missing is a claim that rots silently, which is the exact failure this
-# project is built to avoid. Anything that can be counted is counted.
-def _bangla_gaps() -> list[str]:
-    gaps = [
-        "The 'follow the system' theme choice. The table has আলো, অন্ধকার and "
-        "বেশি কনট্রাস্ট, but nothing for the option that follows the reader's own "
-        "setting.",
-        "The four section headings that do not match a guidebook chapter title: "
-        "what the studio is, the work, installing the packages, and contact.",
-        "Every sentence of body prose except the voice sample. Prose is written, "
-        "not looked up, and writing it is a separate job from approving terms.",
-    ]
-    try:
-        reg = json.loads(CARDS_JSON.read_text(encoding="utf-8"))
-        cards = reg["cards"] if isinstance(reg, dict) and "cards" in reg else reg
-        missing_names = [c["name"] for c in cards if not c.get("name_bn")]
-        missing_subs = sum(1 for c in cards if not c.get("subtitle_bn"))
-        if missing_names:
-            gaps.append(f"{len(missing_names)} of {len(cards)} component names: "
-                        f"{', '.join(missing_names[:5])}"
-                        f"{'…' if len(missing_names) > 5 else ''}")
-        if missing_subs:
-            gaps.append(f"{missing_subs} of {len(cards)} component subtitles.")
-    except (OSError, KeyError, TypeError, json.JSONDecodeError) as exc:
-        gaps.append(f"The component list could not be read to count its gaps: {exc}")
-    return gaps
-
-
-BANGLA_GAPS = _bangla_gaps()
-
-
 # =========================================================================
 # Guards
 # =========================================================================
@@ -397,7 +330,6 @@ def guard_glyphs(pages: dict[str, str]) -> None:
     from fontTools.ttLib import TTFont
 
     latin = set(TTFont(FONTS_DIR / "literata-subset.woff2").getBestCmap())
-    bangla = set(TTFont(FONTS_DIR / "notoserifbengali-subset.woff2").getBestCmap())
     mono = set(TTFont(FONTS_DIR / "anindamono-subset.woff2").getBestCmap())
 
     problems = []
@@ -405,7 +337,7 @@ def guard_glyphs(pages: dict[str, str]) -> None:
         # Text inside <style>, <script> and <title> is never drawn in a page face.
         body = re.sub(r"<(style|script|title)\b[^>]*>.*?</\1>", " ", markup, flags=re.S)
         for run, chunk in text_runs(body):
-            covered = {"bn": bangla, "mono": mono, "latin": latin}[run]
+            covered = {"mono": mono, "latin": latin}[run]
             missing = sorted({ch for ch in chunk if ord(ch) not in covered and ch not in "\n\t"})
             for ch in missing:
                 problems.append(
@@ -514,24 +446,6 @@ def guard_dates(out: dict[str, bytes], pub: dict) -> None:
         raise BuildError("The typed-date rule failed:\n  " + "\n  ".join(problems))
 
 
-def guard_bangla(pages: dict[str, str]) -> None:
-    """Two rules. Every Bangla character must sit inside an element that says
-    lang="bn", and every Bangla string must be one of the verified ones."""
-    allowed = set(BN.values())
-    problems = []
-    for name, markup in pages.items():
-        for run, chunk in text_runs(markup):
-            has_bangla = any("ঀ" <= ch <= "৿" for ch in chunk)
-            if has_bangla and run != "bn":
-                problems.append(f"{name}: Bangla outside lang=\"bn\" — {chunk.strip()[:50]}")
-            if run == "bn" and chunk.strip() and chunk.strip() not in allowed:
-                problems.append(
-                    f"{name}: Bangla string not in the verified table — {chunk.strip()[:50]}"
-                )
-    if problems:
-        raise BuildError("The Bangla standard failed:\n  " + "\n  ".join(problems))
-
-
 # =========================================================================
 # Reading the inputs
 # =========================================================================
@@ -602,16 +516,6 @@ def e(text: str) -> str:
     return html.escape(str(text), quote=True)
 
 
-def bn(key: str, large: bool = False) -> str:
-    cls = ' class="as-bn-large"' if large else ""
-    return f'<span lang="bn"{cls}>{e(BN[key])}</span>'
-
-
-def bn_text(value: str, large: bool = False) -> str:
-    cls = ' class="as-bn-large"' if large else ""
-    return f'<span lang="bn"{cls}>{e(value)}</span>'
-
-
 ICONS = {
     "check": '<path d="M3 8.6 6.4 12 13 4.6"/>',
     "cross": '<path d="M4 4 12 12M12 4 4 12"/>',
@@ -667,13 +571,11 @@ SITE_CSS = """
 .site-brand__mark svg { display: block; inline-size: 100%; block-size: 100%; }
 .site-brand__text { min-width: 0; }
 .site-brand__name { display: block; font-size: var(--as-text-lead); font-weight: 700; line-height: 1.2; }
-.site-brand__bn { display: block; color: var(--as-ink-muted); }
 
 .site-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--as-space-2); }
 .site-controls__label { font-size: var(--as-text-caption); font-weight: 700; color: var(--as-ink-muted); }
 
 .site-hero { display: flex; flex-direction: column; gap: var(--as-space-3); }
-.site-hero__bn { color: var(--as-ink-muted); }
 
 .site-index {
   display: grid;
@@ -694,7 +596,6 @@ SITE_CSS = """
 }
 
 .site-entry__name { font-weight: 700; color: var(--as-ink); }
-.site-entry__bn { color: var(--as-ink-muted); }
 .site-entry__text { font-size: var(--as-text-caption); color: var(--as-ink-muted); }
 
 .site-facts { max-inline-size: 46rem; }
@@ -797,8 +698,6 @@ def theme_control() -> str:
     for value, label, key in THEME_CHOICES:
         pressed = "true" if value == "system" else "false"
         inner = e(label)
-        if key:
-            inner += " " + bn(key)
         buttons.append(
             f'<button type="button" class="as-doc-theme" data-theme-choice="{value}" '
             f'aria-pressed="{pressed}">{inner}</button>'
@@ -819,7 +718,6 @@ def header(mark: str) -> str:
         f'<span class="site-brand__mark">{mark}</span>'
         '<span class="site-brand__text">'
         '<span class="site-brand__name">Aninda Studio</span>'
-        f'<span class="site-brand__bn">{bn("wm-1")}</span>'
         "</span></div>"
         '<a class="as-btn as-btn--quiet site-skip" href="#main">Skip to the content</a>'
         + theme_control()
@@ -831,11 +729,9 @@ def hero() -> str:
     return (
         '<div class="site-hero">'
         '<h1 class="as-h1">Aninda Studio</h1>'
-        f'<p class="site-hero__bn as-lead">{bn("wm-1", large=True)}</p>'
         '<p class="as-lead as-prose">I make small, careful software, and the design '
         "system it is built on. Where something has a limit, the limit is written "
         "down here rather than left for you to find.</p>"
-        f'<p class="as-prose">{bn_text(BN["vc-1"])}</p>'
         "</div>"
     )
 
@@ -964,13 +860,9 @@ def section_system(cards: dict) -> str:
         for card in cards["cards"]:
             if card["group"] != group:
                 continue
-            name_bn = ""
-            if card["name_bn"]:
-                name_bn = f'<span class="site-entry__bn">{bn_text(card["name_bn"])}</span>'
             entries.append(
                 '<div class="site-entry">'
                 f'<span class="site-entry__name">{card["name"]}</span>'
-                + name_bn
                 + f'<span class="site-entry__text">{card["subtitle"]}</span>'
                 "</div>"
             )
@@ -984,8 +876,7 @@ def section_system(cards: dict) -> str:
 
     return (
         '<section class="as-doc-section" aria-labelledby="system">'
-        '<h2 class="as-h2" id="system">The design system '
-        f'{bn("gb-7", large=True)}</h2>'
+        '<h2 class="as-h2" id="system">The design system</h2>'
         '<p class="as-doc-section__note">These are live. The badges, the alert, the '
         'card and the code block below are the real components, styled by the same '
         'stylesheet the library uses, not pictures of them.</p>'
@@ -1050,8 +941,6 @@ def section_install(npm: dict, py_name: str, pub: dict) -> str:
         + code("index.html", '<link rel="stylesheet" href="tokens.css">')
         + code("anything.css", ".panel {\n  background-color: var(--as-surface-bright);\n"
                                "  color: var(--as-ink);\n  border-radius: var(--as-radius-card);\n}")
-        + f'<p class="as-caption as-muted">{e(BN["bt-5"])}</p>'.replace(
-            e(BN["bt-5"]), bn("bt-5"))
         + "</div></section>"
     )
 
@@ -1111,18 +1000,18 @@ def footer(cards: dict) -> str:
         f"<p>Generated by {GENERATOR} from the files named on this page. Editing "
         "this page by hand is undone by the next build.</p>"
         f'<ul class="as-doc-list">{fonts}</ul>'
-        "<p>Literata and Noto Serif Bengali keep their own names. The monospace "
+        "<p>Literata keeps its own name. The monospace "
         "face is a subset of IBM Plex Mono renamed to Aninda Mono, because "
         "Plex is a Reserved Font Name and subsetting is a modification under "
         "clause 3 of the SIL Open Font Licence 1.1. Each licence file sits beside "
         "its font in 08_components/fonts/.</p>"
         "<p>The design tokens and this site are licensed Apache-2.0. "
         "Copyright 2026 Aninda Sundar Howlader.</p>"
-        "<p>Bangla appears only where an approved string exists. The spelling "
-        "rules and their sources are in 06_type/BANGLA-STANDARD.md, which governs; "
-        "the strings themselves are in 06_type/bangla-strings.json, which is the "
-        "file this build reads and which carries the rule number or dictionary page "
-        "each string rests on. Everywhere else the text stays in English rather "
+        "<p>This site is English. It was bilingual until 27 August 2026, and no "
+        "Bangla was ever written for it — only strings checked against the Bangla "
+        "Academy's own dictionary, with the rule number or page recorded beside "
+        "each. 06_type/BANGLA-STANDARD.md keeps that standard and the reason it "
+        "was dropped. Everywhere else the text stays in English rather "
         "than being translated by guesswork, and those places are listed in this "
         "build's output.</p>"
         "</footer>"
@@ -1389,7 +1278,6 @@ def build() -> dict[str, bytes]:
 
     guard_english(pages)
     guard_site_markup(pages)
-    guard_bangla(pages)
     guard_glyphs(pages)
 
     out: dict[str, bytes] = {name: text.encode("utf-8") for name, text in pages.items()}
@@ -1471,11 +1359,6 @@ def main(argv: list[str]) -> int:
     print("\nCNAME carries no header comment. GitHub Pages parses the whole file as "
           "the hostname, so a comment would break the custom domain. It is the only "
           "file here without one.")
-    print(f"\nBangla left in English, because neither "
-          f"06_type/BANGLA-STANDARD.md nor 06_type/bangla-strings.json holds an "
-          f"approved string ({len(BANGLA_GAPS)}):")
-    for gap in BANGLA_GAPS:
-        print(f"  · {gap}")
     return 0
 
 

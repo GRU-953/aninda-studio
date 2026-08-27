@@ -42,7 +42,6 @@
   "families": {
     "ground": {
       "label": "Slate",
-      "label_bn": "\u09b6\u09bf\u09b2\u09be",
       "kind": "neutral",
       "note": "Deliberately almost achromatic. The chroma ceiling is held low by hand so the neutral never reads as a colour.",
       "hue_oklch": 240.335,
@@ -78,7 +77,6 @@
     },
     "accent": {
       "label": "Signal",
-      "label_bn": "\u09b8\u0982\u0995\u09c7\u09a4",
       "kind": "brand",
       "note": "The one colour in the system. If something is this blue, it does something.",
       "hue_oklch": 258.98,
@@ -114,7 +112,6 @@
     },
     "success": {
       "label": "Pass",
-      "label_bn": "\u0989\u09a4\u09cd\u09a4\u09c0\u09b0\u09cd\u09a3",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 159.669,
@@ -150,7 +147,6 @@
     },
     "warning": {
       "label": "Check",
-      "label_bn": "\u09b8\u09a4\u09b0\u09cd\u0995",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 80.566,
@@ -186,7 +182,6 @@
     },
     "danger": {
       "label": "Fail",
-      "label_bn": "\u09ac\u09cd\u09af\u09b0\u09cd\u09a5",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 28.769,
@@ -222,7 +217,6 @@
     },
     "info": {
       "label": "Note",
-      "label_bn": "\u099f\u09c0\u0995\u09be",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 243.165,
@@ -261,7 +255,6 @@
     "light": {
       "key": "light",
       "label": "Light",
-      "label_bn": "\u0986\u09b2\u09cb",
       "polarity": "light",
       "high_contrast": false,
       "text_target": 4.5,
@@ -566,7 +559,6 @@
     "dark": {
       "key": "dark",
       "label": "Dark",
-      "label_bn": "\u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
       "polarity": "dark",
       "high_contrast": false,
       "text_target": 4.5,
@@ -865,7 +857,6 @@
     "hc-light": {
       "key": "hc-light",
       "label": "High contrast, light",
-      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0986\u09b2\u09cb",
       "polarity": "light",
       "high_contrast": true,
       "text_target": 7.0,
@@ -1165,7 +1156,6 @@
     "hc-dark": {
       "key": "hc-dark",
       "label": "High contrast, dark",
-      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
       "polarity": "dark",
       "high_contrast": true,
       "text_target": 7.0,

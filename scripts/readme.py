@@ -131,9 +131,6 @@ REBUILD_NODE = "13_plugins/figma/build.mjs"
 NOT_IN_CHAIN = {
     "06_type/specimen.py":
         "one-off: the type specimen pages that fed the typeface decision",
-    "06_type/review_bangla.py":
-        "a review instrument, run when a Bangla reader is available, not part of "
-        "the build",
 }
 
 
@@ -187,7 +184,7 @@ def check_rebuild_chain() -> dict:
     to add one.
     """
     names = ("build.py", "build.mjs", "emit_css.py", "engine.py", "readme.py",
-             "pdf.py", "specimen.py", "review_bangla.py", "build_skills.py",
+             "pdf.py", "specimen.py", "build_skills.py",
              "findings.py", "benchmark.py", "gaps.py", "material3.py")
     # `git ls-files` rather than rglob, because rglob also walks ignored trees —
     # a stray git worktree under .claude/ made the first version of this guard

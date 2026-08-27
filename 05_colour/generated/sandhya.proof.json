@@ -42,7 +42,6 @@
   "families": {
     "ground": {
       "label": "Ink",
-      "label_bn": "\u0995\u09be\u09b2\u09bf",
       "kind": "brand",
       "note": "A warm near-black. Every surface and every text role is drawn from it, so the whole system reads as one paper stock.",
       "hue_oklch": 59.12,
@@ -78,7 +77,6 @@
     },
     "accent": {
       "label": "Vermilion",
-      "label_bn": "\u09b8\u09bf\u0981\u09a6\u09c1\u09b0",
       "kind": "brand",
       "note": "The only saturated colour in the system. Used sparingly and always meaningfully \u2014 a link, a focus ring, one primary action per screen.",
       "hue_oklch": 31.708,
@@ -114,7 +112,6 @@
     },
     "success": {
       "label": "Bamboo",
-      "label_bn": "\u09ac\u09be\u0981\u09b6",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 144.551,
@@ -150,7 +147,6 @@
     },
     "warning": {
       "label": "Turmeric",
-      "label_bn": "\u09b9\u09b2\u09c1\u09a6",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 77.506,
@@ -186,7 +182,6 @@
     },
     "danger": {
       "label": "Alta",
-      "label_bn": "\u0986\u09b2\u09a4\u09be",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 30.139,
@@ -222,7 +217,6 @@
     },
     "info": {
       "label": "Indigo",
-      "label_bn": "\u09a8\u09c0\u09b2",
       "kind": "semantic",
       "note": "",
       "hue_oklch": 243.354,
@@ -261,7 +255,6 @@
     "light": {
       "key": "light",
       "label": "Light",
-      "label_bn": "\u0986\u09b2\u09cb",
       "polarity": "light",
       "high_contrast": false,
       "text_target": 4.5,
@@ -564,7 +557,6 @@
     "dark": {
       "key": "dark",
       "label": "Dark",
-      "label_bn": "\u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
       "polarity": "dark",
       "high_contrast": false,
       "text_target": 4.5,
@@ -863,7 +855,6 @@
     "hc-light": {
       "key": "hc-light",
       "label": "High contrast, light",
-      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0986\u09b2\u09cb",
       "polarity": "light",
       "high_contrast": true,
       "text_target": 7.0,
@@ -1163,7 +1154,6 @@
     "hc-dark": {
       "key": "hc-dark",
       "label": "High contrast, dark",
-      "label_bn": "\u09ac\u09c7\u09b6\u09bf \u0995\u09a8\u099f\u09cd\u09b0\u09be\u09b8\u09cd\u099f, \u0985\u09a8\u09cd\u09a7\u0995\u09be\u09b0",
       "polarity": "dark",
       "high_contrast": true,
       "text_target": 7.0,

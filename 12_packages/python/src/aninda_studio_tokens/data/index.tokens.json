@@ -1,6 +1,6 @@
 {
   "$comment": "THIS FILE IS AN INDEX, NOT A TOKEN DOCUMENT. Do not hand it to a DTCG tool — it would fail validation, because it is not trying to be DTCG. The conformant documents are the files it lists, under tokens/. DTCG 2025.10 has no theming concept, so there is deliberately no single combined document: each theme is its own file with identical token paths.",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "spec": "Design Tokens Format Module 2025.10 (W3C Community Group report, not a W3C Standard)",
   "primitive": "tokens/primitive.tokens.json",
   "themes": {

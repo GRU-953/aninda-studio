@@ -68,7 +68,6 @@ THEME_LABEL = {"light": "Light", "dark": "Dark",
 
 FONT_FILES = [
     ("Literata", "literata-subset.woff2", "400 700"),
-    ("Noto Serif Bengali", "notoserifbengali-subset.woff2", "400 700"),
     ("Aninda Mono", "anindamono-subset.woff2", "400"),
 ]
 
@@ -334,7 +333,7 @@ def card_type(prim, sem, forced) -> str:
     ty = prim["dimension"]["type"]
     ratio = prim["number"]["scale"]["ratio"]["$value"]
     sizes = [k for k in ty if not k.startswith("$")
-             and not k.startswith("bangla")]
+]
     rows = []
     for key in sizes:
         v = ty[key]["$value"]
@@ -353,36 +352,6 @@ def card_type(prim, sem, forced) -> str:
         "and fewer levels are needed to express it. Literata carries an optical-size "
         "axis from 7 to 72, so the letterforms are redrawn for the size rather than "
         "scaled, and browsers apply that automatically.")
-
-
-def card_bangla(prim, sem, forced) -> str:
-    scale = prim["number"]["scale"]["bangla"]
-    keys = [k for k in scale if not k.startswith("$")]
-    floor = prim["dimension"]["type"]["bangla-min"]["$value"]
-    bump = prim["dimension"]["type"]["bangla-weight-bump-below"]["$value"]
-    lh = prim["number"]["lineHeight"]["bangla"]["$value"]
-    rows = [[f"<code>{e(k)}</code>", f"{scale[k]['$value']}"] for k in keys]
-    body = (
-        table("The measured multiplier per size band. Bangla is set smaller than "
-              "Latin at the same nominal size because its x-height runs larger; "
-              "these figures were measured from rendered specimens, not chosen.",
-              ["Band", "Multiplier"], rows, numeric={1})
-        + '<div style="margin-top:var(--as-space-5)">'
-          '<p lang="bn" style="font-family:var(--as-font-bangla);'
-          'font-size:var(--as-text-h2);line-height:var(--as-bangla-line-height);'
-          'margin:0">অনিন্দ্য স্টুডিও</p>'
-          '<p lang="bn" style="font-family:var(--as-font-bangla);'
-          'line-height:var(--as-bangla-line-height);margin:var(--as-space-2) 0 0">'
-          'আমি ছোটো, যত্নে গড়া সফটওয়্যার বানাই।</p></div>'
-        + f'<p class="note mono">floor {floor["value"]:g}{e(floor["unit"])} · '
-          f'weight bump below {bump["value"]:g}{e(bump["unit"])} · '
-          f'line-height {lh}</p>')
-    return card(
-        "Type", "Bangla", "measured multiplier and a floor", body, 760, 560,
-        "The multiplier never takes Bangla below the floor, because below it the "
-        "মাত্রা — the headline stroke that runs across the top of the letters — stops "
-        "resolving into a continuous line. Under the bump size the weight steps up "
-        "for the same reason.")
 
 
 def card_space(prim, sem, forced) -> str:
@@ -518,7 +487,7 @@ def card_wordmarks(prim, sem, forced) -> str:
         f'{art("wordmark-latin.svg", 300)}<code>wordmark-latin.svg</code></div>'
         '<div class="sw" style="color:var(--as-ink);gap:var(--as-space-2);'
         'margin-top:var(--as-space-5)">'
-        f'{art("wordmark-bangla.svg", 300)}<code>wordmark-bangla.svg</code></div>')
+)
     return card("Brand", "Wordmarks", "Latin and Bangla, drawn as outlines", body,
                 760, 460,
                 "Both are outlines, not live text, so they need no font installed "
@@ -703,7 +672,7 @@ def card_accessibility(prim, sem, forced) -> str:
 
 CARDS = [
     card_surfaces, card_roles, card_ramps, card_forced,
-    card_type, card_bangla,
+    card_type,
     card_space, card_shape, card_motion,
     card_marks, card_wordmarks, card_icons,
     card_actions, card_forms, card_feedback, card_data, card_navigation,

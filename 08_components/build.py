@@ -87,11 +87,14 @@ GENERATOR = "08_components/build.py"
 # apart silently disabled the guard.
 TOKENS_CSS_END = "/* <<< end 07_tokens/css/tokens.css */"
 
+# The third field was the theme's verified Bangla label. Two had one; the two
+# high-contrast names had none, and the book refused to compose one from parts
+# rather than print an unreviewed compound.
 THEMES = [
-    ("light", "Light", "আলো"),
-    ("dark", "Dark", "অন্ধকার"),
-    ("hc-light", "High contrast, light", ""),
-    ("hc-dark", "High contrast, dark", ""),
+    ("light", "Light"),
+    ("dark", "Dark"),
+    ("hc-light", "High contrast, light"),
+    ("hc-dark", "High contrast, dark"),
 ]
 
 FONT_SOURCES = {
@@ -106,16 +109,6 @@ FONT_SOURCES = {
         # the weight axis is deadweight in every card. opsz is kept whole: the
         # type measurements confirmed browsers apply optical sizing on their own.
         "pin": {"wght": (400, 700)},
-        "css_weight": "400 700",
-    },
-    "bangla": {
-        "path": ROOT / "06_type/candidates/bangla/notoserifbengali/NotoSerifBengali[wdth,wght].ttf",
-        "ofl": ROOT / "06_type/candidates/bangla/notoserifbengali/OFL.txt",
-        "out": "notoserifbengali-subset.woff2",
-        "ofl_out": "notoserifbengali-OFL.txt",
-        "family": "Noto Serif Bengali",
-        "rename": None,
-        "pin": {"wdth": 100.0, "wght": (400, 700)},
         "css_weight": "400 700",
     },
     "mono": {
@@ -300,23 +293,28 @@ def guard_markup(markup: str, name: str) -> None:
 # =========================================================================
 
 
-def is_bangla(ch: str) -> bool:
-    # The Bengali block, plus the daṛi (U+0964, shared with Devanagari) and the
-    # two zero-width joiners that conjunct formation depends on.
+def is_bengali(ch: str) -> bool:
+    """Bengali script, still detected after the face that drew it was removed.
+
+    The Bengali block, plus the daṛi (U+0964, shared with Devanagari) and the two
+    zero-width joiners conjunct formation depended on.
+
+    Kept, and used the other way round. It no longer decides which characters go
+    to a Bengali subset — it decides which must not reach a subset at all. A
+    Bengali character in a card would now be handed to Literata, which has no
+    glyph for it, and would subset out as a missing glyph rather than as a visible
+    tofu box: silently, in a card that looked finished.
+    """
     return "ঀ" <= ch <= "৿" or ch in "।॥‌‍"
 
 
 def chars_for(key: str, chars: str) -> str:
-    """Each font carries only what it is actually asked to draw. Handing the
-    Bangla face the whole Latin alphabet would double its size for nothing."""
-    if key == "bangla":
-        keep = {ch for ch in chars if is_bangla(ch)}
-        keep |= set("  .,:;!?()[]-—…0123456789")
-    elif key == "mono":
+    """Each font carries only what it is actually asked to draw."""
+    if key == "mono":
         keep = {ch for ch in chars if " " <= ch <= "~"}
         keep |= set("—…‘’“”·×")
     else:
-        keep = {ch for ch in chars if not is_bangla(ch)}
+        keep = {ch for ch in chars if not is_bengali(ch)}
         keep |= set("".join(chr(c) for c in range(0x20, 0x7F)))
     return "".join(sorted(keep))
 
@@ -469,7 +467,7 @@ def desktop_font() -> bytes:
 
 def font_face_css(faces: dict[str, bytes]) -> str:
     blocks = []
-    for key in ("latin", "bangla", "mono"):
+    for key in ("latin", "mono"):
         spec = FONT_SOURCES[key]
         blocks.append(
             "@font-face {\n"
@@ -519,11 +517,6 @@ def icon(name: str, cls: str = "as-icon") -> str:
     )
 
 
-def bn(text: str, large: bool = False) -> str:
-    cls = ' class="as-bn-large"' if large else ""
-    return f'<span lang="bn"{cls}>{e(text)}</span>'
-
-
 def walk_language_scopes(doc: str):
     """Borrowed, not copied, from 09_guidebook/build.py.
 
@@ -555,55 +548,6 @@ def walk_language_scopes(doc: str):
 
 
 _GUIDEBOOK = None
-
-
-def guard_language_of_parts(pages: dict[str, str]) -> None:
-    """No Bangla may ship outside a lang="bn" element, and no English inside one.
-
-    WCAG 2.2 SC 3.1.2 Language of Parts, Level AA. The site has this guard
-    (11_site/build.py) and the guidebook has it (guard_inline_bangla), and the
-    largest surface — 30 cards — had none, so `grep -n lang 08_components/check.py`
-    returned nothing at all.
-
-    What it cost: two cards shipped a bare Bangla word inside an English paragraph,
-    five times each across the theme panels. Chromium reported the containing
-    paragraph as lang='en' with fontFamily 'Literata, Georgia, serif', and
-    CSS.getPlatformFontsForNode showed the Bangla glyphs drawn by macOS's Kohinoor
-    Bangla — a system face — rather than by the Noto Serif Bengali subset the card
-    inlines. So the card footer's "Fonts are subset and inlined; this card needs no
-    network" was untrue of that text, and on a machine with no Bengali font it is
-    tofu. On typography.html the run sat at 12.0032px and weight 400, which is
-    precisely the case the sentence containing it says must gain a weight step.
-
-    The scope walker skips script, style, title and textarea, which is why this can
-    run over a card that inlines components.css — that stylesheet has মাত্রা in two
-    comments. Running 11_site/check.py's expression verbatim over the cards counted
-    those two as faults on all thirty, and a guard that reports one false positive
-    per file is a guard somebody switches off.
-    """
-    bangla = re.compile(r"[\u0980-\u09FF]")
-    problems: list[str] = []
-    for name, markup in pages.items():
-        for token, lang in walk_language_scopes(markup):
-            if lang == "skip" or not token.strip():
-                continue
-            if bangla.search(token) and lang != "bn":
-                problems.append(
-                    f'{name}: Bangla outside lang="bn" — {token.strip()[:44]}')
-            if lang == "bn" and not bangla.search(token) \
-                    and re.search(r"[A-Za-z]{4}", token):
-                problems.append(
-                    f'{name}: English inside lang="bn" — {token.strip()[:44]}')
-    if problems:
-        raise BuildError(
-            f"WCAG 2.2 SC 3.1.2 Language of Parts failed in {len(problems)} "
-            f"place(s):\n  " + "\n  ".join(problems[:10]) +
-            ("\n  …" if len(problems) > 10 else "") +
-            "\n  Bangla must sit inside lang=\"bn\". Nothing else applies the "
-            "Bengali family, the measured multiplier, the 12 px floor or the "
-            "weight step below 14 px, because all four are keyed to "
-            ":lang(bn), [lang=\"bn\"] in tokens.css."
-        )
 
 
 def guard_field_descriptions(pages: dict[str, str]) -> None:
@@ -659,28 +603,7 @@ def guard_field_descriptions(pages: dict[str, str]) -> None:
         )
 
 
-def e_mixed(text: str) -> str:
-    """Escape a sentence that has a Bangla word inside it, tagging the word.
-
-    Bangla inside an English sentence has to declare its own language. WCAG 2.2
-    SC 3.1.2 Language of Parts (Level AA) asks for it, and in this system it also
-    decides whether the text gets the Bengali family at all: the whole Bangla half
-    of tokens.css is keyed to `:lang(bn), [lang="bn"]`, so an untagged run gets
-    Literata, which has no Bengali glyphs, and falls back to whatever the reader's
-    machine has. Chromium drew the two runs that shipped this way in macOS's
-    Kohinoor Bangla, at 12.0032px and weight 400 — the exact case one of those very
-    sentences says must gain a weight step.
-
-    The card text is written as plain strings and escaped on the way out, so a
-    hand-written <span> in a string would be escaped into visible markup. This
-    escapes the sentence and then wraps each unbroken Bangla run in the span.
-    """
-    escaped = e(text)
-    return re.sub(r"[\u0980-\u09FF\u200c\u200d।॥]+",
-                  lambda m: f'<span lang="bn">{m.group(0)}</span>', escaped)
-
-
-def code_block(name: str, body: str, copy_label: str = "", copy_lang: str = "") -> str:
+def code_block(name: str, body: str, copy_label: str = "") -> str:
     # e_mixed rather than e, because a sample that shows how to mark Bangla up
     # contains Bangla. Untagged, that run is announced as English and set in
     # Aninda Mono, which is subset from IBM Plex Mono and carries no Bengali glyph
@@ -689,15 +612,14 @@ def code_block(name: str, body: str, copy_label: str = "", copy_lang: str = "") 
     lines = []
     for line in body.strip("\n").split("\n"):
         if line.lstrip().startswith("<!--") or line.lstrip().startswith("/*"):
-            lines.append(f'<span class="as-code__comment">{e_mixed(line)}</span>')
+            lines.append(f'<span class="as-code__comment">{e(line)}</span>')
         else:
-            lines.append(e_mixed(line))
+            lines.append(e(line))
     label = copy_label or "Copy the code"
-    lang_attr = f' lang="{copy_lang}"' if copy_lang else ""
     return (
         '<div class="as-code">'
         f'<div class="as-code__head"><span class="as-code__name">{e(name)}</span>'
-        f'<button type="button" class="as-btn as-btn--small"{lang_attr}>{e(label)}</button></div>'
+        f'<button type="button" class="as-btn as-btn--small">{e(label)}</button></div>'
         f'<pre class="as-code__pre"><code>{chr(10).join(lines)}</code></pre>'
         '<p class="as-code__said as-visually-hidden" role="status" aria-live="polite"></p>'
         "</div>"
@@ -715,60 +637,6 @@ def code_block(name: str, body: str, copy_label: str = "", copy_lang: str = "") 
 # English and the gap is reported.
 # =========================================================================
 
-BN = {
-    "wm-1": "অনিন্দ্য স্টুডিও",
-    "wm-2": "অনিন্দ্য",
-    "th-1": "আলো",
-    "th-2": "অন্ধকার",
-    "th-3": "বেশি কনট্রাস্ট",
-    "col-1": "মোহনা",
-    "col-2": "জোয়ার",
-    "col-3": "পলি",
-    "col-4": "কাশ",
-    "col-5": "লাল মাটি",
-    "col-6": "বর্ষা",
-    "bt-1": "লেখাটি সংরক্ষণ করুন",
-    "bt-2": "বাতিল করুন",
-    "bt-3": "ফাইলটি মুছে ফেলুন",
-    "bt-4": "আবার চেষ্টা করুন",
-    "bt-5": "কোডটি কপি করুন",
-    "ms-1": "সংরক্ষণ করা যায়নি। আপনার লেখা এখনো আছে — একটু পরে আবার চেষ্টা করুন।",
-    "ms-2": "ফাইলটি অনেক বড়ো। সর্বোচ্চ ১০ মেগাবাইট।",
-    "ms-3": "এখনো কিছু নেই। শুরু করতে প্রথম লেখাটি যোগ করুন।",
-    "ms-4": "সংরক্ষিত হয়েছে",
-    "vc-1": "আমি ছোটো, যত্নে গড়া সফটওয়্যার বানাই। কোনো কিছুর সীমা থাকলে সেটা এখানেই লেখা থাকবে — লুকিয়ে রাখা হবে না।",
-    "gb-1": "স্বাগতম",
-    "gb-2": "নাম",
-    "gb-3": "চিহ্ন",
-    "gb-4": "রং",
-    "gb-5": "হরফ",
-    "gb-6": "ফাঁক ও আকার",
-    "gb-7": "উপাদান",
-    "gb-8": "গতি",
-    "gb-9": "কণ্ঠস্বর",
-    "gb-10": "যা এই পদ্ধতি করে না",
-}
-
-BANGLA_NOTE = (
-    "Bangla appears only where an approved string exists. Two files, and they are "
-    "not interchangeable: 06_type/BANGLA-STANDARD.md governs — it holds the Bangla "
-    "Academy spelling rules with their primary sources, and the 31 strings reviewed "
-    "against them — while 06_type/bangla-strings.json is the register of 94 "
-    "approved keys written under those rules, each carrying the rule number or "
-    "dictionary page it rests on, and it is the file these cards actually read. "
-    "The fields listed here are empty because neither holds an entry for them. "
-    "Writing new Bangla to fill them is not allowed, so they stay in English and "
-    "are named here instead, for review."
-)
-
-
-def bangla_gaps() -> dict:
-    return {
-        "note": BANGLA_NOTE,
-        "name_bn": [c["slug"] for c in CARDS if not c["name_bn"]],
-        "subtitle_bn": [c["slug"] for c in CARDS if not c["subtitle_bn"]],
-    }
-
 
 # =========================================================================
 # Token data
@@ -778,7 +646,7 @@ def bangla_gaps() -> dict:
 def load_tokens() -> dict:
     primitive = json.loads((TOKENS_BUILD / "primitive.tokens.json").read_text("utf-8"))
     semantic = {}
-    for key, _, _ in THEMES:
+    for key, _ in THEMES:
         semantic[key] = json.loads((TOKENS_BUILD / f"semantic.{key}.tokens.json").read_text("utf-8"))
     mark = json.loads(MARK_MANIFEST.read_text("utf-8"))
     return {"primitive": primitive, "semantic": semantic, "mark": mark}
@@ -834,7 +702,6 @@ def role_rows(tokens: dict, theme: str) -> list[dict]:
             "use": use,
             "family": family,
             "family_name": latin,
-            "family_name_bn": bangla,
             "step": step,
             "required": proof.get("required"),
             "measured": proof.get("measured"),
@@ -895,11 +762,6 @@ def d_button(p, th, T):
     <button type="button" class="as-btn" disabled>Save the entry</button>
     <span class="as-hint">Off until a title is typed.</span>
   </div>
-  <div class="as-row">
-    <button type="button" class="as-btn as-btn--primary" lang="bn">{e(BN['bt-1'])}</button>
-    <button type="button" class="as-btn" lang="bn">{e(BN['bt-2'])}</button>
-    <button type="button" class="as-btn as-btn--danger" lang="bn">{e(BN['bt-3'])}</button>
-  </div>
 </div>"""
 
 
@@ -945,15 +807,16 @@ def d_select(p, th, T):
     </span>
   </div>
   <div class="as-field">
-    <label class="as-label" for="{p}-lang">Language</label>
+    <label class="as-label" for="{p}-sort">Sort by</label>
     <span class="as-select-wrap">
-      <select class="as-select" id="{p}-lang" aria-describedby="{p}-lang-hint">
-        <option selected>English</option>
-        <option lang="bn">{e(BN['wm-2'])}</option>
+      <select class="as-select" id="{p}-sort" aria-describedby="{p}-sort-hint">
+        <option selected>Most recent</option>
+        <option>Oldest first</option>
+        <option>Name, A to Z</option>
       </select>
       <span class="as-select-wrap__arrow">{icon('chevron')}</span>
     </span>
-    <span class="as-hint" id="{p}-lang-hint">The arrow is drawn, not a character, so it keeps the theme colour.</span>
+    <span class="as-hint" id="{p}-sort-hint">The arrow is drawn, not a character, so it keeps the theme colour.</span>
   </div>
   <div class="as-field">
     <label class="as-label" for="{p}-plan">Plan</label>
@@ -1019,8 +882,8 @@ def d_textarea(p, th, T):
     <span class="as-hint" id="{p}-note-hint">Drag the bottom edge to make this taller. It never gets wider, so the line length stays readable.</span>
   </div>
   <div class="as-field">
-    <label class="as-label" for="{p}-empty">A note in Bangla</label>
-    <textarea class="as-textarea" id="{p}-empty" rows="3" lang="bn">{e(BN['vc-1'])}</textarea>
+    <label class="as-label" for="{p}-empty">A longer note</label>
+    <textarea class="as-textarea" id="{p}-empty" rows="3">Three lines of ordinary prose, so the line height and the measure can be read off the control rather than taken on trust.</textarea>
   </div>
 </div>"""
 
@@ -1061,8 +924,8 @@ def d_card(p, th, T):
   </article>
   <article class="as-card as-card--flat">
     <p class="as-card__meta">Foundation</p>
-    <h3 class="as-card__title">{bn(BN['gb-5'], large=True)} Typography</h3>
-    <p class="as-card__body">One scale, two scripts. Bangla is corrected by a measured multiplier and then held at a 12 px floor.</p>
+    <h3 class="as-card__title">Typography</h3>
+    <p class="as-card__body">One scale, two faces, and every step measured off rendered ink rather than read from what a font declares about itself.</p>
     <div class="as-card__foot">
       <a class="as-btn as-btn--small" href="#">Open the card</a>
     </div>
@@ -1078,7 +941,6 @@ def d_alert(p, th, T):
     <div class="as-alert__body">
       <p class="as-alert__title">Couldn't save the entry</p>
       <p class="as-alert__text">Your work is still here. Try again in a moment.</p>
-      <p class="as-alert__text" lang="bn">{e(BN['ms-1'])}</p>
     </div>
   </div>
   <div class="as-alert as-alert--warning">
@@ -1086,7 +948,6 @@ def d_alert(p, th, T):
     <div class="as-alert__body">
       <p class="as-alert__title">That file is too large</p>
       <p class="as-alert__text">The maximum is 10 MB. Choose a smaller file and try again.</p>
-      <p class="as-alert__text" lang="bn">{e(BN['ms-2'])}</p>
     </div>
   </div>
   <div class="as-alert as-alert--success">
@@ -1266,7 +1127,6 @@ def d_toast(p, th, T):
     {icon('check', 'as-icon as-toast__glyph')}
     <div class="as-toast__body">
       <p class="as-toast__title">Saved</p>
-      <p class="as-toast__text" lang="bn">{e(BN['ms-4'])}</p>
     </div>
     <button type="button" class="as-toast__dismiss" aria-label="Dismiss this message">{icon('cross')}</button>
   </div>
@@ -1296,7 +1156,6 @@ def d_empty(p, th, T):
     {icon('doc', 'as-icon as-empty__glyph')}
     <p class="as-empty__title">Nothing here yet</p>
     <p class="as-empty__text">Add your first entry to begin. It takes one line, and you can change it afterwards.</p>
-    <p class="as-empty__text" lang="bn">{e(BN['ms-3'])}</p>
     <button type="button" class="as-btn as-btn--primary">{icon('plus')}<span>Add an entry</span></button>
   </div>
   <div class="as-empty">
@@ -1329,8 +1188,6 @@ def d_code(p, th, T):
   font-size: clamp(var(--as-text-bangla-min),
                    calc(1em * var(--as-bangla-scale-body)), 100em);
 }""",
-        copy_label=BN["bt-5"],
-        copy_lang="bn",
     )
     return (
         '<div class="as-stack">' + first + second
@@ -1373,12 +1230,12 @@ def d_colour(p, th, T):
 
 def colour_tables(T) -> str:
     out = []
-    for key, label, label_bn in THEMES:
+    for key, label in THEMES:
         rows = role_rows(T, key)
         body = "".join(
             f"<tr><th scope=\"row\">{e(r['use'])}</th>"
             f"<td><code>{e(r['var'])}</code></td>"
-            f"<td>{e(r['family_name'])}{(' ' + bn(r['family_name_bn'])) if r['family_name_bn'] else ''} {e(r['step'])}</td>"
+            f"<td>{e(r['family_name'])} {e(r['step'])}</td>"
             f"<td class=\"as-num\">{r['required']}:1</td>"
             f"<td class=\"as-num\">{r['measured']:.4f}:1</td>"
             f"<td class=\"as-num\">{r['worst']:.4f}:1</td>"
@@ -1387,7 +1244,7 @@ def colour_tables(T) -> str:
             for r in rows
         )
         out.append(
-            f'<h3 class="as-h3">{e(label)}{(" " + bn(label_bn)) if label_bn else ""}</h3>'
+            f'<h3 class="as-h3">{e(label)}</h3>'
             '<div class="as-scroll-x"><table class="as-table as-table--numeric">'
             '<caption>Every figure is read from 07_tokens/build/semantic.'
             f'{e(key)}.tokens.json at build time. None of it is typed here.</caption>'
@@ -1406,34 +1263,31 @@ def d_typography(p, th, T):
     rows = []
     for var, name, band in TYPE_STEPS:
         rem = prim["dimension"]["type"][name]["$value"]["value"]
-        px = rem * 16
-        mult = prim["number"]["scale"]["bangla"][band]["$value"]
-        rows.append((var, name, rem, px, band, mult, px * mult))
+        rows.append((var, name, rem, rem * 16))
     scale = "".join(
         f"<tr><th scope=\"row\">{e(n)}</th><td><code>{e(v)}</code></td>"
-        f"<td class=\"as-num\">{r:.4f} rem</td><td class=\"as-num\">{px:.2f} px</td>"
-        f"<td>{e(b)}</td><td class=\"as-num\">{m}</td>"
-        f"<td class=\"as-num\">{max(bpx, 12):.2f} px</td></tr>"
-        for v, n, r, px, b, m, bpx in rows
+        f"<td class=\"as-num\">{r:.4f} rem</td>"
+        f"<td class=\"as-num\">{px:.2f} px</td></tr>"
+        for v, n, r, px in rows
     )
     return f"""
 <div class="as-stack">
   <p class="as-display">Ag</p>
-  <p class="as-h1">Estuary</p>
+  <p class="as-h1">Natural</p>
   <p class="as-h2">A studio of one</p>
   <p class="as-h3">Measured, not assumed</p>
   <p class="as-lead">A perfect fourth, 1.333 &mdash; the name comes from music, where the same ratio separates two notes. The jumps are large on purpose, so the hierarchy is unmistakable and fewer levels are needed to express it.</p>
   <p class="as-body">Literata carries an optical-size axis from 7 to 72, so the letterforms are redrawn for the size rather than scaled. Browsers apply that automatically.</p>
   <p class="as-caption">Caption size is 12 px. Nothing in this system is smaller.</p>
   <hr class="as-divider">
-  <p class="as-lead as-bn-large" lang="bn">{e(BN['gb-5'])}</p>
-  <p lang="bn">{e(BN['vc-1'])}</p>
-  <p class="as-hint">Bangla is set in Noto Serif Bengali, never uppercased, never letter-spaced, never synthetically emboldened. Below 14 px it gains one weight step, because its <span lang="bn">মাত্রা</span> — the headline stroke along the top of the letters — goes pale before the letters do.</p>
+  <p class="as-hint">Literata is never uppercased, never letter-spaced and never
+  synthetically emboldened: the family carries real weights from 200 to 900, and a
+  browser asked to fake one draws a worse letter than the one it already has.</p>
   <hr class="as-divider">
   <div class="as-scroll-x">
     <table class="as-table as-table--numeric">
-      <caption>The scale, and what the Bangla multiplier does to each step. The last column is held at the 12 px floor.</caption>
-      <thead><tr><th scope="col">Step</th><th scope="col">Token</th><th scope="col" class="as-num">rem</th><th scope="col" class="as-num">Latin px</th><th scope="col">Multiplier band</th><th scope="col" class="as-num">Multiplier</th><th scope="col" class="as-num">Bangla px</th></tr></thead>
+      <caption>The scale. Every step is a ratio of the root size, so changing the root changes all of them together.</caption>
+      <thead><tr><th scope="col">Step</th><th scope="col">Token</th><th scope="col" class="as-num">rem</th><th scope="col" class="as-num">px</th></tr></thead>
       <tbody>{scale}</tbody>
     </table>
   </div>
@@ -1541,7 +1395,6 @@ def d_marks(p, th, T):
   <p class="as-hint">Clear space is {e(T['mark']['clear_space'])} — read from
   04_mark/manifest.json when this card is built, so it cannot drift from the rule the
   mark builder and asset.py both follow.</p>
-  <p class="as-lead">{bn(BN['wm-1'], large=True)}</p>
 </div>"""
 
 
@@ -1597,7 +1450,7 @@ def d_signin(p, th, T):
     return f"""
 <div class="as-card" style="max-inline-size: 420px; margin-inline: auto">
   <div class="as-stack as-stack--tight">
-    <p class="as-card__meta">{bn(BN['wm-1'])}</p>
+    <p class="as-card__meta">Aninda Studio</p>
     <h3 class="as-card__title">Sign in</h3>
     <p class="as-card__body">Use the email address you gave me. If you have not set a password, ask for a link instead.</p>
   </div>
@@ -1730,7 +1583,7 @@ def d_docs(p, th, T):
   <nav class="as-breadcrumb" aria-label="Breadcrumb">
     <ol class="as-breadcrumb__list">
       <li class="as-breadcrumb__item"><a class="as-breadcrumb__link" href="#">Guidebook</a><span class="as-breadcrumb__sep" aria-hidden="true">/</span></li>
-      <li class="as-breadcrumb__item"><a class="as-breadcrumb__link" href="#">{bn(BN['gb-7'])}</a><span class="as-breadcrumb__sep" aria-hidden="true">/</span></li>
+      <li class="as-breadcrumb__item"><a class="as-breadcrumb__link" href="#">Foundations</a><span class="as-breadcrumb__sep" aria-hidden="true">/</span></li>
       <li class="as-breadcrumb__item"><span class="as-breadcrumb__current" aria-current="page">Focus</span></li>
     </ol>
   </nav>
@@ -1763,22 +1616,21 @@ def d_docs(p, th, T):
 def d_landing(p, th, T):
     features = [
         ("Measured, not assumed", "Every contrast figure in this system was computed and re-checked with each channel nudged by one, and the worst of those is the number published.", "chart"),
-        ("Two scripts, one system", "Bangla is corrected by a measured multiplier and then held at a 12 px floor, so it never shrinks past the point its মাত্রা survives.", "doc"),
+        ("One scale, measured", "Every step is a ratio of the root size, read off rendered ink rather than taken from what a font declares about itself.", "doc"),
         ("Four themes, one attribute", "Light, dark and both high-contrast themes are chosen with a data-theme attribute on any element, so a dark panel can sit inside a light page.", "gear"),
     ]
     cards = "".join(
         f'<article class="as-card"><p class="as-card__meta">{icon(ic)}</p>'
         f'<h3 class="as-card__title">{e(t)}</h3>'
-        f'<p class="as-card__body">{e_mixed(b)}</p></article>'
+        f'<p class="as-card__body">{e(b)}</p></article>'
         for t, b, ic in features
     )
     return f"""
 <div class="as-stack as-stack--loose">
   <div class="as-stack">
-    <p class="as-card__meta">{bn(BN['wm-1'])}</p>
+    <p class="as-card__meta">Aninda Studio</p>
     <h3 class="as-h2">Software made carefully, for two languages</h3>
     <p class="as-lead as-prose">I build small, careful software. Where something has a limit, the limit is written down here rather than hidden.</p>
-    <p class="as-prose" lang="bn">{e(BN['vc-1'])}</p>
     <div class="as-row">
       <a class="as-btn as-btn--primary" href="#">{icon('arrow')}<span>Read the guidebook</span></a>
       <a class="as-btn" href="#">See the tokens</a>
@@ -1845,9 +1697,9 @@ def d_notfound(p, th, T):
   </div>
   <nav class="as-nav as-nav--horizontal" aria-label="Popular pages">
     <ul class="as-nav__list">
-      <li><a class="as-nav__link" href="#">{bn(BN['gb-4'])} Colour</a></li>
-      <li><a class="as-nav__link" href="#">{bn(BN['gb-5'])} Typography</a></li>
-      <li><a class="as-nav__link" href="#">{bn(BN['gb-8'])} Motion</a></li>
+      <li><a class="as-nav__link" href="#">Colour</a></li>
+      <li><a class="as-nav__link" href="#">Typography</a></li>
+      <li><a class="as-nav__link" href="#">Motion</a></li>
     </ul>
   </nav>
 </div>"""
@@ -1870,9 +1722,8 @@ def d_validation(p, th, T):
   </div>
   <div class="as-field">
     <label class="as-label" for="{p}-v2">Attachment</label>
-    <input class="as-input" id="{p}-v2" type="text" value="specimen-18mb.pdf" aria-invalid="true" aria-describedby="{p}-v2-err {p}-v2-bn">
+    <input class="as-input" id="{p}-v2" type="text" value="specimen-18mb.pdf" aria-invalid="true" aria-describedby="{p}-v2-err">
     <span class="as-error" id="{p}-v2-err">{icon('warn')}<span>That file is too large. The maximum is 10 MB, so choose a smaller one.</span></span>
-    <span class="as-hint" lang="bn" id="{p}-v2-bn">{e(BN['ms-2'])}</span>
   </div>
   <div class="as-field">
     <label class="as-label" for="{p}-v3">Group</label>
@@ -1889,7 +1740,6 @@ def d_validation(p, th, T):
   <div class="as-row">
     <button type="submit" class="as-btn as-btn--primary">Save the entry</button>
     <button type="button" class="as-btn">Cancel the change</button>
-    <button type="button" class="as-btn as-btn--quiet" lang="bn">{e(BN['bt-4'])}</button>
   </div>
 </form>"""
 
@@ -1932,78 +1782,61 @@ def mark_at(svg: str, size: int, accent: bool = False) -> str:
 
 CARDS = [
     # ---- Foundations ----
-    dict(slug="colour", group="Foundations", name="Colour", name_bn=BN["gb-4"],
-         subtitle="Every colour role across four themes, each with the contrast ratio it was measured at and the criterion it was measured against, over the seven surfaces they are measured against.",
-         subtitle_bn="", demo=d_colour, wide=True, height=2400,
+    dict(slug="colour", group="Foundations", name="Colour", subtitle="Every colour role across four themes, each with the contrast ratio it was measured at and the criterion it was measured against, over the seven surfaces they are measured against.",
+         demo=d_colour, wide=True, height=2400,
          extra=lambda T: [("Every role, measured",
                            "Nothing in these tables was typed. Every figure is read from the token files at build time, so the prose cannot drift away from the palette.",
                            colour_tables(T))],
          usage=("markup", '<span class="as-badge as-badge--danger">\n  <svg class="as-icon">…</svg><span>Failed</span>\n</span>\n<!-- The colour is the third signal, never the only one. -->')),
-    dict(slug="typography", group="Foundations", name="Typography", name_bn=BN["gb-5"],
-         subtitle="One scale of a perfect fourth, two scripts, a measured multiplier for Bangla and a floor it never goes below.",
-         subtitle_bn="", demo=d_typography, wide=True, height=1900,
-         usage=("markup", '<p lang="bn">অনিন্দ্য স্টুডিও</p>\n<!-- The lang attribute is enough. tokens.css switches the family,\n     applies the multiplier and clamps it at 12px in one declaration. -->')),
-    dict(slug="space-and-shape", group="Foundations", name="Space and shape", name_bn=BN["gb-6"],
-         subtitle="A 4 px scale in ten steps, and four radii. Everything in the system sits on one of them.",
-         subtitle_bn="", demo=d_space, height=1500,
+    dict(slug="typography", group="Foundations", name="Typography", subtitle="One scale of a perfect fourth, two scripts, a measured multiplier for Bangla and a floor it never goes below.",
+         demo=d_typography, wide=True, height=1900,
+         usage=("markup", '<p class="as-lead">A lead paragraph</p>\n<!-- Every step is a class. The scale is a ratio of the root size, so\n     changing the root changes all of them together. -->')),
+    dict(slug="space-and-shape", group="Foundations", name="Space and shape", subtitle="A 4 px scale in ten steps, and four radii. Everything in the system sits on one of them.",
+         demo=d_space, height=1500,
          usage=("markup", '<div class="as-stack">…</div>\n<!-- .as-stack, .as-row and .as-grid all take their gap from the scale. -->')),
-    dict(slug="motion", group="Foundations", name="Motion", name_bn=BN["gb-8"],
-         subtitle="Two durations and three easing curves. Things that move may overshoot; things that only change colour never do.",
-         subtitle_bn="", demo=d_motion, wide=True, height=1500,
+    dict(slug="motion", group="Foundations", name="Motion", subtitle="Two durations and three easing curves. Things that move may overshoot; things that only change colour never do.",
+         demo=d_motion, wide=True, height=1500,
          usage=("markup", 'transition: background-color var(--as-duration-colour) var(--as-ease-standard);')),
-    dict(slug="the-marks", group="Foundations", name="The marks", name_bn=BN["gb-3"],
-         subtitle="The mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
-         subtitle_bn="", demo=d_marks, wide=True, height=1400,
+    dict(slug="the-marks", group="Foundations", name="The marks", subtitle="The mark in two weights, drawn in currentColor so it takes whatever theme it lands in.",
+         demo=d_marks, wide=True, height=1400,
          usage=("markup", '<svg class="as-doc-mark" viewBox="0 0 100 100">…</svg>\n<!-- currentColor throughout. The mark carries no colour of its own. -->')),
-    dict(slug="accessibility", group="Foundations", name="Accessibility", name_bn="",
-         subtitle="Target sizes with the guidance each one comes from, the anatomy of the focus ring, and what happens in forced colours &mdash; the mode where the operating system replaces every colour with its own.",
-         subtitle_bn="", demo=d_a11y, wide=True, height=1700,
+    dict(slug="accessibility", group="Foundations", name="Accessibility", subtitle="Target sizes with the guidance each one comes from, the anatomy of the focus ring, and what happens in forced colours &mdash; the mode where the operating system replaces every colour with its own.",
+         demo=d_a11y, wide=True, height=1700,
          usage=("markup", '<button class="as-btn as-btn--small">Copy the code</button>\n<!-- The small button is never smaller than 24px tall: WCAG 2.2 SC 2.5.8, Level AA. -->')),
 
     # ---- Components ----
-    dict(slug="button", group="Components", name="Button", name_bn="",
-         subtitle="Four kinds, two sizes and an icon-only form, each with a label that says what will happen.",
-         subtitle_bn="", demo=d_button, height=1500,
+    dict(slug="button", group="Components", name="Button", subtitle="Four kinds, two sizes and an icon-only form, each with a label that says what will happen.",
+         demo=d_button, height=1500,
          usage=("markup", '<button type="button" class="as-btn as-btn--primary">Save the entry</button>\n<button type="button" class="as-btn">Cancel the change</button>\n<button type="button" class="as-btn as-btn--danger">Delete the file</button>')),
-    dict(slug="input", group="Components", name="Input", name_bn="",
-         subtitle="A label, an optional hint, and an error that says what happened and then what to do next.",
-         subtitle_bn="", demo=d_input, height=1500,
+    dict(slug="input", group="Components", name="Input", subtitle="A label, an optional hint, and an error that says what happened and then what to do next.",
+         demo=d_input, height=1500,
          usage=("markup", '<div class="as-field">\n  <label class="as-label" for="size">File size</label>\n  <input class="as-input" id="size" aria-invalid="true"\n         aria-describedby="size-hint size-err">\n  <span class="as-hint" id="size-hint">…</span>\n  <span class="as-error" id="size-err">…</span>\n</div>\n<!-- A hint is described-by too, not only an error. Without it the words are\n     next to the field for a sighted reader and absent for a screen reader. -->')),
-    dict(slug="select", group="Components", name="Select", name_bn="",
-         subtitle="A native select with a drawn arrow, so the arrow follows the theme instead of the operating system.",
-         subtitle_bn="", demo=d_select, height=1300,
+    dict(slug="select", group="Components", name="Select", subtitle="A native select with a drawn arrow, so the arrow follows the theme instead of the operating system.",
+         demo=d_select, height=1300,
          usage=("markup", '<div class="as-field">\n  <label class="as-label" for="plan">Plan</label>\n  <span class="as-select-wrap">\n    <select class="as-select" id="plan" aria-describedby="plan-hint">…</select>\n    <span class="as-select-wrap__arrow"><svg class="as-icon">…</svg></span>\n  </span>\n  <span class="as-hint" id="plan-hint">…</span>\n</div>')),
-    dict(slug="checkbox-radio", group="Components", name="Checkbox and radio", name_bn="",
-         subtitle="Native controls at 24 px, wrapped in a label so the words are part of the target.",
-         subtitle_bn="", demo=d_choice, height=1500,
+    dict(slug="checkbox-radio", group="Components", name="Checkbox and radio", subtitle="Native controls at 24 px, wrapped in a label so the words are part of the target.",
+         demo=d_choice, height=1500,
          usage=("markup", '<label class="as-choice" for="c1">\n  <input class="as-choice__control" id="c1" type="checkbox">\n  <span class="as-choice__text"><span class="as-choice__label">…</span></span>\n</label>')),
-    dict(slug="textarea", group="Components", name="Textarea", name_bn="",
-         subtitle="You can drag it taller but never wider, so the line length stays comfortable to read.",
-         subtitle_bn="", demo=d_textarea, height=1300,
+    dict(slug="textarea", group="Components", name="Textarea", subtitle="You can drag it taller but never wider, so the line length stays comfortable to read.",
+         demo=d_textarea, height=1300,
          usage=("markup", '<textarea class="as-textarea" rows="4"></textarea>\n/* resize: vertical — the width is a layout decision, not the reader\'s. */')),
-    dict(slug="badge", group="Components", name="Badge", name_bn="",
-         subtitle="Five meanings, each carrying a glyph and a word so the colour is the third signal and never the only one.",
-         subtitle_bn="", demo=d_badge, height=1200,
+    dict(slug="badge", group="Components", name="Badge", subtitle="Five meanings, each carrying a glyph and a word so the colour is the third signal and never the only one.",
+         demo=d_badge, height=1200,
          usage=("markup", '<span class="as-badge as-badge--danger">\n  <svg class="as-icon">…</svg><span>Failed</span>\n</span>')),
-    dict(slug="card", group="Components", name="Card", name_bn="",
-         subtitle="A surface a step brighter than the page, with a shadow in the light theme and none in the dark ones.",
-         subtitle_bn="", demo=d_card, wide=True, height=1200,
+    dict(slug="card", group="Components", name="Card", subtitle="A surface a step brighter than the page, with a shadow in the light theme and none in the dark ones.",
+         demo=d_card, wide=True, height=1200,
          usage=("markup", '<article class="as-card">\n  <p class="as-card__meta">Foundation</p>\n  <h3 class="as-card__title">Colour</h3>\n  <p class="as-card__body">…</p>\n</article>')),
-    dict(slug="alert", group="Components", name="Alert", name_bn="",
-         subtitle="Four kinds. Each says what happened, then what happens next, and never blames the reader.",
-         subtitle_bn="", demo=d_alert, wide=True, height=1600,
+    dict(slug="alert", group="Components", name="Alert", subtitle="Four kinds. Each says what happened, then what happens next, and never blames the reader.",
+         demo=d_alert, wide=True, height=1600,
          usage=("markup", '<div class="as-alert as-alert--danger" role="alert">\n  <svg class="as-icon as-alert__glyph">…</svg>\n  <div class="as-alert__body">\n    <p class="as-alert__title">Couldn\'t save the entry</p>\n    <p class="as-alert__text">Your work is still here. Try again in a moment.</p>\n  </div>\n</div>')),
-    dict(slug="dialog", group="Components", name="Dialog", name_bn="",
-         subtitle="A real dialog element over a dimmed backdrop, with the destructive action named rather than called OK.",
-         subtitle_bn="", demo=d_dialog, wide=True, height=1200,
+    dict(slug="dialog", group="Components", name="Dialog", subtitle="A real dialog element over a dimmed backdrop, with the destructive action named rather than called OK.",
+         demo=d_dialog, wide=True, height=1200,
          usage=("markup", '<dialog class="as-dialog" open aria-labelledby="t">…</dialog>\n<!-- In a product this opens with showModal(), which traps focus\n     and adds the ::backdrop. The card shows it open in place. -->')),
-    dict(slug="table", group="Components", name="Table", name_bn="",
-         subtitle="Row headers, a caption saying what the numbers are, and a sideways scroll when the table is wider than the space.",
-         subtitle_bn="", demo=d_table, wide=True, height=1200,
+    dict(slug="table", group="Components", name="Table", subtitle="Row headers, a caption saying what the numbers are, and a sideways scroll when the table is wider than the space.",
+         demo=d_table, wide=True, height=1200,
          usage=("markup", '<div class="as-scroll-x">\n  <table class="as-table as-table--numeric">\n    <caption>…</caption>\n    <thead><tr><th scope="col">Card</th>…</tr></thead>\n  </table>\n</div>')),
-    dict(slug="tabs", group="Components", name="Tabs", name_bn="",
-         subtitle="The selected tab is bold, underlined and marked with aria-selected. Three signals, one of which is a colour.",
-         subtitle_bn="", demo=d_tabs, height=1200,
+    dict(slug="tabs", group="Components", name="Tabs", subtitle="The selected tab is bold, underlined and marked with aria-selected. Three signals, one of which is a colour.",
+         demo=d_tabs, height=1200,
          usage=("markup", '<div class="as-tabs" role="tablist" aria-label="Card groups">\n'
                           '  <button class="as-tab" role="tab" id="t1" aria-selected="true"\n'
                           '          aria-controls="p1">Foundations</button>\n'
@@ -2015,89 +1848,40 @@ CARDS = [
                           '<!-- Every panel has to be in the document, and the arrow keys have to\n'
                           '     move the selection. tabindex="-1" without them takes the tab off\n'
                           '     the keyboard entirely. -->')),
-    dict(slug="nav", group="Components", name="Nav", name_bn="",
-         subtitle="Vertical and horizontal. The current item carries a bar, a heavier weight and aria-current.",
-         subtitle_bn="", demo=d_nav, wide=True, height=1200,
+    dict(slug="nav", group="Components", name="Nav", subtitle="Vertical and horizontal. The current item carries a bar, a heavier weight and aria-current.",
+         demo=d_nav, wide=True, height=1200,
          usage=("markup", '<nav class="as-nav" aria-label="Foundations">\n  <ul class="as-nav__list">\n    <li><a class="as-nav__link" href="#" aria-current="page">Colour</a></li>\n  </ul>\n</nav>')),
-    dict(slug="breadcrumb", group="Components", name="Breadcrumb", name_bn="",
-         subtitle="The last item is not a link, because you are already on it.",
-         subtitle_bn="", demo=d_breadcrumb, height=1000,
+    dict(slug="breadcrumb", group="Components", name="Breadcrumb", subtitle="The last item is not a link, because you are already on it.",
+         demo=d_breadcrumb, height=1000,
          usage=("markup", '<nav class="as-breadcrumb" aria-label="Breadcrumb">\n  <ol class="as-breadcrumb__list">…\n    <li><span class="as-breadcrumb__current" aria-current="page">Breadcrumb</span></li>\n  </ol>\n</nav>')),
-    dict(slug="toast", group="Components", name="Toast", name_bn="",
-         subtitle="A short message with a dismiss button that has a name of its own, not only a cross.",
-         subtitle_bn="", demo=d_toast, wide=True, height=1200,
+    dict(slug="toast", group="Components", name="Toast", subtitle="A short message with a dismiss button that has a name of its own, not only a cross.",
+         demo=d_toast, wide=True, height=1200,
          usage=("markup", '<div class="as-toast as-toast--success" role="status">\n  …\n  <button class="as-toast__dismiss" aria-label="Dismiss this message">…</button>\n</div>')),
-    dict(slug="empty-state", group="Components", name="Empty state", name_bn="",
-         subtitle="Says what is missing, and then exactly what to do about it.",
-         subtitle_bn="", demo=d_empty, wide=True, height=1300,
+    dict(slug="empty-state", group="Components", name="Empty state", subtitle="Says what is missing, and then exactly what to do about it.",
+         demo=d_empty, wide=True, height=1300,
          usage=("markup", '<div class="as-empty">\n  <svg class="as-icon as-empty__glyph">…</svg>\n  <p class="as-empty__title">Nothing here yet</p>\n  <p class="as-empty__text">Add your first entry to begin.</p>\n</div>')),
-    dict(slug="code-block", group="Components", name="Code block", name_bn="",
-         subtitle="Aninda Mono, a horizontal scroll rather than a wrap, and a copy button that says what it copies.",
-         subtitle_bn="", demo=d_code, wide=True, height=1100,
+    dict(slug="code-block", group="Components", name="Code block", subtitle="Aninda Mono, a horizontal scroll rather than a wrap, and a copy button that says what it copies.",
+         demo=d_code, wide=True, height=1100,
          usage=("markup", '<div class="as-code">\n  <div class="as-code__head">…</div>\n  <pre class="as-code__pre"><code>…</code></pre>\n</div>')),
 
     # ---- Patterns ----
-    dict(slug="sign-in", group="Patterns", name="Sign in", name_bn="",
-         subtitle="One card, two fields, and an option for someone who has no password.",
-         subtitle_bn="", demo=d_signin, wide=True, height=1500),
-    dict(slug="settings", group="Patterns", name="Settings", name_bn="",
-         subtitle="Grouped in fieldsets, with the destructive action kept apart and named.",
-         subtitle_bn="", demo=d_settings, wide=True, height=1900),
-    dict(slug="dashboard", group="Patterns", name="Dashboard", name_bn="",
-         subtitle="Four figures, one table, and a note saying where the numbers came from.",
-         subtitle_bn="", demo=d_dashboard, wide=True, height=1900),
-    dict(slug="docs-page", group="Patterns", name="Docs page", name_bn="",
-         subtitle="Breadcrumb, page navigation and prose held to a readable line length.",
-         subtitle_bn="", demo=d_docs, wide=True, height=1900),
-    dict(slug="landing", group="Patterns", name="Landing", name_bn="",
-         subtitle="A claim, the reason to believe it, and two ways forward.",
-         subtitle_bn="", demo=d_landing, wide=True, height=1900),
-    dict(slug="pricing", group="Patterns", name="Pricing", name_bn="",
-         subtitle="Three plans, with the recommended one marked by a badge and a word.",
-         subtitle_bn="", demo=d_pricing, wide=True, height=1600),
-    dict(slug="not-found", group="Patterns", name="Not found", name_bn="",
-         subtitle="Says the page is missing, then offers the pages most people were looking for.",
-         subtitle_bn="", demo=d_notfound, wide=True, height=1300),
-    dict(slug="form-with-validation", group="Patterns", name="Form with validation", name_bn="",
-         subtitle="A summary at the top, an error under each field, and nothing lost.",
-         subtitle_bn="", demo=d_validation, wide=True, height=1700),
+    dict(slug="sign-in", group="Patterns", name="Sign in", subtitle="One card, two fields, and an option for someone who has no password.",
+         demo=d_signin, wide=True, height=1500),
+    dict(slug="settings", group="Patterns", name="Settings", subtitle="Grouped in fieldsets, with the destructive action kept apart and named.",
+         demo=d_settings, wide=True, height=1900),
+    dict(slug="dashboard", group="Patterns", name="Dashboard", subtitle="Four figures, one table, and a note saying where the numbers came from.",
+         demo=d_dashboard, wide=True, height=1900),
+    dict(slug="docs-page", group="Patterns", name="Docs page", subtitle="Breadcrumb, page navigation and prose held to a readable line length.",
+         demo=d_docs, wide=True, height=1900),
+    dict(slug="landing", group="Patterns", name="Landing", subtitle="A claim, the reason to believe it, and two ways forward.",
+         demo=d_landing, wide=True, height=1900),
+    dict(slug="pricing", group="Patterns", name="Pricing", subtitle="Three plans, with the recommended one marked by a badge and a word.",
+         demo=d_pricing, wide=True, height=1600),
+    dict(slug="not-found", group="Patterns", name="Not found", subtitle="Says the page is missing, then offers the pages most people were looking for.",
+         demo=d_notfound, wide=True, height=1300),
+    dict(slug="form-with-validation", group="Patterns", name="Form with validation", subtitle="A summary at the top, an error under each field, and nothing lost.",
+         demo=d_validation, wide=True, height=1700),
 ]
-
-# --- Bangla, filled in from the verified string file ------------------------
-# The card list above was written before 06_type/bangla-strings.json existed, so
-# it carries empty strings wherever no approved Bangla was available at the time.
-# Rather than edit 30 entries by hand and risk one of them drifting from the
-# approved wording, the names and subtitles are filled in from that file here.
-#
-# It is the single source for approved Bangla: every string in it carries the
-# rule number or dictionary page it rests on. Nothing is invented at this step —
-# a card with no entry keeps its English, and says so in the gap list below.
-_BN_STRINGS = ROOT / "06_type" / "bangla-strings.json"
-if _BN_STRINGS.exists():
-    _bn = json.loads(_BN_STRINGS.read_text(encoding="utf-8"))
-    for _card in CARDS:
-        for _field in ("name", "subtitle"):
-            _entry = _bn.get(f"card.{_card['slug']}.{_field}")
-            if _entry and _entry.get("bn"):
-                _card[f"{_field}_bn"] = _entry["bn"]
-
-    # The theme labels, for the same reason. THEMES above carried "" for the two
-    # high-contrast labels, so 60 of the 120 theme buttons across the 30 cards were
-    # monolingual next to 60 that were bilingual — and the gap was declared nowhere,
-    # because _bangla_gaps covers card names and subtitles only. The register holds
-    # both compounds with a cited basis: verified th-3 joined to verified th-1 or
-    # th-2 with the same comma the English label uses.
-    for _index, (_key, _label, _label_bn) in enumerate(THEMES):
-        _entry = _bn.get(f"theme.{_key}")
-        if _entry and _entry.get("bn"):
-            if _entry.get("en") and _entry["en"] != _label:
-                raise BuildError(
-                    f"theme.{_key} in 06_type/bangla-strings.json is keyed to the "
-                    f"English label {_entry['en']!r} and this file writes "
-                    f"{_label!r}. The approved Bangla was joined to match that "
-                    f"exact wording, so the two must not differ."
-                )
-            THEMES[_index] = (_key, _label, _entry["bn"])
 
 GROUP_DIR = {"Foundations": "foundations", "Components": "components", "Patterns": "patterns"}
 
@@ -2109,8 +1893,8 @@ GROUP_DIR = {"Foundations": "foundations", "Components": "components", "Patterns
 
 def theme_switcher() -> str:
     buttons = ['<button type="button" class="as-doc-theme" data-set-theme="" aria-pressed="true">Follow the system</button>']
-    for key, label, label_bn in THEMES:
-        text = e(label) + ((" " + bn(label_bn)) if label_bn else "")
+    for key, label in THEMES:
+        text = e(label)
         buttons.append(
             f'<button type="button" class="as-doc-theme" data-set-theme="{key}" aria-pressed="false">{text}</button>'
         )
@@ -2287,8 +2071,8 @@ def build_page(card: dict, tokens_css: str, components_css: str, faces_css: str,
 
     slug = card["slug"]
     panels = []
-    for key, label, label_bn in THEMES:
-        label_html = e(label) + ((" " + bn(label_bn)) if label_bn else "")
+    for key, label in THEMES:
+        label_html = e(label)
         body = demo(f"{slug}-{key}", key, T)
         # role="group" with aria-labelledby, so the panel has a NAME. Without it
         # every card put four or five copies of each control into one flat
@@ -2326,8 +2110,6 @@ def build_page(card: dict, tokens_css: str, components_css: str, faces_css: str,
             f"{code_block(name, body)}</section>"
         )
 
-    title_bn = f'<p class="as-doc-title-bn as-bn-large" lang="bn">{e(card["name_bn"])}</p>' if card["name_bn"] else ""
-    sub_bn = f'<p class="as-doc-sub-bn" lang="bn">{e(card["subtitle_bn"])}</p>' if card["subtitle_bn"] else ""
 
     is_foundation = group == "Foundations"
     stage_heading = "The foundation" if is_foundation else ("The pattern" if group == "Patterns" else "The component")
@@ -2359,9 +2141,7 @@ def build_page(card: dict, tokens_css: str, components_css: str, faces_css: str,
         '<header class="as-doc-head">',
         f'<p class="as-doc-eyebrow">{e(group)}</p>',
         f'<h1 class="as-doc-title">{e(card["name"])}</h1>',
-        title_bn,
         f'<p class="as-doc-sub">{e(card["subtitle"])}</p>',
-        sub_bn,
         theme_switcher(),
         "</header>",
         '<main class="as-stack as-stack--loose">',
@@ -2462,7 +2242,7 @@ def build() -> dict[str, bytes]:
 
     fonts: dict[str, bytes] = {}
     encoded: dict[str, str] = {}
-    for key in ("latin", "bangla", "mono"):
+    for key in ("latin", "mono"):
         data = build_font(key, chars)
         fonts[key] = data
         encoded[key] = base64.b64encode(data).decode("ascii")
@@ -2496,15 +2276,19 @@ def build() -> dict[str, bytes]:
         guard_markup(rest, rel)
         out[rel] = text.encode("utf-8")
 
-    # WCAG 2.2 SC 3.1.2, over every card. Run on the whole page rather than on
-    # `rest`, because the language of a run depends on the lang attributes of its
-    # ancestors and <html lang="en"> is in the head.
-    guard_language_of_parts({rel: data.decode("utf-8")
-                             for rel, data in out.items() if rel.endswith(".html")})
+    # WCAG 2.2 SC 3.1.2, Language of Parts, was checked here over every card:
+    # no Bangla outside lang="bn" and no English inside it, run on the whole page
+    # rather than on the body, because the language of a run depends on the lang
+    # attributes of its ancestors and <html lang="en"> is in the head.
+    #
+    # One language, one lang attribute, nothing to guard. The rule the guard
+    # enforced now lives in the English-standard checker, inverted: Bangla anywhere
+    # outside the retained record is a failure there, which is one rule in one
+    # place rather than the same rule in four builds.
     guard_field_descriptions({rel: data.decode("utf-8")
                              for rel, data in out.items() if rel.endswith(".html")})
 
-    for key in ("latin", "bangla", "mono"):
+    for key in ("latin", "mono"):
         spec = FONT_SOURCES[key]
         out[f"fonts/{spec['out']}"] = fonts[key]
         out[f"fonts/{spec['ofl_out']}"] = spec["ofl"].read_bytes()
@@ -2549,10 +2333,8 @@ def registry_bytes(fonts: dict[str, bytes]) -> bytes:
         entries.append({
             "path": f"cards/{GROUP_DIR[card['group']]}/{card['slug']}.html",
             "name": card["name"],
-            "name_bn": card["name_bn"],
             "group": card["group"],
             "subtitle": card["subtitle"],
-            "subtitle_bn": card["subtitle_bn"],
             "width": 1280,
             "height": card["height"],
         })
@@ -2564,7 +2346,6 @@ def registry_bytes(fonts: dict[str, bytes]) -> bytes:
             "render height. The cards are fluid; check.py measures them at 360, 768 and "
             "1280 CSS px."
         ),
-        "_bangla_gaps": bangla_gaps(),
         "_fonts": [
             {
                 "file": f"fonts/{FONT_SOURCES[k]['out']}",
@@ -2575,7 +2356,7 @@ def registry_bytes(fonts: dict[str, bytes]) -> bytes:
                 "bytes": len(fonts[k]),
                 "renamed": bool(FONT_SOURCES[k]["rename"]),
             }
-            for k in ("latin", "bangla", "mono")
+            for k in ("latin", "mono")
         ] + desktop_font_row(),
         "counts": {
             g: sum(1 for c in CARDS if c["group"] == g)
@@ -2628,15 +2409,10 @@ def main(argv: list[str]) -> int:
     cards = [r for r in artefacts if r.startswith("cards/")]
     total = sum(len(v) for k, v in artefacts.items() if k.startswith("cards/"))
     print(f"Wrote {len(cards)} cards, {total / 1_000_000:.1f} MB total.")
-    for key in ("latin", "bangla", "mono"):
+    for key in ("latin", "mono"):
         spec = FONT_SOURCES[key]
         size = len(artefacts[f"fonts/{spec['out']}"])
         print(f"  {spec['family']:<20} {size / 1024:6.1f} KB subset")
-    gaps = bangla_gaps()
-    print(f"Bangla left in English because neither 06_type/BANGLA-STANDARD.md nor "
-          f"06_type/bangla-strings.json holds an approved string: "
-          f"{len(gaps['name_bn'])} card names, {len(gaps['subtitle_bn'])} subtitles. "
-          "The slugs are listed under _bangla_gaps in _cards.json.")
     return 0
 
 

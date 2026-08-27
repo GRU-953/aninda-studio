@@ -549,6 +549,32 @@ def check_css(text: str, where: str, system: dict, found: Findings, aaa: bool) -
             "WCAG 2.2 success criterion 2.3.3 Animation from Interactions, level AAA, "
             "and the system's own motion rule, which is stricter",
         )
+    # A reduce block that flattens EVERY transition on a wildcard selector. This
+    # was only a PRESENCE check: a file could satisfy it and still delete the
+    # cross-fade the rule explicitly allows, which is what the snippet in
+    # references/motion.md did for months, directly under a sentence saying "a
+    # colour change may stay".
+    #
+    # Removing a transition is not reducing motion. It replaces a smooth change
+    # with a jump, which is a harsher change than the one being softened.
+    # The inner rule keeps its own closing brace, or RULE below cannot match it.
+    for block in re.findall(r"@media[^{]*prefers-reduced-motion[^{]*\{(.*?\})\s*\}",
+                            text, re.S):
+        for selector, declarations in RULE.findall(block):
+            if " ".join(selector.split()) not in ("*", "*, *::before, *::after",
+                                                  "*,*::before,*::after"):
+                continue
+            if re.search(r"(transition|animation)-duration\s*:\s*0?\.?0*(?:m?s)?\b"
+                         r"|(transition|animation)-duration\s*:\s*1ms", declarations):
+                found.fail(
+                    where,
+                    "a reduced-motion block flattens every transition on a wildcard",
+                    f"{selector} {{ {' '.join(declarations.split())[:60]} }}",
+                    "the motion rule allows a colour change to stay. A wildcard "
+                    "takes the cross-fade with the movement, so a hover that was a "
+                    "gentle tint becomes a snap. Collapse the movement duration and "
+                    "leave the colour one alone.",
+                )
     if not seen_forced_colors and RULE.search(text):
         found.note(
             where,

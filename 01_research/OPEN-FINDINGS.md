@@ -2,16 +2,16 @@
 
 **Every entry below was re-verified against the tree, and each says on what date.** Each also carries the command that was run and what it returned. Nothing here is asserted from memory, and nothing was marked fixed because it looked like the sort of thing that had probably been fixed — a claim was either reproduced or it was not.
 
-64 entries were checked in the pass of 19 August 2026. 40 more were raised later, and 5 of the original entries were re-checked — 25 August 2026, 26 August 2026, 27 August 2026. That first pass was needed because this document had drifted. It was written across three review rounds and never re-checked, and of the 64 entries it covered, **18 were already fixed** and **12 were half right** — what that pass found, on the day, kept as it was reported. A register that is wrong in either direction is worse than a short accurate one.
+64 entries were checked in the pass of 19 August 2026. 41 more were raised later, and 6 of the original entries were re-checked — 25 August 2026, 26 August 2026, 27 August 2026, 28 August 2026. That first pass was needed because this document had drifted. It was written across three review rounds and never re-checked, and of the 64 entries it covered, **18 were already fixed** and **12 were half right** — what that pass found, on the day, kept as it was reported. A register that is wrong in either direction is worse than a short accurate one.
 
 ## Where it stands
 
 | | |
 |---|---|
-| Entries re-verified | **104** |
+| Entries re-verified | **105** |
 | Still open | 30 |
 | Half stale — part reproduced, part not | 12 |
-| Already fixed, kept as a record | 60 |
+| Already fixed, kept as a record | 62 |
 | Closed earlier, by the owner's decision | 2 |
 
 Of the 42 that carry work: 41 minor · 1 not-a-defect. **No blocker.** Everything below is a thing this system says about itself that is not quite true, a guard that is narrower than its message, or a piece of work not yet done — not a defect in what it produces.
@@ -588,7 +588,7 @@ to keep the figure current would cost more than the sentence is worth.
 
 *Smallest fix.* Run pdf.py --probe-interactive once and have _pdf_sizes() read PROBE_PDF's size when the file is present, mirroring what it already does for the print PDF; otherwise leave it, since the prose is already honest about what the number is.
 
-### Already fixed, kept as a record (60)
+### Already fixed, kept as a record (62)
 
 These were true when written and are not true now. They stay because the record of what went wrong is the useful part, and because deleting them would hide that this document had drifted.
 
@@ -951,6 +951,23 @@ These were true when written and are not true now. They stay because the record 
 **Fixed, confirmed 25 August 2026.** Fixed 25 August 2026. The README now says what the table compares — what this run intended against what it managed — and tells the owner to compare the printed SHA-256 and counts against RECEIPT-EXPECTED.json by hand, which is what that file's own comment describes.
 
 *How that was checked.* `grep -c 'RECEIPT-EXPECTED' 13_plugins/figma/dist/code.js dist/ui.html src/ui.html` → `0`, `0`, `0`. `src/code.ts:1383` sets `expected: activePlan.totals`; `src/ui.html:274` reads `expected = message.expected`.
+
+#### R7-1 · The Bangla rule is enforced on the book and the cards and not on a direction spec, so unverified Bangla entered through the one door nothing watches
+
+**Fixed, confirmed 28 August 2026.** Fixed 28 August 2026, by inverting the rule rather than by adding a check at the door the finding named. The finding was right that the Bangla rule was enforced where words were SHOWN and not where they ENTERED — and with Bangla removed entirely, the question is no longer 'was this string checked?' but 'why is there Bangla here?'. That has no entry door to leave unguarded.
+
+The English-standard checker now FAILS on Bengali script anywhere outside two retained record documents and the studio's own name. The name is allowed as a STRING rather than by exempting the six files that mention it, because six exemptions for one word would each also license any other Bangla in that file.
+
+*How that was checked.* $ ./.venv/bin/python 13_plugins/claude-code/skills/aninda-review/scripts/check.py 01_research  ->  0 failures (Bangla in a retained record). The same checker on a file with an unrecorded Bengali run fails with 'Bangla in a system that ships English'. BANGLA_PENDING in that file, which listed the paths still carrying Bangla mid-removal, is empty.
+
+#### R8-1 · The research method read guideline pages and not the feeds where the two stores announce things, so an announcement nine days old was missed
+
+**Fixed, confirmed 28 August 2026.** Recorded and fixed on the same day, because the gap register had carried the fix since 26 August 2026 and the finding it asked for was never written. A gap that says 'recorded as a method finding' and points at no finding is exactly the kind of half-closed entry this register exists to prevent.
+
+*How that was checked.* $ ./.venv/bin/python -c "import json; [print(x['authority'], x['url']) for x in json.load(open('01_research/_data/external-sources.json'))['sources'] if 'whats-new' in x['url'] or 'asset-best' in x['url'] or 'icon-design' in x['url']]"
+  Apple developer.apple.com/app-store/asset-best-practices/
+  Apple developer.apple.com/design/whats-new/
+  Google developer.android.com/distribute/google-play/resources/icon-design-specifications
 
 ### Closed by the owner's decision (2)
 

@@ -154,13 +154,7 @@ FONTS = {
               "note": "Literata, by Veronika Burian and José Scaglione (TypeTogether). "
                       "An optical-size axis from 7 to 72, so the letterforms are "
                       "redrawn for the size rather than merely scaled. Its x-height "
-                      "is almost flat across that range (0.5166 to 0.5130 em), which "
-                      "is why the Bangla multiplier below barely moves."},
-    "bangla": {"family": ["Noto Serif Bengali", "serif"],
-               "licence": "SIL OFL 1.1", "rfn": None,
-               "note": "Never uppercased, never letter-spaced, never synthetically "
-                       "emboldened. A serif Bangla answers Bengali's own letterpress "
-                       "tradition rather than importing a Latin UI convention."},
+                      "is almost flat across that range (0.5166 to 0.5130 em)."},
     "mono": {"family": ["Aninda Mono", "IBM Plex Mono", "ui-monospace", "monospace"],
              "licence": "SIL OFL 1.1", "rfn": "Plex",  # the exact string in its own OFL, NOT "IBM Plex"
              "note": "IBM Plex Mono, by Mike Abbink and Bold Monday. It carries the "
@@ -171,40 +165,18 @@ FONTS = {
                      "Mono installed gets the real thing."},
 }
 
-# Measured on rendered specimens, not estimated. Bangla's reading height sits near
-# 0.62 em against Latin's 0.51, so Bangla set at the same nominal size looks
-# noticeably larger. These are the per-size corrections for THIS pairing.
-BANGLA_SCALE = {
-    "caption": 0.815, "body": 0.816, "heading": 0.817,
-    "title": 0.822, "display": 0.825,
-}
-
-# WHY THESE TWO NUMBERS, AND HOW THEY WERE ARRIVED AT
+# THE THREE BANGLA CONSTANTS THAT WERE HERE
 #
-# The মাত্রা is the horizontal stroke every Bangla word hangs from. In a serif
-# Bangla it is thin — 0.0542 em here against 0.0750 for the sans equivalent — and
-# a stroke below one device pixel does not get thinner, it gets PALER, because the
-# renderer anti-aliases it into grey. That is the real failure and it is why the
-# first two attempts to measure this were both wrong: they measured stroke
-# thickness on an upsampled 2× and 4× render, which cannot answer a 1× question
-# and disagreed with each other by a factor of three.
+# A per-size multiplier (0.815 to 0.825), a 12 px floor and a weight step below
+# 14 px. They were the only size-dependent compensation rules this system had, and
+# they left with the script they were measured for on 27 August 2026.
 #
-# Measured properly at device_scale_factor=1, as the luminance the মাত্রা actually
-# renders at on white (lower is darker; above about 110 it reads as grey, not ink):
-#
-#            weight 400   weight 500   weight 600
-#     12px       123          108           90
-#     13px        94           86           68
-#     14px        73           73           65
-#     16px        56           41           38
-#
-# It is not monotonic, because it depends on how the stroke lands on the pixel
-# grid at each size. 12px at weight 400 is the worst case anywhere in the range —
-# and stepping one weight fixes it. So the floor can stay at 12, PROVIDED the
-# weight bump below 14 is honoured. The two numbers only work together.
-BANGLA_MIN_PX = 12
-BANGLA_WEIGHT_BUMP_BELOW_PX = 14
-BANGLA_LINE_HEIGHT = 1.6
+# The derivation is NOT deleted. It was the strongest measurement in this
+# repository — the luminance the মাত্রা actually rendered at, read at
+# device_scale_factor 1, where 12 px at weight 400 came out at 123 on white and
+# read as grey rather than ink — and it now sits in the guidebook's chapter on what
+# this system does not do, reading 06_type/_data/measurements.json rather than
+# these constants. A record that depended on the tokens would have died with them.
 
 
 def colour(hexv: str) -> dict:
@@ -242,7 +214,7 @@ def primitives(proof: dict) -> dict:
             }
             for step, hexv in fam["ramp"].items()
         }
-        steps["$description"] = f"{fam['label']} ({fam['label_bn']}) — {fam['note'] or fam['kind']}"
+        steps["$description"] = f"{fam['label']} — {fam['note'] or fam['kind']}"
         steps["$extensions"] = {NS: {
             "hueOklch": fam["hue_oklch"],
             "chromaCeiling": fam["chroma_ceiling"],
@@ -297,28 +269,6 @@ def primitives(proof: dict) -> dict:
                     }
                     for name, n in TYPE_STEPS
                 },
-                "bangla-min": {
-                    "$value": dim(BANGLA_MIN_PX),
-                    "$description": (
-                        "Hard floor for Bangla — never apply the multiplier past it. At "
-                        "12px the মাত্রা renders at luminance 123 on white at weight 400, "
-                        "which reads as grey rather than ink; at weight 500 it is 108 and "
-                        "holds. So this floor is only safe together with the weight bump."
-                    ),
-                    "$extensions": {NS: {"measuredAt": "device_scale_factor=1",
-                                         "luminanceByWeight": {"400": 123, "500": 108,
-                                                               "600": 90}}},
-                },
-                "bangla-weight-bump-below": {
-                    "$value": dim(BANGLA_WEIGHT_BUMP_BELOW_PX),
-                    "$description": (
-                        "Below this size, step Bangla up one weight. Measured: 12px/400 "
-                        "fails at luminance 123, 12px/500 holds at 108, 13px/400 already "
-                        "holds at 94. The threshold is set at 14 rather than 13 because "
-                        "the relationship is not monotonic — it depends on how the stroke "
-                        "lands on the pixel grid — and one size of margin is cheap."
-                    ),
-                },
             },
         },
         "number": {
@@ -329,27 +279,6 @@ def primitives(proof: dict) -> dict:
                     "$description": "A perfect fourth. The jumps are large on purpose: "
                                     "hierarchy is unmistakable and fewer levels are "
                                     "needed to express it.",
-                },
-                "bangla": {
-                    "$description": (
-                        "How much to shrink Bangla so it looks the same size as Latin. "
-                        "Measured on rendered specimens, not estimated. Bangla's reading "
-                        "height is about 0.62 em against Latin's 0.51, so equal nominal "
-                        "sizes do not look equal. These barely move across the scale "
-                        "because Literata's x-height is nearly flat across its optical "
-                        "range — a face without that property would need a wider spread."
-                    ),
-                    **{k: {"$value": v,
-                           "$description": f"Bangla multiplier at {k} size"}
-                       for k, v in BANGLA_SCALE.items()},
-                },
-            },
-            "lineHeight": {
-                "bangla": {
-                    "$value": BANGLA_LINE_HEIGHT,
-                    "$description": ("Bangla needs more leading than Latin: the মাত্রা sits "
-                                     "above the letters and the vowel signs hang below, so "
-                                     "lines collide sooner. Collision measured at 1.25."),
                 },
             },
         },
@@ -499,7 +428,7 @@ FORCED_COLORS = {
         "color.ink.default": "CanvasText",
         # CanvasText, not GrayText. CSS Color 4 defines GrayText normatively as
         # DISABLED text, and this role paints toast bodies, empty-state messages,
-        # page subtitles, the Bangla document title and a badge background — live
+        # page subtitles, card meta lines and a badge background — live
         # content, in 33 places in the component layer. In high contrast a reader
         # has learned that colour means "inactive". It also put the measured 5.64:1
         # floor outside this system's control, because WCAG exempts inactive

@@ -25,8 +25,4 @@ final class AnindaTokensTests: XCTestCase {
         }
     }
 
-    func testBanglaFloorIsBelowItsSmallestStep() {
-        XCTAssertLessThanOrEqual(AnindaBangla.minimumPoints,
-                                 AnindaType.caption * AnindaType.rootPoints)
-    }
 }

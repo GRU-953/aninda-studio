@@ -307,7 +307,6 @@ def banner_page(layout: dict) -> str:
     address. Everything sits on an opaque ground taken from the theme."""
     icon = fill_box(load_svg("icon-512.svg"))
     latin = free_height(load_svg("wordmark-latin.svg"))
-    bangla = free_height(load_svg("wordmark-bangla.svg"))
 
     lines = [
         f'<p class="tagline">{TAGLINE}</p>',
@@ -320,7 +319,6 @@ def banner_page(layout: dict) -> str:
         '<div class="icon">' + svg_to_text(icon) + "</div>"
         '<div class="words">'
         '<div class="mark-latin">' + svg_to_text(latin) + "</div>"
-        '<div class="mark-bangla" lang="bn">' + svg_to_text(bangla) + "</div>"
         + "".join(lines) +
         "</div></div></div>"
     )
@@ -332,7 +330,6 @@ def banner_page(layout: dict) -> str:
 .icon svg{{display:block;width:100%;height:100%;}}
 .words{{display:flex;flex-direction:column;gap:{layout['stack']}px;min-width:0;color:var(--as-ink);}}
 .mark-latin svg{{display:block;height:{layout['latin']}px;width:auto;color:var(--as-ink);}}
-.mark-bangla svg{{display:block;height:{layout['bangla']}px;width:auto;color:var(--as-ink-muted);}}
 p{{margin:0;font-family:Literata,serif;color:var(--as-ink);}}
 .tagline{{font-size:{layout['tagline']}px;line-height:1.3;font-weight:600;}}
 .strap{{font-size:{layout['strap']}px;line-height:1.4;font-weight:400;color:var(--as-ink-muted);}}
@@ -346,12 +343,12 @@ p{{margin:0;font-family:Literata,serif;color:var(--as-ink);}}
 # =========================================================================
 
 
-def banner(theme: str, icon: int, latin: int, bangla: int, tagline: int,
+def banner(theme: str, icon: int, latin: int, tagline: int,
            strap: int = 0, url: int = 0, pad_block: int = 0, pad_inline: int = 0,
            pad_inline_end: int = 0, gap: int = 0, stack: int = 0,
            justify: str = "center") -> dict:
     return {
-        "theme": theme, "icon": icon, "latin": latin, "bangla": bangla,
+        "theme": theme, "icon": icon, "latin": latin,
         "tagline": tagline, "strap": strap, "url": url,
         "strapline": strap > 0, "url_line": url > 0,
         "pad_block": pad_block, "pad_inline": pad_inline,
@@ -514,7 +511,7 @@ def asset_list() -> list[dict]:
         {
             "name": "og-image.png", "w": 1200, "h": 630, "opaque": True,
             "render": ("banner", banner(
-                "dark", icon=132, latin=76, bangla=54, tagline=34, url=25,
+                "dark", icon=132, latin=76, tagline=34, url=25,
                 pad_block=72, pad_inline=88, gap=56, stack=18)),
             "purpose": "Open Graph image, and the X large summary card. One image "
                        "serves both; they take the same shape.",
@@ -524,7 +521,7 @@ def asset_list() -> list[dict]:
         {
             "name": "github-social-preview.png", "w": 1280, "h": 640, "opaque": True,
             "render": ("banner", banner(
-                "dark", icon=136, latin=78, bangla=56, tagline=35, url=26,
+                "dark", icon=136, latin=78, tagline=35, url=26,
                 pad_block=76, pad_inline=92, gap=58, stack=18)),
             "purpose": "Repository social preview on GitHub.",
             "spec": "GitHub repository social preview, 1280 x 640 px",
@@ -533,7 +530,7 @@ def asset_list() -> list[dict]:
         {
             "name": "x-header.png", "w": 1500, "h": 500, "opaque": True,
             "render": ("banner", banner(
-                "dark", icon=104, latin=58, bangla=42, tagline=26, url=20,
+                "dark", icon=104, latin=58, tagline=26, url=20,
                 pad_block=96, pad_inline=96, gap=48, stack=12)),
             "purpose": "Header image on an X profile. Everything is kept 96 px "
                        "clear of the top and bottom, past the 60 px X says it may crop.",
@@ -543,7 +540,7 @@ def asset_list() -> list[dict]:
         {
             "name": "linkedin-personal-banner.png", "w": 1584, "h": 396, "opaque": True,
             "render": ("banner", banner(
-                "dark", icon=96, latin=54, bangla=38, tagline=24, url=18,
+                "dark", icon=96, latin=54, tagline=24, url=18,
                 pad_block=56, pad_inline=96, gap=44, stack=10)),
             "purpose": "Cover image on a personal LinkedIn profile.",
             "spec": VERIFIED["linkedin-personal-banner"]["spec"],
@@ -552,7 +549,7 @@ def asset_list() -> list[dict]:
         {
             "name": "linkedin-company-cover.png", "w": 4200, "h": 700, "opaque": True,
             "render": ("banner", banner(
-                "dark", icon=168, latin=96, bangla=68, tagline=44, url=32,
+                "dark", icon=168, latin=96, tagline=44, url=32,
                 pad_block=120, pad_inline=260, pad_inline_end=1700, gap=76, stack=20,
                 justify="flex-start")),
             "purpose": "Cover image on a LinkedIn Page. The content is held to the "
@@ -564,7 +561,7 @@ def asset_list() -> list[dict]:
         {
             "name": "README-header-light.png", "w": 1280, "h": 320, "opaque": True,
             "render": ("banner", banner(
-                "light", icon=124, latin=62, bangla=44, tagline=28, strap=20,
+                "light", icon=124, latin=62, tagline=28, strap=20,
                 pad_block=52, pad_inline=72, gap=48, stack=12)),
             "purpose": "Header image for a README, shown to readers using the light theme.",
             "spec": "No platform publishes a size for this. 1280 x 320 was chosen "
@@ -576,7 +573,7 @@ def asset_list() -> list[dict]:
         {
             "name": "README-header-dark.png", "w": 1280, "h": 320, "opaque": True,
             "render": ("banner", banner(
-                "dark", icon=124, latin=62, bangla=44, tagline=28, strap=20,
+                "dark", icon=124, latin=62, tagline=28, strap=20,
                 pad_block=52, pad_inline=72, gap=48, stack=12)),
             "purpose": "Header image for a README, shown to readers using the dark theme.",
             "spec": "No platform publishes a size for this. 1280 x 320 was chosen "

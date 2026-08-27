@@ -55,15 +55,15 @@ and their alert both say the figures are examples rather than readings.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 13 chapters in English and Bangla, one self-contained HTML file (15.1 MB) that needs no network, plus a 1.2 MB PDF |
-| `07_tokens/` | The design tokens: DTCG source, and 66 CSS custom properties generated from it |
+| `09_guidebook/` | **The guidebook.** 13 chapters in English and Bangla, one self-contained HTML file (8.9 MB) that needs no network, plus a 1.2 MB PDF |
+| `07_tokens/` | The design tokens: DTCG source, and 57 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
-| `04_mark/` | 18 mark, wordmark and icon files |
+| `04_mark/` | 22 mark, wordmark and icon files |
 | `10_assets/` | 20 ready-made images at exact platform sizes |
 | `11_site/` | The website, generated from the tokens |
 | `12_packages/` | The tokens as an npm package and a Python package |
 | `13_plugins/` | A Figma plugin, a Claude Code plugin, and the Claude Design bundle |
-| `15_native/` | Swift and Kotlin — the tokens, 16 SwiftUI components, a Compose theme, and the 8 patterns as screens on both, 63 files in all, compiled by the build that gates them |
+| `15_native/` | Swift and Kotlin — the tokens, 16 SwiftUI components, a Compose theme, and the 8 patterns as screens on both, 62 files in all, compiled by the build that gates them |
 | `14_delivery/` | The two store asset packages — 45 files for the Apple App Store and Google Play, each citing the page its size came from |
 | `01_research/` | What was checked, when, and against which source — including what could not be verified |
 
@@ -132,7 +132,7 @@ That step ends by checking the manifest, so what it writes is a bundle Figma wil
 load. `--code-only` compiles the same artefacts and stops before that check; it is
 what continuous integration runs to compare `dist/` against what is committed.
 
-Two generators are deliberately not in that chain: `06_type/specimen.py` — one-off: the type specimen pages that fed the typeface decision; `06_type/review_bangla.py` — a review instrument, run when a Bangla reader is available, not part of the build.
+One generators are deliberately not in that chain: `06_type/specimen.py` — one-off: the type specimen pages that fed the typeface decision.
 
 Every generator is fail-closed: if a check does not pass, it writes nothing at
 all. A half-written token set that looks plausible is worse than none.

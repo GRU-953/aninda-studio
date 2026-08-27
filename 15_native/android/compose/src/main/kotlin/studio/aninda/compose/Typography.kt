@@ -6,7 +6,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import studio.aninda.tokens.AnindaBangla
+
+/** The line height this scale is set at. */
+private const val LINE_HEIGHT = 1.55f
 
 /**
  * Material's type slots, filled with THIS system's scale rather than Material's.
@@ -21,16 +23,12 @@ import studio.aninda.tokens.AnindaBangla
  */
 public fun anindaTypography(
     family: FontFamily = FontFamily.Default,
-    script: AnindaScript = AnindaScript.LATIN,
 ): Typography {
-    val m = script.multiplier
     fun style(sp: Float, weight: FontWeight = FontWeight.Normal) = TextStyle(
         fontFamily = family,
         fontWeight = weight,
-        fontSize = (sp * m).sp,
-        // Bangla needs more room between lines than Latin at the same size,
-        // because its matra sits above the letters and its descenders below.
-        lineHeight = (sp * m * script.lineHeight).sp,
+        fontSize = sp.sp,
+        lineHeight = (sp * LINE_HEIGHT).sp,
     )
     return Typography(
         displayLarge = style(67.34f), displayMedium = style(50.52f),
@@ -47,24 +45,15 @@ public fun anindaTypography(
     )
 }
 
-/**
- * Which script a tree is set in, and what that does to its size.
- *
- * The multipliers were measured on rendered specimens rather than estimated:
- * Bangla's reading height sits near 0.62 em against Latin's 0.51, so equal nominal
- * sizes do not look equal.
- *
- * Material classifies Bangla as a MEDIUM language-height script needing roughly
- * 7 per cent taller line heights at the same nominal size. These figures are not
- * that measurement and are not offered as agreeing with it: this system's Bangla
- * leading is 1.6 against Latin's 1.55, which is +3.2 per cent, and the Bangla is
- * also set smaller — so its absolute line box is smaller, not larger. Both numbers
- * are published; neither confirms the other.
- */
-public enum class AnindaScript(
-    public val multiplier: Float,
-    public val lineHeight: Float,
-) {
-    LATIN(1.0f, 1.55f),
-    BANGLA(AnindaBangla.BODY, 1.6f),
-}
+// A `script` PARAMETER AND AN `AnindaScript` ENUM WERE HERE, and removing them is
+// a source-breaking change to a published API rather than an internal tidy — which
+// is why the package version goes to 2.0.0 in the same body of work.
+//
+// The enum carried two cases, LATIN and BANGLA, and Bangla's multiplier and
+// leading with them. What it recorded is worth keeping: Material classifies Bangla
+// as a MEDIUM language-height script needing roughly 7 per cent taller line
+// heights at the same nominal size, and this system's own measurement did NOT
+// agree with that figure — its Bangla leading was 1.6 against Latin's 1.55, +3.2
+// per cent, and the Bangla was also set smaller, so its absolute line box was
+// smaller rather than larger. Both numbers were published and neither was offered
+// as confirming the other. 06_type/MEASUREMENTS.md keeps the measurement.

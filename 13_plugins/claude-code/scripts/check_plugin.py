@@ -356,6 +356,35 @@ SPELLED = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven",
            8: "eight", 9: "nine", 10: "ten", 11: "eleven", 12: "twelve"}
 
 
+def check_reference_files(problems: Problems) -> None:
+    """Every `*.svg` a reference document names must be a file the skill ships.
+
+    references/icons.md described the SUPERSEDED icon decision for two weeks and
+    named two artefacts the mark build had deleted — `icon-1088-watch.svg` and
+    `icon-appstore-square-1024.svg`. Nothing noticed. references/colour.md is
+    gated against the tokens and references/bangla.md was gated against the string
+    register, so the two documents with a mechanical check stayed true and the two
+    without drifted.
+
+    A code span naming a file is a claim about what is in the bundle, and it is
+    cheap to check.
+    """
+    marks = SKILLS / "aninda-brand" / "assets" / "marks"
+    have = {p.name for p in marks.glob("*.svg")} if marks.is_dir() else set()
+    named, missing = set(), []
+    for doc in sorted((SKILLS / "aninda-brand" / "references").glob("*.md")):
+        for name in re.findall(r"`([A-Za-z0-9._-]+\.svg)`", doc.read_text("utf-8")):
+            named.add(name)
+            if name not in have:
+                missing.append(f"{doc.name} names {name}, which the skill does not ship")
+    if missing:
+        for m in sorted(set(missing)):
+            problems.wrong(m)
+    else:
+        problems.ok(f"every one of the {len(named)} SVG files named in "
+                    f"references/*.md is in assets/marks")
+
+
 def check_rule_count(problems: Problems) -> None:
     """SKILL.md's heading must count the rules under it.
 
@@ -687,6 +716,7 @@ def main() -> int:
     check_bundled_copies(problems)
     check_ofl_template(problems)
     check_rule_count(problems)
+    check_reference_files(problems)
     check_token_names(problems)
     check_colour_reference(problems)
     check_bangla_document(problems)

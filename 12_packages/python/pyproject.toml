@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aninda-studio-tokens"
-version = "1.0.0"
+version = "2.0.0"
 description = "The Aninda Studio design tokens: colour, type, space, shape and motion, in four themes — light, dark, and a high-contrast pair. Every colour pairing was measured rather than chosen, against WCAG 2.2 AA in the ordinary themes and AAA in the high-contrast ones."
 readme = "README.md"
 requires-python = ">=3.9"

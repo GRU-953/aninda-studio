@@ -125,10 +125,8 @@ export interface ComponentSpec {
 
 export interface CardFrameSpec {
   name: string;
-  nameBangla: string;
   group: string;
   subtitle: string;
-  subtitleBangla: string;
   width: number;
   height: number;
   path: string;
@@ -378,18 +376,14 @@ export function buildPlan(input: RawInput): Plan {
   });
 
   // --- Text styles ----------------------------------------------------------
-  const banglaMin = primitivePx['dimension/type/bangla-min'];
-  const banglaBumpBelow = primitivePx['dimension/type/bangla-weight-bump-below'];
-  const banglaLineHeight = primitiveNumber['number/lineHeight/bangla'];
-
-  const steps: { key: string; label: string; banglaScaleKey: string }[] = [
-    { key: 'display', label: 'Display', banglaScaleKey: 'display' },
-    { key: 'h1', label: 'H1', banglaScaleKey: 'title' },
-    { key: 'h2', label: 'H2', banglaScaleKey: 'title' },
-    { key: 'h3', label: 'H3', banglaScaleKey: 'heading' },
-    { key: 'lead', label: 'Lead', banglaScaleKey: 'heading' },
-    { key: 'body', label: 'Body', banglaScaleKey: 'body' },
-    { key: 'caption', label: 'Caption', banglaScaleKey: 'caption' },
+  const steps: { key: string; label: string }[] = [
+    { key: 'display', label: 'Display' },
+    { key: 'h1', label: 'H1' },
+    { key: 'h2', label: 'H2' },
+    { key: 'h3', label: 'H3' },
+    { key: 'lead', label: 'Lead' },
+    { key: 'body', label: 'Body' },
+    { key: 'caption', label: 'Caption' },
   ];
 
   const textStyles: TextStyleSpec[] = [];
@@ -412,7 +406,7 @@ export function buildPlan(input: RawInput): Plan {
     needFont('Literata', 'Regular', 'every Latin text style');
     textStyles.push({
       name: `Latin/${step.label}`,
-      description: `${px} px, from ${varName}. Line height is left on Figma's automatic setting, because the token set defines a line height for Bangla only.`,
+      description: `${px} px, from ${varName}. Line height is left on Figma's automatic setting: the token set defines no line height.`,
       family: 'Literata',
       style: 'Regular',
       fontSize: px,
@@ -422,37 +416,11 @@ export function buildPlan(input: RawInput): Plan {
     });
   }
 
-  for (const step of steps) {
-    const latinPx = primitivePx[`dimension/type/${step.key}`];
-    if (typeof latinPx !== 'number') continue;
-    const scale = primitiveNumber[`number/scale/bangla/${step.banglaScaleKey}`];
-    const raw = round(latinPx * scale, 4);
-    const clamped = raw < banglaMin;
-    const size = clamped ? banglaMin : raw;
-    const heavier = size < banglaBumpBelow;
-    const style = heavier ? 'Medium' : 'Regular';
-    needFont('Noto Serif Bengali', style, 'Bangla text styles');
-    const notes: string[] = [
-      `${latinPx} px Latin times the measured Bangla multiplier ${scale} gives ${raw} px.`,
-    ];
-    if (clamped) notes.push(`That is below the ${banglaMin} px Bangla floor, so it is held at ${banglaMin} px.`);
-    if (heavier) {
-      notes.push(
-        `Below ${banglaBumpBelow} px the Bangla is set one weight heavier, so this style is Medium rather than Regular.`
-      );
-    }
-    notes.push(`Line height ${banglaLineHeight}, from number/lineHeight/bangla.`);
-    textStyles.push({
-      name: `Bangla/${step.label}`,
-      description: notes.join(' '),
-      family: 'Noto Serif Bengali',
-      style,
-      fontSize: size,
-      lineHeightPercent: round(banglaLineHeight * 100, 2),
-      bindFontSize: clamped ? 'dimension/type/bangla-min' : null,
-      bindFontFamily: 'fontFamily/bangla',
-    });
-  }
+  // SEVEN BANGLA TEXT STYLES WERE BUILT HERE, and what they encoded is worth
+  // recording: each was the Latin size times a measured multiplier, clamped up to a
+  // 12 px floor, and set one weight heavier below 14 px — with the reason written
+  // into every style's own description so a designer reading the panel in Figma saw
+  // why the number was what it was. They left with the Bangla on 27 August 2026.
 
   for (const step of [
     { key: 'body', label: 'Body' },
@@ -477,8 +445,8 @@ export function buildPlan(input: RawInput): Plan {
   knownGaps.push({
     what: 'Latin and monospaced text styles carry no line height.',
     why:
-      'The token set defines number/lineHeight/bangla and nothing for Latin. Figma’s automatic line height ' +
-      'is used rather than a number I would have had to invent.',
+      'The token set defines no line height at all. There was one, for Bangla, and it went with the Bangla. ' +
+      'Figma’s automatic line height is used rather than a number I would have had to invent.',
   });
 
   // --- Effect styles --------------------------------------------------------
@@ -554,44 +522,30 @@ export function buildPlan(input: RawInput): Plan {
 
   const components: ComponentSpec[] = [];
 
-  const buttonVariants: { tone: string; script: string; label: string; role: string; source: string }[] = [
+  // Two variants, not four. Each tone carried a Latin and a Bangla label, and the
+  // Bangla halves left on 27 August 2026. The Script property goes with them: a
+  // variant property with one value is a property in name only.
+  const buttonVariants: { tone: string; label: string; role: string; source: string }[] = [
     {
       tone: 'Accent',
-      script: 'Latin',
       label: 'Save the entry',
       role: 'color/accent/default',
       source: 'ENGLISH-STANDARD.md, the interface-text rule that a button is a verb with its object',
     },
     {
-      tone: 'Accent',
-      script: 'Bangla',
-      label: 'লেখাটি সংরক্ষণ করুন',
-      role: 'color/accent/default',
-      source: 'BANGLA-STANDARD.md, verified string bt-1',
-    },
-    {
       tone: 'Danger',
-      script: 'Latin',
       label: 'Delete the file',
       role: 'color/status/danger',
-      source: 'the plain-English pair of the verified Bangla string bt-3',
-    },
-    {
-      tone: 'Danger',
-      script: 'Bangla',
-      label:
-        'ফাইলটি মুছে ফেলুন',
-      role: 'color/status/danger',
-      source: 'BANGLA-STANDARD.md, verified string bt-3',
+      source: 'ENGLISH-STANDARD.md, the same rule — a verb with its object',
     },
   ];
 
   for (const v of buttonVariants) {
     components.push({
       set: 'Button',
-      name: `Tone=${v.tone}, Script=${v.script}`,
+      name: `Tone=${v.tone}`,
       kind: 'button',
-      variantProps: { Tone: v.tone, Script: v.script },
+      variantProps: { Tone: v.tone },
       width: 0,
       height: comfortable,
       paddingX: space4,
@@ -604,7 +558,7 @@ export function buildPlan(input: RawInput): Plan {
       lines: [
         {
           text: v.label,
-          textStyle: v.script === 'Bangla' ? 'Bangla/Body' : 'Latin/Body',
+          textStyle: 'Latin/Body',
           colourRole: 'color/accent/on',
           source: v.source,
         },
@@ -646,13 +600,13 @@ export function buildPlan(input: RawInput): Plan {
           text: 'Name',
           textStyle: 'Latin/Caption',
           colourRole: 'color/ink/muted',
-          source: 'BANGLA-STANDARD.md verified string gb-2 (নাম), in its English pair',
+          source: 'ENGLISH-STANDARD.md — a field label is the thing asked for, not an instruction',
         },
         {
-          text: 'নাম',
-          textStyle: 'Bangla/Body',
+          text: 'Aninda Sundar Howlader',
+          textStyle: 'Latin/Body',
           colourRole: 'color/ink/default',
-          source: 'BANGLA-STANDARD.md, verified string gb-2',
+          source: 'a filled field, so the input shows its own text colour and not a placeholder',
         },
       ],
     });
@@ -744,17 +698,6 @@ export function buildPlan(input: RawInput): Plan {
     height: Number(c.height),
     path: String(c.path),
   }));
-
-  const missingBanglaName = cardFrames.filter((c) => c.nameBangla === '').length;
-  const missingBanglaSubtitle = cardFrames.filter((c) => c.subtitleBangla === '').length;
-  if (missingBanglaName > 0 || missingBanglaSubtitle > 0) {
-    knownGaps.push({
-      what: `${missingBanglaName} card frames carry no Bangla name and ${missingBanglaSubtitle} carry no Bangla subtitle.`,
-      why:
-        'BANGLA-STANDARD.md holds a verified string for each of the others and none for these. Writing new Bangla ' +
-        'to fill the space is not allowed, so those frames stay English-only and are counted here instead.',
-    });
-  }
 
   const totals = {
     collections: collections.length,

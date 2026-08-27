@@ -78,22 +78,6 @@ public enum AnindaType {
     public static let display: Double = 4.2087
 }
 
-/// Bangla is set smaller than Latin so the two look the same size, and
-/// the multipliers were measured on rendered specimens rather than
-/// estimated. Below `weightBumpBelowPoints` the weight steps up, because
-/// the matra thins out on the pixel grid before the glyph does — the two
-/// rules only work together.
-public enum AnindaBangla {
-    public static let caption: Double = 0.815
-    public static let body: Double = 0.816
-    public static let heading: Double = 0.817
-    public static let title: Double = 0.822
-    public static let display: Double = 0.825
-    public static let minimumPoints: Double = 12
-    public static let weightBumpBelowPoints: Double = 14
-    public static let banglaLineHeight: Double = 1.6
-}
-
 public enum AnindaMotion {
     public static let colourMilliseconds: Double = 120
     public static let moveMilliseconds: Double = 220
