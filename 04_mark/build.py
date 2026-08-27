@@ -102,6 +102,28 @@ BANGLA_FONT = FONTS / "bangla" / "notoserifbengali" / "NotoSerifBengali[wdth,wgh
 WORD_LATIN = "aninda studio"
 WORD_BANGLA = "অনিন্দ্য স্টুডিও"
 
+# The Latin wordmark's own axis settings. Named here because the ligature gate
+# proves shaping under the same conditions the artwork is drawn at, and a second
+# copy of these two numbers would let the gate and the drawing drift apart.
+LATIN_WORDMARK_AXES = {"opsz": 72, "wght": 500}
+
+# The ligature gate's probes. Single words, no spaces, so the glyph count is clean.
+#
+# Each must collapse AND must produce a glyph that no code point maps to. The
+# second half is the half that matters, and it is why "fi" is NOT on this list:
+# Literata's cmap maps U+FB01 straight to the `fi` glyph, so a shaper that did
+# nothing but look up code points could still produce that collapse. U+FB03 and
+# U+FB04 are absent from the same cmap, so `f_f_i` and `f_f_l` can only have
+# arrived through a substitution. Measured 27 August 2026:
+#
+#     cmap maps 1163 code points onto 1163 distinct glyph ids
+#     U+FB01 -> 'fi' gid 513        (reachable — useless as evidence)
+#     U+FB03 -> None                (unreachable — `f_f_i` gid 505 is evidence)
+#     'office'        6 cp ->  4 glyphs, unreachable [505]
+#     'fi'            2 cp ->  1 glyph,  unreachable []
+#     'aninda studio' 13 cp -> 13 glyphs, unreachable []
+LIGATURE_PROBES = ("office", "difficult", "waffle")
+
 
 class Fail(Exception):
     """A check did not pass. Nothing is written."""
@@ -270,8 +292,44 @@ def naive_to_glyphs(text: str, font_path: Path) -> list[int]:
     return [order.get(cmap[ord(c)], 0) for c in text if ord(c) in cmap]
 
 
+def shaped_glyph_ids(text: str, font_path: Path,
+                     variations: dict | None = None) -> list[int]:
+    """The glyph ids HarfBuzz produces, at the axis settings the artwork uses."""
+    import uharfbuzz as hb
+    font = hb.Font(hb.Face(hb.Blob.from_file_path(str(font_path))))
+    if variations:
+        font.set_variations(variations)
+    buf = hb.Buffer()
+    buf.add_str(text)
+    buf.guess_segment_properties()
+    hb.shape(font, buf)
+    return [g.codepoint for g in buf.glyph_infos]
+
+
+def cmap_glyph_ids(font_path: Path) -> set[int]:
+    """Every glyph id that some code point maps to directly.
+
+    A glyph OUTSIDE this set cannot be reached by looking up code points at all,
+    so a shaped run containing one is evidence that substitution happened. This
+    is the difference between a ligature that proves something and one that does
+    not: a precomposed ligature with its own code point proves nothing.
+    """
+    from fontTools.ttLib import TTFont
+    tt = TTFont(str(font_path))
+    order = {n: i for i, n in enumerate(tt.getGlyphOrder())}
+    return {order[n] for n in tt.getBestCmap().values() if n in order}
+
+
 def shaping_gates() -> list[str]:
-    """Five gates, all of which must pass before a single byte is written."""
+    """Every shaping gate. All must pass before a single byte is written.
+
+    Two of these were Bangla until 27 August 2026, when the kit stopped shipping
+    it. The Latin wordmark cannot do their job: "aninda studio" shapes to 13
+    glyphs from 13 code points and the naive cmap path returns the SAME 13, so it
+    passes identically whether or not shaping happens. That is precisely the hole
+    the Bangla gates were covering, and it is why the replacements use probe words
+    rather than the artwork.
+    """
     import uharfbuzz as hb
     notes = []
 
@@ -286,35 +344,41 @@ def shaping_gates() -> list[str]:
             raise Fail(f"{label}: shaping produced zero advance width")
         notes.append(f"{label}: {len(text)} code points → {n} glyphs, advance {adv:.1f}")
 
-    # G4 — conjuncts actually formed.
-    _, _, n_shaped = shape_to_path(WORD_BANGLA, BANGLA_FONT, 100.0)
-    n_codepoints = len([c for c in WORD_BANGLA if c != " "])
-    if n_shaped >= n_codepoints:
-        raise Fail(
-            f"Bangla shaping produced {n_shaped} glyphs from {n_codepoints} code "
-            f"points — no conjunct formed. HarfBuzz is present but the font's GSUB "
-            f"table is not being applied."
-        )
-    notes.append(f"conjuncts formed: {n_codepoints} code points → {n_shaped} glyphs")
+    # G4 — a ligature actually formed, which is what proves GSUB is applied.
+    # Two assertions per probe, and the second is the one that carries the weight.
+    reachable = cmap_glyph_ids(LATIN_FONT)
+    for probe in LIGATURE_PROBES:
+        ids = shaped_glyph_ids(probe, LATIN_FONT, LATIN_WORDMARK_AXES)
+        if len(ids) >= len(probe):
+            raise Fail(
+                f"{probe!r} shaped to {len(ids)} glyphs from {len(probe)} code "
+                f"points — no ligature formed. HarfBuzz is present but the font's "
+                f"GSUB table is not being applied.")
+        made = sorted(g for g in ids if g not in reachable)
+        if not made:
+            raise Fail(
+                f"{probe!r} collapsed to {len(ids)} glyphs, but every one of them "
+                f"is reachable straight from the cmap, so looking code points up "
+                f"one at a time could have produced this. The collapse is real and "
+                f"it is not evidence of substitution.")
+        notes.append(f"ligature formed: {probe}, {len(probe)} code points → "
+                     f"{len(ids)} glyphs, one of them gid {made[0]}, which no code "
+                     f"point maps to")
 
     # G5 — THE NEGATIVE CONTROL. The naive path must produce a different result.
     # A positive control alone cannot catch a fallback shaper that silently does
     # nothing; this can.
-    naive = naive_to_glyphs(WORD_BANGLA, BANGLA_FONT)
-    import uharfbuzz as _hb
-    blob = _hb.Blob.from_file_path(str(BANGLA_FONT))
-    buf = _hb.Buffer(); buf.add_str(WORD_BANGLA); buf.guess_segment_properties()
-    f = _hb.Font(_hb.Face(blob)); _hb.shape(f, buf)
-    shaped = [g.codepoint for g in buf.glyph_infos]
+    probe = LIGATURE_PROBES[0]
+    naive = naive_to_glyphs(probe, LATIN_FONT)
+    shaped = shaped_glyph_ids(probe, LATIN_FONT, LATIN_WORDMARK_AXES)
     if naive == shaped:
         raise Fail(
-            "NEGATIVE CONTROL FAILED: mapping each code point straight through the "
-            "cmap produced exactly the same glyphs as HarfBuzz. Shaping is not "
-            "happening, and the Bangla would be drawn wrong in a way that still "
-            "looks like Bangla."
-        )
+            f"NEGATIVE CONTROL FAILED: mapping each code point of {probe!r} "
+            f"straight through the cmap produced exactly the same glyphs as "
+            f"HarfBuzz. Shaping is not happening, and every ligature in the "
+            f"wordmark would be drawn as separate letters.")
     notes.append(f"negative control passed: naive {len(naive)} glyphs ≠ shaped "
-                 f"{len(shaped)} glyphs")
+                 f"{len(shaped)} glyphs for {probe}")
     return notes
 
 
@@ -866,7 +930,7 @@ def main() -> int:
 
     # --- wordmarks, from real shaped outlines ------------------------------
     for name, text, font, var in (
-        ("wordmark-latin", WORD_LATIN, LATIN_FONT, {"opsz": 72, "wght": 500}),
+        ("wordmark-latin", WORD_LATIN, LATIN_FONT, LATIN_WORDMARK_AXES),
         ("wordmark-bangla", WORD_BANGLA, BANGLA_FONT, {"wght": 500}),
     ):
         try:
@@ -1109,6 +1173,46 @@ def main() -> int:
             "rule": (f"stroke {STROKE_REGULAR:g} at {STROKE_SWITCH_PX} px and "
                      f"above; stroke {STROKE_HEAVY:g} below"),
             "stroke_by_file": stroke_by_file,
+        },
+        "shaping_proof": {
+            "gate": ("Three probe words are shaped through HarfBuzz at the "
+                     "wordmark's own axis settings. Each must collapse to fewer "
+                     "glyphs than it has code points, and each must produce a glyph "
+                     "that no code point maps to — the second condition being the "
+                     "one that distinguishes a substitution from a lookup. A "
+                     "negative control then requires the naive cmap path to differ "
+                     "from the shaped result."),
+            "probes": list(LIGATURE_PROBES),
+            "axes": dict(LATIN_WORDMARK_AXES),
+            "why_not_fi": ("'fi' collapses too, and proves nothing: Literata's cmap "
+                           "maps U+FB01 straight to that glyph, so a shaper doing "
+                           "nothing but code-point lookup could produce it. U+FB03 "
+                           "and U+FB04 are absent from that cmap, which is what "
+                           "makes f_f_i and f_f_l evidence."),
+            "why_not_the_wordmark": ("'aninda studio' shapes to 13 glyphs from 13 "
+                                     "code points and the naive path returns the "
+                                     "same 13, so the artwork passes either way. "
+                                     "The proof has to use something that does not."),
+            "superseded": [{
+                "decision": ("The shaping proof was Bangla. Two gates ran the Bangla "
+                             "wordmark through HarfBuzz — one requiring conjuncts to "
+                             "form, one a negative control — because Bangla reorders "
+                             "pre-base vowels and joins consonants, so glyphs pulled "
+                             "out by code point produce nonsense that still looks "
+                             "like Bangla to someone who cannot read it."),
+                "taken": "14 August 2026",
+                "superseded": "27 August 2026",
+                "why": "This kit no longer ships Bangla.",
+                "what_is_preserved": ("The mechanism: that HarfBuzz is present, that "
+                                      "the font's GSUB table is applied, and that the "
+                                      "naive path is measurably different."),
+                "what_is_lost": ("The stakes. A Latin ligature is cosmetic, so a "
+                                 "shaper failing here produces ugly type rather than "
+                                 "wrong words. The Bangla gate caught a failure that "
+                                 "changed meaning. This is a weaker proof of a "
+                                 "smaller consequence, and it is recorded rather "
+                                 "than hidden."),
+            }],
         },
         "clear_space": "half the mark's own height on all four sides",
         "safe_field": SAFE,
