@@ -3,7 +3,6 @@
 // library here only so the other two modules can depend on it in one graph.
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
 }
 
 android {
@@ -14,4 +13,9 @@ android {
     sourceSets["main"].manifest.srcFile("src/main/AndroidManifest.xml")
 }
 
-kotlin { explicitApi() }
+// `kotlin { explicitApi() }` was here. It came from the standalone Kotlin plugin's
+// extension, which AGP 9 replaces, and whether the built-in one exposes the same
+// call is not something this machine can find out. Removed rather than guessed at:
+// kotlinc does not enforce explicit API today either, so no check is lost — the
+// sources declare `public` on everything regardless. Worth restoring once somebody
+// with a JDK can confirm the DSL.

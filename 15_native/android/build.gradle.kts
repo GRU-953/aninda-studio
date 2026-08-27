@@ -6,8 +6,12 @@
 // is a pre-release channel whose interfaces may change without warning, so this
 // system does not build against it.
 plugins {
+    // No org.jetbrains.kotlin.android. AGP 9.0 carries Kotlin support built in and
+    // REFUSES the standalone plugin outright — "no longer required for Kotlin
+    // support since AGP 9.0". Kotlin's own version comes from AGP; only the Compose
+    // compiler plugin is still applied separately, and it is versioned with the
+    // Kotlin AGP ships.
     id("com.android.library") version "9.0.0" apply false
-    id("org.jetbrains.kotlin.android") version "2.4.10" apply false
     id("org.jetbrains.kotlin.plugin.compose") version "2.4.10" apply false
 }
 
