@@ -1210,11 +1210,37 @@ def ignored(paths: list[Path]) -> set[Path]:
 
 
 def compare(out: dict[Path, bytes]) -> list[str]:
-    """Both directions. A file the build did not write is the drift that ships."""
+    """Both directions. A file the build did not write is the drift that ships.
+
+    Text is compared byte for byte. RASTERS ARE NOT, and this file had to learn the
+    same lesson 10_assets/build.py already carries in writing.
+
+    A browser does not rasterise identically across platforms. The committed PNGs
+    are made on macOS; on the first CI run of this gate, five differed on Ubuntu —
+    google-play/store-listing/icon-512.png and all four Android screenshot frames.
+    On one machine the render IS deterministic, built twice with the same sha256,
+    so a byte gate is meaningful locally and impossible in CI. 10_assets hit that
+    wall on 19 August 2026, wrote down why, and moved to a structural comparison;
+    this build was written a week later and byte-compared anyway.
+
+    So rasters are compared by what a rasteriser cannot change and a redrawn mark
+    cannot hide: dimensions, ink coverage to three decimals, and the bounding box of
+    every non-background pixel. _ink_geometry is 10_assets' own function, reached
+    through _assets_module() rather than copied, so both packages measure identically
+    by construction. The four frames carry TEXT, which is where the platform
+    difference is largest — a font falls back differently — and their geometry still
+    holds, because the hatch and the border dominate the ink.
+    """
     problems = []
+    assets = _assets_module()
+    ink, drifted = assets._ink_geometry, assets.raster_drift
     for path, data in sorted(out.items()):
         if not path.exists():
             problems.append(f"{path.relative_to(ROOT)} is missing")
+        elif path.suffix.lower() == ".png":
+            moved = drifted(ink(data), ink(path.read_bytes()))
+            if moved:
+                problems.append(f"{path.relative_to(ROOT)}: {moved}")
         elif path.read_bytes() != data:
             problems.append(f"{path.relative_to(ROOT)} differs from the build")
     on_disk = [p for root in (APPLE, PLAY) if root.is_dir()

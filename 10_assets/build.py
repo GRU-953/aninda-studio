@@ -780,6 +780,38 @@ def _ink_geometry(data: bytes) -> tuple:
     return (w, h, coverage, frame)
 
 
+def raster_drift(want: tuple, got: tuple) -> str | None:
+    """Has the artwork moved? A sentence if so, None if not.
+
+    One function because the comparison was written twice — here and in
+    14_delivery/build.py — and the second copy carried a fault the first was only
+    lucky to avoid. The expression read
+
+        abs(want[2] - got[2]) > 0.01 or want[3] is None or got[3] is None or ...
+
+    which flags an image whose bounding box is None. A box is None when there is no
+    ink at all, and a flat layer legitimately has none on BOTH sides: Android's
+    background and monochrome mipmaps are flat, and every one of them failed while
+    reporting identical figures — "coverage 0.0 and box None on disk against 0.0
+    and None from the build". No asset in 10_assets is flat, so the fault sat here
+    unreachable until a package with flat layers reused it.
+
+    None on both sides is AGREEMENT. None on one side and a box on the other is the
+    real fault it was reaching for: ink appeared, or all of it vanished.
+    """
+    if want[:2] != got[:2]:
+        return f"{got[0]}x{got[1]} on disk, {want[0]}x{want[1]} from the source"
+    if abs(want[2] - got[2]) > 0.01:
+        return (f"ink coverage {got[2]} on disk against {want[2]} from the source")
+    if (want[3] is None) != (got[3] is None):
+        return ("all the ink appeared or vanished: box "
+                f"{got[3]} on disk against {want[3]} from the source")
+    if want[3] is not None and max(abs(x - y) for x, y in zip(want[3], got[3])) > 0.02:
+        return (f"the artwork has moved — box {got[3]} on disk against {want[3]} "
+                f"from the source")
+    return None
+
+
 def _ico_planes(raw: bytes):
     """Every plane inside an .ico, measured the way the PNGs are measured.
 
@@ -856,16 +888,9 @@ def _structural_check(out: dict) -> list[str]:
                             f"ink coverage {got[2]} and box {got[3]} on disk against "
                             f"{want[2]} and {want[3]} from the marks")
         elif name.endswith(".png"):
-            want, got = _ink_geometry(data), _ink_geometry(on_disk)
-            if want[:2] != got[:2]:
-                problems.append(f"{name}: {got[0]}x{got[1]} on disk, "
-                                f"{want[0]}x{want[1]} from the marks")
-            elif (abs(want[2] - got[2]) > 0.01
-                  or want[3] is None or got[3] is None
-                  or max(abs(a - b) for a, b in zip(want[3], got[3])) > 0.02):
-                problems.append(
-                    f"{name}: the artwork has moved — ink coverage {got[2]} and box "
-                    f"{got[3]} on disk against {want[2]} and {want[3]} from the marks")
+            drift = raster_drift(_ink_geometry(data), _ink_geometry(on_disk))
+            if drift:
+                problems.append(f"{name}: {drift}")
     return problems
 
 

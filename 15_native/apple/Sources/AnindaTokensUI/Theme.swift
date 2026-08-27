@@ -154,4 +154,28 @@ public extension View {
         onHover(perform: action)
         #endif
     }
+
+    /// `scrollContentBackground(.hidden)` where it exists, and nothing where it
+    /// does not.
+    ///
+    /// Unavailable — not deprecated, unavailable — on tvOS. A `TextEditor` paints
+    /// its own opaque backing over the token fill, so hiding it is what makes the
+    /// field read as the right colour in the dark and high-contrast themes. On tvOS
+    /// there is no way to hide it, and a text editor is not a tvOS control anyway.
+    ///
+    /// This is the second helper of its kind, and it is here for the same reason as
+    /// the first: `anindaHover` exists because three components called `onHover`
+    /// bare and two others had each written their own private guard. This one comes
+    /// from the opposite direction — ONE component called
+    /// `scrollContentBackground` bare, no local run could see it because this
+    /// machine has the macOS SDK alone, and the first CI run on a macOS runner
+    /// found that AnindaComponents had never compiled for tvOS at all.
+    @ViewBuilder
+    func anindaHideScrollBackground() -> some View {
+        #if os(tvOS)
+        self
+        #else
+        scrollContentBackground(.hidden)
+        #endif
+    }
 }

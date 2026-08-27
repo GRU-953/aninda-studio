@@ -56,8 +56,9 @@ public struct AnindaTextareaModifier: ViewModifier {
                 .foregroundStyle(isEnabled ? s.ink : s.inkMuted)
                 // Without this the editor paints its own opaque backing over the
                 // token fill, and the field reads as the wrong colour in the dark
-                // and high-contrast themes only.
-                .scrollContentBackground(.hidden)
+                // and high-contrast themes only. Through the bridge, because the
+                // modifier is unavailable on tvOS — see anindaHideScrollBackground.
+                .anindaHideScrollBackground()
                 // The CSS asks for line-height 1.5 — a 24 pt line box on 16 pt
                 // text, so 8 pt of added leading. There is no token for the
                 // remainder after the font's own leading is counted, and I did not

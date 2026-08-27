@@ -12,6 +12,7 @@ give.
 - 37 authored source file(s) carry no literal colour and no literal size
 - 16 SwiftUI components, one for each component card in 08_components/_cards.json, with nothing orphaned either way
 - 8 SwiftUI patterns and 8 Compose patterns, the same 8 names on both, matching the 8 pattern cards in 08_components/_cards.json
+- 2 platform-limited API(s) are wrapped only in apple/Sources/AnindaTokensUI/Theme.swift, and every component calls the wrapper rather than the API
 - no deprecated Material role name is used as a token name in the 3 files that define tokens
 - 160 emitted colour values re-derived and matched to their tokens
 - 30 file Swift package builds and tests with Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101) — Executed 3 tests, with 0 failures (0 unexpected)

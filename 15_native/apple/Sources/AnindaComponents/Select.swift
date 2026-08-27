@@ -70,7 +70,7 @@ public struct AnindaSelect: ViewModifier {
             // Hover is a pointer state. It is inert on a touch-only device, which
             // is why it changes the border rather than being the only way to tell
             // the control apart from the page.
-            .anindaOnHover { hovering = $0 }
+            .anindaHover { hovering = $0 }
             .animation(AnindaAnimation.colour(reduceMotion: reduceMotion),
                        value: hovering)
             .animation(AnindaAnimation.colour(reduceMotion: reduceMotion),
@@ -110,24 +110,6 @@ public struct AnindaSelect: ViewModifier {
         if invalid { return s.danger }
         if !isEnabled { return s.line }
         return hovering ? s.inkMuted : s.line
-    }
-}
-
-private extension View {
-    /// `onHover` where a pointer exists, and nothing where one does not.
-    ///
-    /// `onHover(perform:)` is unavailable on watchOS and tvOS, so calling it
-    /// unguarded refuses to compile for two of the five platforms this package
-    /// declares. Hover is a pointer state; a platform without a pointer losing it
-    /// costs nothing, which is why the border carries hover and never carries
-    /// anything on its own.
-    @ViewBuilder
-    func anindaOnHover(_ action: @escaping (Bool) -> Void) -> some View {
-        #if os(watchOS) || os(tvOS)
-        self
-        #else
-        onHover(perform: action)
-        #endif
     }
 }
 

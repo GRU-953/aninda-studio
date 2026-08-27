@@ -522,6 +522,23 @@ def compile_swift(files: dict[Path, str]) -> str:
     generated tree, which the drift gate would then report as a file the build did
     not write.
     """
+    # Apple only, and the reason is not that swift is missing. ubuntu-24.04 ships
+    # Swift 6.3.3, so `shutil.which("swift")` is satisfied there — and then the
+    # build fails on `import SwiftUI` in the bridge, because SwiftUI is an Apple
+    # framework with no Linux implementation. CI found this on the first run of the
+    # native-android job: an Ubuntu runner tried to build the whole Apple package
+    # and reported "no such module 'SwiftUI'" as a Kotlin failure.
+    #
+    # NotEquipped rather than BuildError, because nothing is wrong: this platform
+    # cannot host the proof. A run that asked for it with --require still exits 2
+    # and says so; the Kotlin job, which did not ask, gets a NOT COMPILED HERE note.
+    if sys.platform != "darwin":
+        raise NotEquipped(
+            f"this package cannot be built on {sys.platform}: AnindaTokensUI and "
+            f"AnindaComponents import SwiftUI, which exists on Apple platforms "
+            f"only. Swift itself may well be present — ubuntu-24.04 ships it — but "
+            f"the framework is not. The files are still written; the proof that "
+            f"they build belongs to a macOS runner.")
     if shutil.which("swift") is None:
         raise NotEquipped(
             "swift is not on PATH, so the emitted package cannot be built. On macOS "
@@ -845,6 +862,69 @@ def guard_authored_uses_tokens() -> str:
             + "\n  ".join(problems[:25])
             + (f"\n  ... and {len(problems) - 25} more" if len(problems) > 25 else ""))
     return f"{n} authored source file(s) carry no literal colour and no literal size"
+
+
+# An API that does not exist on every declared platform, and the bridge helper
+# that wraps it. The KEY is what a component must not write; the VALUE is what it
+# writes instead.
+PLATFORM_LIMITED = {
+    "onHover(perform:": "anindaHover",
+    "scrollContentBackground(": "anindaHideScrollBackground",
+}
+BRIDGE = "apple/Sources/AnindaTokensUI/Theme.swift"
+
+
+def guard_platform_wrappers() -> str:
+    """A platform-conditional API is wrapped ONCE, in the bridge, and called by name.
+
+    Theme.swift already says why the wrapper exists: "a rule that has to be
+    remembered per file is a rule that will be forgotten in one." It was, twice, and
+    neither was caught by anything until a compiler on a different platform ran.
+
+    Select.swift kept its own private copy of the hover guard under a different
+    name, `anindaOnHover`, through the very commit that consolidated the other
+    five — so the rule lived in two places and a reader of either would not know.
+    And Textarea.swift called `scrollContentBackground` bare, which is unavailable
+    on tvOS, so AnindaComponents had never compiled for tvOS at all. No local run
+    could see that: this machine carries the macOS SDK alone.
+
+    So this checks the shape rather than the outcome. A duplicate wrapper and a bare
+    call both fail, and both fail HERE rather than on a runner twenty minutes later.
+    """
+    problems: list[str] = []
+    for p in sorted(APPLE.rglob("*.swift")):
+        if not is_authored(p):
+            continue
+        rel = p.relative_to(HERE).as_posix()
+        if rel == BRIDGE:
+            continue
+        text = p.read_text(encoding="utf-8")
+        for i, line in enumerate(text.splitlines(), 1):
+            code = line.split("//")[0]
+            for api, helper in PLATFORM_LIMITED.items():
+                if api in code:
+                    problems.append(
+                        f"{p.relative_to(ROOT)}:{i}: calls {api}...) directly. It is "
+                        f"unavailable on at least one declared platform — use "
+                        f".{helper}(), which is guarded once in {BRIDGE}")
+        # A file that wraps it privately is the other half of the same fault: the
+        # guard is right and it is in the wrong place, so the next file gets it
+        # wrong again.
+        for helper in PLATFORM_LIMITED.values():
+            if f"func {helper}" in text:
+                problems.append(
+                    f"{p.relative_to(ROOT)}: declares its own {helper} — that "
+                    f"wrapper belongs in {BRIDGE} and nowhere else")
+        if "#if os(" in text and any(a in text for a in PLATFORM_LIMITED):
+            problems.append(
+                f"{p.relative_to(ROOT)}: guards a platform-limited API in place "
+                f"rather than through the bridge")
+    if problems:
+        raise BuildError(
+            "a platform-conditional API is not going through the bridge:\n  "
+            + "\n  ".join(problems))
+    return (f"{len(PLATFORM_LIMITED)} platform-limited API(s) are wrapped only in "
+            f"{BRIDGE}, and every component calls the wrapper rather than the API")
 
 
 def guard_pattern_contract() -> str:
@@ -1229,6 +1309,7 @@ def main(argv: list[str]) -> int:
             guard_authored_uses_tokens(),
             guard_component_contract(),
             guard_pattern_contract(),
+            guard_platform_wrappers(),
             guard_deprecated_names(files),
             guard_values_match_source(files, data),
         ]
