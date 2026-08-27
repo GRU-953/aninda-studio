@@ -8,7 +8,7 @@ Apple Human Interface Guidelines and App Store Connect, and Google Material 3, A
 
 23 gaps found: **8 blockers**, 8 major, 7 minor.
 
-**14 are now closed**, 7 are open and 2 are deferred with the reason recorded. Of the 8 blockers, **1 remain open**.
+**15 are now closed**, 6 are open and 2 are deferred with the reason recorded. Of the 8 blockers, **1 remain open**.
 
 20 of 23 cite a published requirement, across 14 distinct sources; the rest are rules this kit sets for itself and are marked as such. A closed gap keeps its entry, because the record of what was wrong is the useful part.
 
@@ -38,9 +38,9 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 | `G-NATIVE-2` | No component maps to either platform | Both | Major | **closed** |
 | `G-A11Y-1` | Contrast is measured by WCAG relative luminance only; Apple now names APCA as well | Apple | Minor | open |
 | `G-MOTION-1` | Reduced motion removes transitions rather than substituting a fade | Both | Minor | open |
-| `G-REC-2` | A third, stale type answer survives in the directions build | This kit's own record | Minor | open |
 | `G-REC-3` | The mark's minimum size is not in the mark's own manifest | This kit's own record | Minor | open |
 | `G-A11Y-2` | Accessibility Nutrition Labels are unaddressed | Apple | Minor | deferred |
+| `G-REC-2` | A third, stale type answer survives in the directions build | This kit's own record | Minor | **closed** |
 | `G-STORE-3` | No raster declares its colour space | Both | Minor | **closed** |
 | `G-STORE-4` | No notification icon | Google | Minor | deferred |
 
@@ -374,13 +374,13 @@ A **blocker** means a store would refuse the listing, or a platform's own compon
 
 ### `G-REC-2` — A third, stale type answer survives in the directions build
 
-**Minor** · This kit's own record · open
+**Minor** · This kit's own record · closed
 
 **What is required.** One name for one thing.
 
 **What is here.** 03_directions/build.py names Estuary's type as Archivo, Noto Sans Bengali and JetBrains Mono. The file is flagged as one-off exploration and sits outside the build chain, but it still generates COMPARE.html and COMPARE.pdf.
 
-**The fix.** Mark the stale answer where it is generated, rather than leaving a reader to discover the contradiction.
+**The fix.** Closed 27 August 2026 by removing the exploration entirely. The folder held a fourth answer to the typeface question — Archivo, Noto Sans Bengali and JetBrains Mono for Estuary — plus every rejected direction's colours and hand-typed Bangla, and it was outside the rebuild chain, so nothing regenerated it and no gate compared it to anything. Owner's decision: moved to Trash rather than corrected, because a record that contradicts what shipped is worse than no record, and the reason the palette was chosen over three alternatives is written down in 05_colour/directions/natural.json's own premise and supersedes block. Its NOT_IN_CHAIN entry in scripts/readme.py went in the same commit, because that guard raises on an entry naming a file that is not there.
 
 **Sources.** None. This is a rule this kit sets for itself, and no platform is cited for it.
 

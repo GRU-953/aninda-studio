@@ -2,23 +2,23 @@
 
 **Every entry below was re-verified against the tree, and each says on what date.** Each also carries the command that was run and what it returned. Nothing here is asserted from memory, and nothing was marked fixed because it looked like the sort of thing that had probably been fixed — a claim was either reproduced or it was not.
 
-64 entries were checked in the pass of 19 August 2026. 40 more were raised later, and 4 of the original entries were re-checked — 25 August 2026, 26 August 2026, 27 August 2026. That first pass was needed because this document had drifted. It was written across three review rounds and never re-checked, and of the 64 entries it covered, **18 were already fixed** and **12 were half right** — what that pass found, on the day, kept as it was reported. A register that is wrong in either direction is worse than a short accurate one.
+64 entries were checked in the pass of 19 August 2026. 40 more were raised later, and 5 of the original entries were re-checked — 25 August 2026, 26 August 2026, 27 August 2026. That first pass was needed because this document had drifted. It was written across three review rounds and never re-checked, and of the 64 entries it covered, **18 were already fixed** and **12 were half right** — what that pass found, on the day, kept as it was reported. A register that is wrong in either direction is worse than a short accurate one.
 
 ## Where it stands
 
 | | |
 |---|---|
 | Entries re-verified | **104** |
-| Still open | 31 |
+| Still open | 30 |
 | Half stale — part reproduced, part not | 12 |
-| Already fixed, kept as a record | 59 |
+| Already fixed, kept as a record | 60 |
 | Closed earlier, by the owner's decision | 2 |
 
-Of the 43 that carry work: 42 minor · 1 not-a-defect. **No blocker.** Everything below is a thing this system says about itself that is not quite true, a guard that is narrower than its message, or a piece of work not yet done — not a defect in what it produces.
+Of the 42 that carry work: 41 minor · 1 not-a-defect. **No blocker.** Everything below is a thing this system says about itself that is not quite true, a guard that is narrower than its message, or a piece of work not yet done — not a defect in what it produces.
 
 ## The register
 
-### Minors (42)
+### Minors (41)
 
 #### 11 · README.bn.md silently drops a whole section and the asset.py demonstration, with no note that it is abridged
 
@@ -388,18 +388,6 @@ This line is the one confirmation a reader gets that the DTCG documents in the p
 
 *Smallest fix.* Split the note in 12_packages/build.py:769 — count only the five DTCG documents and name the forced-colours map separately, for example '5 DTCG documents and the forced-colours map shipped verbatim'.
 
-#### R2-22 · COMPARE.pdf and all eight files in 03_directions/shots have no writer anywhere in the repository
-
-`03_directions/build.py`
-
-10_assets/build.py opens by stating the house rule — "Nothing here is hand-drawn and nothing here should be hand-edited" — and these nine files are the exception: no generator, so no way to reproduce or check them, and no document explaining what they are. Two of them are unlabelled pre-decision pages showing marks and palettes the project rejected, which is the same class of stray the repository removed _reference/ to stop shipping. A reader opening _m2.html sees four candidate identities with no indication which, if any, is the brand.
-
-**Still open, 19 August 2026.** Reproduced in full, including the second half: _m2.html and _marks.html open on candidate marks and palettes with no page-level label saying which, if any, was chosen. Nine tracked files with no generator and no explanatory document, against 10_assets/build.py's stated house rule.
-
-*How that was checked.* `git ls-files 03_directions` shows all nine tracked: `03_directions/COMPARE.pdf` and the eight files `shots/_m2.html`, `shots/_marks.html`, `shots/derived.png`, `shots/estuary.png`, `shots/full.png`, `shots/instrument.png`, `shots/marks.png`, `shots/sandhya.png`. 03_directions/build.py writes only two things: line 30 `OUT = HERE / "COMPARE.html"` with line 439 `OUT.write_text(html)`, and line 356 `(MARKS / f"{key}-mark-{label}.svg").write_text(` — no .pdf, no shots/. Repo-wide `grep -rn "COMPARE"` (excluding .venv/__pycache__) hits only 01_research/OPEN-FINDINGS.md:321 and 03_directions/build.py:30; `grep -rn "shots"` hits only OPEN-FINDINGS.md:321. The only PDF printer, 09_guidebook/scripts/pdf.py, is hardcoded to the guidebook (`if not PRINT_HTML.exists()` … `render_pdf(PRINT_HTML, OUT_PDF, strict=True)`) and cannot produce COMPARE.pdf. No document covers them: README.md:118 names 03_directions/build.py as "one-off exploration: it writes the three rejected colour directions" and mentions neither shots/ nor COMPARE.pdf, and there is no README in 03_directions/. `head -c 600` on both HTML files confirms they carry no heading or label — _marks.html opens straight into a flex row of swatch panels and _m2.html likewise, each with `<title>Aninda Studio — Estuary mark, regular weight</title>` inside the SVGs of rejected candidates.
-
-*Smallest fix.* Either delete the nine files (the decision they record is already written up in COMPARE.html, which does have a generator) or add a short 03_directions/README.md naming each one as a superseded pre-decision artefact and stating that it has no writer.
-
 #### R2-3 · CI enforces a seventh banned word that appears in no published blocklist, so a writer who follows the English standard exactly can be failed by it
 
 `02_strategy/ENGLISH-STANDARD.md`
@@ -600,7 +588,7 @@ to keep the figure current would cost more than the sentence is worth.
 
 *Smallest fix.* Run pdf.py --probe-interactive once and have _pdf_sizes() read PROBE_PDF's size when the file is present, mirroring what it already does for the print PDF; otherwise leave it, since the prose is already honest about what the number is.
 
-### Already fixed, kept as a record (59)
+### Already fixed, kept as a record (60)
 
 These were true when written and are not true now. They stay because the record of what went wrong is the useful part, and because deleting them would hide that this document had drifted.
 
@@ -687,6 +675,12 @@ These were true when written and are not true now. They stay because the record 
 **Fixed, confirmed 19 August 2026.** Fixed 19 August 2026. The page now links the repository, the guidebook, the cards and the tokens.
 
 *How that was checked.* The published page offered two links, skip-to-content and a mailto. It now carries five. Hyperlinks are not subresources, so the page keeps its offline-and-self-contained property, and 11_site/check.py still reports external references as a note rather than a failure.
+
+#### R2-22 · COMPARE.pdf and all eight files in 03_directions/shots have no writer anywhere in the repository
+
+**Fixed, confirmed 27 August 2026.** Fixed since this was written, by removal rather than by giving the files a writer. The finding was right: COMPARE.pdf and the eight PNGs under 03_directions/shots had no generator anywhere in the repository, so nothing could reproduce or check them. The whole exploration went to Trash on 27 August 2026 by the owner's decision.
+
+*How that was checked.* $ git ls-files 03_directions | wc -l  ->  19 before, 0 after. $ ls 03_directions  ->  no such file or directory; the bytes are in Trash, not deleted.
 
 #### R2-23 · Outstanding, not a defect: the Claude Design push is still to be done, and the deliverable is named in no shipped surface
 

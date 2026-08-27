@@ -129,9 +129,6 @@ REBUILD_NODE = "13_plugins/figma/build.mjs"
 # Generators deliberately outside the chain, each with the reason. A script here
 # is a script whose output is not a shipped deliverable that drifts with a token.
 NOT_IN_CHAIN = {
-    "03_directions/build.py":
-        "one-off exploration: it writes the three rejected colour directions, "
-        "which are a record of a decision already taken and do not move again",
     "06_type/specimen.py":
         "one-off: the type specimen pages that fed the typeface decision",
     "06_type/review_bangla.py":
@@ -253,7 +250,15 @@ def count() -> dict:
     f["tokens"] = len(set(re.findall(r"--as-[a-z0-9-]+", css)))
     f["themes"] = len(re.findall(r'\[data-theme="[a-z-]+"\] \{', css))
 
-    proof = json.loads((ROOT / "05_colour" / "generated" / "estuary.proof.json").read_text())
+    # The direction is read from the token set, not named here. This line said
+    # "estuary" after the palette was replaced, so the README's headline contrast
+    # figures described the retired palette — and --check could not catch it,
+    # because it regenerates from the same wrong expression and both sides agree.
+    _prim = json.loads(
+        (ROOT / "07_tokens" / "build" / "primitive.tokens.json").read_text())
+    _direction = _prim["$extensions"]["studio.aninda"]["direction"]
+    proof = json.loads(
+        (ROOT / "05_colour" / "generated" / f"{_direction}.proof.json").read_text())
     roles = [r for t in proof["themes"].values() for r in t["roles"].values()]
     f["pairs"] = len(roles)
 

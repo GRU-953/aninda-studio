@@ -34,11 +34,11 @@ measured against every surface it can land on, on the rounded 8-bit hex a browse
 actually produces, and then measured again with every channel of both colours
 nudged by one bit. The published figure is the worst of those results.
 
-- **28 text pairings.** The lowest is **5.1623:1**, against a
+- **28 text pairings.** The lowest is **4.719:1**, against a
   floor of 4.5:1 (WCAG 2.2 SC 1.4.3) in the ordinary themes and 7:1 (SC 1.4.6) in
   the high-contrast ones.
 - **12 non-text pairings** — borders and focus rings. The lowest is
-  **3.7326:1**, against a floor of 3:1 (SC 1.4.11).
+  **3.3892:1**, against a floor of 3:1 (SC 1.4.11).
 
 Those two are counted separately on purpose. **WCAG defines no AAA level for
 non-text contrast**, so a border at 3.9:1 has fully met its criterion; judging it
@@ -133,7 +133,7 @@ That step ends by checking the manifest, so what it writes is a bundle Figma wil
 load. `--code-only` compiles the same artefacts and stops before that check; it is
 what continuous integration runs to compare `dist/` against what is committed.
 
-Three generators are deliberately not in that chain: `03_directions/build.py` — one-off exploration: it writes the three rejected colour directions, which are a record of a decision already taken and do not move again; `06_type/specimen.py` — one-off: the type specimen pages that fed the typeface decision; `06_type/review_bangla.py` — a review instrument, run when a Bangla reader is available, not part of the build.
+Two generators are deliberately not in that chain: `06_type/specimen.py` — one-off: the type specimen pages that fed the typeface decision; `06_type/review_bangla.py` — a review instrument, run when a Bangla reader is available, not part of the build.
 
 Every generator is fail-closed: if a check does not pass, it writes nothing at
 all. A half-written token set that looks plausible is worse than none.

@@ -11,7 +11,7 @@ derivation is where a measured system quietly stops being one.
 
 So the rule this file enforces is narrow: every colour it emits must be
 bit-identical to a value this system already measured — a semantic role, a tonal
-surface, or a step of one of the six committed ramps. Nothing is interpolated,
+surface, or a step of one of the committed ramps. Nothing is interpolated,
 nothing is nudged, and a value that matches none of those stops the build.
 
 WHY NOT lightColorScheme()
@@ -23,18 +23,31 @@ The primary constructor has no defaults, so a missing role is a compile error, a
 a Material version that adds a role breaks the build loudly rather than filling it
 in. The pinned library version becomes the measuring instrument.
 
-THE ONE HUE THAT DOES NOT EXIST
--------------------------------
-Material wants secondary AND tertiary accent groups. 05_colour/directions/estuary.json
-states the brand premise as "the warmth coming from the paper rather than from a
-second expressive colour", and there is no third hue to give it. Material Theme
-Builder would invent one by rotating the hue about 60 degrees. That is a brand
-decision, and no amount of measurement makes it one this file is entitled to take.
+WHICH BRAND FAMILY BECOMES WHICH MATERIAL ACCENT GROUP
+------------------------------------------------------
+Material wants four accent groups: primary, secondary, tertiary and error. This
+system has four brand families and all four are primary by the owner's decision of
+26 August 2026 — none supports the others. Three map without argument: accent is
+primary, ground is secondary (which is what Material means by "less prominent"),
+danger is error.
 
-So secondary comes from the GROUND family, which is already a brand family, and
-tertiary from the accent family at a different tonal position. Every Material role
-exists and no new hue enters the brand. The cost — an Aninda scheme carries less
-hue variety than a stock Material one — is recorded rather than hidden.
+Nothing claimed tertiary. Under Estuary this file took it from a sixth family,
+`info`, which the four-colour palette does not have — and `info` is now a ROLE that
+resolves to accent, so reading it here would have made tertiary bit-identical to
+primary and a tertiary element would not have read as tertiary at all. Two gates
+below now forbid exactly that.
+
+Tertiary is the SUCCESS family. Owner's decision, 27 August 2026. The reasoning is
+recorded because the cost is real: Material has no success slot of its own, so this
+is the only route Natural Green has into an Android colour scheme, and a scheme that
+used three of four primaries would contradict the palette it is derived from. What
+is given up is that Green carries two meanings on this platform — success in this
+system's own roles, and a decorative accent in Material's. A green tertiary chip may
+read as a confirmation. Material components use tertiary only when an app asks for
+it, so the exposure is small, but it is a cost and not a free choice.
+
+No hue is rotated into existence, which is what Material Theme Builder would have
+done, and which no amount of measurement would have entitled this file to do.
 
 CRITERION 21, WHICH THIS FILE LOOKS LIKE IT BREAKS
 --------------------------------------------------
@@ -60,7 +73,17 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-PROOF = ROOT / "05_colour" / "generated" / "estuary.proof.json"
+# The direction is READ from the token set, never named here. This line said
+# "estuary" for a day after the palette was replaced, and nothing noticed: the file
+# it named still existed and still parsed, so every gate stayed green while the
+# whole 48-role scheme shipped the retired palette — Material.kt carried
+# 0xFF126974 while Tokens.kt, in the same Kotlin package, carried 0xFF224959.
+# The token file records which direction produced it, so there is one name for it
+# and every consumer reads that one.
+_PRIM = json.loads(
+    (ROOT / "07_tokens" / "build" / "primitive.tokens.json").read_text(encoding="utf-8"))
+DIRECTION = _PRIM["$extensions"]["studio.aninda"]["direction"]
+PROOF = ROOT / "05_colour" / "generated" / f"{DIRECTION}.proof.json"
 OUT = HERE / "_proof" / "material3.roles.json"
 
 DEPRECATED_NAMES = ("background", "onBackground", "surfaceVariant")
@@ -101,6 +124,8 @@ MUST_DIFFER = [
     ("surface", "onSurface", "body text would vanish"),
     ("surface", "onSurfaceVariant", "secondary text would vanish"),
     ("surface", "outline", "a text field would have no visible border"),
+    ("primary", "tertiary", "a tertiary accent that equals primary is not an accent"),
+    ("secondary", "tertiary", "as above — three accent groups, or two wearing three names"),
     ("primary", "primaryContainer", "a tonal button would not read as tonal"),
     ("secondary", "secondaryContainer", "as above"),
     ("tertiary", "tertiaryContainer", "as above"),
@@ -292,7 +317,7 @@ def derive(E, proof: dict) -> dict:
         sec_c, sec_on, sec_p = pick_container_pair(
             E, ramps["ground"], s["base"], r["accent"]["value"], polarity, target, f"{key}/secondaryContainer")
         ter_c, ter_on, ter_p = pick_container_pair(
-            E, ramps["info"], s["base"], r["accent"]["value"], polarity, target, f"{key}/tertiaryContainer")
+            E, ramps["success"], s["base"], r["accent"]["value"], polarity, target, f"{key}/tertiaryContainer")
         err_c, err_on, err_p = pick_container_pair(
             E, ramps["danger"], s["base"], r["accent"]["value"], polarity, target, f"{key}/errorContainer")
         proofs.update({"primaryContainer": pri_p, "secondaryContainer": sec_p,
@@ -304,17 +329,21 @@ def derive(E, proof: dict) -> dict:
         sf, sfd, sfo, sfov, sf_p = pick_fixed_pair(
             E, ramps["ground"], target, f"{key}/secondaryFixed")
         tf, tfd, tfo, tfov, tf_p = pick_fixed_pair(
-            E, ramps["info"], target, f"{key}/tertiaryFixed")
+            E, ramps["success"], target, f"{key}/tertiaryFixed")
         proofs.update({"primaryFixed": pf_p, "secondaryFixed": sf_p,
                        "tertiaryFixed": tf_p})
 
         # --- secondary and tertiary accents, from families that already exist -
         # secondary is the GROUND family used as an accent, which is what Material
-        # means by "less prominent". tertiary is the info family, the only other
-        # brand-adjacent hue this system measured — NOT a hue rotated into
-        # existence, which is what Material Theme Builder would have done.
+        # means by "less prominent". tertiary is the SUCCESS family — the fourth
+        # brand primary, which Material has no slot of its own for. Neither is a hue
+        # rotated into existence, which is what Material Theme Builder would do.
+        #
+        # tertiary read r["info"] until 27 August 2026. Under the six-colour palette
+        # info was its own family; under this one it is a role that resolves to
+        # accent, so that line would have handed tertiary the primary colour.
         secondary = r["ink-muted"]["value"]
-        tertiary = r["info"]["value"]
+        tertiary = r["success"]["value"]
 
         scheme = {
             "primary": r["accent"]["value"],
@@ -519,14 +548,17 @@ def build() -> dict:
             "background, onBackground and surfaceVariant appear here as constructor "
             "ARGUMENTS because the library requires them. No token in this system "
             "carries those names, which is what criterion 21 forbids."),
-        "one_hue": (
-            "This system has two brand families, ground and accent, and the brand "
-            "premise in 05_colour/directions/estuary.json is that the warmth comes "
-            "from the paper rather than from a second expressive colour. Material "
-            "wants secondary AND tertiary accent groups. Secondary is taken from the "
-            "ground family and tertiary from the info family; no hue was rotated into "
-            "existence. An Aninda scheme therefore carries less hue variety than a "
-            "stock Material one, which is a consequence and not a defect."),
+        "accent_groups": (
+            f"This system has four brand families and all four are primary. Material "
+            f"wants four accent groups and three map without argument: accent is "
+            f"primary, ground is secondary, danger is error. Tertiary is the success "
+            f"family, by the owner's decision of 27 August 2026, because Material has "
+            f"no success slot and a scheme using three of four primaries would "
+            f"contradict the palette it comes from. The cost is that green carries two "
+            f"meanings here — success among this system's roles, a decorative accent "
+            f"among Material's — so a green tertiary element may read as a "
+            f"confirmation. No hue was rotated into existence. Read from "
+            f"{DIRECTION}.proof.json."),
         "distinct_colours_per_theme": distinct,
         "repetition_note": (
             "48 Material roles are derived from 18 measured ones, so colours repeat. "

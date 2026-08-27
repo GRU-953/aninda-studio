@@ -1,415 +1,415 @@
 {
- "_generator": "Hand-maintained input for scripts/gaps.py, which writes 01_research/PLATFORM-GAPS.md. Every gap names the requirement, the source it comes from with the date it was read, what was measured in this tree, and the fix. A gap with no source is one this system sets for itself, and says so.",
- "assessed_on": "26 August 2026",
- "against": "Apple Human Interface Guidelines and App Store Connect, and Google Material 3, Android developer documentation and Google Play Console, all read on 26 August 2026.",
- "gaps": [
-  {
-   "id": "G-ICON-1",
-   "area": "icon",
-   "platform": "both",
-   "severity": "blocker",
-   "title": "The app icon is pre-rounded, and both platforms ask for it not to be",
-   "requirement": "Apple: \"Produce appropriately shaped, unmasked layers. The system masks all layer edges… Providing layers with pre-defined masking negatively impacts specular highlight effects and makes edges look jagged.\" Google: the Play icon is a full square and Play applies a corner mask equivalent to 30 % of the icon size, plus the drop shadow.",
-   "sources": [
+  "_generator": "Hand-maintained input for scripts/gaps.py, which writes 01_research/PLATFORM-GAPS.md. Every gap names the requirement, the source it comes from with the date it was read, what was measured in this tree, and the fix. A gap with no source is one this system sets for itself, and says so.",
+  "assessed_on": "26 August 2026",
+  "against": "Apple Human Interface Guidelines and App Store Connect, and Google Material 3, Android developer documentation and Google Play Console, all read on 26 August 2026.",
+  "gaps": [
     {
-     "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
-     "date": "change log 8 Jun 2026; read 26 Aug 2026"
+      "id": "G-ICON-1",
+      "area": "icon",
+      "platform": "both",
+      "severity": "blocker",
+      "title": "The app icon is pre-rounded, and both platforms ask for it not to be",
+      "requirement": "Apple: \"Produce appropriately shaped, unmasked layers. The system masks all layer edges… Providing layers with pre-defined masking negatively impacts specular highlight effects and makes edges look jagged.\" Google: the Play icon is a full square and Play applies a corner mask equivalent to 30 % of the icon size, plus the drop shadow.",
+      "sources": [
+        {
+          "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
+          "date": "change log 8 Jun 2026; read 26 Aug 2026"
+        },
+        {
+          "url": "developer.android.com/distribute/google-play/resources/icon-design-specifications",
+          "date": "page updated 15 Jun 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "Every shipped icon carries rx=24 ry=24 on the 100-unit grid and measures 4.7 % background showing. 04_mark/manifest.json records the decision behind it: \"One rounded icon is used on every surface, Apple included. Owner's decision, 14 August 2026.\"",
+      "fix": "Closed 26 August 2026. The owner reversed the policy and 04_mark/build.py now writes square unmasked masters for Apple and three 108 dp layers for Android, with the rounded tile kept for the web. Measured: the Apple masters and the Android background show 0.0 per cent background, and the mark reads at the same size on both platforms to within 1.24 percentage points.",
+      "status": "closed"
     },
     {
-     "url": "developer.android.com/distribute/google-play/resources/icon-design-specifications",
-     "date": "page updated 15 Jun 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "Every shipped icon carries rx=24 ry=24 on the 100-unit grid and measures 4.7 % background showing. 04_mark/manifest.json records the decision behind it: \"One rounded icon is used on every surface, Apple included. Owner's decision, 14 August 2026.\"",
-   "fix": "Closed 26 August 2026. The owner reversed the policy and 04_mark/build.py now writes square unmasked masters for Apple and three 108 dp layers for Android, with the rounded tile kept for the web. Measured: the Apple masters and the Android background show 0.0 per cent background, and the mark reads at the same size on both platforms to within 1.24 percentage points.",
-   "status": "closed"
-  },
-  {
-   "id": "G-ICON-2",
-   "area": "icon",
-   "platform": "apple",
-   "severity": "blocker",
-   "title": "No 1024 px raster exists, only a vector that is never rendered",
-   "requirement": "App icon layout size is 1024×1024 px for iOS, iPadOS and macOS.",
-   "sources": [
-    {
-     "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
-     "date": "change log 8 Jun 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "04_mark/svg/icon-appstore-square-1024.svg exists and is square, fully opaque, 0.0 % background showing. 10_assets/MANIFEST.json states plainly that it \"is not rendered by this build\". The largest raster in the tree is 512×512.",
-   "fix": "Closed 26 August 2026. 14_delivery/build.py renders icon-1024.png, -dark, -mono and the 1088 watchOS master, each measured for opaque corners and each declaring sRGB.",
-   "status": "closed"
-  },
-  {
-   "id": "G-ICON-3",
-   "area": "icon",
-   "platform": "apple",
-   "severity": "blocker",
-   "title": "The watchOS master is pre-rounded and no unmasked 1088 exists",
-   "requirement": "watchOS app icon layout size is 1088×1088 px, unmasked; the system masks it to a circle.",
-   "sources": [
-    {
-     "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
-     "date": "change log 8 Jun 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "icon-1088-watch.svg is the correct 1088×1088 but carries rx=24 ry=24 and all four corners read (0,0,0,0). Benchmark criterion 1 already records this as part met.",
-   "fix": "Closed 26 August 2026. icon-apple-1088-watch.svg is square and unmasked, and its rendered master measures 0.0 per cent background showing.",
-   "status": "closed"
-  },
-  {
-   "id": "G-ICON-4",
-   "area": "icon",
-   "platform": "google",
-   "severity": "blocker",
-   "title": "No adaptive icon exists at all",
-   "requirement": "Each layer is 108×108 dp; the safe zone never clipped by any mask is 66×66 dp centred; the outer 18 dp per side is reserved for masking and motion effects.",
-   "sources": [
-    {
-     "url": "developer.android.com/develop/ui/views/launch/icon_design_adaptive",
-     "date": "page updated 13 Aug 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "No ic_launcher, no mipmap directory, no foreground or background layer anywhere in the repository. The string \"adaptive icon\" does not appear in any file.",
-   "fix": "Closed 26 August 2026. Background, foreground and monochrome layers exist on the 108 dp canvas, rendered at all five densities, with ic_launcher.xml. Every foreground pixel is measured against the 66 dp safe circle, in both directions, so a mark that shrank would fail as loudly as one that overflowed.",
-   "status": "closed"
-  },
-  {
-   "id": "G-ICON-5",
-   "area": "icon",
-   "platform": "google",
-   "severity": "major",
-   "title": "No monochrome layer, so themed icons fall back or are machine-generated",
-   "requirement": "A single monochrome layer supports user theming from Android 13 (API 33). From Android 16 QPR 2 the system themes icons automatically for apps that supply none.",
-   "sources": [
-    {
-     "url": "developer.android.com/develop/ui/views/launch/icon_design_adaptive",
-     "date": "page updated 13 Aug 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "11_site/site.webmanifest declares only \"any\" and \"maskable\". No monochrome purpose and no monochrome drawable exists.",
-   "fix": "Closed 26 August 2026. The monochrome layer is byte-identical to the foreground apart from its title, is measured for a single grey value, and is declared unconditionally in ic_launcher.xml.",
-   "status": "closed"
-  },
-  {
-   "id": "G-ICON-6",
-   "area": "store",
-   "platform": "google",
-   "severity": "blocker",
-   "title": "No Play Store icon",
-   "requirement": "512×512 px, 32-bit PNG, sRGB, maximum 1024 KB, full square. Mandatory to publish a listing.",
-   "sources": [
-    {
-     "url": "developer.android.com/distribute/google-play/resources/icon-design-specifications",
-     "date": "page updated 15 Jun 2026; read 26 Aug 2026"
+      "id": "G-ICON-2",
+      "area": "icon",
+      "platform": "apple",
+      "severity": "blocker",
+      "title": "No 1024 px raster exists, only a vector that is never rendered",
+      "requirement": "App icon layout size is 1024×1024 px for iOS, iPadOS and macOS.",
+      "sources": [
+        {
+          "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
+          "date": "change log 8 Jun 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "04_mark/svg/icon-appstore-square-1024.svg exists and is square, fully opaque, 0.0 % background showing. 10_assets/MANIFEST.json states plainly that it \"is not rendered by this build\". The largest raster in the tree is 512×512.",
+      "fix": "Closed 26 August 2026. 14_delivery/build.py renders icon-1024.png, -dark, -mono and the 1088 watchOS master, each measured for opaque corners and each declaring sRGB.",
+      "status": "closed"
     },
     {
-     "url": "support.google.com/googleplay/android-developer/answer/9866151",
-     "date": "no date published; read 26 Aug 2026"
-    }
-   ],
-   "measured": "Nothing of that size or purpose exists.",
-   "fix": "Closed 26 August 2026. 512 x 512, 32-bit PNG with a fully opaque alpha band, sRGB declared, 13,037 bytes against Google's 1,024,000 limit, and every pixel outside Play's 30 per cent corner arc is measured as ground.",
-   "status": "closed"
-  },
-  {
-   "id": "G-STORE-1",
-   "area": "store",
-   "platform": "google",
-   "severity": "blocker",
-   "title": "No feature graphic",
-   "requirement": "1024×500 px, JPEG or 24-bit PNG, no alpha. \"You must provide a feature graphic to publish your store listing.\" It must not contain device images, screenshots, or small text illegible when scaled down, and must not resemble an advertisement.",
-   "sources": [
-    {
-     "url": "support.google.com/googleplay/android-developer/answer/9866151",
-     "date": "no date published; read 26 Aug 2026"
+      "id": "G-ICON-3",
+      "area": "icon",
+      "platform": "apple",
+      "severity": "blocker",
+      "title": "The watchOS master is pre-rounded and no unmasked 1088 exists",
+      "requirement": "watchOS app icon layout size is 1088×1088 px, unmasked; the system masks it to a circle.",
+      "sources": [
+        {
+          "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
+          "date": "change log 8 Jun 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "icon-1088-watch.svg is the correct 1088×1088 but carries rx=24 ry=24 and all four corners read (0,0,0,0). Benchmark criterion 1 already records this as part met.",
+      "fix": "Closed 26 August 2026. icon-apple-1088-watch.svg is square and unmasked, and its rendered master measures 0.0 per cent background showing.",
+      "status": "closed"
     },
     {
-     "url": "developer.android.com/docs/quality-guidelines/core-app-quality",
-     "date": "page updated 21 Aug 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "No file of that dimension exists and the term appears nowhere in the repository.",
-   "fix": "Closed 26 August 2026. 1024 x 500, 24-bit, no alpha band, sRGB declared. It carries the mark, the name and one line — no device image, no screenshot, and no small text, per Play_Feature_Graphic.",
-   "status": "closed"
-  },
-  {
-   "id": "G-STORE-2",
-   "area": "store",
-   "platform": "both",
-   "severity": "blocker",
-   "title": "No store screenshots, and none can honestly be made yet",
-   "requirement": "Google: at least two across device types, mandatory to publish. Apple: iPhone 6.9 inch and iPad 13 inch, 1 to 10 per device type, no alpha channels. Apple additionally forbids screenshots that show only title art, a login page or a splash screen.",
-   "sources": [
-    {
-     "url": "developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
-     "date": "read 26 Aug 2026"
+      "id": "G-ICON-4",
+      "area": "icon",
+      "platform": "google",
+      "severity": "blocker",
+      "title": "No adaptive icon exists at all",
+      "requirement": "Each layer is 108×108 dp; the safe zone never clipped by any mask is 66×66 dp centred; the outer 18 dp per side is reserved for masking and motion effects.",
+      "sources": [
+        {
+          "url": "developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+          "date": "page updated 13 Aug 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "No ic_launcher, no mipmap directory, no foreground or background layer anywhere in the repository. The string \"adaptive icon\" does not appear in any file.",
+      "fix": "Closed 26 August 2026. Background, foreground and monochrome layers exist on the 108 dp canvas, rendered at all five densities, with ic_launcher.xml. Every foreground pixel is measured against the 66 dp safe circle, in both directions, so a mark that shrank would fail as loudly as one that overflowed.",
+      "status": "closed"
     },
     {
-     "url": "developer.apple.com/app-store/review/guidelines/",
-     "date": "App Review Guideline 2.3.3; read 26 Aug 2026"
+      "id": "G-ICON-5",
+      "area": "icon",
+      "platform": "google",
+      "severity": "major",
+      "title": "No monochrome layer, so themed icons fall back or are machine-generated",
+      "requirement": "A single monochrome layer supports user theming from Android 13 (API 33). From Android 16 QPR 2 the system themes icons automatically for apps that supply none.",
+      "sources": [
+        {
+          "url": "developer.android.com/develop/ui/views/launch/icon_design_adaptive",
+          "date": "page updated 13 Aug 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "11_site/site.webmanifest declares only \"any\" and \"maskable\". No monochrome purpose and no monochrome drawable exists.",
+      "fix": "Closed 26 August 2026. The monochrome layer is byte-identical to the foreground apart from its title, is measured for a single grey value, and is declared unconditionally in ic_launcher.xml.",
+      "status": "closed"
     },
     {
-     "url": "support.google.com/googleplay/android-developer/answer/9866151",
-     "date": "no date published; read 26 Aug 2026"
-    }
-   ],
-   "measured": "No screenshot assets exist. No Aninda Studio app exists either, so there is nothing truthful to photograph.",
-   "fix": "Part met 26 August 2026. Correctly sized frames exist for iPhone 6.9 inch, iPad 13 inch and Android phone, drawn with a 45-degree hatch and labelled so they could not be mistaken for a capture, and each names the file that should replace it. A read-only --check-captures mode measures the owner's own screenshots. What cannot be closed without an app is the screenshots themselves.",
-   "status": "open"
-  },
-  {
-   "id": "G-STORE-3",
-   "area": "store",
-   "platform": "both",
-   "severity": "minor",
-   "title": "No raster declares its colour space",
-   "requirement": "Play requires sRGB for the store icon. Apple supports sRGB, Gray Gamma 2.2 and Display P3.",
-   "sources": [
-    {
-     "url": "developer.android.com/distribute/google-play/resources/icon-design-specifications",
-     "date": "page updated 15 Jun 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "Benchmark criterion 7, scored 19 August 2026: no P3 asset exists anywhere, but none of the 19 exported rasters carries an embedded profile, so sRGB is implicit rather than declared.",
-   "fix": "Closed 26 August 2026 for the store packages: every raster written by 14_delivery/build.py carries an sRGB chunk, read back off the file by guard_srgb_declared. The 20 rasters in 10_assets still carry none, so criterion 7 is closed for the store assets and open for the web set.",
-   "status": "closed"
-  },
-  {
-   "id": "G-STORE-4",
-   "area": "store",
-   "platform": "google",
-   "severity": "minor",
-   "title": "No notification icon",
-   "requirement": "A small icon is the only user-visible content a notification requires. It renders monochrome in the status bar and the system tints it from Android 12.",
-   "sources": [
-    {
-     "url": "developer.android.com/develop/ui/views/notifications/build-notification",
-     "date": "page updated 14 Aug 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "None exists. The answer is computable from the mark's own floor: at 24 dp the regular stroke renders at 9 × 0.920767 × 0.24 = 1.99 px, below the 2.4 px the 16 px mark floor is written against, while the heavy stroke gives 3.05 px.",
-   "fix": "Not required to publish either listing, and no app exists to notify. The measurement is recorded so the next person does not re-derive it: if one is ever needed, it is the heavy artwork.",
-   "status": "deferred"
-  },
-  {
-   "id": "G-COLOUR-1",
-   "area": "colour",
-   "platform": "google",
-   "severity": "blocker",
-   "title": "No token is named for the colour that sits on the accent",
-   "requirement": "Material 3 cannot construct a ColorScheme without onPrimary, and every on-role and on-container role has the same requirement. The Compose primary constructor takes 48 named parameters and has no defaults.",
-   "sources": [
-    {
-     "url": "m3.material.io/styles/color/roles",
-     "date": "read 26 Aug 2026 through a browser"
-    }
-   ],
-   "measured": "08_components/src/components.css:225 paints .as-btn--primary with background-color: var(--as-accent) and color: var(--as-surface-lowest), and 08_components/check.py already measures that composited pair in a real browser at rest, hover and active. So the pair is proven. What is missing is the name: no token carries it, so nothing downstream can reference it. The Figma plugin's own receipt records the consequence — it draws outlined rather than filled buttons \"because no 'on accent' text colour is defined\".",
-   "fix": "Closed 26 August 2026. color.accent.on is emitted as --as-accent-on in all four themes. No colour was invented: the value is surface.lowest, which components.css was already using. What is new is the name and the proof — it is measured as ink against EVERY fill that carries it (accent, accent-hover and danger) and the published figure is the worst of those. In the dark themes the hardest ground turned out to be danger rather than accent, so a role proven only against the accent would have published 6.2931 instead of the true worst of 5.6640. The Figma library now draws filled buttons, which is what it recorded the missing role as the reason for not doing.",
-   "status": "closed"
-  },
-  {
-   "id": "G-COLOUR-2",
-   "area": "colour",
-   "platform": "google",
-   "severity": "major",
-   "title": "No Material 3 role mapping exists",
-   "requirement": "26 documented colour roles in six groups, plus add-on roles; 48 parameters on the Compose constructor.",
-   "sources": [
-    {
-     "url": "m3.material.io/styles/color/roles",
-     "date": "read 26 Aug 2026 through a browser"
-    }
-   ],
-   "measured": "18 semantic colours per theme: 7 surfaces plus ink, ink-muted, line, accent, accent-edge, accent-hover, focus-ring, success, warning, danger and info.",
-   "fix": "Closed 26 August 2026. 15_native/material3.py derives all 48 parameters of androidx.compose.material3.ColorScheme's PRIMARY constructor for each of the four themes, and every emitted value is proven to be bit-identical to a semantic role, a tonal surface, or a step of one of the six committed ramps — a value matching none of those stops the build. The primary constructor is used rather than lightColorScheme() precisely because the latter defaults every parameter to Material's baseline purple, so a forgotten role would ship an unmeasured colour in silence. 23 pairs a Material component would break on if they were one colour are gated, along with a floor on distinct colours per theme; the four schemes carry 25 to 27.",
-   "status": "closed"
-  },
-  {
-   "id": "G-COLOUR-3",
-   "area": "colour",
-   "platform": "google",
-   "severity": "major",
-   "title": "Material needs secondary and tertiary groups; the brand premise forbids a second expressive colour",
-   "requirement": "Material components reference secondary and tertiary roles, so those roles must exist.",
-   "sources": [
-    {
-     "url": "m3.material.io/styles/color/roles",
-     "date": "read 26 Aug 2026 through a browser"
-    }
-   ],
-   "measured": "05_colour/directions/estuary.json states the premise: \"the warmth coming from the paper rather than from a second expressive colour.\" Two brand families exist, ground and accent, and no third hue.",
-   "fix": "Closed 26 August 2026. Secondary is filled from the ground family and tertiary from the info family. Every Material role exists and no new hue entered the brand, so the premise in estuary.json holds as written. Material Theme Builder would have derived a tertiary by rotating the hue about 60 degrees; that is a brand decision and no measurement makes it one a generator may take. The consequence — an Aninda scheme carries less hue variety than a stock Material one — is recorded in material3.roles.json rather than hidden.",
-   "status": "closed"
-  },
-  {
-   "id": "G-NATIVE-1",
-   "area": "native",
-   "platform": "both",
-   "severity": "major",
-   "title": "Tokens reach no Apple or Android surface",
-   "requirement": "Apple: \"When you need a custom color, add a Color Set asset to your app's asset catalog in Xcode, and specify the bright and dim variants… Avoid using hard-coded color values or colors that don't adapt.\" Android core app quality requires app content to support both light and dark themes (Theme_Support). Neither is reachable from a stylesheet.",
-   "sources": [
-    {
-     "url": "developer.apple.com/design/human-interface-guidelines/dark-mode",
-     "date": "change log 6 Aug 2024; read 26 Aug 2026"
+      "id": "G-ICON-6",
+      "area": "store",
+      "platform": "google",
+      "severity": "blocker",
+      "title": "No Play Store icon",
+      "requirement": "512×512 px, 32-bit PNG, sRGB, maximum 1024 KB, full square. Mandatory to publish a listing.",
+      "sources": [
+        {
+          "url": "developer.android.com/distribute/google-play/resources/icon-design-specifications",
+          "date": "page updated 15 Jun 2026; read 26 Aug 2026"
+        },
+        {
+          "url": "support.google.com/googleplay/android-developer/answer/9866151",
+          "date": "no date published; read 26 Aug 2026"
+        }
+      ],
+      "measured": "Nothing of that size or purpose exists.",
+      "fix": "Closed 26 August 2026. 512 x 512, 32-bit PNG with a fully opaque alpha band, sRGB declared, 13,037 bytes against Google's 1,024,000 limit, and every pixel outside Play's 30 per cent corner arc is measured as ground.",
+      "status": "closed"
     },
     {
-     "url": "developer.android.com/docs/quality-guidelines/core-app-quality",
-     "date": "page updated 21 Aug 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "Tokens emit CSS, DTCG JSON, TypeScript and Python. There is no Swift, Kotlin, Xcode or Gradle file in the repository; benchmark criterion 23 records this in writing. The three platform target tokens, 28, 44 and 48 px, are cited figures rather than outputs.",
-   "fix": "Closed 26 August 2026. 15_native/ emits a Swift package and a Kotlin token layer, both framework-free by design, which is what lets a compiler run on them: the Swift package builds and its tests pass under Swift 6.3.3, and the Kotlin compiles under kotlinc 2.4.10. Stronger than either compile, because a wrong hex is valid Swift: all 152 emitted colour values are read back out of the generated text and re-derived from the DTCG token they came from, each RGB component included. The Bangla ramp ships as values-bn/dimens.xml, applied by Android's own locale mechanism, with the caption size clamped to the measured 12 sp floor.",
-   "status": "closed"
-  },
-  {
-   "id": "G-NATIVE-2",
-   "area": "native",
-   "platform": "both",
-   "severity": "major",
-   "title": "No component maps to either platform",
-   "requirement": "Apple gives default and minimum control sizes per platform — 44×44 pt default and 28×28 pt minimum on iOS and iPadOS — and asks for roughly 12 pt of padding around bezelled elements and 24 pt around unbezelled ones. Android core app quality requires touch targets of at least 48 dp (Touch_Target_Size), 3:1 contrast for large text and graphics and 4.5:1 for small text (Visual_Contrast), and a content description on every element that is not a TextView (Content_Description). A stylesheet can satisfy none of these on either platform.",
-   "sources": [
-    {
-     "url": "developer.apple.com/design/human-interface-guidelines/accessibility",
-     "date": "change log 9 Jun 2025; read 26 Aug 2026"
+      "id": "G-STORE-1",
+      "area": "store",
+      "platform": "google",
+      "severity": "blocker",
+      "title": "No feature graphic",
+      "requirement": "1024×500 px, JPEG or 24-bit PNG, no alpha. \"You must provide a feature graphic to publish your store listing.\" It must not contain device images, screenshots, or small text illegible when scaled down, and must not resemble an advertisement.",
+      "sources": [
+        {
+          "url": "support.google.com/googleplay/android-developer/answer/9866151",
+          "date": "no date published; read 26 Aug 2026"
+        },
+        {
+          "url": "developer.android.com/docs/quality-guidelines/core-app-quality",
+          "date": "page updated 21 Aug 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "No file of that dimension exists and the term appears nowhere in the repository.",
+      "fix": "Closed 26 August 2026. 1024 x 500, 24-bit, no alpha band, sRGB declared. It carries the mark, the name and one line — no device image, no screenshot, and no small text, per Play_Feature_Graphic.",
+      "status": "closed"
     },
     {
-     "url": "developer.android.com/docs/quality-guidelines/core-app-quality",
-     "date": "page updated 21 Aug 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "30 cards, HTML and CSS only: 1,109 lines and 87 class blocks in 08_components/src/components.css. No SwiftUI, no Compose, no Material role names, no Cupertino equivalents.",
-   "fix": "Closed 27 August 2026 for the component layer. 16 SwiftUI components are authored against the CSS reference and compile: the package builds and its tests pass under Swift 6.3.3, and a gate refuses any authored file carrying a literal colour or a literal size — the native analogue of the stylesheet guard, proven in both directions by planting a literal and watching it fail. Android takes the idiomatic route instead of a parallel set: Material's own components read colour, type and shape from the theme, so AnindaTheme supplies a ColorScheme built with the PRIMARY constructor and every Material component is themed at once. Reimplementing Compose's Button would discard the ripple, the state layers, the touch-target expansion and the accessibility it already has. Two things remain: the eight patterns are not implemented, and the components are compiled for macOS here and for the other four Apple platforms only by CI, because this machine has one SDK.",
-   "status": "closed"
-  },
-  {
-   "id": "G-MOTION-1",
-   "area": "motion",
-   "platform": "both",
-   "severity": "minor",
-   "title": "Reduced motion removes transitions rather than substituting a fade",
-   "requirement": "Apple: \"When this setting is active, ensure your app or game responds by reducing automatic and repetitive animations, including zooming, scaling, and peripheral motion,\" and lists replacing transitions among the practices for doing so. Material expresses the same split in its motion scheme: every effects damping is 1.0 and never overshoots, while spatial motion does — so the reduced case is the effects half, not the absence of both.",
-   "sources": [
-    {
-     "url": "developer.apple.com/design/human-interface-guidelines/accessibility",
-     "date": "change log 9 Jun 2025; read 26 Aug 2026"
+      "id": "G-STORE-2",
+      "area": "store",
+      "platform": "both",
+      "severity": "blocker",
+      "title": "No store screenshots, and none can honestly be made yet",
+      "requirement": "Google: at least two across device types, mandatory to publish. Apple: iPhone 6.9 inch and iPad 13 inch, 1 to 10 per device type, no alpha channels. Apple additionally forbids screenshots that show only title art, a login page or a splash screen.",
+      "sources": [
+        {
+          "url": "developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
+          "date": "read 26 Aug 2026"
+        },
+        {
+          "url": "developer.apple.com/app-store/review/guidelines/",
+          "date": "App Review Guideline 2.3.3; read 26 Aug 2026"
+        },
+        {
+          "url": "support.google.com/googleplay/android-developer/answer/9866151",
+          "date": "no date published; read 26 Aug 2026"
+        }
+      ],
+      "measured": "No screenshot assets exist. No Aninda Studio app exists either, so there is nothing truthful to photograph.",
+      "fix": "Part met 26 August 2026. Correctly sized frames exist for iPhone 6.9 inch, iPad 13 inch and Android phone, drawn with a 45-degree hatch and labelled so they could not be mistaken for a capture, and each names the file that should replace it. A read-only --check-captures mode measures the owner's own screenshots. What cannot be closed without an app is the screenshots themselves.",
+      "status": "open"
     },
     {
-     "url": "github.com/androidx/androidx",
-     "date": "StandardMotionTokens.kt and ExpressiveMotionTokens.kt, VERSION v0_14_0; read 26 Aug 2026"
-    }
-   ],
-   "measured": "Benchmark criterion 20, part met: nothing moves, blurs or changes depth either way, but under prefers-reduced-motion both duration tokens fall to 1 ms and the colour transitions are removed rather than cross-faded.",
-   "fix": "Substitute a fade rather than collapsing the duration.",
-   "status": "open"
-  },
-  {
-   "id": "G-ICON-7",
-   "area": "icon",
-   "platform": "apple",
-   "severity": "major",
-   "title": "No artefact is designated the Mono appearance layer",
-   "requirement": "Apple's specification table lists six appearances for iOS, iPadOS and macOS; the prose says four; Icon Composer has you author three, of which Mono is one, and previews clear and tinted from it.",
-   "sources": [
+      "id": "G-STORE-3",
+      "area": "store",
+      "platform": "both",
+      "severity": "minor",
+      "title": "No raster declares its colour space",
+      "requirement": "Play requires sRGB for the store icon. Apple supports sRGB, Gray Gamma 2.2 and Display P3.",
+      "sources": [
+        {
+          "url": "developer.android.com/distribute/google-play/resources/icon-design-specifications",
+          "date": "page updated 15 Jun 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "Benchmark criterion 7, scored 19 August 2026: no P3 asset exists anywhere, but none of the 19 exported rasters carries an embedded profile, so sRGB is implicit rather than declared.",
+      "fix": "Closed 26 August 2026 for the store packages: every raster written by 14_delivery/build.py carries an sRGB chunk, read back off the file by guard_srgb_declared. The 20 rasters in 10_assets still carry none, so criterion 7 is closed for the store assets and open for the web set.",
+      "status": "closed"
+    },
     {
-     "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
-     "date": "change log 8 Jun 2026; read 26 Aug 2026"
-    }
-   ],
-   "measured": "Benchmark criterion 6, part met: single-colour recolourable marks render legibly at 1024 px and at the documented 16 px floor, counter open in both, but no artefact is designated a Mono appearance layer.",
-   "fix": "Closed 26 August 2026. icon-apple-1024-mono.svg is designated the Mono appearance, carries no ground, and is refused by check_transparent_layer if one is ever baked in.",
-   "status": "closed"
-  },
-  {
-   "id": "G-A11Y-1",
-   "area": "accessibility",
-   "platform": "apple",
-   "severity": "minor",
-   "title": "Contrast is measured by WCAG relative luminance only; Apple now names APCA as well",
-   "requirement": "Apple's Accessibility page names both the Web Content Accessibility Guidelines and the Accessible Perceptual Contrast Algorithm as standards of measure.",
-   "sources": [
+      "id": "G-STORE-4",
+      "area": "store",
+      "platform": "google",
+      "severity": "minor",
+      "title": "No notification icon",
+      "requirement": "A small icon is the only user-visible content a notification requires. It renders monochrome in the status bar and the system tints it from Android 12.",
+      "sources": [
+        {
+          "url": "developer.android.com/develop/ui/views/notifications/build-notification",
+          "date": "page updated 14 Aug 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "None exists. The answer is computable from the mark's own floor: at 24 dp the regular stroke renders at 9 × 0.920767 × 0.24 = 1.99 px, below the 2.4 px the 16 px mark floor is written against, while the heavy stroke gives 3.05 px.",
+      "fix": "Not required to publish either listing, and no app exists to notify. The measurement is recorded so the next person does not re-derive it: if one is ever needed, it is the heavy artwork.",
+      "status": "deferred"
+    },
     {
-     "url": "developer.apple.com/design/human-interface-guidelines/accessibility",
-     "date": "change log 9 Jun 2025; read 26 Aug 2026"
-    }
-   ],
-   "measured": "05_colour/engine.py measures WCAG 2.1 relative-luminance ratios with coloraide, method wcag21. There is no APCA anywhere in the repository.",
-   "fix": "Additive, not a defect. Publishing an APCA figure beside the WCAG one would say more about small text than a ratio can. It changes no existing verdict.",
-   "status": "open"
-  },
-  {
-   "id": "G-A11Y-2",
-   "area": "accessibility",
-   "platform": "apple",
-   "severity": "minor",
-   "title": "Accessibility Nutrition Labels are unaddressed",
-   "requirement": "Voluntary today, with nine declarable features. The threshold to claim one is strict: a person must be able to complete all common tasks of the app using that feature.",
-   "sources": [
+      "id": "G-COLOUR-1",
+      "area": "colour",
+      "platform": "google",
+      "severity": "blocker",
+      "title": "No token is named for the colour that sits on the accent",
+      "requirement": "Material 3 cannot construct a ColorScheme without onPrimary, and every on-role and on-container role has the same requirement. The Compose primary constructor takes 48 named parameters and has no defaults.",
+      "sources": [
+        {
+          "url": "m3.material.io/styles/color/roles",
+          "date": "read 26 Aug 2026 through a browser"
+        }
+      ],
+      "measured": "08_components/src/components.css:225 paints .as-btn--primary with background-color: var(--as-accent) and color: var(--as-surface-lowest), and 08_components/check.py already measures that composited pair in a real browser at rest, hover and active. So the pair is proven. What is missing is the name: no token carries it, so nothing downstream can reference it. The Figma plugin's own receipt records the consequence — it draws outlined rather than filled buttons \"because no 'on accent' text colour is defined\".",
+      "fix": "Closed 26 August 2026. color.accent.on is emitted as --as-accent-on in all four themes. No colour was invented: the value is surface.lowest, which components.css was already using. What is new is the name and the proof — it is measured as ink against EVERY fill that carries it (accent, accent-hover and danger) and the published figure is the worst of those. In the dark themes the hardest ground turned out to be danger rather than accent, so a role proven only against the accent would have published 6.2931 instead of the true worst of 5.6640. The Figma library now draws filled buttons, which is what it recorded the missing role as the reason for not doing.",
+      "status": "closed"
+    },
     {
-     "url": "developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels",
-     "date": "read 26 Aug 2026"
-    }
-   ],
-   "measured": "Apple's own wording is \"voluntary to start\", and the Upcoming Requirements page carries no entry for them as at 26 August 2026.",
-   "fix": "Record which of the nine this system can already substantiate from measurements it holds, and which it cannot. Claiming one needs an app, because the threshold is about completing tasks.",
-   "status": "deferred"
-  },
-  {
-   "id": "G-REC-1",
-   "area": "record",
-   "platform": "none",
-   "severity": "major",
-   "title": "The type recommendation names a stack that did not ship",
-   "requirement": "One name for one thing.",
-   "sources": [],
-   "measured": "06_type/RECOMMENDATION.md recommends Inter, Noto Sans Bengali and JetBrains Mono. 07_tokens/build.py ships Literata, Noto Serif Bengali and Aninda Mono. No document records the reversal; it is visible only in the generator.",
-   "fix": "Record the reversal and its reason where the recommendation is, so a reader is not sent to the wrong stack.",
-   "status": "open"
-  },
-  {
-   "id": "G-REC-2",
-   "area": "record",
-   "platform": "none",
-   "severity": "minor",
-   "title": "A third, stale type answer survives in the directions build",
-   "requirement": "One name for one thing.",
-   "sources": [],
-   "measured": "03_directions/build.py names Estuary's type as Archivo, Noto Sans Bengali and JetBrains Mono. The file is flagged as one-off exploration and sits outside the build chain, but it still generates COMPARE.html and COMPARE.pdf.",
-   "fix": "Mark the stale answer where it is generated, rather than leaving a reader to discover the contradiction.",
-   "status": "open"
-  },
-  {
-   "id": "G-REC-3",
-   "area": "record",
-   "platform": "none",
-   "severity": "minor",
-   "title": "The mark's minimum size is not in the mark's own manifest",
-   "requirement": "A consumer reading the manifest should find every rule the manifest is about.",
-   "sources": [],
-   "measured": "04_mark/manifest.json states the stroke rule and the safe field but no minimum size. The 16 px floor lives in a plugin script, and its own reference document acknowledges the split.",
-   "fix": "Carry the floor in the manifest, computed rather than typed.",
-   "status": "open"
-  },
-  {
-   "id": "G-REC-4",
-   "area": "record",
-   "platform": "none",
-   "severity": "major",
-   "title": "The benchmark missed an announcement nine days older than its own check date",
-   "requirement": "A benchmark that claims a check date must actually cover what was published before it.",
-   "sources": [
+      "id": "G-COLOUR-2",
+      "area": "colour",
+      "platform": "google",
+      "severity": "major",
+      "title": "No Material 3 role mapping exists",
+      "requirement": "26 documented colour roles in six groups, plus add-on roles; 48 parameters on the Compose constructor.",
+      "sources": [
+        {
+          "url": "m3.material.io/styles/color/roles",
+          "date": "read 26 Aug 2026 through a browser"
+        }
+      ],
+      "measured": "18 semantic colours per theme: 7 surfaces plus ink, ink-muted, line, accent, accent-edge, accent-hover, focus-ring, success, warning, danger and info.",
+      "fix": "Closed 26 August 2026. 15_native/material3.py derives all 48 parameters of androidx.compose.material3.ColorScheme's PRIMARY constructor for each of the four themes, and every emitted value is proven to be bit-identical to a semantic role, a tonal surface, or a step of one of the six committed ramps — a value matching none of those stops the build. The primary constructor is used rather than lightColorScheme() precisely because the latter defaults every parameter to Material's baseline purple, so a forgotten role would ship an unmeasured colour in silence. 23 pairs a Material component would break on if they were one colour are gated, along with a floor on distinct colours per theme; the four schemes carry 25 to 27.",
+      "status": "closed"
+    },
     {
-     "url": "developer.apple.com/app-store/asset-best-practices/",
-     "date": "announced 5 Aug 2026; read 26 Aug 2026"
+      "id": "G-COLOUR-3",
+      "area": "colour",
+      "platform": "google",
+      "severity": "major",
+      "title": "Material needs secondary and tertiary groups; the brand premise forbids a second expressive colour",
+      "requirement": "Material components reference secondary and tertiary roles, so those roles must exist.",
+      "sources": [
+        {
+          "url": "m3.material.io/styles/color/roles",
+          "date": "read 26 Aug 2026 through a browser"
+        }
+      ],
+      "measured": "05_colour/directions/estuary.json states the premise: \"the warmth coming from the paper rather than from a second expressive colour.\" Two brand families exist, ground and accent, and no third hue.",
+      "fix": "Closed 26 August 2026. Secondary is filled from the ground family and tertiary from the info family. Every Material role exists and no new hue entered the brand, so the premise in estuary.json holds as written. Material Theme Builder would have derived a tertiary by rotating the hue about 60 degrees; that is a brand decision and no measurement makes it one a generator may take. The consequence — an Aninda scheme carries less hue variety than a stock Material one — is recorded in material3.roles.json rather than hidden.",
+      "status": "closed"
+    },
+    {
+      "id": "G-NATIVE-1",
+      "area": "native",
+      "platform": "both",
+      "severity": "major",
+      "title": "Tokens reach no Apple or Android surface",
+      "requirement": "Apple: \"When you need a custom color, add a Color Set asset to your app's asset catalog in Xcode, and specify the bright and dim variants… Avoid using hard-coded color values or colors that don't adapt.\" Android core app quality requires app content to support both light and dark themes (Theme_Support). Neither is reachable from a stylesheet.",
+      "sources": [
+        {
+          "url": "developer.apple.com/design/human-interface-guidelines/dark-mode",
+          "date": "change log 6 Aug 2024; read 26 Aug 2026"
+        },
+        {
+          "url": "developer.android.com/docs/quality-guidelines/core-app-quality",
+          "date": "page updated 21 Aug 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "Tokens emit CSS, DTCG JSON, TypeScript and Python. There is no Swift, Kotlin, Xcode or Gradle file in the repository; benchmark criterion 23 records this in writing. The three platform target tokens, 28, 44 and 48 px, are cited figures rather than outputs.",
+      "fix": "Closed 26 August 2026. 15_native/ emits a Swift package and a Kotlin token layer, both framework-free by design, which is what lets a compiler run on them: the Swift package builds and its tests pass under Swift 6.3.3, and the Kotlin compiles under kotlinc 2.4.10. Stronger than either compile, because a wrong hex is valid Swift: all 152 emitted colour values are read back out of the generated text and re-derived from the DTCG token they came from, each RGB component included. The Bangla ramp ships as values-bn/dimens.xml, applied by Android's own locale mechanism, with the caption size clamped to the measured 12 sp floor.",
+      "status": "closed"
+    },
+    {
+      "id": "G-NATIVE-2",
+      "area": "native",
+      "platform": "both",
+      "severity": "major",
+      "title": "No component maps to either platform",
+      "requirement": "Apple gives default and minimum control sizes per platform — 44×44 pt default and 28×28 pt minimum on iOS and iPadOS — and asks for roughly 12 pt of padding around bezelled elements and 24 pt around unbezelled ones. Android core app quality requires touch targets of at least 48 dp (Touch_Target_Size), 3:1 contrast for large text and graphics and 4.5:1 for small text (Visual_Contrast), and a content description on every element that is not a TextView (Content_Description). A stylesheet can satisfy none of these on either platform.",
+      "sources": [
+        {
+          "url": "developer.apple.com/design/human-interface-guidelines/accessibility",
+          "date": "change log 9 Jun 2025; read 26 Aug 2026"
+        },
+        {
+          "url": "developer.android.com/docs/quality-guidelines/core-app-quality",
+          "date": "page updated 21 Aug 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "30 cards, HTML and CSS only: 1,109 lines and 87 class blocks in 08_components/src/components.css. No SwiftUI, no Compose, no Material role names, no Cupertino equivalents.",
+      "fix": "Closed 27 August 2026 for the component layer. 16 SwiftUI components are authored against the CSS reference and compile: the package builds and its tests pass under Swift 6.3.3, and a gate refuses any authored file carrying a literal colour or a literal size — the native analogue of the stylesheet guard, proven in both directions by planting a literal and watching it fail. Android takes the idiomatic route instead of a parallel set: Material's own components read colour, type and shape from the theme, so AnindaTheme supplies a ColorScheme built with the PRIMARY constructor and every Material component is themed at once. Reimplementing Compose's Button would discard the ripple, the state layers, the touch-target expansion and the accessibility it already has. Two things remain: the eight patterns are not implemented, and the components are compiled for macOS here and for the other four Apple platforms only by CI, because this machine has one SDK.",
+      "status": "closed"
+    },
+    {
+      "id": "G-MOTION-1",
+      "area": "motion",
+      "platform": "both",
+      "severity": "minor",
+      "title": "Reduced motion removes transitions rather than substituting a fade",
+      "requirement": "Apple: \"When this setting is active, ensure your app or game responds by reducing automatic and repetitive animations, including zooming, scaling, and peripheral motion,\" and lists replacing transitions among the practices for doing so. Material expresses the same split in its motion scheme: every effects damping is 1.0 and never overshoots, while spatial motion does — so the reduced case is the effects half, not the absence of both.",
+      "sources": [
+        {
+          "url": "developer.apple.com/design/human-interface-guidelines/accessibility",
+          "date": "change log 9 Jun 2025; read 26 Aug 2026"
+        },
+        {
+          "url": "github.com/androidx/androidx",
+          "date": "StandardMotionTokens.kt and ExpressiveMotionTokens.kt, VERSION v0_14_0; read 26 Aug 2026"
+        }
+      ],
+      "measured": "Benchmark criterion 20, part met: nothing moves, blurs or changes depth either way, but under prefers-reduced-motion both duration tokens fall to 1 ms and the colour transitions are removed rather than cross-faded.",
+      "fix": "Substitute a fade rather than collapsing the duration.",
+      "status": "open"
+    },
+    {
+      "id": "G-ICON-7",
+      "area": "icon",
+      "platform": "apple",
+      "severity": "major",
+      "title": "No artefact is designated the Mono appearance layer",
+      "requirement": "Apple's specification table lists six appearances for iOS, iPadOS and macOS; the prose says four; Icon Composer has you author three, of which Mono is one, and previews clear and tinted from it.",
+      "sources": [
+        {
+          "url": "developer.apple.com/design/human-interface-guidelines/app-icons",
+          "date": "change log 8 Jun 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "Benchmark criterion 6, part met: single-colour recolourable marks render legibly at 1024 px and at the documented 16 px floor, counter open in both, but no artefact is designated a Mono appearance layer.",
+      "fix": "Closed 26 August 2026. icon-apple-1024-mono.svg is designated the Mono appearance, carries no ground, and is refused by check_transparent_layer if one is ever baked in.",
+      "status": "closed"
+    },
+    {
+      "id": "G-A11Y-1",
+      "area": "accessibility",
+      "platform": "apple",
+      "severity": "minor",
+      "title": "Contrast is measured by WCAG relative luminance only; Apple now names APCA as well",
+      "requirement": "Apple's Accessibility page names both the Web Content Accessibility Guidelines and the Accessible Perceptual Contrast Algorithm as standards of measure.",
+      "sources": [
+        {
+          "url": "developer.apple.com/design/human-interface-guidelines/accessibility",
+          "date": "change log 9 Jun 2025; read 26 Aug 2026"
+        }
+      ],
+      "measured": "05_colour/engine.py measures WCAG 2.1 relative-luminance ratios with coloraide, method wcag21. There is no APCA anywhere in the repository.",
+      "fix": "Additive, not a defect. Publishing an APCA figure beside the WCAG one would say more about small text than a ratio can. It changes no existing verdict.",
+      "status": "open"
+    },
+    {
+      "id": "G-A11Y-2",
+      "area": "accessibility",
+      "platform": "apple",
+      "severity": "minor",
+      "title": "Accessibility Nutrition Labels are unaddressed",
+      "requirement": "Voluntary today, with nine declarable features. The threshold to claim one is strict: a person must be able to complete all common tasks of the app using that feature.",
+      "sources": [
+        {
+          "url": "developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels",
+          "date": "read 26 Aug 2026"
+        }
+      ],
+      "measured": "Apple's own wording is \"voluntary to start\", and the Upcoming Requirements page carries no entry for them as at 26 August 2026.",
+      "fix": "Record which of the nine this system can already substantiate from measurements it holds, and which it cannot. Claiming one needs an app, because the threshold is about completing tasks.",
+      "status": "deferred"
+    },
+    {
+      "id": "G-REC-1",
+      "area": "record",
+      "platform": "none",
+      "severity": "major",
+      "title": "The type recommendation names a stack that did not ship",
+      "requirement": "One name for one thing.",
+      "sources": [],
+      "measured": "06_type/RECOMMENDATION.md recommends Inter, Noto Sans Bengali and JetBrains Mono. 07_tokens/build.py ships Literata, Noto Serif Bengali and Aninda Mono. No document records the reversal; it is visible only in the generator.",
+      "fix": "Record the reversal and its reason where the recommendation is, so a reader is not sent to the wrong stack.",
+      "status": "open"
+    },
+    {
+      "id": "G-REC-2",
+      "area": "record",
+      "platform": "none",
+      "severity": "minor",
+      "title": "A third, stale type answer survives in the directions build",
+      "requirement": "One name for one thing.",
+      "sources": [],
+      "measured": "03_directions/build.py names Estuary's type as Archivo, Noto Sans Bengali and JetBrains Mono. The file is flagged as one-off exploration and sits outside the build chain, but it still generates COMPARE.html and COMPARE.pdf.",
+      "fix": "Closed 27 August 2026 by removing the exploration entirely. The folder held a fourth answer to the typeface question — Archivo, Noto Sans Bengali and JetBrains Mono for Estuary — plus every rejected direction's colours and hand-typed Bangla, and it was outside the rebuild chain, so nothing regenerated it and no gate compared it to anything. Owner's decision: moved to Trash rather than corrected, because a record that contradicts what shipped is worse than no record, and the reason the palette was chosen over three alternatives is written down in 05_colour/directions/natural.json's own premise and supersedes block. Its NOT_IN_CHAIN entry in scripts/readme.py went in the same commit, because that guard raises on an entry naming a file that is not there.",
+      "status": "closed"
+    },
+    {
+      "id": "G-REC-3",
+      "area": "record",
+      "platform": "none",
+      "severity": "minor",
+      "title": "The mark's minimum size is not in the mark's own manifest",
+      "requirement": "A consumer reading the manifest should find every rule the manifest is about.",
+      "sources": [],
+      "measured": "04_mark/manifest.json states the stroke rule and the safe field but no minimum size. The 16 px floor lives in a plugin script, and its own reference document acknowledges the split.",
+      "fix": "Carry the floor in the manifest, computed rather than typed.",
+      "status": "open"
+    },
+    {
+      "id": "G-REC-4",
+      "area": "record",
+      "platform": "none",
+      "severity": "major",
+      "title": "The benchmark missed an announcement nine days older than its own check date",
+      "requirement": "A benchmark that claims a check date must actually cover what was published before it.",
+      "sources": [
+        {
+          "url": "developer.apple.com/app-store/asset-best-practices/",
+          "date": "announced 5 Aug 2026; read 26 Aug 2026"
+        }
+      ],
+      "measured": "Apple announced new App Store creative asset slots on 5 August 2026. The benchmark was checked on 14 August 2026 and does not mention them. The Play icon design specification, updated 15 June 2026, was missed the same way.",
+      "fix": "The fault is structural rather than careless: the check read guideline pages and not the developer news feed or the distribution pages. Both are now sources, and the omission is recorded as a method finding rather than quietly patched.",
+      "status": "open"
     }
-   ],
-   "measured": "Apple announced new App Store creative asset slots on 5 August 2026. The benchmark was checked on 14 August 2026 and does not mention them. The Play icon design specification, updated 15 June 2026, was missed the same way.",
-   "fix": "The fault is structural rather than careless: the check read guideline pages and not the developer news feed or the distribution pages. Both are now sources, and the omission is recorded as a method finding rather than quietly patched.",
-   "status": "open"
-  }
- ]
+  ]
 }
