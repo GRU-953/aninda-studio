@@ -79,12 +79,19 @@ valid Swift and would pass every compiler.
   which is why there is no icon set, no navigation library and no `LazyColumn`
   here.
 
-  **It is no longer the only check on that code.** A Gradle job on `ubuntu-24.04`
-  compiles the Compose theme and the eight patterns against REAL androidx —
-  Material 3 from the stable channel, by way of `compose-bom`. The stub is what a
-  developer machine without the Android SDK can run; the Gradle gate is what says
-  whether the code actually builds. Where the two disagree, the Gradle gate is
-  right, and CI is the only place it runs.
+  **A Gradle gate now checks that code against the real library, and it is not
+  passing yet.** On `ubuntu-24.04` it resolves androidx — Material 3 from the
+  stable channel by way of `compose-bom` — and compiles `:compose` and
+  `:patterns`. As of 28 August 2026 the theme compiles and THE PATTERNS DO NOT:
+  `:patterns:compileReleaseKotlin` fails against the real library while passing
+  against the declared surface, which is the exact discrepancy this gate was built
+  to find and the reason it was worth building. The specific errors are not yet
+  fixed, and the gate lives on the `compose-against-androidx` branch rather than
+  on `main` for that reason.
+
+  The stub is what a machine without the Android SDK can run; the Gradle gate is
+  what says whether the code actually builds. Where the two disagree, the Gradle
+  gate is right.
 - **The Gradle gate touches the network, and this is the only thing here that
   does.** Every other build script in this repository reads the tree and nothing
   else. Resolution is pinned by VERSION and by channel, and the gate runs in CI

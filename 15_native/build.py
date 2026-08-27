@@ -645,6 +645,24 @@ def compile_gradle() -> str:
         cwd=root, capture_output=True, text=True)
     if res.returncode != 0:
         out = res.stdout + res.stderr
+        # KOTLIN'S OWN ERRORS ARE NOT IN THE DEFAULT OUTPUT. Gradle's Build Tools
+        # API reports "Compilation error. See log for more details" and logs the
+        # `e: file://...` lines at info level, so the first failure of this gate
+        # said a compile had failed and not one word about where. Re-run once, at
+        # info, purely to recover them — only on the failure path, so a passing run
+        # never pays for it.
+        deep = subprocess.run(
+            ["gradle", "--no-daemon", "--console=plain", "--info",
+             ":compose:compileReleaseKotlin", ":patterns:compileReleaseKotlin"],
+            cwd=root, capture_output=True, text=True)
+        kotlin_errors = [l.strip() for l in (deep.stdout + deep.stderr).splitlines()
+                         if l.lstrip().startswith("e: ")][:15]
+        if kotlin_errors:
+            raise BuildError(
+                "the Compose sources do not compile against androidx:\n  "
+                + "\n  ".join(
+                    x.replace(str(root) + "/", "").replace("file://", "")
+                    for x in kotlin_errors))
         # KEEP GRADLE'S OWN DIAGNOSIS. The first version of this filtered for
         # ": error:" and "FAILURE:", which threw away the "* What went wrong:"
         # block — the only part that says WHY. The result was a gate whose failure
@@ -1285,12 +1303,19 @@ valid Swift and would pass every compiler.
   which is why there is no icon set, no navigation library and no `LazyColumn`
   here.
 
-  **It is no longer the only check on that code.** A Gradle job on `ubuntu-24.04`
-  compiles the Compose theme and the eight patterns against REAL androidx —
-  Material 3 from the stable channel, by way of `compose-bom`. The stub is what a
-  developer machine without the Android SDK can run; the Gradle gate is what says
-  whether the code actually builds. Where the two disagree, the Gradle gate is
-  right, and CI is the only place it runs.
+  **A Gradle gate now checks that code against the real library, and it is not
+  passing yet.** On `ubuntu-24.04` it resolves androidx — Material 3 from the
+  stable channel by way of `compose-bom` — and compiles `:compose` and
+  `:patterns`. As of 28 August 2026 the theme compiles and THE PATTERNS DO NOT:
+  `:patterns:compileReleaseKotlin` fails against the real library while passing
+  against the declared surface, which is the exact discrepancy this gate was built
+  to find and the reason it was worth building. The specific errors are not yet
+  fixed, and the gate lives on the `compose-against-androidx` branch rather than
+  on `main` for that reason.
+
+  The stub is what a machine without the Android SDK can run; the Gradle gate is
+  what says whether the code actually builds. Where the two disagree, the Gradle
+  gate is right.
 - **The Gradle gate touches the network, and this is the only thing here that
   does.** Every other build script in this repository reads the tree and nothing
   else. Resolution is pinned by VERSION and by channel, and the gate runs in CI
