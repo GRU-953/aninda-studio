@@ -644,11 +644,25 @@ def compile_gradle() -> str:
          ":compose:compileReleaseKotlin", ":patterns:compileReleaseKotlin"],
         cwd=root, capture_output=True, text=True)
     if res.returncode != 0:
-        errs = [l.strip() for l in (res.stdout + res.stderr).splitlines()
-                if ": error:" in l or "FAILURE:" in l][:8]
+        out = res.stdout + res.stderr
+        # KEEP GRADLE'S OWN DIAGNOSIS. The first version of this filtered for
+        # ": error:" and "FAILURE:", which threw away the "* What went wrong:"
+        # block — the only part that says WHY. The result was a gate whose failure
+        # message read "FAILURE: Build failed with an exception." and nothing else,
+        # which is a gate that cannot be acted on.
+        lines = out.splitlines()
+        why = []
+        for i, line in enumerate(lines):
+            if "What went wrong" in line:
+                why = [l.rstrip() for l in lines[i:i + 25] if l.strip()]
+                break
+        if not why:
+            why = [l.rstrip() for l in lines
+                   if ": error:" in l or "Could not" in l or "not found" in l
+                   or "Unresolved" in l or "Plugin [" in l][:12]
         raise BuildError(
             "the Compose sources do not compile against androidx:\n  "
-            + "\n  ".join(errs or [(res.stdout + res.stderr)[-1500:]]))
+            + "\n  ".join(why or [out[-2000:]]))
     ver = subprocess.run(["gradle", "--version"], cwd=root,
                          capture_output=True, text=True).stdout
     gradle_v = next((l.split()[-1] for l in ver.splitlines()
@@ -1376,6 +1390,20 @@ def main(argv: list[str]) -> int:
         # slowest and the only one that reaches outside the machine.
         for name, fn in (("swift", compile_swift), ("kotlin", compile_kotlin),
                          ("gradle", lambda _: compile_gradle())):
+            # GRADLE IS OPT-IN, and the others are not. `required` below only
+            # governs what happens when a toolchain is ABSENT; a real compile
+            # failure fails the run either way, which is right for swift and kotlin
+            # and wrong for this one. Gradle is on the macOS runner too, so the
+            # first version of this made native-apple resolve androidx and fail on
+            # it — a Swift job reporting a Compose error.
+            #
+            # It is heavyweight and it touches the network. A run that did not ask
+            # for it should not pay for it.
+            if name == "gradle" and name not in required:
+                notes.append("gradle: NOT ASKED FOR — this run did not require it, "
+                             "and no claim is made that the Compose sources build "
+                             "against androidx")
+                continue
             try:
                 notes.append(fn(files))
                 if name == "swift":
