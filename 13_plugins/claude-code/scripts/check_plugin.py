@@ -33,7 +33,7 @@ EXPECTED_SKILLS = ("aninda-brand", "aninda-repo", "aninda-review")
 EXPECTED_COMMANDS = ("asset", "design", "check", "init")
 BRAND_REFERENCES = (
     "colour", "typography", "layout", "logo", "icons",
-    "motion", "voice", "bangla", "licence", "naming",
+    "motion", "voice", "licence", "naming",
 )
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 
@@ -192,126 +192,6 @@ def check_skills(problems: Problems) -> None:
         problems.wrong(f"skills/ holds folders nobody expects: {', '.join(sorted(extra))}")
 
 
-def check_bangla_agreement(problems: Problems) -> None:
-    """The table a person reads and the JSON a script reads must say the same thing —
-    and BOTH must match the document they cite as their source.
-
-    Comparing only the plugin's two copies to each other left four copies of these
-    31 pairs with one comparison between two of them. ms-2's English gloss read
-    "That file is too big. The limit is 10 MB." while 06_type/review_bangla.py,
-    which BANGLA-STANDARD.md quotes, says "That file is too large. The limit is
-    10 MB." The Bangla was identical in all four; only the gloss diverged — and the
-    gloss is the only way an agent finds the right string, with the plugin's rule
-    being to use a listed string or leave the English alone.
-    """
-    json_path = SKILLS / "aninda-brand" / "assets" / "bangla-verified.json"
-    markdown_path = SKILLS / "aninda-brand" / "references" / "bangla.md"
-    if not json_path.exists() or not markdown_path.exists():
-        problems.wrong("the verified Bangla data or its reference document is missing")
-        return
-    from_json = {entry["id"]: entry["bangla"] for entry in json.loads(json_path.read_text("utf-8"))["strings"]}
-    from_markdown = {}
-    for line in markdown_path.read_text("utf-8").split("\n"):
-        row = re.match(r"^\|\s*([a-z]+-\d+)\s*\|\s*([^|]+?)\s*\|", line)
-        if row:
-            from_markdown[row.group(1)] = row.group(2).strip()
-    # The source: the review sheet's STRINGS table, which BANGLA-STANDARD.md
-    # quotes string by string. Read by parsing rather than importing, so this
-    # check does not depend on that script running.
-    source_path = REPO_ROOT / "06_type" / "review_bangla.py"
-    source: dict[str, tuple[str, str]] = {}
-    if source_path.exists():
-        text = source_path.read_text("utf-8")
-        for match in re.finditer(
-                r'\(\s*"([a-z]+-\d+)"\s*,\s*"((?:[^"\\]|\\.)*)"\s*,\s*\n?\s*"((?:[^"\\]|\\.)*)"',
-                text):
-            source[match.group(1)] = (match.group(2), match.group(3))
-        # A FLOOR, because everything below compares intersections only. If this
-        # regex stops matching — a re-quoting of those literals is enough — `source`
-        # empties, every `if key in source` finds nothing, and the whole comparison
-        # reports success having compared nothing. Proved: re-quoting the tuples cut
-        # the parse from 23 to 3 and a deliberately corrupted gloss then passed.
-        # The count is measured against what the file holds, not a number typed here.
-        declared = len(set(re.findall(r'"([a-z]+-\d+)"\s*,', text)))
-        if len(source) < declared - 2:
-            problems.wrong(
-                f"only {len(source)} strings were parsed out of "
-                f"06_type/review_bangla.py and it declares about {declared} — the "
-                f"parse broke, so this comparison did not really run")
-    else:
-        problems.wrong("06_type/review_bangla.py is missing, so the plugin's verified "
-                       "strings cannot be checked against the document they cite")
-
-    glosses = {entry["id"]: entry["english"]
-               for entry in json.loads(json_path.read_text("utf-8"))["strings"]}
-
-    # The gb-* namespace is EXCLUDED, and this is a real defect rather than a
-    # convenience: the review sheet uses gb-1 for a display row carrying three
-    # chapter titles at once ("Welcome · The name · The mark"), and the plugin uses
-    # gb-1 for the single title "Welcome". Two documents, one id namespace, two
-    # meanings. The guidebook now keys its chapters to chapter.<slug> in the
-    # register; the plugin still uses gb-*, and until it does the same these ids
-    # cannot be compared. Recorded in 01_research/OPEN-FINDINGS.md.
-    GROUPED = {key for key in source if key.startswith("gb-")}
-
-    drifted = []
-    for key, (english, bangla) in sorted(source.items()):
-        if key in GROUPED:
-            continue
-        if key in from_json and from_json[key] != bangla:
-            drifted.append(f"{key} Bangla: the plugin has {from_json[key]!r}, "
-                           f"06_type/review_bangla.py has {bangla!r}")
-    for item in drifted:
-        problems.wrong(item)
-
-    # The two files ask different questions of the same string, and for two ids
-    # the right answers differ. The review sheet's English column is "the string
-    # this row is about", shown to a reviewer beside its Bangla; the plugin's
-    # gloss is "what this Bangla means", used by an agent to find the right
-    # string. For the wordmark those are not the same thing:
-    #
-    #   wm-1  the wordmark is DRAWN lowercase, so the sheet shows "aninda studio";
-    #         the name it means is "Aninda Studio", which is the useful gloss.
-    #   wm-2  the sheet labels the row "Aninda Studio (short form)" to say which
-    #         wordmark is under review; অনিন্দ্য on its own means "Aninda".
-    #
-    # Both are right, so both stay, and the reconciliation is written here rather
-    # than left as an unexplained divergence a future reader would try to "fix".
-    # Settled by the owner on 19 August 2026.
-    #
-    # The other two in this group were real and are gone: ms-2 read "too big"
-    # against a source saying "too large", and th-3 was "High contrast" here and
-    # "More contrast" in the sheet and on the website's own theme button — one
-    # English for one string, and BANGLA-STANDARD.md reviews it as "High contrast".
-    RECONCILED = {"wm-1", "wm-2"}
-
-    gloss_drift = [
-        f"{key}: plugin gloss {glosses[key]!r}, 06_type/review_bangla.py {english!r}"
-        for key, (english, _) in sorted(source.items())
-        if key not in GROUPED and key not in RECONCILED
-        and key in glosses and glosses[key] != english
-    ]
-    for item in gloss_drift:
-        problems.wrong(item)
-    if not gloss_drift:
-        problems.ok(f"every English gloss matches 06_type/review_bangla.py, except "
-                    f"{len(RECONCILED)} recorded as deliberately different and why")
-
-    if from_json == from_markdown and not drifted and not gloss_drift:
-        problems.ok(
-            f"the {len(from_json)} verified Bangla strings agree between bangla.md, "
-            f"bangla-verified.json and the {len(source)} in 06_type/review_bangla.py, "
-            f"in Bangla and in English"
-        )
-        return
-    for key in sorted(set(from_json) | set(from_markdown)):
-        if from_json.get(key) != from_markdown.get(key):
-            problems.wrong(
-                f"verified Bangla {key} differs: bangla-verified.json has "
-                f"{from_json.get(key)!r} and bangla.md has {from_markdown.get(key)!r}"
-            )
-
-
 # Every file the skill bundles that also exists in the repository, and where it
 # comes from. The skill is meant to work standalone once installed, so it carries
 # copies — but while both live in one tree the copy must be the source, byte for
@@ -407,9 +287,11 @@ def check_bundled_copies(problems: Problems) -> None:
 
     Second, and that is what it cost: the bundled Noto Serif Bengali subset drifted
     to 450 glyphs against the source's 515, losing ten codepoints including ঠ and ২.
-    ঠ is in কণ্ঠস্বর, one of the approved strings in this skill's own
-    bangla-verified.json, and ২ is in the Bangla Academy edition year the same file
-    cites as its authority. Both rendered as tofu boxes from the skill's own font,
+    ঠ was in কণ্ঠস্বর, one of the approved strings in the skill's own
+    bangla-verified.json, and ২ was in the Bangla Academy edition year that file
+    cited as its authority. Both files were removed with the Bangla on 27 August
+    2026; this paragraph is the record of what the missing guard cost, which is why
+    the fonts are pattern-matched now. Both rendered as tofu boxes from the skill's own font,
     on green CI, because the guard for exactly this hand-listed one file of three.
 
     So the fonts are now matched by pattern too. Any file in the skill's fonts
@@ -468,55 +350,6 @@ def check_ofl_template(problems: Problems) -> None:
         return
     problems.ok("aninda-repo/templates/OFL.txt carries SIL's placeholder header and "
                 "a licence body byte-identical to the OFL this repository ships")
-
-
-def check_bangla_font_coverage(problems: Problems) -> None:
-    """The bundled Bangla font must be able to draw the Bangla this skill ships.
-
-    A byte-for-byte drift check is not enough on its own. The subsets are built
-    from the union of what the 30 component cards contain, so a Bangla character
-    that appears only in the plugin's own data was never in the font — and the
-    plugin is the surface that carries this system's Bangla to other people. When
-    this guard was written it found ৫, the Bengali five in the Bangla Academy
-    reprint year the skill cites as its authority, and ঝ in the reference tables.
-    08_components/build.py now folds these two files into the charset, so the fix
-    is at the subsetter and this is the check that says it held.
-
-    Measured from the font's cmap, not asserted.
-    """
-    try:
-        from fontTools.ttLib import TTFont
-    except ImportError:
-        problems.wrong("fontTools is not importable, so the bundled Bangla font "
-                       "cannot be checked against the Bangla this skill ships")
-        return
-    font_path = (SKILLS / "aninda-brand" / "assets" / "fonts"
-                 / "notoserifbengali-subset.woff2")
-    if not font_path.exists():
-        problems.wrong(f"{font_path.relative_to(SKILLS)} is missing")
-        return
-    covered = set(TTFont(str(font_path)).getBestCmap())
-    sources = [SKILLS / "aninda-brand" / "assets" / "bangla-verified.json",
-               SKILLS / "aninda-brand" / "references" / "bangla.md"]
-    missing: dict[str, set[str]] = {}
-    for source in sources:
-        if not source.exists():
-            problems.wrong(f"{source.relative_to(SKILLS)} is missing")
-            continue
-        text = source.read_text(encoding="utf-8")
-        gap = {ch for ch in text if "\u0980" <= ch <= "\u09ff" and ord(ch) not in covered}
-        if gap:
-            missing[source.relative_to(SKILLS).as_posix()] = gap
-    if missing:
-        for name, gap in sorted(missing.items()):
-            problems.wrong(
-                f"{name} holds Bangla the bundled subset cannot draw: "
-                f"{''.join(sorted(gap))} — those render as tofu boxes. Add these "
-                f"files to the charset union in 08_components/build.py and rebuild."
-            )
-        return
-    problems.ok(f"the bundled Bangla subset covers every Bangla character in "
-                f"{len(sources)} shipped data file(s), {len(covered)} codepoints")
 
 
 SPELLED = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven",
@@ -850,10 +683,8 @@ def main() -> int:
     check_manifest(problems)
     check_commands(problems)
     check_skills(problems)
-    check_bangla_agreement(problems)
     check_marketplace(problems)
     check_bundled_copies(problems)
-    check_bangla_font_coverage(problems)
     check_ofl_template(problems)
     check_rule_count(problems)
     check_token_names(problems)

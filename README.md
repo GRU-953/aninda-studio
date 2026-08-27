@@ -14,7 +14,6 @@
 **A brand and a design system, built by one person and measured rather than
 asserted.**
 
-*অনিন্দ্য স্টুডিও · [বাংলায় পড়ুন](README.bn.md)*
 
 [![System: Apache-2.0](https://img.shields.io/badge/system-Apache--2.0-0D1A17)](LICENSE)
 [![Writing: PolyForm NC](https://img.shields.io/badge/writing-PolyForm%20NC%201.0.0-115E68)](LICENSE-DOCS.md)
@@ -56,7 +55,7 @@ and their alert both say the figures are examples rather than readings.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.4 MB) that needs no network, plus a 1.9 MB PDF |
+| `09_guidebook/` | **The guidebook.** 14 chapters in English and Bangla, one self-contained HTML file (15.3 MB) that needs no network, plus a 1.9 MB PDF |
 | `07_tokens/` | The design tokens: DTCG source, and 66 CSS custom properties generated from it |
 | `08_components/` | 30 component and pattern cards — 6 foundations, 16 components, 8 patterns |
 | `04_mark/` | 18 mark, wordmark and icon files |
@@ -149,9 +148,6 @@ Stated here rather than discovered later:
 - **The npm and PyPI packages are built but not published.** Checked
   2026-08-18: the npm registry and the Python Package Index hold nothing under `aninda-studio-tokens`. The
   packages work from this checkout; the registry commands do not work yet.
-- **The Bangla has not been reviewed by a second Bangla reader.** Spelling follows
-  the Bangla Academy standard and every ruling is sourced, but sourced is not the
-  same as read well. 30 of 30 cards carry Bangla names.
 - **Rendering checks are Chromium only.** They run on macOS locally and on Ubuntu
   in CI, from a clean checkout, so the results are not particular to one machine.
   Safari, Firefox and real Windows High Contrast were not run.

@@ -75,13 +75,6 @@ CARDS_DIR = HERE / "cards"
 FONTS_DIR = HERE / "fonts"
 REGISTRY = HERE / "_cards.json"
 
-# The Claude Code plugin bundles these same subsets and renders its own approved
-# Bangla with them, so its Bangla is part of the character set. See the charset
-# union in build() for what went wrong when it was not.
-_SKILL = ROOT / "13_plugins" / "claude-code" / "skills" / "aninda-brand"
-PLUGIN_BANGLA_JSON = _SKILL / "assets" / "bangla-verified.json"
-PLUGIN_BANGLA_MD = _SKILL / "references" / "bangla.md"
-
 # The shaping test set from 06_type. 06_type/review_bangla.py shows it in the
 # shipped face, so it belongs in the charset the shipped face is subset to.
 MEASUREMENTS_JSON = ROOT / "06_type" / "_data" / "measurements.json"
@@ -2440,20 +2433,15 @@ def build() -> dict[str, bytes]:
     for text in pages.values():
         charset |= set(text)
 
-    # Plus the Bangla the Claude Code plugin ships, because the plugin bundles
-    # these same three subsets as assets/fonts/*.woff2 and renders its approved
-    # strings with them. Subsetting to the cards alone left the plugin unable to
-    # draw ঠ in কণ্ঠস্বর — one of its own approved strings — and ২ and ৫ in the
-    # Bangla Academy edition years it cites as its authority, so those came out as
-    # tofu boxes from the skill's own font. The union is the honest boundary: every
-    # character any consumer of these files is told it may use.
-    for extra in (PLUGIN_BANGLA_JSON, PLUGIN_BANGLA_MD):
-        if not extra.exists():
-            raise BuildError(
-                f"{extra} is missing. The subset fonts are built to cover the "
-                f"Bangla the Claude Code plugin ships, so that file has to be here."
-            )
-        charset |= set(extra.read_text(encoding="utf-8"))
+    # The Claude Code plugin's own Bangla was in this union until 27 August 2026,
+    # because the plugin bundles these same subsets and rendered its approved
+    # strings with them. Subsetting to the cards alone had left it unable to draw ঠ
+    # in one of its own approved strings, and ২ and ৫ in the Bangla Academy edition
+    # years it cited as its authority. The plugin ships no Bangla now, so there is
+    # nothing to add — but the principle it established still governs this union
+    # and is worth keeping in words: the boundary is every character any consumer
+    # of these files is TOLD it may use, not every character the cards happen to
+    # contain.
 
     # Plus the shaping test set from the type research. 06_type/review_bangla.py
     # shows those conjuncts and words in the shipped face, so the shipped face has

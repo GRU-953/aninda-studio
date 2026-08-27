@@ -8,8 +8,7 @@ states the part that applies here.
 -------------------------------------------------------------------------------
 THE CODE AND THE DATA — Apache License 2.0
 -------------------------------------------------------------------------------
-   Covers   scripts/asset.py, assets/tokens/*.json, assets/css/tokens.css, and
-            assets/bangla-verified.json.
+   Covers   scripts/asset.py, assets/tokens/*.json and assets/css/tokens.css.
    Means    Anyone may use, change and redistribute it, including commercially,
             with attribution and a note of what they changed.
    Text     LICENSE.txt

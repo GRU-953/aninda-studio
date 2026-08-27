@@ -23,7 +23,7 @@
       "source": "06_type/candidates/bangla/notoserifbengali/NotoSerifBengali[wdth,wght].ttf",
       "licence": "SIL OFL 1.1",
       "licence_file": "fonts/notoserifbengali-OFL.txt",
-      "bytes": 110712,
+      "bytes": 108804,
       "renamed": false
     },
     {
@@ -32,7 +32,7 @@
       "source": "06_type/candidates/mono/ibmplexmono/IBMPlexMono-Regular.ttf",
       "licence": "SIL OFL 1.1",
       "licence_file": "fonts/anindamono-OFL.txt",
-      "bytes": 10464,
+      "bytes": 10288,
       "renamed": true
     },
     {

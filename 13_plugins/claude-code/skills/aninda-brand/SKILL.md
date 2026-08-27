@@ -4,21 +4,20 @@ description: >-
   Make ONE thing to the Aninda Studio brand and design system — a logo, mark,
   icon, app icon, favicon, wordmark, tile, colour swatch, button, card, page,
   component, email, slide, document or piece of copy. Holds every rule: the
-  Estuary colour ramps and every semantic role across light, dark,
-  hc-light and hc-dark; the Literata, Noto Serif Bengali and Aninda Mono type
-  scale with the measured Bangla multiplier and its 12 px floor; the 4 px
+  Natural colour ramps and every semantic role across light, dark,
+  hc-light and hc-dark; the Literata and Aninda Mono type scale; the 4 px
   spacing scale and four radii; clear space and stroke weight on the mark; the
   motion durations and easing curves; the plain-English voice with its banned
-  words; the verified Bangla strings; the Apache-2.0, PolyForm Noncommercial,
+  words; the Apache-2.0, PolyForm Noncommercial,
   SIL OFL and unlicensed-identity split; and the naming conventions. Use when
   asked to design, draw, generate, brand, style, theme, write copy for, or make
   an asset, and when asked "what colour", "which font", "how big", "what
   spacing", "is this on-brand", "brand guidelines", "design tokens",
   "tokens.css", "our accent colour", "the mark", "the logo", "app icon", "App
-  Store icon", "favicon", "dark mode", "high contrast", "forced colors", or
-  "Bangla text". Ships scripts/asset.py, which REFUSES an impermissible
+  Store icon", "favicon", "dark mode", "high contrast" or "forced colors".
+  Ships scripts/asset.py, which REFUSES an impermissible
   combination rather than warning about it. For setting up or upgrading a whole
-  REPOSITORY — licences, NOTICE, a bilingual README, a CI brand check — use the
+  REPOSITORY — licences, NOTICE, a README, a CI brand check — use the
   aninda-repo skill instead. For checking something that ALREADY EXISTS against
   the system or WCAG 2.2 AA, use the aninda-review skill instead.
 ---
@@ -46,7 +45,7 @@ short list for the job in front of you.
 | --- | --- |
 | Anything at all | this file, to the end of "The seven rules" |
 | Choosing or checking a colour | `references/colour.md` |
-| Setting type, or any Bangla text | `references/typography.md`, `references/bangla.md` |
+| Setting type | `references/typography.md` |
 | Spacing, radii, target sizes, grid | `references/layout.md` |
 | The mark, the wordmark, clear space | `references/logo.md` |
 | An app icon, favicon or tile | `references/icons.md` |
@@ -57,12 +56,12 @@ short list for the job in front of you.
 
 ---
 
-## The eight rules
+## The seven rules
 
-These eight cover most of what goes wrong. Everything else is in the references.
+These seven cover most of what goes wrong. Everything else is in the references.
 
 1. **Never write a raw value.** Use a token. `var(--as-accent)`, never
-   `#126974`. `var(--as-space-4)`, never `24px`. A raw value cannot follow a
+   `#224959`. `var(--as-space-4)`, never `24px`. A raw value cannot follow a
    theme, and there are four themes. The CSS name drops a trailing `default`, so
    the role `color.accent.default` is the property `--as-accent`.
 2. **Four themes, always.** Light, dark, high-contrast light, high-contrast
@@ -72,28 +71,20 @@ These eight cover most of what goes wrong. Everything else is in the references.
 3. **Never rely on colour alone.** In forced-colors mode all four status
    colours resolve to `CanvasText`, so a red dot carries nothing. Every state
    needs a word and a glyph as well.
-4. **Bangla is not translated English.** Use only a string listed as verified in
-   `references/bangla.md`. If none fits, leave the English and say so. Writing
-   new Bangla here is not allowed.
-5. **Every Bangla run carries `lang="bn"`, and nothing else applies the Bangla
-   rules.** Write `<span lang="bn">রং</span>`, never a bare `রং`. The
-   `:lang(bn), [lang="bn"]` block in `assets/css/tokens.css` is the only thing
-   that switches the Bengali family on, applies the measured size multiplier,
-   holds the 12 px floor and adds the weight step below 14 px — so untagged
-   Bangla gets none of the four, falls back to whatever Bengali font the reader's
-   machine happens to have, and fails WCAG 2.2 SC 3.1.2 Language of Parts
-   (Level AA) because a screen reader pronounces it with an English engine. Do
-   not apply the multipliers by hand: the attribute does it, and doing both
-   applies them twice. `references/typography.md` has the figures and says the
-   same.
-6. **The words *simply*, *just*, *easy*, *obviously*, *of course* and *clearly*
+4. **This system ships English.** Bangla was removed on 27 August 2026 and
+   nothing applies the Bangla rules any more: there is no `:lang(bn)` block, no
+   Bengali face in the subsets and no verified-string list. A Bangla run would
+   fall back to whatever Bengali font the reader's machine happens to have, at
+   the Latin size, and would fail WCAG 2.2 SC 3.1.2 Language of Parts besides.
+   The record of the decision is in `06_type/BANGLA-STANDARD.md`.
+5. **The words *simply*, *just*, *easy*, *obviously*, *of course* and *clearly*
    are banned**, and so are exclamation marks. British spelling, plain
    international vocabulary, first person singular. `references/voice.md` has
    the rest.
-7. **The mark carries no colour of its own.** It is drawn in `currentColor` and
+6. **The mark carries no colour of its own.** It is drawn in `currentColor` and
    takes the theme it lands in. Never recolour it, never add a shadow, never
    stretch it.
-8. **Four licences, not one.** System and scripts Apache-2.0; written
+7. **Four licences, not one.** System and scripts Apache-2.0; written
    documentation PolyForm Noncommercial 1.0.0; fonts SIL OFL 1.1; the identity
    not licensed at all. `references/licence.md` has the exact wording.
 

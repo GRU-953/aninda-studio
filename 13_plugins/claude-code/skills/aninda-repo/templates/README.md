@@ -9,7 +9,6 @@
 
 # {PROJECT NAME}
 
-[বাংলায় পড়ুন](README.bn.md)
 
 {One sentence saying what this is and who it is for. Put the main point first, so
 a reader who stops after this line still has the answer.}

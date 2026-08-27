@@ -101,6 +101,50 @@ TARGET_FLOOR_PX = 24
 SPACING_SCALE = (4, 8, 12, 16, 24, 32, 48, 64, 96, 128)
 DURATIONS_MS = (120, 220)
 BENGALI = re.compile(r"[ঀ-৿]")
+
+# Bangla may appear in two kinds of file and nowhere else.
+#
+# RECORD — permanently. These do not ship Bangla; they are ABOUT it. The standard
+# and the string register are the record of the decision. The type documents name
+# Bengali faces and Bengali typographic features — মাত্রা is the headstroke, and a
+# measurement of it cannot be written without naming it. 01_research narrates the
+# work and its removal. Every one of these is still held to the English standard in
+# every other respect, which is why they stay on the checked-path list rather than
+# being exempted from it wholesale.
+BANGLA_RECORD = (
+    "06_type/BANGLA-STANDARD.md",
+    "06_type/BANGLA-STRINGS.md",
+    "06_type/MEASUREMENTS.md",
+    "06_type/SHORTLIST.md",
+    "06_type/RECOMMENDATION.md",
+    "06_type/pairings.md",
+    "01_research/",
+)
+
+# PENDING — temporarily, while the removal is in progress. Listed rather than
+# exempted in silence, because a silent exemption is how a partial removal comes to
+# look like a finished one.
+#
+# THIS TUPLE IS THE ACCEPTANCE TEST FOR THE WHOLE JOB. It must be empty before the
+# removal can be called done, and when it is empty this gate proves that no Bangla
+# ships anywhere outside the record. Do not add to it to make a build pass.
+BANGLA_PENDING = (
+    "09_guidebook/chapters/",
+)
+
+# The studio's own name, which stays.
+#
+# A NAME IS NOT TEXT. It is not translated, it does not need a verified-string
+# list, and dropping Bangla from what this system BUILDS does not rename the
+# studio — "Aninda" is the romanised form of অনিন্দ্য and says so in
+# references/naming.md, which is the one place a reader can find out why the
+# English is not spelled "Anindya".
+#
+# Allowed as a STRING rather than by exempting files, because the alternative was a
+# list naming TRADEMARKS.md, two NOTICE files, licence.md, naming.md and logo.md —
+# six exemptions for one word, each of which would then also carry a licence to put
+# any other Bangla in those files. This way the rule is what it sounds like.
+STUDIO_NAME_BN = ("অনিন্দ্য স্টুডিও", "অনিন্দ্য")
 # A run of Bengali script, allowing the spaces and punctuation that fall inside a
 # Bangla phrase, but stopping at the first Latin character.
 BENGALI_RUN = re.compile(r"[ঀ-৿](?:[ঀ-৿]|[  —\-,।](?=[ঀ-৿]))*")
@@ -143,8 +187,6 @@ BLIND_SPOTS = [
     "right thing. Both need a person.",
     "Whether the English is actually clear. Sentence length and a banned-word list are "
     "proxies; a short sentence can still be baffling.",
-    "Whether unverified Bangla is wrong. This reports only that a string is not on the "
-    "verified list. Judging it needs the Bangla Academy dictionary and a reader.",
     "Whether a licence choice is legally sound. This checks that the files exist and "
     "that the identifiers and URLs are right. It is not legal advice.",
     "Text inside an image, a PDF, a font, or a compiled bundle.",
@@ -211,7 +253,7 @@ def property_for_role(role: str, properties: dict[str, str]) -> str | None:
 
 
 def load_system() -> dict:
-    """The role hexes, the token values, the CSS property names and the Bangla.
+    """The role hexes, the token values and the CSS property names.
 
     Two layouts are supported. Installed as a plugin, the three skills sit side
     by side and this reads the brand skill's own assets, so there is one source
@@ -219,9 +261,8 @@ def load_system() -> dict:
     the bundler wrote in. If neither is there, it says so rather than guessing.
     """
     tokens_dir = SKILL_ROOT.parent / "aninda-brand" / "assets" / "tokens"
-    bangla_path = SKILL_ROOT.parent / "aninda-brand" / "assets" / "bangla-verified.json"
     css_path = SKILL_ROOT.parent / "aninda-brand" / "assets" / "css" / "tokens.css"
-    if tokens_dir.is_dir() and bangla_path.exists() and css_path.exists():
+    if tokens_dir.is_dir() and css_path.exists():
         primitives = _flatten(json.loads((tokens_dir / "primitive.tokens.json").read_text("utf-8")), "", {})
 
         def hex_of(value):
@@ -244,12 +285,10 @@ def load_system() -> dict:
                 "text": float(studio.get("textTarget", 4.5)),
                 "nonText": float(studio.get("nonTextTarget", 3.0)),
             }
-        bangla = json.loads(bangla_path.read_text("utf-8"))
         return {
             "themes": themes,
             "targets": targets,
             "properties": properties_from_css(css_path.read_text("utf-8")),
-            "bangla": [s["bangla"] for s in bangla["strings"]],
             "source": "the aninda-brand skill's own token files",
         }
 
@@ -653,34 +692,55 @@ def check_prose(text: str, where: str, system: dict, found: Findings) -> None:
                     f"{SENTENCE_WORD_LIMIT}. First words: " + " ".join(words[:12]) + " …",
                 )
 
-    # Only the Bangla a reader will actually see. Bangla inside a comment or a
-    # code sample is a note to a developer, not a shipped string.
+    # This system ships English. Bangla was removed on 27 August 2026, and two
+    # documents were kept as the record of why — they are the only files it may
+    # appear in.
     #
-    # Each run is a stretch of Bengali script with its own spaces and punctuation
-    # inside it, which stops a Latin label next door being read as part of it. A
-    # run that is a fragment of a verified string counts as verified: markup
-    # often splits one sentence across two elements.
-    verified = set(system["bangla"])
+    # This is the INVERSE of the check that stood here, which asked whether a
+    # Bangla string was on a verified list. Finding R7-1 recorded that that rule
+    # was enforced where the words were SHOWN and not where they ENTERED, which is
+    # how Bangla nobody had checked reached the palette. Inverting it closes both
+    # doors, because there is no longer a door: the question is not "was this
+    # checked?" but "why is this here?".
+    #
+    # It is a FAILURE and not a note, because nothing downstream applies the
+    # Bangla rules any more. There is no :lang(bn) block, no Bengali face in the
+    # subsets and no multiplier, so a Bangla run would fall back to whatever
+    # Bengali font the reader's machine happens to have, at the Latin size, and
+    # would fail WCAG 2.2 SC 3.1.2 with an English speech engine besides.
     for line_number, line in enumerate(prose.split("\n"), start=1):
         if len(line) > MAX_LINE_CHARS or not BENGALI.search(line):
             continue
-        cited = spans_of(CITED, line)
+        place = str(where).replace("\\", "/")
+        if any(place.endswith(r) or f"/{r}" in place + "/" for r in BANGLA_RECORD):
+            found.did("Bangla in a retained record, which is where it belongs")
+            continue
+        if any(f"/{r}" in place + "/" or place.startswith(r) for r in BANGLA_PENDING):
+            found.note(
+                f"{where}:{line_number}",
+                "Bangla still here while the removal is in progress",
+                "This path is in BANGLA_PENDING in this checker. That list is the "
+                "acceptance test for the removal and has to reach empty.",
+            )
+            continue
         for match in BENGALI_RUN.finditer(line):
             candidate = " ".join(match.group(0).split()).strip(" —-,।")
             if not candidate:
                 continue
-            if candidate in verified or any(candidate in string for string in verified):
-                found.did("verified Bangla strings found")
+            if any(candidate == name or candidate in name
+                   for name in STUDIO_NAME_BN):
+                found.did("the studio's own name, which is a name and not text")
                 continue
-            if inside(cited, match.start(), match.end()):
-                # A spelling example in a reference document, not a shipped string.
-                found.did("Bangla cited as an example rather than shipped")
-                continue
-            found.note(
+            found.fail(
                 f"{where}:{line_number}",
-                "a Bangla string that is not on the verified list",
-                f"{candidate[:70]!r} — it may well be right, but it has not been checked against "
-                "the Bangla Academy dictionary, and only the 31 verified strings may ship.",
+                "Bangla in a system that ships English",
+                f"{candidate[:70]!r}",
+                "Bangla was removed on 27 August 2026. Nothing applies the Bangla "
+                "rules any more, so this would render in whatever Bengali font the "
+                "reader happens to have, at the Latin size. The record of the "
+                "decision lives in 06_type/BANGLA-STANDARD.md. If this run is a "
+                "record rather than shipped prose, it belongs in BANGLA_RECORD in "
+                "this checker, named and reasoned — not exempted quietly.",
             )
 
 

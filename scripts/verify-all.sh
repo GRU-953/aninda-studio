@@ -104,7 +104,7 @@ echo "--- prose and licences ---"
 # The count printed at the end is counted, not typed. It said 17 while the list
 # held 18, in a project whose whole claim is that its numbers are measured.
 n_prose=0
-for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md \
+for path in README.md NOTICE TRADEMARKS.md LICENSE-DOCS.md \
             00_sandbox/TOOLCHAIN.md 01_research 02_strategy 09_guidebook/chapters \
             13_plugins/claude-code/README.md 13_plugins/claude-code/skills \
             13_plugins/figma/README.md 13_plugins/claude-design/PUSH-RECORD.md \

@@ -70,7 +70,7 @@ jobs:
         # which read this prose rather than writing their own.
         run: |
           fail=0
-          for path in README.md README.bn.md NOTICE TRADEMARKS.md LICENSE-DOCS.md                       00_sandbox/TOOLCHAIN.md 01_research 02_strategy                       09_guidebook/chapters 13_plugins/claude-code/README.md                       13_plugins/claude-code/skills 13_plugins/figma/README.md 13_plugins/claude-design/PUSH-RECORD.md                       06_type/BANGLA-STANDARD.md 06_type/BANGLA-STRINGS.md                       06_type/SHORTLIST.md 06_type/RECOMMENDATION.md                       06_type/MEASUREMENTS.md 06_type/pairings.md 14_delivery/apple-app-store/README.md 14_delivery/google-play/README.md 14_delivery/apple-app-store/CHECKLIST.md 14_delivery/google-play/CHECKLIST.md ; do
+          for path in README.md NOTICE TRADEMARKS.md LICENSE-DOCS.md                       00_sandbox/TOOLCHAIN.md 01_research 02_strategy                       09_guidebook/chapters 13_plugins/claude-code/README.md                       13_plugins/claude-code/skills 13_plugins/figma/README.md 13_plugins/claude-design/PUSH-RECORD.md                       06_type/BANGLA-STANDARD.md 06_type/BANGLA-STRINGS.md                       06_type/SHORTLIST.md 06_type/RECOMMENDATION.md                       06_type/MEASUREMENTS.md 06_type/pairings.md 14_delivery/apple-app-store/README.md 14_delivery/google-play/README.md 14_delivery/apple-app-store/CHECKLIST.md 14_delivery/google-play/CHECKLIST.md ; do
             python 13_plugins/claude-code/skills/aninda-review/scripts/check.py "$path"               || { echo "::error::$path fails the English standard"; fail=1; }
           done
           exit $fail

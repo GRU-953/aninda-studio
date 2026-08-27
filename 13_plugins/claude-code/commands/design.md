@@ -24,9 +24,7 @@ Do this:
 3. Write every English word to `references/voice.md`. The words *simply*,
    *just*, *easy*, *obviously*, *of course* and *clearly* are banned, and so are
    exclamation marks.
-4. For Bangla, use only a string listed in `references/bangla.md` as verified.
-   If none fits, say so and leave the English in place. Do not write new Bangla.
-5. Check what you made with the `aninda-review` skill before you hand it over.
+4. Check what you made with the `aninda-review` skill before you hand it over.
 
 If the user wants one asset file rather than a design, use the `aninda-brand`
 skill's `scripts/asset.py` through `/aninda-studio:asset`. If they want a whole

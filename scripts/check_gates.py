@@ -239,6 +239,41 @@ def check_browser_jobs() -> list[str]:
     return problems
 
 
+def prose_paths(text: str) -> list[str]:
+    """The English-standard path list out of a `for path in ... ; do` loop.
+
+    Both files carry the SAME list, written out longhand, and until now nothing
+    compared them. check_gates.py's other comparison could not: it is a substring
+    test for the label "english standard", which passes whether the two lists agree
+    or not. So the failure mode was the one this whole file exists to prevent —
+    green locally, red in CI — reachable by editing one copy and not the other,
+    which is exactly what removing a path from the list requires.
+    """
+    m = re.search(r"for path in (.*?)\s*;?\s*do", text, re.S)
+    if not m:
+        return []
+    raw = m.group(1).replace("\\\n", " ")
+    return sorted(w for w in raw.split() if w and not w.startswith("$"))
+
+
+def check_prose_lists() -> list[str]:
+    """The two copies of the English-standard path list must be identical."""
+    ci = prose_paths(CI.read_text(encoding="utf-8"))
+    sh = prose_paths(SCRIPT.read_text(encoding="utf-8"))
+    if not ci or not sh:
+        return ["the English-standard path list could not be found in "
+                + ("ci.yml" if not ci else "verify-all.sh")
+                + " — this comparison did not really run"]
+    if ci == sh:
+        return []
+    problems = []
+    for path in sorted(set(sh) - set(ci)):
+        problems.append(f"{path}: in verify-all.sh and not in ci.yml")
+    for path in sorted(set(ci) - set(sh)):
+        problems.append(f"{path}: in ci.yml and not in verify-all.sh")
+    return problems
+
+
 def main() -> int:
     for path in (CI, SCRIPT):
         if not path.exists():
@@ -300,8 +335,21 @@ def main() -> int:
               "development machine always has a browser.", file=sys.stderr)
         return 1
 
-    print(f"  all {checked} CI gates appear in scripts/verify-all.sh, and every gate "
-          f"that needs a browser is in a job that installs one")
+    prose = check_prose_lists()
+    if prose:
+        print("the English standard's path list differs between the two files:",
+              file=sys.stderr)
+        for item in prose:
+            print(f"  {item}", file=sys.stderr)
+        print("\n  The list is written out longhand in both, so a path has to be "
+              "added or removed twice. A local run passes on the script's copy "
+              "alone; CI runs the other one.", file=sys.stderr)
+        return 1
+
+    n_prose = len(prose_paths(SCRIPT.read_text(encoding="utf-8")))
+    print(f"  all {checked} CI gates appear in scripts/verify-all.sh, every gate "
+          f"that needs a browser is in a job that installs one, and both copies of "
+          f"the English standard's {n_prose}-path list agree")
     return 0
 
 

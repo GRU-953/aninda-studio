@@ -5,13 +5,13 @@ description: >-
   four-licence split (Apache-2.0 for the system and scripts, PolyForm
   Noncommercial 1.0.0 for the writing, SIL OFL 1.1 for the fonts, and no licence
   at all for the name and the marks), the NOTICE file that states all four, a
-  TRADEMARKS file, a bilingual English and Bangla README pair, the DTCG token
+  TRADEMARKS file, a README, the DTCG token
   files, an SPDX header on every source file, a .gitignore, and a
   continuous-integration workflow that regenerates every generated file and fails
   on a diff. Use when asked to set up, scaffold, bootstrap, initialise, start,
   create, upgrade, migrate, standardise or bring a repository or project up to
   standard, and when asked "add a licence", "which licence", "licence headers",
-  "SPDX headers", "add a NOTICE", "add a bilingual README", "README.bn.md", "set
+  "SPDX headers", "add a NOTICE", "add a README", "set
   up CI", "add a brand check to CI", "GitHub Actions for the brand", "new repo",
   "new project", or "make this repo compliant". This skill WRITES SEVERAL FILES
   AT A REPOSITORY ROOT, so it lists what it will do and asks before it does it.
@@ -60,7 +60,6 @@ someone chose on purpose is not a thing to quietly swap.
 | `NOTICE` | All four licences, each with what it covers and where its text lives. | — |
 | `TRADEMARKS.md` | What is not licensed at all, and how to ask. | PolyForm |
 | `README.md` | English. | PolyForm |
-| `README.bn.md` | Bangla, written as Bangla — not translated from the English. | PolyForm |
 | `.gitignore` | The usual, plus anything generated that is not committed. | — |
 | `.github/workflows/brand.yml` | The brand check. | Apache-2.0 |
 | `fonts/*-OFL.txt` | One beside each font file, never one shared copy. Copy `templates/OFL.txt` and fill in its first two lines: the dates, the copyright holder, and the Reserved Font Name if the face has one. | — |
@@ -126,21 +125,15 @@ on the first line. `references/ci.md` explains why that line is load-bearing.
 
 ## The bilingual README
 
-Two files, not one file with two halves.
+One README, in English, written to `aninda-brand/references/voice.md`.
 
-- `README.md` — English, written to `aninda-brand/references/voice.md`.
-- `README.bn.md` — Bangla, written **as Bangla**. Same meaning, same steps,
-  different sentences.
+There were two. A `README.bn.md` written **as Bangla** rather than translated
+from the English sat beside it, and every string in it had been checked against
+the Bangla Academy's dictionary. Both are gone as of 27 August 2026: this system
+ships English. `06_type/BANGLA-STANDARD.md` records the standard that governed
+the Bangla, and why it was dropped.
 
-**Use only a verified Bangla string.** The list is in
-`aninda-brand/references/bangla.md` and `aninda-brand/assets/bangla-verified.json`.
-If a heading or a sentence you need is not on it, keep that part in English and
-tell the user which string is missing. Do not write new Bangla.
-
-Each README links to the other in its first few lines, so a reader lands in the
-right one.
-
-`templates/README.md` and `templates/README.bn.md` are the starting points.
+`templates/README.md` is the starting point.
 
 ---
 
@@ -167,7 +160,7 @@ file that gets diffed. `references/ci.md` covers this in full.
 2. List what will change. Ask. Wait.
 3. Write the licence files, then `NOTICE`, then `TRADEMARKS.md`.
 4. Add SPDX headers, matching each file to the right one of the four.
-5. Write `README.md`, then `README.bn.md` with verified Bangla only.
+5. Write `README.md`.
 6. Copy the token files in, if the repository uses them.
 7. Put one `-OFL.txt` beside each font file.
 8. Add `.gitignore` and the CI workflow.

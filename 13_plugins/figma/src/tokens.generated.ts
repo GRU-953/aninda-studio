@@ -9,7 +9,7 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "e7061c8188cc883168bce84112e072843195772ad233810afdc84b6ce69fb47d";
+export const BUNDLE_SHA256 = "687479cdedb015052c9ac122cc1d24fdfbb05782dec8090cb2fd82e0b78336bc";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
   "07_tokens/build/primitive.tokens.json": "ed3704900dbb4c968130313529ed7379eb004c5dffe28a8a43ef8473a59b62aa",
@@ -37,7 +37,7 @@ export const SOURCE_HASHES: { [file: string]: string } = {
   "04_mark/svg/wordmark-latin-colour.svg": "9d014a6f050f1e996dcf1f6ad3c1aa0bb3ba18871198ca43262b4634fe5c3bda",
   "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
   "04_mark/manifest.json": "436b51961fb83be02995ae2a4cc01809c59772d1fd31b90b8f3aa0ae6fdf1432",
-  "08_components/_cards.json": "bd177c1e4882eaa9df2c6a6bc1d3807563914b0c7c463c9fdd3fd8915ee08421"
+  "08_components/_cards.json": "629aece00fb080d8bac0bacdb99547be9f378159d187c9760f50448a79d550b9"
 };
 
 export const BUNDLED: RawInput = {
@@ -3697,7 +3697,7 @@ export const BUNDLED: RawInput = {
       "source": "06_type/candidates/bangla/notoserifbengali/NotoSerifBengali[wdth,wght].ttf",
       "licence": "SIL OFL 1.1",
       "licence_file": "fonts/notoserifbengali-OFL.txt",
-      "bytes": 110712,
+      "bytes": 108804,
       "renamed": false
     },
     {
@@ -3706,7 +3706,7 @@ export const BUNDLED: RawInput = {
       "source": "06_type/candidates/mono/ibmplexmono/IBMPlexMono-Regular.ttf",
       "licence": "SIL OFL 1.1",
       "licence_file": "fonts/anindamono-OFL.txt",
-      "bytes": 10464,
+      "bytes": 10288,
       "renamed": true
     },
     {
