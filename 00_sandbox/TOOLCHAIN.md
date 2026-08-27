@@ -32,7 +32,7 @@ would silently change measured contrast figures between runs.
 |---|---|---|---|
 | `coloraide` | 8.11.1 | MIT | Converts between colour systems and **measures** contrast, so the palette is provably readable rather than assumed to be |
 | `fonttools` | 4.63.0 | MIT | Reads font files, pulls out letter outlines, subsets fonts down to only the characters used, and writes web font files |
-| `uharfbuzz` | 0.56.0 | Apache-2.0 | Real text shaping — the thing that makes Bangla come out right. See below |
+| `uharfbuzz` | 0.56.0 | Apache-2.0 | Real text shaping — it applies the font's own substitution rules instead of looking glyphs up one code point at a time. See below |
 | `brotli` | 1.2.0 | MIT | Compression used to make `.woff2` web fonts |
 | `playwright` | 1.62.0 | Apache-2.0 | Drives a real browser: renders pages, **measures** what actually appeared, exports PNG and PDF |
 | `Pillow` | 12.1.0 | MIT-CMU | Image work — PNG exports, and writing the multi-size `.ico` favicon |
@@ -52,9 +52,13 @@ would silently change measured contrast figures between runs.
 ## The one dependency this build deliberately does NOT have: Inkscape
 
 The sibling GRU953 kit treated Inkscape as a hard requirement. It used it for one job: converting
-Bangla text to real, correctly-shaped outlines. Bangla needs genuine text shaping — consonants
-join into conjuncts, and some vowel signs are **written before** the consonant they actually
-follow. Pulling glyphs out of a font by code point produces nonsense.
+text to real, correctly-shaped outlines. That job was chosen for Bangla, where the stakes are
+highest — consonants join into conjuncts, and some vowel signs are **written before** the
+consonant they actually follow, so pulling glyphs out of a font by code point produces nonsense.
+The Bangla left on 27 August 2026 and the requirement did not: Latin needs the same machinery for
+its ligatures, and the shaping gate now proves it on `office`, `difficult` and `waffle`, each of
+which produces a glyph no code point maps to. A failure there costs ugly type rather than wrong
+words, which is a real loss of stakes and is recorded as one.
 
 Inkscape is a ~1 GB application that must be installed system-wide. **This build replaces it with
 `uharfbuzz` + `fontTools`**, both pip packages inside `.venv/`, which do the same job through the

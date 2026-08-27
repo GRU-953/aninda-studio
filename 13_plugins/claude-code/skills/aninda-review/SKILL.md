@@ -10,7 +10,7 @@ description: >-
   check", "WCAG 2.2 AA", "AAA", "target size", "focus visible", "focus
   obscured", "reduced motion", "forced colors", "high contrast mode", "does this
   use the tokens", "any hard-coded hex", "raw pixel values", "did I use banned
-  words", "plain English check", "is the Bangla verified", "are the licences
+  words", "plain English check", "why is there Bangla here", "are the licences
   right", or "what did I miss". Ships scripts/check.py, which measures what it
   can from the source and then names its own blind spots rather than passing them
   silently. For MAKING something new — an asset, a page, a component, a piece of
@@ -95,15 +95,25 @@ It reports three things, in this order, and all three matter:
 - *we* used for one person.
 
 **Bangla**
-- Every Bengali-script string a reader will see, checked against the verified list
-  in the `aninda-brand` skill. Anything not on that list is reported as a note,
-  because it has not been checked against the Bangla Academy dictionary.
-- Bangla inside backticks, inside a code sample, or inside an HTML comment is
-  read as a citation and passes. A document whose subject is Bangla spelling has
-  to name the words it is teaching.
-- **Expect notes when checking a reference document about Bangla.** Its examples
-  are not shipped strings, and the checker cannot tell the difference between an
-  example and an oversight. Say which it is when you report it.
+
+This studio shipped Bangla until 27 August 2026 and now ships English. The check
+was **inverted** rather than deleted, and the difference matters when you read a
+report: the old question was "is this string on the verified list?", the new one
+is "why is there Bangla here at all?".
+
+- **Any Bengali-script run is a FAILURE**, not a note. Nothing applies the Bangla
+  rules any more — no `:lang(bn)` block, no Bengali face in the subsets — so the
+  run would render in whatever font the reader's machine happens to have, at the
+  Latin size.
+- **Two exceptions, both named in the checker.** The studio's own name
+  (**অনিন্দ্য**, **অনিন্দ্য স্টুডিও**) passes, because a name is not text. And a
+  short list of retained record documents passes — the Bangla standard, the string
+  register and the type measurements, which are *about* Bangla rather than written
+  in it. They stay on the checked-path list in every other respect.
+- **Do not exempt a file quietly.** If a run really is record, it belongs in
+  `BANGLA_RECORD` in the checker, named with its reason. An exemption for one word
+  would also license every other Bangla run in that file, which is the failure the
+  old rule had.
 
 **Licences**
 - Whether `LICENSE`, `LICENSE-DOCS.md`, `NOTICE` and `TRADEMARKS.md` exist.
@@ -131,8 +141,8 @@ before you run it.
   the right thing. Both need a person.
 - **Whether the English is *actually* clear.** Sentence length and a banned-word
   list are proxies. A short sentence can still be baffling.
-- **Whether unverified Bangla is *wrong*.** It reports that a string is not on
-  the verified list. It cannot tell you whether it is correct, because that needs
+- **Whether the Bangla in a retained record is *right*.** It reports where
+  Bangla is allowed to be, not whether the words there are correct. That needs
   the Bangla Academy dictionary and a reader.
 - **Whether a licence choice is legally sound.** It checks that the files exist
   and that the identifiers and URLs are right. It is not legal advice.

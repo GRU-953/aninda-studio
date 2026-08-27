@@ -10,8 +10,7 @@ Copyright 2026 Aninda Sundar Howlader -->
 Design or build something new, to the Aninda Studio system.
 
 Use the `aninda-brand` skill. It carries the colour, typography, layout, logo,
-icons, motion, voice, Bangla, licence and naming rules, and the token files
-themselves.
+icons, motion, voice, licence and naming rules, and the token files themselves.
 
 What the user asked for: `$ARGUMENTS`
 

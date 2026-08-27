@@ -41,8 +41,10 @@ incomplete as a submission, and `CHECKLIST.md` says which is which.
 counts — code points and UTF-8 bytes — because neither store says which unit it
 counts. `metadata/metadata.md` is the same text laid out for copying.
 
-Metadata is supplied in English and Bangla. Apple added Bangla to its metadata languages on
-30 March 2026 and names it "Bangla", which is this studio's own term.
+Metadata is supplied in English. Both stores accept Bangla — Apple added it to
+its metadata languages on 30 March 2026 and names it "Bangla", which is this
+studio's own term — and both listings carried it until the Bangla left this
+system on 27 August 2026.
 
 ## Replacing the screenshot frames
 

@@ -205,6 +205,9 @@ jobs:
       - name: The eight patterns must exist on all three platforms
         run: python scripts/check_patterns.py
 
+      - name: Prose must not name a custom property that does not exist
+        run: python scripts/check_token_citations.py
+
       - name: The READMEs must still describe the repository they are in
         run: python scripts/readme.py --check
       - run: python 12_packages/build.py --check

@@ -14,9 +14,11 @@ difference. That is the drift guard: if a token moves and this book is not
 rebuilt, --check fails.
 
 WHAT IS HAND-WRITTEN AND WHAT IS NOT
-    Hand-written, read from chapters/ and chapters/bn/:
-        Welcome, The name, The mark, Icons, Voice, Writing in Bangla,
-        Applying it, Licence and trademarks, What this system does not do.
+    Hand-written, read from chapters/:
+        Welcome, The name, The mark, Icons, Voice, Applying it,
+        Licence and trademarks, What this system does not do.
+    A chapters/bn/ sibling held the Bangla half of each until 27 August 2026, and
+    "Writing in Bangla" was a chapter of its own.
     Generated here, from the sources named at the top of each builder function:
         Colour, Type, Space and shape, Components, Motion.
     Not one colour, size, duration or ratio in this book was typed by a person.

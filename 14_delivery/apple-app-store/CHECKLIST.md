@@ -8,7 +8,7 @@
 - [x] Dark and Mono appearances authored
 - [x] watchOS master at 1088 x 1088
 - [x] Screenshot frames at 1290 x 2796 and 2064 x 2752
-- [x] Name, subtitle, promotional text, description and keywords, within limits, English and Bangla
+- [x] Name, subtitle, promotional text, description and keywords, within limits, in English
 
 ## Not ready, and why
 

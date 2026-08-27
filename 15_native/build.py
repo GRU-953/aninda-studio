@@ -299,8 +299,8 @@ def kt_const(name: str) -> str:
 def kotlin_tokens(data: dict) -> str:
     d = dimensions(data)
     L = [f"// {GENERATED}", "", "package studio.aninda.tokens", "",
-         "/**", " * Every colour this system measured, for all four themes, plus the",
-         " * dimensions and the Bangla ramp.",
+         "/**", " * Every colour this system measured, for all four themes, plus",
+         " * the dimensions.",
          " *",
          " * This file imports nothing — no androidx, no Compose. That is what lets",
          " * `kotlinc` compile it, so the values are proven to build rather than",
@@ -1228,12 +1228,13 @@ valid Swift and would pass every compiler.
   two ordinary themes. The two high-contrast themes are available in the Kotlin
   constants and have no resource configuration to live in, so a View-based consumer
   gets the standard pair only.
-- **Material's Bangla figure and this system's are not the same measurement.**
-  Material calls Bangla a medium language-height script needing roughly 7 per cent
-  taller line heights at the same nominal size. This system's Bangla leading is 1.6
-  against Latin's 1.55, which is +3.2 per cent, and the Bangla is also set at
-  x0.816 — so its absolute line box is smaller, not larger. Both are published and
-  neither confirms the other.
+- **This system publishes no line height, and Material's type scale assumes one.**
+  Material sorts scripts into language-height categories and sets leading from the
+  category. The only line-height token this system ever had was for Bangla, and it
+  left with the Bangla on 27 August 2026, so `anindaTypography` sets sizes and
+  leaves leading to the platform default. That is honest rather than complete: a
+  consumer who wants Material's leading has to supply it, and nothing here measures
+  whether the default matches what the type wants.
 """
 
 

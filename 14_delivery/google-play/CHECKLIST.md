@@ -9,7 +9,7 @@
 - [x] Adaptive icon layers at five densities, plus ic_launcher.xml
 - [x] Monochrome layer for themed icons
 - [x] Screenshot frames at 1080 x 1920
-- [x] Title, short description and full description, within limits, English and Bangla
+- [x] Title, short description and full description, within limits, in English
 
 ## Not ready, and why
 

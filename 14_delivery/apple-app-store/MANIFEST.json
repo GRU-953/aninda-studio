@@ -134,17 +134,17 @@
    "field": "description",
    "limit": 4000,
    "counted_in": "code_points",
-   "code_points": 650,
-   "utf8_bytes": 650,
-   "text": "Aninda Studio is one person making simple apps for real life.\n\nEverything here is built on a design system where the claims are measured rather than asserted. Every colour pairing was measured against every surface it can land on, in a real browser, and the published figure is the worst result rather than the flattering one. Where something has a limit, the limit is written down.\n\nThe system is bilingual. English and Bangla are both first-class, and the Bangla type was measured rather than scaled by eye: it carries its own size ramp, its own floor, and a weight step for small sizes.\n\nThis listing describes the studio. No app is published yet."
+   "code_points": 667,
+   "utf8_bytes": 667,
+   "text": "Aninda Studio is one person making simple apps for real life.\n\nEverything here is built on a design system where the claims are measured rather than asserted. Every colour pairing was measured against every surface it can land on, in a real browser, and the published figure is the worst result rather than the flattering one. Where something has a limit, the limit is written down.\n\nAlmost nothing here is written by hand. The colours, the type ramp, the spacing, the icons and the words that describe them are generated from one set of tokens, and a check refuses to finish if any of them drifts from it.\n\nThis listing describes the studio. No app is published yet."
   },
   {
    "field": "keywords",
    "limit": 100,
    "counted_in": "utf8_bytes",
-   "code_points": 74,
-   "utf8_bytes": 74,
-   "text": "design system,design tokens,accessibility,contrast,bangla,typography,brand"
+   "code_points": 72,
+   "utf8_bytes": 72,
+   "text": "design system,design tokens,accessibility,contrast,typography,brand,wcag"
   },
   {
    "field": "name",

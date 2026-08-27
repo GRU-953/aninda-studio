@@ -9,7 +9,7 @@
 
 import type { RawInput } from './plan';
 
-export const BUNDLE_SHA256 = "65e85d8be57e4d91ed0f983de727cded9ab549e6a1ea65df7a5a5b3daa615e14";
+export const BUNDLE_SHA256 = "c54b260861a2354caa24d3fd9cb674916984a677612099c1965fb0365d7ab345";
 
 export const SOURCE_HASHES: { [file: string]: string } = {
   "07_tokens/build/primitive.tokens.json": "694e01c4b541e2b229486a618f10447626bbc8cee3316a131eae54155dffb22e",
@@ -41,7 +41,7 @@ export const SOURCE_HASHES: { [file: string]: string } = {
   "04_mark/svg/wordmark-latin-white-on-black.svg": "5f517c74be71ec0dfdeef898ff4548e9116974270bfdf3fdb574e2a8fe2a719b",
   "04_mark/svg/wordmark-latin.svg": "975775a95ca4d09341cd38a165006ab092581cffdeaab533f61934a4206893af",
   "04_mark/manifest.json": "28c58bde27a9952d7a76f58d278a28cbf5a29832d4da14261530f2d4334d19c6",
-  "08_components/_cards.json": "8415b67d1849878c3a1b40e0fa4bc788b5a3e1c3ab631a0401a294853f7f05a6"
+  "08_components/_cards.json": "90917179ab69dbdf78a28091ca8bf92c95334d4a904ab562c56e420a809c82de"
 };
 
 export const BUNDLED: RawInput = {
@@ -3702,7 +3702,7 @@ export const BUNDLED: RawInput = {
       "path": "cards/foundations/typography.html",
       "name": "Typography",
       "group": "Foundations",
-      "subtitle": "One scale of a perfect fourth, two scripts, a measured multiplier for Bangla and a floor it never goes below.",
+      "subtitle": "One scale of a perfect fourth, two faces, and every size read out of the token file rather than typed.",
       "width": 1280,
       "height": 1900
     },

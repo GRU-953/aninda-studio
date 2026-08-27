@@ -400,7 +400,7 @@ meets. You can check the claim rather than trust it.
 
 ## Fonts are not included
 
-The system uses Literata, Noto Serif Bengali and IBM Plex Mono, all under the SIL
+The system uses Literata and IBM Plex Mono, both under the SIL
 Open Font Licence 1.1. They are not bundled: it would triple the size of this
 package, and an OFL font inside an Apache-2.0 package muddies the licence
 declaration. `typography.css` declares the families and leaves the loading to you.
@@ -436,8 +436,8 @@ WHAT IS AND IS NOT COVERED
     by it. Fork the system and put your own identity on it.
 
   Typefaces
-    Not included here. Literata, Noto Serif Bengali and IBM Plex Mono are each
-    under the SIL Open Font Licence 1.1 and keep their own terms.
+    Not included here. Literata and IBM Plex Mono are both under the SIL
+    Open Font Licence 1.1 and keep their own terms.
 
 Contact: {EMAIL}
 Source:  {REPO}
@@ -456,7 +456,7 @@ Source:  {REPO}
         "repository": {"type": "git", "url": f"git+{REPO}.git"},
         "bugs": {"url": f"{REPO}/issues"},
         "keywords": ["design-tokens", "dtcg", "design-system", "accessibility",
-                     "wcag", "high-contrast", "css-variables", "bangla", "bilingual"],
+                     "wcag", "high-contrast", "css-variables", "oklch"],
         "sideEffects": ["*.css"],
         "files": ["dist", "README.md", "LICENSE", "NOTICE"],
         "exports": {
@@ -541,9 +541,11 @@ Source:  {REPO}
         "/* Aninda Studio — typography. GENERATED, do not hand-edit.\n"
         " * Fonts are NOT bundled; declare your own @font-face or load them from a\n"
         " * host you control. Family names below match the design system's own.\n */\n"
+        # A :lang(bn) rule sat between these two until 27 August 2026, naming
+        # --as-font-bangla and --as-bangla-line-height. Both properties left with
+        # the Bangla and the rule did not, so this package shipped two var() calls
+        # that resolve to nothing — which inherits silently rather than failing.
         ":root{font-family:var(--as-font-latin);}\n"
-        ':lang(bn),[lang="bn"]{font-family:var(--as-font-bangla);'
-        "line-height:var(--as-bangla-line-height);}\n"
         "code,kbd,samp,pre{font-family:var(--as-font-mono);}\n"
     )
     files[npm / "dist" / "layout.css"] = (
@@ -749,7 +751,7 @@ container widths they set are in the token documents, under `fontFamily` and
 
 ## Fonts are not included
 
-The system uses Literata, Noto Serif Bengali and IBM Plex Mono, all under the SIL
+The system uses Literata and IBM Plex Mono, both under the SIL
 Open Font Licence 1.1. They are not bundled: it would triple the size of this
 package, and an OFL font inside an Apache-2.0 package muddies the licence
 declaration. The families are named in the token documents; loading them is yours.

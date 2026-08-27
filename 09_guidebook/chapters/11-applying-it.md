@@ -62,26 +62,18 @@ The token file arranges them in five layers, and the order matters:
 Leave `data-theme` off entirely to follow the reader's own system setting. That
 is the right default for most pages.
 
-## Bangla
+## A second script
 
-The token file already carries the rule:
+There is no rule for one, and that is a deliberate absence rather than an
+oversight. A `:lang(bn)` block sat in the stylesheet until 27 August 2026,
+carrying a measured size multiplier and a 12 px floor in a single `clamp()`.
+It went with the Bangla, along with the four custom properties it read.
 
-```css
-:lang(bn), [lang="bn"] {
-  font-family: var(--as-font-bangla);
-  line-height: var(--as-bangla-line-height);
-  font-size: clamp(var(--as-text-bangla-min),
-                   calc(1em * var(--as-bangla-scale-body)), 100em);
-}
-```
-
-The `clamp()` applies the measured size multiplier and refuses to go below the
-12 px floor, so the rule and its exception live in one declaration rather than
-relying on anyone remembering the exception.
-
-Mark Bangla with `lang="bn"` and the rest follows. Add `.as-bn-large` on
-anything at lead size or larger, which exempts it from the small-size weight
-bump.
+If you set a second script with this kit, do not reach for the shape of that
+rule from memory. Measure the face you actually intend to ship: the multiplier
+that made the two look equal was a property of Literata and Noto Serif Bengali
+together, not a general fact about either script. `06_type/BANGLA-STANDARD.md`
+records how it was measured, which is the transferable part.
 
 ## Accessibility, in the order it usually goes wrong
 

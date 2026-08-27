@@ -137,18 +137,12 @@ class BuildError(Exception):
     pass
 
 
-# =========================================================================
-# Verified Bangla. The ids below are quoted from the final table of
-# 06_type/BANGLA-STANDARD.md. 06_type/bangla-strings.json is merged over them
-# fourteen lines further down and supplies most of what actually ships.
-# Nothing outside those two files may appear in Bangla.
-# =========================================================================
-
-
-# The ids above came from the first verified table. 06_type/bangla-strings.json
-# was written afterwards and holds 94 approved strings under readable keys —
-# `ui.copy`, `theme.hc-dark`, `card.button.name` and so on — each carrying the
-# rule number or dictionary page it rests on.
+# A table of verified Bangla ids stood here, quoted from the final table of
+# 06_type/BANGLA-STANDARD.md and merged with the 94 approved strings in
+# 06_type/bangla-strings.json — `ui.copy`, `theme.hc-dark`, `card.button.name` and
+# so on, each carrying the rule number or dictionary page it rested on. Nothing
+# outside those two files was allowed to appear in Bangla. It went with the Bangla
+# on 27 August 2026; both documents are kept as record.
 #
 # =========================================================================
 # Guards
@@ -742,8 +736,8 @@ def section_studio() -> str:
         '<h2 class="as-h2" id="studio">What this studio is</h2>'
         '<div class="as-prose as-stack">'
         "<p>Aninda Studio is one person: Aninda Sundar Howlader. I design and build "
-        "software, and I write in two languages, English and Bangla, because both "
-        "are first languages for the people I build for.</p>"
+        "software in English, for people whose first language is often not English "
+        "— which is a reason to write plainly rather than a reason to write less.</p>"
         "<p>The rule I work to is that a claim gets measured before it is made. "
         "Contrast ratio — how far apart two colours are in brightness — was measured "
         "for every colour pairing in this system rather than judged by eye. Every "
@@ -1051,8 +1045,8 @@ def document(title: str, description: str, body: str, tokens_css: str,
         f'<meta property="og:image" content="{ORIGIN}/og-image.png">\n'
         f'<meta property="og:image:width" content="{og_width}">\n'
         f'<meta property="og:image:height" content="{og_height}">\n'
-        '<meta property="og:image:alt" content="The Aninda Studio mark, the name in '
-        'English and Bangla, and the line: Simple apps for real life.">\n'
+        '<meta property="og:image:alt" content="The Aninda Studio mark, the name, '
+        'and the line: Simple apps for real life.">\n'
         '<meta name="twitter:card" content="summary_large_image">\n'
         f"<script>{THEME_JS}</script>\n"
         "</head>\n"

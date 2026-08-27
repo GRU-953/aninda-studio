@@ -440,9 +440,10 @@ STORE_TEXT = {
             "against every surface it can land on, in a real browser, and the "
             "published figure is the worst result rather than the flattering one. "
             "Where something has a limit, the limit is written down.\n\n"
-            "The system is bilingual. English and Bangla are both first-class, and "
-            "the Bangla type was measured rather than scaled by eye: it carries its "
-            "own size ramp, its own floor, and a weight step for small sizes.\n\n"
+            "Almost nothing here is written by hand. The colours, the type ramp, "
+            "the spacing, the icons and the words that describe them are generated "
+            "from one set of tokens, and a check refuses to finish if any of them "
+            "drifts from it.\n\n"
             "This listing describes the studio. No app is published yet.",
             4000),
     },
@@ -460,13 +461,14 @@ STORE_TEXT = {
             "against every surface it can land on, in a real browser, and the "
             "published figure is the worst result rather than the flattering one. "
             "Where something has a limit, the limit is written down.\n\n"
-            "The system is bilingual. English and Bangla are both first-class, and "
-            "the Bangla type was measured rather than scaled by eye: it carries its "
-            "own size ramp, its own floor, and a weight step for small sizes.\n\n"
+            "Almost nothing here is written by hand. The colours, the type ramp, "
+            "the spacing, the icons and the words that describe them are generated "
+            "from one set of tokens, and a check refuses to finish if any of them "
+            "drifts from it.\n\n"
             "This listing describes the studio. No app is published yet.",
             4000),
-        "keywords": ("design system,design tokens,accessibility,contrast,bangla,"
-                     "typography,brand", 100),
+        "keywords": ("design system,design tokens,accessibility,contrast,"
+                     "typography,brand,wcag", 100),
     },
 }
 
@@ -891,7 +893,7 @@ def package_readme(store: str, items: list[dict], text_rows) -> str:
     rows = "\n".join(
         f"| `{i['path']}` | {i['w']} x {i['h']} | {i['purpose']}|"
         for i in sorted(mine, key=lambda x: x["path"]))
-    lang = "English and Bangla" if True else ""
+
     return f"""<!-- {DO_NOT_EDIT} -->
 
 # {name} — asset package
@@ -915,8 +917,10 @@ incomplete as a submission, and `CHECKLIST.md` says which is which.
 counts — code points and UTF-8 bytes — because neither store says which unit it
 counts. `metadata/metadata.md` is the same text laid out for copying.
 
-Metadata is supplied in {lang}. Apple added Bangla to its metadata languages on
-30 March 2026 and names it "Bangla", which is this studio's own term.
+Metadata is supplied in English. Both stores accept Bangla — Apple added it to
+its metadata languages on 30 March 2026 and names it "Bangla", which is this
+studio's own term — and both listings carried it until the Bangla left this
+system on 27 August 2026.
 
 {CAPTURE_STEPS.format(captures=captures, example=example,
                       store_size_note=size_note, store_rule=rule)}
@@ -944,7 +948,7 @@ def package_checklist(store: str) -> str:
              "- [x] watchOS master at 1088 x 1088\n"
              "- [x] Screenshot frames at 1290 x 2796 and 2064 x 2752\n"
              "- [x] Name, subtitle, promotional text, description and keywords, "
-             "within limits, English and Bangla\n"
+             "within limits, in English\n"
              if is_apple else
              "- [x] Store icon, 512 x 512, full square, sRGB declared, under 1024 KB\n"
              "- [x] Feature graphic, 1024 x 500, no alpha\n"
@@ -952,7 +956,7 @@ def package_checklist(store: str) -> str:
              "- [x] Monochrome layer for themed icons\n"
              "- [x] Screenshot frames at 1080 x 1920\n"
              "- [x] Title, short description and full description, within limits, "
-             "English and Bangla\n")
+             "in English\n")
     blocked = ("- [ ] **Real screenshots.** Frames are templates. Guideline 2.3.3 "
                "refuses a screenshot that shows only title art or a splash screen.\n"
                "- [ ] **An app.** There is nothing to submit yet.\n"

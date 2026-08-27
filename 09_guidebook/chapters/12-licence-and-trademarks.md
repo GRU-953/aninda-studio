@@ -78,9 +78,11 @@ be renamed before it is distributed.
 this system is therefore renamed **Aninda Mono** in its `name` table, and the
 build refuses to finish if any Reserved Font Name survives the rename.
 
-**Literata and Noto Serif Bengali carry no Reserved Font Name**, so their
-subsets keep their real names. Renaming those would make the system harder to
-trace rather than safer, which is the opposite of what the rule is for.
+**Literata carries no Reserved Font Name**, so its subset keeps its real name.
+Renaming it would make the system harder to trace rather than safer, which is
+the opposite of what the rule is for. Noto Serif Bengali is in the same position
+and is named here because the licence research covered it; it stopped shipping
+on 27 August 2026.
 
 Each subset ships with the full `OFL.txt` of the font it came from.
 

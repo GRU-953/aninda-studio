@@ -35,11 +35,11 @@
     },
     {
       "date": "28 August 2026",
-      "covered": 1,
+      "covered": 3,
       "already_fixed": 0,
       "half_right": 0,
       "by": "the English-only pass",
-      "note": "One entry: the method finding the platform-gap register had been pointing at since 26 August without it existing."
+      "note": "Three entries: the method the platform-gap register had been pointing at since 26 August without it existing, the first result from compiling the Compose patterns against the real library, and the half of the Bangla removal that a rule about script could not see."
     }
   ],
   "_preamble": "# Open findings — carried forward\n\n<!-- This file ships, so it is held to 02_strategy/ENGLISH-STANDARD.md like any\n other prose here — including the banned-word list. Four banned words arrived\n in it when the findings were copied in verbatim from the reviewers' own\n wording, and CI's lint job caught them. If you paste a finding in, reword it.\n A findings record that breaks the rule it records findings about is a poor\n advertisement for the rule. -->\n\nRound 1 of the convergence review raised 59 findings across six independent\nlenses, each adversarially verified before it counted. The blockers and majors\nwere fixed. These minors were judged not worth the change at the time, and are\nrecorded here rather than dropped, because an unwritten known fault becomes an\nunknown one within a week.\n\nEach is real and reproducible. None affects correctness of the design system's\noutput. If you disagree with a judgement, the finding is here to be picked up.\n",
@@ -1741,6 +1741,42 @@
         ],
         "note": "Recorded and fixed on the same day, because the gap register had carried the fix since 26 August 2026 and the finding it asked for was never written. A gap that says 'recorded as a method finding' and points at no finding is exactly the kind of half-closed entry this register exists to prevent.",
         "evidence": "$ ./.venv/bin/python -c \"import json; [print(x['authority'], x['url']) for x in json.load(open('01_research/_data/external-sources.json'))['sources'] if 'whats-new' in x['url'] or 'asset-best' in x['url'] or 'icon-design' in x['url']]\"\n  Apple developer.apple.com/app-store/asset-best-practices/\n  Apple developer.apple.com/design/whats-new/\n  Google developer.android.com/distribute/google-play/resources/icon-design-specifications"
+      }
+    },
+    {
+      "id": "R8-2",
+      "round": 8,
+      "heading": "The eight Compose patterns compile against the declared surface and NOT against androidx, which is the discrepancy the stub could never have reported",
+      "file": "15_native/android/patterns/src/main/kotlin/studio/aninda/patterns/",
+      "body": "The Compose theme and the eight patterns were compiled against twelve files of hand-typed androidx signatures in compose/stubs, because no machine this system is developed on has the Android SDK. That surface proved the Kotlin parsed and was self-consistent. It could not prove the code compiles against the library it imitates, and LIMITS.md said so.\n\nA Gradle gate on ubuntu-24.04 now compiles both modules against the real library. On 28 August 2026 the theme PASSES and the patterns FAIL:\n\n    Execution failed for task ':patterns:compileReleaseKotlin'\n    > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.btapi.BuildToolsApiCompilationWork\n       > Compilation error. See log for more details\n\nThis is not a fault in the gate. It is the gate working: eight screens that satisfy a hand-typed surface do not satisfy androidx, and nothing before this could have said so. The measured error rate of that surface was already known — two of roughly thirteen declarations added on 27 August were wrong, and one REJECTED valid code — and this is the other direction: the surface ACCEPTING code the library refuses.\n\nThe specific compiler errors are not yet in hand. Gradle's Build Tools API logs them at info level, so the first two failures named a task and nothing else; the gate now re-runs once with --info on the failure path to recover them. The next run will name the lines.\n\nSmallest fix: read those lines, correct the eight screens, and merge the branch. Until then the gate lives on compose-against-androidx and NOT on main, so main stays green and the claim on main is still the honest one — that the Compose code is checked against a declared surface only.",
+      "verdict": {
+        "id": "R8-2",
+        "status": "open",
+        "severity_now": "major",
+        "verified_on": "28 August 2026",
+        "passes": [
+          "28 August 2026"
+        ],
+        "note": "Open, and open on purpose. The finding is the reason the gate was built; closing it means fixing the eight screens, not removing the gate.",
+        "evidence": "GitHub Actions run 33112551133, job native-android: :compose:compileReleaseKotlin passed, :patterns:compileReleaseKotlin failed, BUILD FAILED in 1m 38s."
+      }
+    },
+    {
+      "id": "R8-3",
+      "round": 8,
+      "heading": "The Bangla removal was enforced on SCRIPT and not on CLAIMS, so 42 gates passed over a shipped stylesheet rule, a shipped code sample and about thirty English sentences that were all false",
+      "file": "scripts/check_token_citations.py",
+      "body": "The removal is guarded by the review checker, which fails on Bengali codepoints anywhere outside the retained record. That rule is sound and it reached empty. It is also structurally blind to the larger half of the problem: every sentence below is pure ASCII, and not one of them contains a Bengali character.\n\nWHAT REACHED A READER\n  - 12_packages/npm/dist/typography.css shipped\n        :lang(bn),[lang=\"bn\"]{font-family:var(--as-font-bangla);\n                              line-height:var(--as-bangla-line-height);}\n    in the published npm package. Neither property is defined anywhere. A var() with no definition and no fallback is not a build error and not a runtime error — it inherits, silently.\n  - The code-block component card taught readers to write a :lang(bn) rule using three properties that do not exist, in a sample with a copy button.\n  - The guidebook's chapter 11 carried the same rule as instruction, and chapter 1 told the reader to use a language toggle that is not there.\n  - The site said \"I write in two languages, English and Bangla\", and its og:image:alt described a Bangla name that the image does not contain — the banner renders the Latin wordmark alone.\n  - Both store listings claimed \"The system is bilingual\", the App Store keyword list bought a slot for `bangla`, and both READMEs said metadata was supplied in English and Bangla.\n  - The review skill documented its own Bangla check BACKWARDS, describing the verified-list rule that was replaced by the inverted one.\n  - The plugin offered ten reference files and shipped nine; the tenth was `references/bangla.md`.\n  - Criterion 12's evidence field still counted \"exactly 3 families ... bangla (Noto Serif Bengali, serif)\" underneath a note that correctly said two. The verdict was re-scored on 27 August and the evidence under it was never re-run.\n  - 13_plugins/claude-design/build.py left an unclosed <div>: the Bangla wordmark's artwork was removed from a second row and the row's opening tag was not.\n\nTHE GATE\nscripts/check_token_citations.py checks the one claim in this class with an exact mechanical answer: a custom property named in prose, in a stylesheet or on a card is defined, or it is not. 24,329 citations across 82 files, one declared counter-example — `--as-accent-default`, which the naming rules name in order to say it does not exist.\n\nIt caught a fault in its own fix within a minute: the replacement code sample written for the code-block card used `--as-surface-raised`, a role this system has never had.\n\nWHAT IT STILL DOES NOT COVER\nGenerators are not scanned, because a .py builds names by concatenation and a scan reports `--as-space-` as undefined. They are covered indirectly, through what they write. And no gate checks an English SENTENCE about the system — \"the system is bilingual\" has no mechanical answer, and the roughly thirty of those found here were found by reading.",
+      "verdict": {
+        "id": "R8-3",
+        "status": "stale",
+        "severity_now": "major",
+        "verified_on": "28 August 2026",
+        "passes": [
+          "28 August 2026"
+        ],
+        "note": "Fixed 28 August 2026. The dead stylesheet rule, the dead code sample and the unclosed div are gone; the prose is corrected in about thirty places across the guidebook, the site, both stores, both packages, three plugins and the benchmark. The mechanical half is now gated; the prose half is not, and that is stated rather than implied.",
+        "evidence": "$ ./.venv/bin/python scripts/check_token_citations.py\n  ok    24329 custom-property citations across 82 documents, stylesheets and cards, every one defined — among the 57 in 07_tokens/css/tokens.css, or by the file itself (1 declared counter-example)\n\nProved to fail as well as pass: appending a line naming `--as-font-bangla` to a guidebook chapter exits 1 and names the file and line. Before the fixes it failed on 17 citations across two files."
       }
     }
   ]

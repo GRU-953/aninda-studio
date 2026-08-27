@@ -2,16 +2,16 @@
 
 **Every entry below was re-verified against the tree, and each says on what date.** Each also carries the command that was run and what it returned. Nothing here is asserted from memory, and nothing was marked fixed because it looked like the sort of thing that had probably been fixed — a claim was either reproduced or it was not.
 
-64 entries were checked in the pass of 19 August 2026. 41 more were raised later, and 6 of the original entries were re-checked — 25 August 2026, 26 August 2026, 27 August 2026, 28 August 2026. That first pass was needed because this document had drifted. It was written across three review rounds and never re-checked, and of the 64 entries it covered, **18 were already fixed** and **12 were half right** — what that pass found, on the day, kept as it was reported. A register that is wrong in either direction is worse than a short accurate one.
+64 entries were checked in the pass of 19 August 2026. 43 more were raised later, and 6 of the original entries were re-checked — 25 August 2026, 26 August 2026, 27 August 2026, 28 August 2026. That first pass was needed because this document had drifted. It was written across three review rounds and never re-checked, and of the 64 entries it covered, **18 were already fixed** and **12 were half right** — what that pass found, on the day, kept as it was reported. A register that is wrong in either direction is worse than a short accurate one.
 
 ## Where it stands
 
 | | |
 |---|---|
-| Entries re-verified | **105** |
+| Entries re-verified | **107** |
 | Still open | 30 |
 | Half stale — part reproduced, part not | 12 |
-| Already fixed, kept as a record | 62 |
+| Already fixed, kept as a record | 63 |
 | Closed earlier, by the owner's decision | 2 |
 
 Of the 42 that carry work: 41 minor · 1 not-a-defect. **No blocker.** Everything below is a thing this system says about itself that is not quite true, a guard that is narrower than its message, or a piece of work not yet done — not a defect in what it produces.
@@ -588,7 +588,7 @@ to keep the figure current would cost more than the sentence is worth.
 
 *Smallest fix.* Run pdf.py --probe-interactive once and have _pdf_sizes() read PROBE_PDF's size when the file is present, mirroring what it already does for the print PDF; otherwise leave it, since the prose is already honest about what the number is.
 
-### Already fixed, kept as a record (62)
+### Already fixed, kept as a record (63)
 
 These were true when written and are not true now. They stay because the record of what went wrong is the useful part, and because deleting them would hide that this document had drifted.
 
@@ -968,6 +968,15 @@ The English-standard checker now FAILS on Bengali script anywhere outside two re
   Apple developer.apple.com/app-store/asset-best-practices/
   Apple developer.apple.com/design/whats-new/
   Google developer.android.com/distribute/google-play/resources/icon-design-specifications
+
+#### R8-3 · The Bangla removal was enforced on SCRIPT and not on CLAIMS, so 42 gates passed over a shipped stylesheet rule, a shipped code sample and about thirty English sentences that were all false
+
+**Fixed, confirmed 28 August 2026.** Fixed 28 August 2026. The dead stylesheet rule, the dead code sample and the unclosed div are gone; the prose is corrected in about thirty places across the guidebook, the site, both stores, both packages, three plugins and the benchmark. The mechanical half is now gated; the prose half is not, and that is stated rather than implied.
+
+*How that was checked.* $ ./.venv/bin/python scripts/check_token_citations.py
+  ok    24329 custom-property citations across 82 documents, stylesheets and cards, every one defined — among the 57 in 07_tokens/css/tokens.css, or by the file itself (1 declared counter-example)
+
+Proved to fail as well as pass: appending a line naming `--as-font-bangla` to a guidebook chapter exits 1 and names the file and line. Before the fixes it failed on 17 citations across two files.
 
 ### Closed by the owner's decision (2)
 

@@ -3,8 +3,8 @@
 package studio.aninda.tokens
 
 /**
- * Every colour this system measured, for all four themes, plus the
- * dimensions and the Bangla ramp.
+ * Every colour this system measured, for all four themes, plus
+ * the dimensions.
  *
  * This file imports nothing — no androidx, no Compose. That is what lets
  * `kotlinc` compile it, so the values are proven to build rather than

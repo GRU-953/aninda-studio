@@ -8,14 +8,14 @@ Both counts are given because neither store publishes which unit it counts. The 
 
 ### full_description
 
-*650 code points, 650 UTF-8 bytes, limit 4000.*
+*667 code points, 667 UTF-8 bytes, limit 4000.*
 
 ```
 Aninda Studio is one person making simple apps for real life.
 
 Everything here is built on a design system where the claims are measured rather than asserted. Every colour pairing was measured against every surface it can land on, in a real browser, and the published figure is the worst result rather than the flattering one. Where something has a limit, the limit is written down.
 
-The system is bilingual. English and Bangla are both first-class, and the Bangla type was measured rather than scaled by eye: it carries its own size ramp, its own floor, and a weight step for small sizes.
+Almost nothing here is written by hand. The colours, the type ramp, the spacing, the icons and the words that describe them are generated from one set of tokens, and a check refuses to finish if any of them drifts from it.
 
 This listing describes the studio. No app is published yet.
 ```

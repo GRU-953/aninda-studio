@@ -1,5 +1,5 @@
 ---
-description: Set up or upgrade a whole repository to the Aninda Studio standard — the four licences, NOTICE, a bilingual README, the token files and a CI brand check.
+description: Set up or upgrade a whole repository to the Aninda Studio standard — the four licences, NOTICE, the README, the token files and a CI brand check.
 argument-hint: "[path to the repository, default the current folder] [--upgrade]"
 disable-model-invocation: true
 ---
@@ -11,7 +11,7 @@ Set up a new repository, or upgrade an existing one, to the Aninda Studio
 standard.
 
 Use the `aninda-repo` skill. It owns the whole-repository job: the licence
-split, the NOTICE file, the bilingual README pair, the token files, and the
+split, the NOTICE file, the README, the token files, and the
 continuous-integration check that keeps them from drifting.
 
 What the user asked for: `$ARGUMENTS`

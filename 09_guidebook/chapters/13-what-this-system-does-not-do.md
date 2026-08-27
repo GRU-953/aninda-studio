@@ -25,28 +25,28 @@ date.
 
 This kit has no equivalent, and no amount of rigour elsewhere substitutes for
 it. Every judgement in this book about how something *feels* — whether the
-corrected Bangla size looks equal to the Latin beside it, whether 220 ms feels
-right, whether the mark reads as a river — is one person's judgement.
+type looks right at 220 ms, whether the mark reads as a river — is one
+person's judgement.
 
-## The Bangla has not been reviewed by a second Bangla reader
+## The Bangla record was never read by a second Bangla reader
 
-This is the single most important gap in the book.
+The Bangla stopped shipping on 27 August 2026 and the record of it was kept.
+This is a limitation of that record, and it transfers to anyone who picks it up.
 
 The Bangla was checked rule by rule against the Bangla Academy's 2012 spelling
 rules and its own dictionary, with page numbers recorded for every ruling. That
-is a careful reading of primary sources by one person. It is not a review by a
-second Bangla reader, and it cannot substitute for one.
+is a careful reading of primary sources by one person. It was never a review by
+a second Bangla reader, and it cannot substitute for one.
 
 The type work has the same shape. HarfBuzz shaping produced no dotted circles,
 no missing glyphs and no stray hasantas across sixteen conjuncts in all ten
-Bangla faces, and pixel analysis confirmed the matra is continuous. **That proves
-nothing is broken. It does not prove the Bangla is good.** Whether Noto Serif
-Bengali's conjuncts read as well-drawn Bangla to someone in Barishal is a
+Bangla faces, and pixel analysis confirmed the matra was continuous. **That
+proved nothing was broken. It never proved the Bangla was good.** Whether Noto
+Serif Bengali's conjuncts read as well-drawn Bangla to someone in Barishal is a
 judgement no measurement can make.
 
-Where no verified string existed, the English was left in place and the gap was
-named rather than filled. Those gaps are listed with the chapter they fall in,
-below.
+So the record is sound about the rules it cites and silent about whether the
+result reads well. Anyone rebuilding a Bangla layer from it inherits both halves.
 
 ## Chromium only
 
@@ -57,12 +57,11 @@ measurement and 2 for the specimen images. It runs on macOS here and on Ubuntu i
 CI, from a clean checkout, so the readings are not particular to one machine.
 
 Windows uses DirectWrite. Android has its own stack. Hinting and stem darkening
-differ between them. The findings most likely to move are the sub-pixel matra
-results at 11 px and 12 px. Safari and Firefox were not tested at all.
+differ between them. Safari and Firefox were not tested at all.
 
-Nothing was tested in print, either. The device-pixel argument that sets the
-12 px Bangla floor does not apply on paper, so print can go smaller than this
-system says.
+Nothing was tested in print, either. Every size floor in this system is argued
+from device pixels, and that argument does not apply on paper, so print can go
+smaller than this system says.
 
 ## The icon decision's untested dynamic cost
 
@@ -126,10 +125,12 @@ the English standard.
 
 In the order I would do them, given the chance:
 
-1. A Bangla reader who is not me, going through every string and every specimen.
-2. A person who uses a screen reader daily, going through the components.
-3. Rendering checks on Windows and on Android, at 1× and 2×.
-4. Five people who are not me, building something small with the kit.
+1. A person who uses a screen reader daily, going through the components.
+2. Rendering checks on Windows and on Android, at 1× and 2×.
+3. Five people who are not me, building something small with the kit.
+4. A Bangla reader who is not me, going through the retained record — needed
+   only by whoever rebuilds a Bangla layer from it, which is why it is last
+   here and was first while the Bangla shipped.
 
 Until those happen, the honest description of this system is: carefully
 measured, thoroughly documented, and checked by one person — on two operating

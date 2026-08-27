@@ -482,17 +482,17 @@ def card_wordmarks(prim, sem, forced) -> str:
     def art(name: str, width: int) -> str:
         svg = (MARKS / name).read_text(encoding="utf-8")
         return svg.replace("<svg ", f'<svg width="{width}" role="img" ', 1)
+    # ONE wordmark. A Bangla sibling sat in a second row here until 27 August
+    # 2026, and removing its artwork left the row's opening <div> behind with
+    # nothing in it and nothing closing it.
     body = (
         '<div class="sw" style="color:var(--as-ink);gap:var(--as-space-2)">'
-        f'{art("wordmark-latin.svg", 300)}<code>wordmark-latin.svg</code></div>'
-        '<div class="sw" style="color:var(--as-ink);gap:var(--as-space-2);'
-        'margin-top:var(--as-space-5)">'
-)
-    return card("Brand", "Wordmarks", "Latin and Bangla, drawn as outlines", body,
+        f'{art("wordmark-latin.svg", 300)}<code>wordmark-latin.svg</code></div>')
+    return card("Brand", "The wordmark", "drawn as outlines, not live text", body,
                 760, 460,
-                "Both are outlines, not live text, so they need no font installed "
-                "and cannot reflow. অনিন্দ্য is the name; Aninda is its romanised "
-                "form, and the two are not interchangeable in running text.")
+                "It is an outline, not live text, so it needs no font installed and "
+                "cannot reflow. Aninda is the romanised form of the studio's name; "
+                "the two are not interchangeable in running text.")
 
 
 def card_icons(prim, sem, forced) -> str:
@@ -734,14 +734,14 @@ def skill_md(cards: dict[str, str]) -> str:
 name: Aninda Studio
 description: >-
   The Aninda Studio brand and design system. Use these tokens, components and
-  rules when designing or building anything for Aninda Studio, in English or in
-  Bangla. Every colour pairing here was measured rather than chosen, and the
+  rules when designing or building anything for Aninda Studio. Every colour
+  pairing here was measured rather than chosen, and the
   figure published is the worst case rather than the flattering one.
 ---
 
 # Aninda Studio
 
-A studio of one, working in two scripts. This project holds the whole visual
+A studio of one. This project holds the whole visual
 system: {len(cards)} preview cards, the design tokens they are built from, the
 component stylesheet, and the identity artwork.
 
@@ -758,9 +758,10 @@ component stylesheet, and the identity artwork.
    complete set of values, not a filter over another set.
 3. **Colour is never the only signal.** Every state carries a word and a glyph,
    because in forced-colors mode every status colour becomes CanvasText.
-4. **Bangla is set from the register.** Only strings approved against
-   বাংলা একাডেমি প্রমিত বাংলা বানানের নিয়ম appear in Bangla; everything else stays
-   in English rather than being translated by guesswork.
+4. **One language, and the record of the other.** This system shipped Bangla
+   until 27 August 2026 and ships English now. Nothing applies the Bangla rules
+   any more, so do not set Bangla with these tokens: it would fall back to
+   whatever Bengali font the reader happens to have, at the Latin size.
 5. **A number that must stay true is derived, never typed.** Every figure on
    every card here is read from the token files when this project is built.
 

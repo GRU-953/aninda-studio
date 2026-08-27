@@ -123,7 +123,7 @@ on the first line. `references/ci.md` explains why that line is load-bearing.
 
 ---
 
-## The bilingual README
+## The README
 
 One README, in English, written to `aninda-brand/references/voice.md`.
 

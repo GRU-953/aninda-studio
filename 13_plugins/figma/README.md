@@ -37,12 +37,11 @@ the styles, the marks, a small set of components, and one frame for each of the
 
 ## Before you start
 
-You need three fonts installed on your computer:
+You need two fonts installed on your computer:
 
 | Family | Style | Where it comes from |
 | --- | --- | --- |
 | Literata | Regular | The Latin text face. SIL Open Font License 1.1. Install it from Google Fonts under its own name. |
-| Noto Serif Bengali | Regular and Medium | The Bangla text face. SIL Open Font License 1.1. Install it from Google Fonts under its own name. |
 | Aninda Mono | Regular | The monospaced face. It exists only inside this project: it is IBM Plex Mono renamed, because `Plex` is a Reserved Font Name and renaming is what OFL 1.1 clause 3 requires of a modified font. **This project builds it for you** — see below. |
 
 Figma reads fonts your operating system has installed. The `.woff2` files in this
@@ -52,8 +51,8 @@ exactly that name, the plugin stops and says so.
 
 ### Making and installing Aninda Mono
 
-Literata and Noto Serif Bengali can be installed from upstream under their own
-names. `Aninda Mono` cannot, because the name exists nowhere else. Until 18 August
+Literata can be installed from upstream under its own name. `Aninda Mono`
+cannot, because the name exists nowhere else. Until 18 August
 2026 this project shipped it only as a `.woff2`, so this step had no answer and
 step 1 below ended in a refusal.
 
@@ -231,11 +230,10 @@ Some things are deliberately not made, and the receipt says so each run:
 - **No elevation or shadow styles.** The token set has no shadow token, and
   inventing blur radii here would put numbers in the library the system never
   agreed to.
-- **No line height on the Latin and monospaced text styles.** The token set
-  defines a line height for Bangla only, so Figma's automatic setting is used.
-A fourth bullet used to sit here — "no Bangla on 25 of the 30 card frames". Every
-card now carries a verified Bangla name and subtitle, so the plan reports no such
-gap and no frame says so.
+- **No line height on any text style.** The token set defines no line-height
+  token, so Figma's automatic setting is used. It defined one for Bangla alone
+  until 27 August 2026, which is why this bullet used to name two of the three
+  style groups rather than all of them.
 
 The counts in the table above are checked against `RECEIPT-EXPECTED.json` every
 time `build.mjs` runs, so they cannot drift from the plugin again.

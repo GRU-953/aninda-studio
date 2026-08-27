@@ -373,7 +373,7 @@ and their alert both say the figures are examples rather than readings.
 
 | Folder | What it holds |
 |---|---|
-| `09_guidebook/` | **The guidebook.** {f['chapters']} chapters in English and Bangla, one self-contained HTML file ({f['guidebook_mb']} MB) that needs no network, plus a {f['pdf_mb']} MB PDF |
+| `09_guidebook/` | **The guidebook.** {f['chapters']} chapters in English, one self-contained HTML file ({f['guidebook_mb']} MB) that needs no network, plus a {f['pdf_mb']} MB PDF |
 | `07_tokens/` | The design tokens: DTCG source, and {f['tokens']} CSS custom properties generated from it |
 | `08_components/` | {f['cards']} component and pattern cards — {f['foundations']} foundations, {f['components']} components, {f['patterns']} patterns |
 | `04_mark/` | {f['marks']} mark, wordmark and icon files |
@@ -474,8 +474,8 @@ Four licences, because the parts genuinely differ. `NOTICE` explains each one.
 - **The writing** — the guidebook and the documents: **PolyForm Noncommercial
   1.0.0**. Free to read, copy and adapt; not to resell. This is
   source-available, **not open source**, and licence scanners will flag it.
-- **The typefaces** — Literata, Noto Serif Bengali, IBM Plex Mono: **SIL OFL 1.1**,
-  each licence beside its file.
+- **The typefaces** — Literata and IBM Plex Mono: **SIL OFL 1.1**, each licence
+  beside its file.
 - **The name and the marks** — **not licensed at all**. Take the system, leave the
   identity. See `TRADEMARKS.md`.
 

@@ -604,11 +604,12 @@ def guard_field_descriptions(pages: dict[str, str]) -> None:
 
 
 def code_block(name: str, body: str, copy_label: str = "") -> str:
-    # e_mixed rather than e, because a sample that shows how to mark Bangla up
-    # contains Bangla. Untagged, that run is announced as English and set in
-    # Aninda Mono, which is subset from IBM Plex Mono and carries no Bengali glyph
-    # at all — so the sample teaching the lang attribute was itself unable to draw
-    # its own example. The span changes nothing a reader sees or copies.
+    # e_mixed rather than e. The sample that needed it was the :lang(bn) rule,
+    # which contained the Bangla it was teaching a reader to mark up: untagged, that
+    # run was announced as English and set in Aninda Mono, which is subset from IBM
+    # Plex Mono and carries no Bengali glyph at all. The sample is gone and the span
+    # stays, because it changes nothing a reader sees or copies and the next mixed
+    # run should not have to rediscover the problem.
     lines = []
     for line in body.strip("\n").split("\n"):
         if line.lstrip().startswith("<!--") or line.lstrip().startswith("/*"):
@@ -626,16 +627,11 @@ def code_block(name: str, body: str, copy_label: str = "") -> str:
     )
 
 
-# =========================================================================
-# Verified Bangla. Every string in this dictionary is taken verbatim from the
-# recommended-strings table of 06_type/BANGLA-STANDARD.md, which is the governing
-# document. Nothing in it was written by me.
-#
-# It is not the whole story: 06_type/bangla-strings.json is the register written
-# under those rules, and it supplies the card names, the card subtitles and the
-# theme labels further down this file. Where neither holds a string, the card uses
-# English and the gap is reported.
-# =========================================================================
+# A dictionary of verified Bangla stood here, every string taken verbatim from the
+# recommended-strings table of 06_type/BANGLA-STANDARD.md, supplying the card names,
+# the card subtitles and the theme labels below. Where neither it nor
+# 06_type/bangla-strings.json held a string, the card used English and reported the
+# gap. It went with the Bangla on 27 August 2026; both documents are kept as record.
 
 
 # =========================================================================
@@ -844,7 +840,7 @@ def d_choice(p, th, T):
       </label>
       <label class="as-choice" for="{p}-c2">
         <input class="as-choice__control" id="{p}-c2" type="checkbox">
-        <span class="as-choice__text"><span class="as-choice__label">The Bangla specimen</span></span>
+        <span class="as-choice__text"><span class="as-choice__label">The monospaced specimen</span></span>
       </label>
       <label class="as-choice" for="{p}-c3">
         <input class="as-choice__control" id="{p}-c3" type="checkbox" disabled>
@@ -1179,14 +1175,19 @@ def d_code(p, th, T):
 .as-btn--primary:hover  { background-color: var(--as-accent-hover); }
 .as-btn--primary:active { box-shadow: inset 0 0 0 1px var(--as-surface-lowest); }""",
     )
+    # This sample was the :lang(bn) rule until 27 August 2026. It could not stay:
+    # the three properties it named left with the Bangla, so a reader who copied
+    # it got a var() with no definition and no fallback — which inherits silently
+    # rather than failing. A teaching sample has to resolve.
     second = code_block(
         "tokens.css",
-        """/* The Bangla rule and its exception in one declaration, so nobody
-   has to remember the exception. */
-:lang(bn), [lang="bn"] {
-  font-family: var(--as-font-bangla);
-  font-size: clamp(var(--as-text-bangla-min),
-                   calc(1em * var(--as-bangla-scale-body)), 100em);
+        """/* A role, never a literal. The role resolves per theme, so this
+   one rule is correct in all four. */
+.as-callout {
+  background: var(--as-surface-high);
+  color: var(--as-ink);
+  border: 1px solid var(--as-line);
+  border-radius: var(--as-radius-card);
 }""",
     )
     return (
@@ -1629,7 +1630,7 @@ def d_landing(p, th, T):
 <div class="as-stack as-stack--loose">
   <div class="as-stack">
     <p class="as-card__meta">Aninda Studio</p>
-    <h3 class="as-h2">Software made carefully, for two languages</h3>
+    <h3 class="as-h2">Software made carefully, and measured before it is claimed</h3>
     <p class="as-lead as-prose">I build small, careful software. Where something has a limit, the limit is written down here rather than hidden.</p>
     <div class="as-row">
       <a class="as-btn as-btn--primary" href="#">{icon('arrow')}<span>Read the guidebook</span></a>
@@ -1788,7 +1789,7 @@ CARDS = [
                            "Nothing in these tables was typed. Every figure is read from the token files at build time, so the prose cannot drift away from the palette.",
                            colour_tables(T))],
          usage=("markup", '<span class="as-badge as-badge--danger">\n  <svg class="as-icon">…</svg><span>Failed</span>\n</span>\n<!-- The colour is the third signal, never the only one. -->')),
-    dict(slug="typography", group="Foundations", name="Typography", subtitle="One scale of a perfect fourth, two scripts, a measured multiplier for Bangla and a floor it never goes below.",
+    dict(slug="typography", group="Foundations", name="Typography", subtitle="One scale of a perfect fourth, two faces, and every size read out of the token file rather than typed.",
          demo=d_typography, wide=True, height=1900,
          usage=("markup", '<p class="as-lead">A lead paragraph</p>\n<!-- Every step is a class. The scale is a ratio of the root size, so\n     changing the root changes all of them together. -->')),
     dict(slug="space-and-shape", group="Foundations", name="Space and shape", subtitle="A 4 px scale in ten steps, and four radii. Everything in the system sits on one of them.",

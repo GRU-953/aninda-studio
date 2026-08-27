@@ -2,20 +2,20 @@
 name: Aninda Studio
 description: >-
   The Aninda Studio brand and design system. Use these tokens, components and
-  rules when designing or building anything for Aninda Studio, in English or in
-  Bangla. Every colour pairing here was measured rather than chosen, and the
+  rules when designing or building anything for Aninda Studio. Every colour
+  pairing here was measured rather than chosen, and the
   figure published is the worst case rather than the flattering one.
 ---
 
 # Aninda Studio
 
-A studio of one, working in two scripts. This project holds the whole visual
+A studio of one. This project holds the whole visual
 system: 17 preview cards, the design tokens they are built from, the
 component stylesheet, and the identity artwork.
 
 ## What is here
 
-- **Brand** — Icons, The mark, Wordmarks
+- **Brand** — Icons, The mark, The wordmark
 - **Colour** — Forced colours, Ramps, Roles, Surfaces
 - **Components** — Buttons, Card and table, Badges and alerts, Fields, Navigation
 - **Foundations** — Accessibility
@@ -32,9 +32,10 @@ component stylesheet, and the identity artwork.
    complete set of values, not a filter over another set.
 3. **Colour is never the only signal.** Every state carries a word and a glyph,
    because in forced-colors mode every status colour becomes CanvasText.
-4. **Bangla is set from the register.** Only strings approved against
-   বাংলা একাডেমি প্রমিত বাংলা বানানের নিয়ম appear in Bangla; everything else stays
-   in English rather than being translated by guesswork.
+4. **One language, and the record of the other.** This system shipped Bangla
+   until 27 August 2026 and ships English now. Nothing applies the Bangla rules
+   any more, so do not set Bangla with these tokens: it would fall back to
+   whatever Bengali font the reader happens to have, at the Latin size.
 5. **A number that must stay true is derived, never typed.** Every figure on
    every card here is read from the token files when this project is built.
 

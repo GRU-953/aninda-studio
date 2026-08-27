@@ -9,11 +9,13 @@ import AnindaComponents
 
 /// A landing page: what this is, why, and the two things to do next.
 ///
-/// The headline is the studio's tagline. The web card still reads "Software made
-/// carefully, for two languages", which was true of a bilingual system and is not
-/// true of this one; that card changes when Bangla leaves the component library,
-/// and this screen is written to where the brand now is rather than to where the
-/// card currently sits.
+/// The headline is the studio's tagline rather than the web card's, which is a
+/// deliberate difference and not a drift. The card read "Software made carefully,
+/// for two languages" when this screen was written — true of a bilingual system
+/// and not of this one — so the screen was written to where the brand was rather
+/// than to where the card sat. The card was corrected on 28 August 2026 and now
+/// reads "Software made carefully, and measured before it is claimed"; the tagline
+/// here is shorter on purpose, because a phone headline has less room than a page.
 public struct AnindaLandingScreen: View {
     @Environment(\.anindaTheme) private var theme
 

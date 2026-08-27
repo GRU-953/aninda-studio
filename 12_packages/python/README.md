@@ -88,7 +88,7 @@ container widths they set are in the token documents, under `fontFamily` and
 
 ## Fonts are not included
 
-The system uses Literata, Noto Serif Bengali and IBM Plex Mono, all under the SIL
+The system uses Literata and IBM Plex Mono, both under the SIL
 Open Font Licence 1.1. They are not bundled: it would triple the size of this
 package, and an OFL font inside an Apache-2.0 package muddies the licence
 declaration. The families are named in the token documents; loading them is yours.

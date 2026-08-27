@@ -25,8 +25,7 @@
     "wcag",
     "high-contrast",
     "css-variables",
-    "bangla",
-    "bilingual"
+    "oklch"
   ],
   "sideEffects": [
     "*.css"

@@ -50,7 +50,7 @@
       "path": "cards/foundations/typography.html",
       "name": "Typography",
       "group": "Foundations",
-      "subtitle": "One scale of a perfect fourth, two scripts, a measured multiplier for Bangla and a floor it never goes below.",
+      "subtitle": "One scale of a perfect fourth, two faces, and every size read out of the token file rather than typed.",
       "width": 1280,
       "height": 1900
     },

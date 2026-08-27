@@ -156,10 +156,12 @@ A sentence is never made friendlier at the cost of being right.
   the way.
 - **Not shorter at any cost.** A sentence that saves three words and costs the
   reader a re-read is a bad trade.
-- **Not the same as the Bangla.** The Bangla is written as Bangla, not translated
-  from this. Same meaning, same steps, different sentences. Where the two must
-  agree exactly — a number, a licence name, a file name — they agree; everywhere
-  else they are written independently, each natural in its own language.
+- **Not a translation of anything.** This standard governed the English half of
+  a bilingual system until 27 August 2026, and the Bangla was written as Bangla
+  rather than translated from it: same meaning, same steps, different sentences,
+  agreeing exactly only where they had to — a number, a licence name, a file
+  name. There is one language now. If a second returns, it is written that way
+  again and not run through a translator.
 
 ---
 

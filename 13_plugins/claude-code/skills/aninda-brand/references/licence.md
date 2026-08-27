@@ -80,7 +80,7 @@ Copyright 2026 Aninda Sundar Howlader
 
 ## 3. The typefaces — SIL Open Font License 1.1
 
-**Covers** Literata, Noto Serif Bengali, and the IBM Plex Mono subset.
+**Covers** Literata and the IBM Plex Mono subset. It covered Noto Serif Bengali too, until that face left with the Bangla on 27 August 2026.
 
 **There is no OFL version 1.2.** Version 1.1 dates from 26 February 2007 and the
 canonical home is now `https://openfontlicense.org/`. A reference to "OFL 1.2" is
@@ -93,13 +93,13 @@ root — one per font, next to the font.
 Subsetting a font counts as modifying it under OFL 1.1 clause 3, and a modified
 version may not use a reserved name. The subset here is therefore renamed
 **Aninda Mono**, with the unmodified family kept as the next fallback in the
-stack. Literata and Noto Serif Bengali carry no reserved name and keep theirs.
+stack. Literata carries no reserved name and keeps its own.
 
 ---
 
 ## 4. The identity — not licensed at all
 
-**Covers** the name "Aninda Studio", the Bangla name "অনিন্দ্য", the mark, the
+**Covers** the name "Aninda Studio", its Bengali form "অনিন্দ্য" — the name is claimed in both scripts whatever the system sets type in — the mark, the
 wordmark, the tile, the icons, and any lockup of them.
 
 **Means** no licence is granted to any of it, by any file in the system. It is

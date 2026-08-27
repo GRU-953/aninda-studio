@@ -4,10 +4,11 @@ This is the whole of Aninda Studio in one file. The mark, the colour, the type,
 the components, the words, the licences and the honest list of what is missing.
 Nothing here points at a server. If you have this file, you have the brand.
 
-I am Aninda Sundar Howlader. I work alone, from Barishal, in Bangladesh. The
-studio serves two audiences in two scripts — Bangla and English — and most of
-the decisions in this book exist because those two scripts do not behave the
-same way.
+I am Aninda Sundar Howlader. I work alone, from Barishal, in Bangladesh. This
+book is written in English, and says so plainly because it did not used to be:
+the studio served two scripts until 27 August 2026, and several of the decisions
+recorded here were shaped by a second script that no longer ships. Chapter 13
+says what went and what was kept.
 
 ## Two halves, and why they are separate
 
@@ -33,9 +34,9 @@ drawn in the wrong place. Chapter 13 sets out the terms in full.
 
 ## How to read this
 
-Each chapter has an English section and a Bangla one. The button at the top of
-the page shows one and hides the other. It is one book, not two, because two
-files drift apart and this whole project is arranged against drift.
+Straight through. There is one language and one column, so there is nothing to
+switch between — a language toggle stood at the top of every chapter until the
+Bangla left it on 27 August 2026.
 
 Every number in the generated chapters — colour, type, space and shape,
 components, motion — was read out of the token files at build time. Not one of

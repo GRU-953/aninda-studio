@@ -49,11 +49,11 @@ the other two and sends their work to them, rather than competing for it.
 | Skill | Unit of work | Reach for it when |
 | --- | --- | --- |
 | `aninda-brand` | **one thing** | Making a mark, an icon, a page, a component, a piece of copy. It holds every rule; the other two point back at it. |
-| `aninda-repo` | **a whole repository** | Setting up or upgrading licences, `NOTICE`, a bilingual README pair, SPDX headers, a CI brand check. |
+| `aninda-repo` | **a whole repository** | Setting up or upgrading licences, `NOTICE`, the README, SPDX headers, a CI brand check. |
 | `aninda-review` | **something that already exists** | Checking a page, a stylesheet or a repository against the system and WCAG 2.2 AA. |
 
-`aninda-brand` carries ten reference files — colour, typography, layout, logo,
-icons, motion, voice, Bangla, licence, naming — plus the token files, the
+`aninda-brand` carries nine reference files — colour, typography, layout, logo,
+icons, motion, voice, licence, naming — plus the token files, the
 stylesheet, the marks and the fonts. Its `SKILL.md` says which to read for which
 job, so a small question does not cost ten files of context.
 
@@ -162,8 +162,8 @@ python scripts/check_plugin.py
 It checks the things that would otherwise fail quietly: a command with no
 `argument-hint`, a skill whose description is too thin to be chosen, a skill that
 does not route the other two jobs away, a `SKILL.md` pointing at a file that is
-not there, a bundle with more than one timestamp in it, and the verified Bangla
-table disagreeing with the JSON the scripts read.
+not there, a bundle with more than one timestamp in it, and the retained Bangla
+string register disagreeing with the JSON beside it.
 
 ---
 
@@ -187,11 +187,10 @@ one of the four commands.
 
 ## What needs the owner
 
-- **Bangla beyond the verified list.** The 30 component cards contain Bangla
-  prose that is not among the 31 verified strings. `check.py` reports each one as
-  a note rather than a failure, because it cannot tell you whether the Bangla is
-  wrong — only that it has not been checked against the Bangla Academy
-  dictionary.
+Nothing, as of 27 August 2026. The one entry that stood here was Bangla prose on
+the 30 component cards that had never been checked against the Bangla Academy
+dictionary, and it closed the way an open question sometimes does — not by being
+answered, but by the thing it asked about no longer existing.
 
 **Settled, and recorded so it is not reopened.** Clear space around the mark used
 to be stated two incompatible ways: `04_mark/manifest.json` said half the mark's

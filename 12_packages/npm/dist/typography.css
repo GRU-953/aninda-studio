@@ -3,5 +3,4 @@
  * host you control. Family names below match the design system's own.
  */
 :root{font-family:var(--as-font-latin);}
-:lang(bn),[lang="bn"]{font-family:var(--as-font-bangla);line-height:var(--as-bangla-line-height);}
 code,kbd,samp,pre{font-family:var(--as-font-mono);}

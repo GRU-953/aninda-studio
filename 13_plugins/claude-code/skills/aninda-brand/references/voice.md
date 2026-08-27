@@ -115,7 +115,8 @@ sentence is never made friendlier at the cost of being right.
   out of the way.
 - **Not shorter at any cost.** A sentence that saves three words and costs a
   re-read is a bad trade.
-- **Not the same as the Bangla.** The Bangla is written as Bangla, not translated
-  from this. Same meaning, same steps, different sentences.
+- **Not a translation of anything.** This studio wrote its Bangla as Bangla
+  rather than translating it, and if a second language returns it should be
+  written the same way — same meaning, same steps, different sentences.
 
 *A reader should never have to be clever to understand this studio.*

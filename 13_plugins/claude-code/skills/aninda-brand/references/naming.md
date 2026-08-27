@@ -14,7 +14,7 @@ One name for one thing, everywhere. If it is the *mark*, it is never also the
 | Word | Means | Never call it |
 | --- | --- | --- |
 | **mark** | The `a` glyph on its own | logo, icon, symbol, logomark |
-| **wordmark** | The set name, Latin or Bangla | logotype, text logo |
+| **wordmark** | The set name | logotype, text logo |
 | **tile** | The mark on a rounded coloured square | badge, avatar |
 | **icon** | An app or platform icon file | logo, favicon |
 | **lockup** | Mark and wordmark placed together | combined logo |
@@ -44,8 +44,8 @@ Dot-separated, lowercase, hyphens inside a segment.
 color.ramp.ground.900
 color.surface.base
 dimension.space.4
-dimension.type.bangla-min
-number.scale.bangla.body
+dimension.type.caption
+number.scale.ratio
 duration.motion.colour
 cubicBezier.motion.standard
 ```
@@ -88,7 +88,7 @@ Everything that is not a colour has a fixed family name, not a derived one:
 | `dimension.space.4` | `--as-space-4` | family `space` |
 | `dimension.type.body` | `--as-text-body` | family renamed `type` to `text` |
 | `dimension.radius.card` | `--as-radius-card` | family `radius` |
-| `fontFamily.bangla` | `--as-font-bangla` | family renamed to `font` |
+| `fontFamily.mono` | `--as-font-mono` | family renamed to `font` |
 | `duration.motion.move` | `--as-duration-move` | `motion` dropped, family `duration` |
 | `cubicBezier.motion.enter` | `--as-ease-enter` | `motion` dropped, family renamed `ease` |
 | `number.scale.ratio` | `--as-scale-ratio` | family `scale` |
@@ -107,11 +107,12 @@ read prose, which is why this section had to be corrected by hand.
 Variables use `/` for grouping, mirroring the token path exactly:
 `color/surface/base`, `dimension/space/4`.
 
-Styles use a readable form: `Theme/Surface/Base`, `Latin/Body`, `Bangla/H2`,
+Styles use a readable form: `Theme/Surface/Base`, `Latin/Body`, `Latin/H2`,
 `Mono/Caption`, `Focus/Ring`, `Layout/12 column`.
 
 Component variants use Figma's own `Property=Value` form: `Tone=Accent,
-Script=Bangla`.
+State=Hover`. A `Script=` property existed until the Bangla left on 27 August
+2026; there is one script now, so nothing needs to say which.
 
 ---
 
@@ -161,7 +162,9 @@ may not borrow the repository's name either.
 ## The name itself
 
 - English: **Aninda Studio**. Two words, both capitalised.
-- Bangla: **অনিন্দ্য স্টুডিও**. Verified string wm-1.
-- "Aninda" is the romanised form of অনিন্দ্য. Never write "Anindya" in English
-  running text, and never write the English form inside Bangla text.
+- "Aninda" is the romanised form of **অনিন্দ্য**, which is why it is not spelled
+  "Anindya" — never write "Anindya" in English running text. The Bengali form of
+  the name is not set anywhere in this system: the Bengali face left with the
+  Bangla on 27 August 2026, so a Bengali run would fall back to whatever font
+  the reader's machine happens to have.
 - Domain: `anindastudio.com`. No hyphen.
