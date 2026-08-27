@@ -64,7 +64,7 @@ and their alert both say the figures are examples rather than readings.
 | `11_site/` | The website, generated from the tokens |
 | `12_packages/` | The tokens as an npm package and a Python package |
 | `13_plugins/` | A Figma plugin, a Claude Code plugin, and the Claude Design bundle |
-| `15_native/` | Swift and Kotlin — the tokens, 16 SwiftUI components and a Compose theme, 42 files in all, compiled by the build that gates them |
+| `15_native/` | Swift and Kotlin — the tokens, 16 SwiftUI components, a Compose theme, and the 8 patterns as screens on both, 63 files in all, compiled by the build that gates them |
 | `14_delivery/` | The two store asset packages — 45 files for the Apple App Store and Google Play, each citing the page its size came from |
 | `01_research/` | What was checked, when, and against which source — including what could not be verified |
 

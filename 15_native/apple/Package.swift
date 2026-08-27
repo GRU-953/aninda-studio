@@ -9,6 +9,17 @@ let package = Package(
         .library(name: "AnindaTokens", targets: ["AnindaTokens"]),
         .library(name: "AnindaTokensUI", targets: ["AnindaTokensUI"]),
         .library(name: "AnindaComponents", targets: ["AnindaComponents"]),
+        // The patterns are a product for a MECHANICAL reason, not a change of
+        // heart about coupling. xcodebuild generates schemes from products, so a
+        // target that is not one can only ever be compiled for whatever platform
+        // `swift build` happens to run on — and eight page compositions are
+        // exactly the code that breaks on availability. Without this line the
+        // patterns would be checked for macOS and for nothing else.
+        //
+        // A product does not couple anything: a caller depending on
+        // AnindaComponents never resolves AnindaExamples. The opt-in the target
+        // boundary expresses is unchanged.
+        .library(name: "AnindaExamples", targets: ["AnindaExamples"]),
     ],
     targets: [
         // GENERATED, and framework-free on purpose. It imports nothing, so it

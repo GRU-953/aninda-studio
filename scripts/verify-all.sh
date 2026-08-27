@@ -142,6 +142,7 @@ if ! $PY 04_mark/build.py >/dev/null 2>&1; then
 else
   drift "the committed marks" 04_mark/svg 04_mark/manifest.json 04_mark/proof.svg
 fi
+run "the eight patterns"      $PY scripts/check_patterns.py
 run "scripts/readme.py"       $PY scripts/readme.py --check
 run "15_native/material3.py" $PY 15_native/material3.py --check
 # Both compilers, because this machine has both. Each CI job can only prove one,

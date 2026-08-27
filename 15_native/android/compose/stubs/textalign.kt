@@ -6,8 +6,12 @@
 // Declarations read from: compose-bom 1.4.0 (stable, 12 August 2026) — androidx.compose.material3 1.4.0, androidx.compose.foundation 1.4.0, androidx.compose.ui 1.4.0. Read 27 August 2026.
 @file:Suppress("unused", "UNUSED_PARAMETER")
 
-package androidx.compose.ui.graphics
+package androidx.compose.ui.text.style
 
-public class Color(public val value: Long) {
-    public companion object { public val Transparent: Color = Color(0L) }
+public class TextAlign {
+    public companion object {
+        public val Start: TextAlign = TextAlign()
+        public val Center: TextAlign = TextAlign()
+        public val End: TextAlign = TextAlign()
+    }
 }

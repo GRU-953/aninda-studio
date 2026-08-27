@@ -73,6 +73,7 @@ AUTHORED_ROOTS = (
     "apple/Sources/AnindaComponents",
     "apple/Sources/AnindaExamples",
     "android/compose/src/main/kotlin",
+    "android/patterns/src/main/kotlin",
 )
 # NOT the stubs. compose/stubs is GENERATED — it is in `files`, so the sweep keeps
 # it — and listing it as authored made the second Kotlin pass collect it twice,
@@ -477,6 +478,37 @@ def android_dimens_bn_xml(data: dict) -> str:
 # The gates that actually compile
 # =========================================================================
 
+def stage_apple(files: dict[Path, str], root: Path) -> int:
+    """Lay the Apple package out under `root`: generated files plus authored ones.
+
+    Extracted so that `swift build` and `xcodebuild` compile THE SAME THING. They
+    did not: this staged the pending files while the platform sweep ran against the
+    package on disk. Nothing caught it while Package.swift was stable, and it broke
+    the moment a product was added — the sweep asked for a scheme that existed only
+    in the version not yet written.
+    """
+    n = 0
+    for p, text in files.items():
+        if not str(p).startswith(str(APPLE)):
+            continue
+        q = root / p.relative_to(APPLE)
+        q.parent.mkdir(parents=True, exist_ok=True)
+        q.write_text(text, encoding="utf-8")
+        n += 1
+    # The AUTHORED sources too, read off disk. The package is the generated token
+    # layer PLUS the SwiftUI bridge, the components and the patterns, and compiling
+    # only part of it would prove only part of it — while reporting that the
+    # package builds.
+    for p in sorted(APPLE.rglob("*.swift")):
+        if not is_authored(p):
+            continue
+        q = root / p.relative_to(APPLE)
+        q.parent.mkdir(parents=True, exist_ok=True)
+        q.write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
+        n += 1
+    return n
+
+
 def compile_swift(files: dict[Path, str]) -> str:
     """Build AND test the emitted package, in a temporary copy of it.
 
@@ -497,25 +529,7 @@ def compile_swift(files: dict[Path, str]) -> str:
             "written; what is missing is the proof that they build.")
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp) / "pkg"
-        n = 0
-        for p, text in files.items():
-            if not str(p).startswith(str(APPLE)):
-                continue
-            q = root / p.relative_to(APPLE)
-            q.parent.mkdir(parents=True, exist_ok=True)
-            q.write_text(text, encoding="utf-8")
-            n += 1
-        # The AUTHORED sources too, read off disk. The package is the generated
-        # token layer PLUS the SwiftUI bridge and the components, and compiling
-        # only half of it would prove only half of it — while reporting that the
-        # package builds.
-        for p in sorted(APPLE.rglob("*.swift")):
-            if not is_authored(p):
-                continue
-            q = root / p.relative_to(APPLE)
-            q.parent.mkdir(parents=True, exist_ok=True)
-            q.write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
-            n += 1
+        n = stage_apple(files, root)
         res = subprocess.run(["swift", "build", "--package-path", str(root)],
                              capture_output=True, text=True)
         if res.returncode != 0:
@@ -549,7 +563,7 @@ DESTINATIONS = (("macOS", "generic/platform=macOS"),
                 ("visionOS", "generic/platform=visionOS"))
 
 
-def compile_swift_platforms(root: Path) -> str:
+def compile_swift_platforms(files: dict[Path, str]) -> str:
     """Build for every platform the package declares, and NAME the ones it could not.
 
     `swift build` compiles for the host and nothing else. The package declares five
@@ -566,28 +580,42 @@ def compile_swift_platforms(root: Path) -> str:
     """
     if shutil.which("xcodebuild") is None:
         return "xcodebuild is absent, so only the host platform was compiled"
+    # Both products, because they fail differently. The components are small views
+    # whose availability problems are per-API; the patterns are whole screens that
+    # use layout containers with their own platform floors. Compiling one and
+    # reporting for both is how a pattern that cannot exist on watchOS would have
+    # shipped looking checked.
+    schemes = ("AnindaComponents", "AnindaExamples")
     built, missing = [], []
     # Derived data goes OUTSIDE the tree. Building into it left a .dd directory
     # inside 15_native/apple that the sweep then deleted file by file, which is a
     # lot of churn to announce for a build product.
     dd = tempfile.mkdtemp(prefix="aninda-dd-")
+    staged = tempfile.mkdtemp(prefix="aninda-pkg-")
+    root = Path(staged) / "pkg"
+    stage_apple(files, root)
     for name, dest in DESTINATIONS:
-        res = subprocess.run(
-            ["xcodebuild", "-scheme", "AnindaComponents", "-destination", dest,
-             "-derivedDataPath", dd, "build"],
-            cwd=root, capture_output=True, text=True)
-        out = res.stdout + res.stderr
-        if "BUILD SUCCEEDED" in out:
-            built.append(name)
-        elif "is not installed" in out or "Unable to find a destination" in out:
-            missing.append(name)
-        else:
+        absent = False
+        for scheme in schemes:
+            res = subprocess.run(
+                ["xcodebuild", "-scheme", scheme, "-destination", dest,
+                 "-derivedDataPath", dd, "build"],
+                cwd=root, capture_output=True, text=True)
+            out = res.stdout + res.stderr
+            if "BUILD SUCCEEDED" in out:
+                continue
+            if "is not installed" in out or "Unable to find a destination" in out:
+                absent = True
+                break
             errs = [l.strip() for l in out.splitlines() if ": error:" in l][:6]
             raise BuildError(
-                f"the components do not build for {name}:\n  "
+                f"{scheme} does not build for {name}:\n  "
                 + "\n  ".join(errs or [out[-1200:]]))
+        (missing if absent else built).append(name)
     shutil.rmtree(dd, ignore_errors=True)
-    note = f"components build for {', '.join(built)}"
+    shutil.rmtree(staged, ignore_errors=True)
+    note = (f"components and patterns build for {', '.join(built)}"
+            if built else "no declared platform could be compiled here")
     if missing:
         note += (f" — NOT compiled for {', '.join(missing)}, whose SDKs are not "
                  f"installed on this machine. Those platforms are compiled by the "
@@ -775,6 +803,19 @@ def guard_authored_uses_tokens() -> str:
     SIZED = re.compile(
         r'\.(padding|frame|cornerRadius|lineWidth|offset|spacing|size|'
         r'strokeBorder|inset)\s*\([^)]*?(?<![\w.])(\d+(?:\.\d+)?)(?![\w.])')
+    # Kotlin was held to a WEAKER rule than Swift until 27 August 2026, and the
+    # reason was the regex above rather than a decision: `padding(16.dp)` has a dot
+    # straight after the digits, so the `(?![\w.])` lookahead refuses to match it.
+    # Every literal size in Compose is written that way, so the Kotlin half of the
+    # authored tree was effectively unchecked. This catches the `.dp` form directly.
+    #
+    # Deliberately NOT `.sp`. Typography.kt carries fifteen literal sp figures
+    # because kotlin_tokens() emits no AnindaType to read them from; extending this
+    # to type sizes would fail a file for a gap in the emitter rather than a fault
+    # in the file. That is recorded as a follow-up, not smuggled in as a pass.
+    SIZED_DP = re.compile(
+        r'\.?(padding|width|height|heightIn|widthIn|sizeIn|size|defaultMinSize|'
+        r'offset|border|spacedBy)\s*\([^)]*?(?<![\w.])(\d+(?:\.\d+)?)\s*\.dp')
     ALLOW = {"0", "1", "0.0", "1.0", "2"}   # hairlines, zero, and a 2px focus ring
     problems: list[str] = []
     n = 0
@@ -792,17 +833,68 @@ def guard_authored_uses_tokens() -> str:
                 if RGB.search(code):
                     problems.append(f"{p.relative_to(ROOT)}:{i}: a colour built "
                                     f"from components rather than from a token")
-                for m in SIZED.finditer(code):
-                    if m.group(2) not in ALLOW:
-                        problems.append(
-                            f"{p.relative_to(ROOT)}:{i}: the literal size "
-                            f"{m.group(2)} on .{m.group(1)} — use a token")
+                for pattern, unit in ((SIZED, ""), (SIZED_DP, ".dp")):
+                    for m in pattern.finditer(code):
+                        if m.group(2) not in ALLOW:
+                            problems.append(
+                                f"{p.relative_to(ROOT)}:{i}: the literal size "
+                                f"{m.group(2)}{unit} on .{m.group(1)} — use a token")
     if problems:
         raise BuildError(
             "authored source carries values nobody measured:\n  "
             + "\n  ".join(problems[:25])
             + (f"\n  ... and {len(problems) - 25} more" if len(problems) > 25 else ""))
     return f"{n} authored source file(s) carry no literal colour and no literal size"
+
+
+def guard_pattern_contract() -> str:
+    """The same eight patterns on Apple and on Android, and the registry's count.
+
+    Deliberately narrower than guard_component_contract, and it does NOT restate
+    the name table. scripts/check_patterns.py owns the mapping from a card's prose
+    name to a file stem on each platform, because that mapping spans three folders
+    and belongs to none of them. Restating it here would be a second source of
+    truth for the one thing hardest to keep in step.
+
+    What is left is what this build is entitled to assert without that table: the
+    two native platforms carry the same set of stems, and there are as many of them
+    as the registry says there are patterns. Set equality needs no mapping, and it
+    is the half that catches the failure that actually happens — a screen written
+    for one platform and forgotten on the other.
+    """
+    reg = json.loads((ROOT / "08_components" / "_cards.json").read_text())
+    counts = reg.get("counts", {}) if isinstance(reg, dict) else {}
+    want = counts.get("Patterns")
+    if want is None:
+        raise BuildError("08_components/_cards.json declares no Patterns count")
+
+    def stems(root: Path, suffix: str) -> set[str]:
+        if not root.is_dir():
+            return set()
+        # `Patterns` is the module's front door on both platforms, not a pattern.
+        # Named rather than pattern-matched, so a file called PatternsHelper does
+        # not slip through by prefix.
+        return {p.stem for p in root.glob(f"*{suffix}") if p.stem != "Patterns"}
+
+    apple = stems(APPLE / "Sources" / "AnindaExamples", ".swift")
+    android = stems(
+        ANDROID / "patterns" / "src" / "main" / "kotlin" / "studio" / "aninda"
+        / "patterns", ".kt")
+
+    only_apple = sorted(apple - android)
+    only_android = sorted(android - apple)
+    if only_apple or only_android:
+        lines = [f"{s}: on Apple and not on Android" for s in only_apple]
+        lines += [f"{s}: on Android and not on Apple" for s in only_android]
+        raise BuildError("the patterns disagree between the two platforms:\n  "
+                         + "\n  ".join(lines))
+    if len(apple) != want:
+        raise BuildError(
+            f"08_components/_cards.json declares {want} patterns and each platform "
+            f"carries {len(apple)}: {', '.join(sorted(apple)) or 'none'}")
+    return (f"{len(apple)} SwiftUI patterns and {len(android)} Compose patterns, the "
+            f"same {len(apple)} names on both, matching the {want} pattern cards in "
+            f"08_components/_cards.json")
 
 
 def guard_component_contract() -> str:
@@ -895,6 +987,17 @@ let package = Package(
         .library(name: "AnindaTokens", targets: ["AnindaTokens"]),
         .library(name: "AnindaTokensUI", targets: ["AnindaTokensUI"]),
         .library(name: "AnindaComponents", targets: ["AnindaComponents"]),
+        // The patterns are a product for a MECHANICAL reason, not a change of
+        // heart about coupling. xcodebuild generates schemes from products, so a
+        // target that is not one can only ever be compiled for whatever platform
+        // `swift build` happens to run on — and eight page compositions are
+        // exactly the code that breaks on availability. Without this line the
+        // patterns would be checked for macOS and for nothing else.
+        //
+        // A product does not couple anything: a caller depending on
+        // AnindaComponents never resolves AnindaExamples. The opt-in the target
+        // boundary expresses is unchanged.
+        .library(name: "AnindaExamples", targets: ["AnindaExamples"]),
     ],
     targets: [
         // GENERATED, and framework-free on purpose. It imports nothing, so it
@@ -1017,16 +1120,55 @@ valid Swift and would pass every compiler.
   `UIPasteboard` both are, and both reached this package before anything caught
   them. The macos-15 job in CI is the only place the other four are compiled, which
   makes it the one gate here that CI proves and a local run cannot.
-- **The Compose sources are compiled against a DECLARED SURFACE, not androidx.**
-  The Android SDK is not installed. Compiling against `compose/stubs` proves the
-  Kotlin parses, that every name and arity is consistent, that the token constants
-  exist and are the right type, and — because the stubbed `ColorScheme` takes all
-  48 parameters with no defaults — that not one Material role was forgotten. It
-  does not prove the code compiles against androidx. A stub can differ from the
-  library it imitates, and if it does, this gate passes and a real build fails.
-- **No pattern is implemented.** `AnindaExamples` is a placeholder. The eight
-  patterns are page compositions rather than components, and they are the part of
-  the approved scope that is not done.
+- **The Compose sources are compiled against a DECLARED SURFACE, not androidx,
+  and that surface got three times bigger on 27 August 2026.** The Android SDK is
+  not installed. Compiling against `compose/stubs` proves the Kotlin parses, that
+  every name and arity is consistent, that the token constants exist and are the
+  right type, and — because the stubbed `ColorScheme` takes all 48 parameters with
+  no defaults — that not one Material role was forgotten. It does not prove the
+  code compiles against androidx. A stub can differ from the library it imitates,
+  and if it does, this gate passes and a real build fails.
+
+  That last sentence now carries more weight than it did. The surface was eight
+  files when it declared little beyond `ColorScheme`, whose 48 parameters are READ
+  from the derivation and therefore cannot drift. Carrying eight page compositions
+  took it to twelve files, and the added declarations — `OutlinedTextField`,
+  `Modifier`, the layout scopes — are hand-typed signatures whose fidelity rests on
+  somebody having copied them correctly. Two of them were WRONG on the first
+  attempt, and the compile caught both: `heading()` was declared as a member where
+  androidx has an extension function, and `Arrangement.spacedBy` returned a
+  horizontal-only type where androidx returns one that is both. A stub that refuses
+  valid code is as much a fault as one that accepts invalid code.
+
+  What bounds it: every stub file names the artifact and version its declarations
+  were read from, so a divergence is attributable and dated; and a pattern may use
+  only a Material composable corresponding to one of the sixteen component cards,
+  which is why there is no icon set, no navigation library and no `LazyColumn`
+  here. **The real fix is not a better stub.** `ubuntu-24.04` carries the Android
+  SDK, so a Gradle job compiling against real androidx would replace this gate
+  rather than reinforce it. That is not built.
+- **The patterns are compiled for five platforms and laid out for none.** Eight
+  screens exist on both native platforms and every one of them compiles, but a
+  compile is not a layout. Nothing here has measured a pattern on a screen, and
+  watchOS and tvOS get the same composition as a desktop with no compact variant.
+  The web card for Docs page is two columns where the Compose screen is one, because
+  Compose has no `ViewThatFits` and branching on width needs a dependency this
+  module does not carry.
+- **The patterns' accessibility is written, not measured.** Headings are marked,
+  the pricing cards carry content descriptions, and the validation summary merges
+  its descendants so a count is announced as one thing. None of that is verified by
+  anything: the thirty web cards are measured in a real browser, and the native
+  equivalent does not exist. The SwiftUI validation summary is marked
+  `.updatesFrequently`, which tells VoiceOver an element changes and does NOT
+  announce the change — a real live region needs an announcement posted when the
+  count moves, and that belongs to whatever owns the submit.
+- **Type in Compose is Material's slots, and the mono face is missing.**
+  `kotlin_tokens()` emits no `AnindaType`, so `Typography.kt` carries fifteen
+  literal `sp` figures and a Compose caller cannot ask for the monospace family
+  without writing a literal the token guard would refuse. The code sample on the
+  Docs page screen is therefore set in the body face. The size guard was extended
+  on 27 August 2026 to catch `padding(16.dp)`, which it had never seen — but
+  deliberately not `.sp`, because that would fail a file for a gap in the emitter.
 - **No rendered measurement.** Every contrast figure the native layer carries was
   computed from the same rounded 8-bit hexes the stylesheet uses, under the same
   worst-case sweep. No native pixel has been read. The browser harness measures
@@ -1086,6 +1228,7 @@ def main(argv: list[str]) -> int:
             guard_no_framework_imports(files),
             guard_authored_uses_tokens(),
             guard_component_contract(),
+            guard_pattern_contract(),
             guard_deprecated_names(files),
             guard_values_match_source(files, data),
         ]
@@ -1095,7 +1238,7 @@ def main(argv: list[str]) -> int:
                 if name == "swift":
                     # Only after the package is known to build for the host. There
                     # is no sense asking about watchOS while macOS is broken.
-                    notes.append(compile_swift_platforms(APPLE))
+                    notes.append(compile_swift_platforms(files))
             except NotEquipped:
                 if name in required:
                     raise
@@ -1192,15 +1335,177 @@ def compose_stubs(data: dict) -> dict[str, str]:
     15_native/_proof/material3.roles.json, which took it from ColorScheme.kt on
     androidx-main. So the stub cannot drift from the list the derivation used, and
     a Material release that adds a role changes both together or neither.
+
+    HOW BIG THIS IS ALLOWED TO GET, AND WHY THAT MATTERS
+    ====================================================
+    This surface tripled on 27 August 2026 to carry the eight patterns, and that
+    weakens it. When it declared little more than ColorScheme, its strongest claim
+    was EARNED: those 48 parameters are read from the derivation, so they cannot
+    drift. Nothing about a hand-typed OutlinedTextField signature is earned. The
+    more of Compose is declared here, the more of this gate rests on somebody
+    having copied a signature correctly.
+
+    Two things bound it. Every file carries the artifact and version its
+    declarations were read from, so a divergence is attributable and dated rather
+    than anonymous. And the patterns may use ONLY a Material composable
+    corresponding to one of the sixteen component cards, plus layout, text, state
+    and semantics primitives — which is why there is no LazyColumn, no icon set and
+    no navigation here. A screen that needs something else needs a component, and
+    the component library is where that goes.
+
+    Provenance is per PACKAGE rather than per declaration, because that is the
+    granularity artifact coordinates actually have. Repeating one artifact string
+    beside every signature would look like more evidence than it is.
     """
+    # What these declarations were read from. Named once so every file says it, and
+    # so a version bump is one edit rather than fourteen.
+    SOURCE = ("compose-bom 1.4.0 (stable, 12 August 2026) — "
+              "androidx.compose.material3 1.4.0, androidx.compose.foundation 1.4.0, "
+              "androidx.compose.ui 1.4.0. Read 27 August 2026.")
     params = data["material3"]["constructor"]["order"]
     args = ",\n".join(f"    public val {p}: Color" for p in params)
     banner = (f"// {GENERATED}\n//\n// A DECLARED SURFACE, not androidx. See "
               f"compose_stubs() in 15_native/build.py\n// for what compiling "
-              f"against this does and does not prove.\n"
+              f"against this does and does not prove.\n//\n"
+              f"// Declarations read from: {SOURCE}\n"
               f'@file:Suppress("unused", "UNUSED_PARAMETER")\n\n')
 
     files: dict[str, str] = {}
+
+    # Modifier is an interface with a companion that IS one, which is what makes
+    # `Modifier.padding(...)` read as a chain starting from nothing.
+    files["ui.kt"] = banner + """package androidx.compose.ui
+
+public interface Modifier {
+    public companion object : Modifier
+}
+
+// Alignment's nested types are separate on purpose: Row takes a Vertical and
+// Column takes a Horizontal, and mixing them up is a compile error in androidx
+// too. A single flat Alignment type would accept both and prove less.
+public class Alignment {
+    public class Vertical
+    public class Horizontal
+    public companion object {
+        public val Top: Vertical = Vertical()
+        public val CenterVertically: Vertical = Vertical()
+        public val Bottom: Vertical = Vertical()
+        public val Start: Horizontal = Horizontal()
+        public val CenterHorizontally: Horizontal = Horizontal()
+        public val End: Horizontal = Horizontal()
+    }
+}
+"""
+
+    files["semantics.kt"] = banner + """package androidx.compose.ui.semantics
+
+import androidx.compose.ui.Modifier
+
+// A heading announced as one. The web cards are MEASURED for this; these screens
+// are not measured for it by anything, which is stated in LIMITS.md rather than
+// implied by the declaration existing.
+public class SemanticsPropertyReceiver {
+    public var contentDescription: String = ""
+    public var stateDescription: String = ""
+    public var role: Role? = null
+}
+
+// An extension function at package level, which is how androidx declares it — so
+// it is IMPORTED rather than reached through the receiver. Declaring it as a
+// member compiled here and would have failed against the real library.
+public fun SemanticsPropertyReceiver.heading() { }
+
+public class Role {
+    public companion object {
+        public val Button: Role = Role()
+        public val Checkbox: Role = Role()
+        public val RadioButton: Role = Role()
+        public val Tab: Role = Role()
+    }
+}
+
+public fun Modifier.semantics(
+    mergeDescendants: Boolean = false,
+    properties: SemanticsPropertyReceiver.() -> Unit,
+): Modifier = this
+
+public fun Modifier.clearAndSetSemantics(
+    properties: SemanticsPropertyReceiver.() -> Unit,
+): Modifier = this
+"""
+
+    files["layout.kt"] = banner + """package androidx.compose.foundation.layout
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+
+public class PaddingValues(public val all: Dp)
+
+// Horizontal and Vertical are INTERFACES and spacedBy returns a type implementing
+// both, which is androidx's own shape. Declaring them as classes made
+// `Column(verticalArrangement = Arrangement.spacedBy(...))` a type error here while
+// being perfectly correct against the real library — a stub failing valid code is
+// as much a fault as one accepting invalid code.
+public class Arrangement {
+    public interface Horizontal
+    public interface Vertical
+    public interface HorizontalOrVertical : Horizontal, Vertical
+    public companion object {
+        public val Start: Horizontal = object : Horizontal {}
+        public val End: Horizontal = object : Horizontal {}
+        public val Center: HorizontalOrVertical = object : HorizontalOrVertical {}
+        public val SpaceBetween: HorizontalOrVertical = object : HorizontalOrVertical {}
+        public val Top: Vertical = object : Vertical {}
+        public val Bottom: Vertical = object : Vertical {}
+        public fun spacedBy(space: Dp): HorizontalOrVertical =
+            object : HorizontalOrVertical {}
+    }
+}
+
+public fun Modifier.padding(all: Dp): Modifier = this
+public fun Modifier.padding(horizontal: Dp, vertical: Dp): Modifier = this
+public fun Modifier.fillMaxWidth(fraction: Float = 1f): Modifier = this
+public fun Modifier.fillMaxSize(fraction: Float = 1f): Modifier = this
+public fun Modifier.width(width: Dp): Modifier = this
+public fun Modifier.height(height: Dp): Modifier = this
+public fun Modifier.heightIn(min: Dp): Modifier = this
+public fun Modifier.widthIn(min: Dp): Modifier = this
+public fun Modifier.defaultMinSize(minWidth: Dp, minHeight: Dp): Modifier = this
+public fun Modifier.size(size: Dp): Modifier = this
+
+// weight lives INSIDE the scopes, exactly as it does in androidx. That is what
+// makes a weighted cell a compile error outside a Row or a Column, and it is the
+// whole reason a table of Rows works at all.
+public interface ColumnScope { public fun Modifier.weight(weight: Float): Modifier }
+public interface RowScope { public fun Modifier.weight(weight: Float): Modifier }
+
+@Composable
+public fun Column(
+    modifier: Modifier = Modifier,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    content: @Composable ColumnScope.() -> Unit,
+) { }
+
+@Composable
+public fun Row(
+    modifier: Modifier = Modifier,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    content: @Composable RowScope.() -> Unit,
+) { }
+
+@Composable
+public fun Box(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) { }
+
+@Composable
+public fun Spacer(modifier: Modifier = Modifier) { }
+"""
 
     files["runtime.kt"] = banner + """package androidx.compose.runtime
 
@@ -1236,6 +1541,27 @@ public fun CompositionLocalProvider(
     vararg values: Pair<ProvidableCompositionLocal<*>, Any?>,
     content: @Composable () -> Unit,
 ) { }
+
+// State. `by remember { mutableStateOf(x) }` is how every one of the eight
+// patterns holds its own field values, so the delegation operators have to be
+// here or the `by` refuses to compile.
+public interface State<out T> { public val value: T }
+public interface MutableState<T> : State<T> { public override var value: T }
+
+public fun <T> mutableStateOf(value: T): MutableState<T> = object : MutableState<T> {
+    override var value: T = value
+}
+
+@Composable
+public fun <T> remember(calculation: () -> T): T = calculation()
+
+@Composable
+public fun <T> remember(key1: Any?, calculation: () -> T): T = calculation()
+
+public operator fun <T> State<T>.getValue(thisObj: Any?, property: Any?): T = value
+public operator fun <T> MutableState<T>.setValue(
+    thisObj: Any?, property: Any?, value: T,
+) { this.value = value }
 """
 
     files["graphics.kt"] = banner + """package androidx.compose.ui.graphics
@@ -1272,6 +1598,17 @@ public class FontWeight(public val weight: Int) {
 }
 """
 
+    files["textalign.kt"] = banner + """package androidx.compose.ui.text.style
+
+public class TextAlign {
+    public companion object {
+        public val Start: TextAlign = TextAlign()
+        public val Center: TextAlign = TextAlign()
+        public val End: TextAlign = TextAlign()
+    }
+}
+"""
+
     files["text.kt"] = banner + """package androidx.compose.ui.text
 
 import androidx.compose.ui.text.font.FontFamily
@@ -1295,18 +1632,40 @@ public class RoundedCornerShape(public val radius: Dp)
 
     files["foundation.kt"] = banner + """package androidx.compose.foundation
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 
 @Composable
 public fun isSystemInDarkTheme(): Boolean = false
+
+public class ScrollState(public val initial: Int)
+
+@Composable
+public fun rememberScrollState(initial: Int = 0): ScrollState = ScrollState(initial)
+
+public fun Modifier.verticalScroll(state: ScrollState): Modifier = this
+public fun Modifier.background(color: Color): Modifier = this
+public fun Modifier.background(color: Color, shape: RoundedCornerShape): Modifier = this
+public fun Modifier.border(width: Dp, color: Color): Modifier = this
+public fun Modifier.border(width: Dp, color: Color, shape: RoundedCornerShape): Modifier = this
+public fun Modifier.clip(shape: RoundedCornerShape): Modifier = this
 """
 
     files["material3.kt"] = banner + """package androidx.compose.material3
 
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 
 // Every parameter, and NO defaults. That is the completeness gate: a role left out
 // is a compile error rather than Material's baseline purple shipped in silence.
@@ -1341,6 +1700,137 @@ public fun MaterialTheme(
     typography: Typography,
     shapes: Shapes,
     content: @Composable () -> Unit,
+) { }
+
+// A function and an object may share a name in Kotlin, which is exactly how
+// androidx declares this: MaterialTheme(...) wraps a tree, MaterialTheme.colorScheme
+// reads out of it. The object is the ONLY way a Compose pattern takes a type size
+// or a colour without writing a literal, so without it the authored screens could
+// not satisfy guard_authored_uses_tokens() at all.
+//
+// The getters throw. A declared surface has no values in it — these resolve types,
+// and the compile never runs them. Returning a constructed ColorScheme would mean
+// typing 48 placeholder colours, which reads like data and is not.
+public object MaterialTheme {
+    private const val SURFACE = "declared surface: types only, no values"
+    public val colorScheme: ColorScheme @Composable get() = error(SURFACE)
+    public val typography: Typography @Composable get() = error(SURFACE)
+    public val shapes: Shapes @Composable get() = error(SURFACE)
+}
+
+// ---------------------------------------------------------------------------
+// The composables the eight patterns use.
+//
+// One per component card, and no more. There is no LazyColumn (the screens are
+// fixed-length examples, so a Column and a forEach is enough and halves this
+// file), no Icons (a separate artifact, and stubbing an icon set proves nothing),
+// and no navigation. A pattern that needs something else needs a COMPONENT, and
+// the component library is where that goes.
+// ---------------------------------------------------------------------------
+
+@Composable
+public fun Text(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color? = null,
+    style: TextStyle? = null,
+    textAlign: TextAlign? = null,
+    maxLines: Int = Int.MAX_VALUE,
+) { }
+
+@Composable
+public fun Button(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    content: @Composable RowScope.() -> Unit,
+) { }
+
+@Composable
+public fun OutlinedButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    content: @Composable RowScope.() -> Unit,
+) { }
+
+@Composable
+public fun TextButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    content: @Composable RowScope.() -> Unit,
+) { }
+
+@Composable
+public fun OutlinedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: (@Composable () -> Unit)? = null,
+    supportingText: (@Composable () -> Unit)? = null,
+    isError: Boolean = false,
+    singleLine: Boolean = false,
+    minLines: Int = 1,
+    readOnly: Boolean = false,
+) { }
+
+@Composable
+public fun Checkbox(
+    checked: Boolean,
+    onCheckedChange: ((Boolean) -> Unit)?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) { }
+
+@Composable
+public fun RadioButton(
+    selected: Boolean,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) { }
+
+@Composable
+public fun Card(
+    modifier: Modifier = Modifier,
+    shape: RoundedCornerShape? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) { }
+
+@Composable
+public fun Surface(
+    modifier: Modifier = Modifier,
+    shape: RoundedCornerShape? = null,
+    color: Color? = null,
+    contentColor: Color? = null,
+    border: Dp? = null,
+    content: @Composable () -> Unit,
+) { }
+
+@Composable
+public fun HorizontalDivider(
+    modifier: Modifier = Modifier,
+    thickness: Dp? = null,
+    color: Color? = null,
+) { }
+
+@Composable
+public fun TabRow(
+    selectedTabIndex: Int,
+    modifier: Modifier = Modifier,
+    containerColor: Color? = null,
+    contentColor: Color? = null,
+    tabs: @Composable () -> Unit,
+) { }
+
+@Composable
+public fun Tab(
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    text: (@Composable () -> Unit)? = null,
 ) { }
 """
     return files

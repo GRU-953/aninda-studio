@@ -102,6 +102,15 @@ public enum AnindaFont {
                                         relativeTo: .title) }
     public static var h1: Font { scaled(AnindaType.h1 * AnindaType.rootPoints,
                                         relativeTo: .largeTitle) }
+
+    /// The largest step, for a page that has one thing to say.
+    ///
+    /// `relativeTo: .largeTitle` like `h1`, because that is the largest text style
+    /// Apple defines and there is nothing above it to be relative to. The two
+    /// therefore scale together under Dynamic Type, which is correct: they are two
+    /// sizes of the same role, not two roles.
+    public static var display: Font { scaled(AnindaType.display * AnindaType.rootPoints,
+                                             relativeTo: .largeTitle) }
 }
 
 /// Motion, and what a reduced-motion preference does to it.
