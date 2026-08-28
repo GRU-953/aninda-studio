@@ -1207,28 +1207,98 @@ def build_files(data: dict) -> dict[Path, str]:
     return f
 
 
-# Notes that report THIS RUN rather than a property of the layer. They are
-# printed and they are NOT written into LIMITS.md, because that file is committed
-# and diffed byte for byte: a note naming "Apple Swift version 6.3.3
-# (swiftlang-6.3.3.1.3 clang-2100.1.1.101)" or "(JRE 26.0.2)" cannot match on a
-# runner with a different toolchain, and the platform note is DIFFERENT BY DESIGN
-# on a machine with all five SDKs — which is the macos-15 job, the one place the
-# other four platforms are compiled at all.
+# WHICH NOTES REACH LIMITS.md — AND THE RULE IS AN ALLOW-LIST, NOT A DENY-LIST.
 #
-# CI found this twice in one afternoon: both native jobs failed with
-# "15_native/LIMITS.md differs from the build" while every gate inside them passed.
-# The compile record belongs on stdout, where it is read once by whoever ran it.
-RUN_SPECIFIC = ("builds and tests with", "compile with kotlinc",
-                "build for", "NOT COMPILED HERE", "xcodebuild is absent")
+# LIMITS.md is committed and diffed byte for byte, so a note that reports THIS RUN
+# rather than a property of the layer makes the file undiffable. A note naming
+# "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)" or
+# "(JRE 26.0.2)" cannot match on a runner with a different toolchain, and the
+# platform note is DIFFERENT BY DESIGN on a machine with all five SDKs — which is
+# the macos-15 job, the one place the other four platforms are compiled at all.
+#
+# This was a DENY-LIST of run-specific markers until 28 August 2026, and a
+# deny-list admits anything nobody thought of. The gradle gate then added two new
+# notes — one when it runs and a different one when it is not asked for — and both
+# went straight into the committed file, so LIMITS.md depended on WHICH OPTIONAL
+# TOOLCHAIN THE RUN HAPPENED TO ASK FOR. Every gate inside native-android passed
+# and the job failed on "15_native/LIMITS.md differs from the build".
+#
+# That is the fourth time this class has been found, after PNG bytes, per-file byte
+# counts in the store packages, and the guidebook citing the size of its own PDF.
+# Three of the four were caught by CI failing rather than by anything designed to
+# catch them, which is why the rule is now inverted: a note is EXCLUDED unless it
+# is named here as a property of the layer. A new note is silent by default, and
+# making it visible is a deliberate act with a reason attached.
+LAYER_NOTES = (
+    "no framework import reached",
+    "carry no literal colour and no literal size",
+    "SwiftUI components, one for each component card",
+    "SwiftUI patterns and",
+    "platform-limited API(s) are wrapped only in",
+    "no deprecated Material role name",
+    "emitted colour values re-derived and matched to their tokens",
+)
 
 
-def is_run_specific(note: str) -> bool:
-    return any(marker in note for marker in RUN_SPECIFIC)
+def is_layer_note(note: str) -> bool:
+    """True if this note describes the LAYER and not the machine that ran."""
+    return any(marker in note for marker in LAYER_NOTES)
+
+
+# Real notes, from real failures, that must never reach the committed file. Each
+# one was written into LIMITS.md at some point and each one broke a diff.
+INTRUDERS = (
+    "gradle: NOT ASKED FOR — this run did not require it, and no claim is made "
+    "that the Compose sources build against androidx",
+    "the Compose theme and the 8 patterns compile against REAL androidx with "
+    "Gradle 9.4.0 — Material 3 from the stable channel, pinned by version",
+    "30 file Swift package builds and tests with Apple Swift version 6.3.3 "
+    "(swiftlang-6.3.3.1.3 clang-2100.1.1.101)",
+    "2 framework-free Kotlin file(s) compile with kotlinc-jvm 2.4.10 (JRE 26.0.2.1)",
+    "components and patterns build for macOS — NOT COMPILED HERE for iOS",
+    "xcodebuild is absent",
+)
+
+
+def guard_limits_is_run_independent(notes: list[str]) -> str:
+    """LIMITS.md is the same bytes whatever this machine happened to have.
+
+    The rule it enforces is the one this repository has now learned four times:
+    A COMMITTED GENERATED FILE MUST NOT RECORD THE MACHINE THAT WROTE IT. PNG
+    bytes, per-file byte counts in the store packages, compiler versions here, and
+    the guidebook citing the size of its own PDF — four instances, and every one
+    of them found by a diff failing rather than by anything looking for it.
+
+    This looks for it. It renders LIMITS.md twice: once from the notes this run
+    actually produced, and once from those notes plus every note known to describe
+    a machine rather than the layer. If the two differ, a run-specific fact is
+    reaching the committed file, and it would fail on the next runner with a
+    different toolchain instead of here.
+
+    It is cheap and it writes nothing, which is why it can run on every build. It
+    does NOT prove the wider rule for other generators — only for this one file.
+    """
+    clean = limits(notes)
+    noisy = limits(list(notes) + list(INTRUDERS))
+    if clean != noisy:
+        extra = [n for n in INTRUDERS if is_layer_note(n)]
+        raise BuildError(
+            "LIMITS.md changes when a run-specific note is added, so it records "
+            "the machine that wrote it and cannot be diffed on another.\n  "
+            + ("These are being admitted by LAYER_NOTES and should not be:\n    "
+               + "\n    ".join(n[:88] for n in extra)
+               if extra else
+               "No INTRUDER matched LAYER_NOTES, so the difference is elsewhere in "
+               "limits() — something outside the notes list depends on the run."))
+    return (f"LIMITS.md is unchanged by {len(INTRUDERS)} run-specific notes, so it "
+            f"does not record the machine that wrote it")
 
 
 def limits(notes: list[str]) -> str:
-    # Only the notes that are true of the LAYER, not of the machine.
-    notes = [n for n in notes if not is_run_specific(n)]
+    # Only the notes that are true of the LAYER, not of the machine. Anything not
+    # declared in LAYER_NOTES is dropped, INCLUDING a note nobody has classified
+    # yet — which is the whole point of an allow-list.
+    notes = [n for n in notes if is_layer_note(n)]
     return f"""<!-- {GENERATED} -->
 
 # What the native layer proves, and what it does not
@@ -1448,6 +1518,11 @@ def main(argv: list[str]) -> int:
                     raise
                 notes.append(f"{name}: NOT COMPILED HERE — this run did not require "
                              f"it, and no claim is made that it builds")
+
+        # Last, because it needs the finished notes list — and INSIDE the try, so
+        # a failure prints the same refusal every other gate here prints instead
+        # of a traceback.
+        notes.append(guard_limits_is_run_independent(notes))
     except NotEquipped as exc:
         print(f"NOT EQUIPPED: {exc}", file=sys.stderr)
         return 2

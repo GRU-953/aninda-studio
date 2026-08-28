@@ -15,7 +15,6 @@ give.
 - 2 platform-limited API(s) are wrapped only in apple/Sources/AnindaTokensUI/Theme.swift, and every component calls the wrapper rather than the API
 - no deprecated Material role name is used as a token name in the 3 files that define tokens
 - 160 emitted colour values re-derived and matched to their tokens
-- gradle: NOT ASKED FOR — this run did not require it, and no claim is made that the Compose sources build against androidx
 
 The compile record — which compilers ran, at which versions, and which platforms
 this machine could build for — is printed by the build and deliberately not
