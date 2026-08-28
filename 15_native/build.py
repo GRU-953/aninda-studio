@@ -1303,15 +1303,23 @@ valid Swift and would pass every compiler.
   which is why there is no icon set, no navigation library and no `LazyColumn`
   here.
 
-  **A Gradle gate now checks that code against the real library, and it is not
-  passing yet.** On `ubuntu-24.04` it resolves androidx — Material 3 from the
-  stable channel by way of `compose-bom` — and compiles `:compose` and
-  `:patterns`. As of 28 August 2026 the theme compiles and THE PATTERNS DO NOT:
-  `:patterns:compileReleaseKotlin` fails against the real library while passing
-  against the declared surface, which is the exact discrepancy this gate was built
-  to find and the reason it was worth building. The specific errors are not yet
-  fixed, and the gate lives on the `compose-against-androidx` branch rather than
-  on `main` for that reason.
+  **A Gradle gate checks that code against the real library, and it has already
+  paid for itself.** On `ubuntu-24.04` it resolves androidx — Material 3 from the
+  stable channel by way of `compose-bom` — and compiles `:compose` and `:patterns`.
+
+  On 28 August 2026 the theme compiled and THE PATTERNS DID NOT. Four errors, all
+  one class: `stateDescription`, `role` and `contentDescription` were declared as
+  MEMBERS of `SemanticsPropertyReceiver` in the stub, and androidx declares every
+  one of them as an extension property at package level — so the real library needs
+  an import per property and the stub needed none. The note under `heading()` in
+  that same file had said exactly this, about exactly this receiver, and had been
+  applied to one declaration out of four.
+
+  Both halves are fixed. The three declarations are extensions now, so the LOCAL
+  kotlinc compile reproduces the failure that used to need a CI run — same files,
+  same line and column — and the five missing imports are in. That is the whole
+  value of the gate: not that it found four typos, but that it moved a class of
+  error off a remote runner and onto the machine the code is written on.
 
   The stub is what a machine without the Android SDK can run; the Gradle gate is
   what says whether the code actually builds. Where the two disagree, the Gradle
@@ -1597,19 +1605,51 @@ public class Alignment {
 
 import androidx.compose.ui.Modifier
 
+// The receiver carries NOTHING. Every semantics property androidx defines is an
+// EXTENSION at package level, so each one is imported separately — and a screen
+// that forgets an import does not compile.
+//
+// contentDescription, stateDescription and role were MEMBERS of this class until
+// 28 August 2026, which meant they needed no import and the receiver resolved them
+// for free. The note under heading() already said, twelve lines below, exactly why
+// that is wrong; it was written for heading() and not applied upward.
+//
+// The real library refused all three: GitHub Actions run 33118789482, job
+// native-android, four errors and no others —
+//
+//   e: patterns/.../FormWithValidation.kt:86:25 Unresolved reference 'stateDescription'.
+//   e: patterns/.../FormWithValidation.kt:159:57 Unresolved reference 'role'.
+//   e: patterns/.../Pricing.kt:70:25 Unresolved reference 'contentDescription'.
+//   e: patterns/.../Settings.kt:75:57 Unresolved reference 'role'.
+//
+// Correcting them here moves that failure OFF a remote branch gate and onto the
+// local kotlinc compile, which is the whole point: a surface that accepts what the
+// library refuses is worse than no surface, because it reports success.
+public class SemanticsPropertyReceiver
+
 // A heading announced as one. The web cards are MEASURED for this; these screens
 // are not measured for it by anything, which is stated in LIMITS.md rather than
 // implied by the declaration existing.
-public class SemanticsPropertyReceiver {
-    public var contentDescription: String = ""
-    public var stateDescription: String = ""
-    public var role: Role? = null
-}
-
-// An extension function at package level, which is how androidx declares it — so
-// it is IMPORTED rather than reached through the receiver. Declaring it as a
-// member compiled here and would have failed against the real library.
+//
+// An extension at package level, which is how androidx declares it — so it is
+// IMPORTED rather than reached through the receiver. Declaring it as a member
+// compiled here and would have failed against the real library.
 public fun SemanticsPropertyReceiver.heading() { }
+
+// The three that were members. An extension property can carry no backing field,
+// so each states a getter and a setter that do nothing; this surface exists to be
+// compiled against and never to run.
+public var SemanticsPropertyReceiver.contentDescription: String
+    get() = ""
+    set(value) { }
+
+public var SemanticsPropertyReceiver.stateDescription: String
+    get() = ""
+    set(value) { }
+
+public var SemanticsPropertyReceiver.role: Role
+    get() = Role.Button
+    set(value) { }
 
 public class Role {
     public companion object {

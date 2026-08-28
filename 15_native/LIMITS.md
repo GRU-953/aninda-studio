@@ -79,15 +79,23 @@ valid Swift and would pass every compiler.
   which is why there is no icon set, no navigation library and no `LazyColumn`
   here.
 
-  **A Gradle gate now checks that code against the real library, and it is not
-  passing yet.** On `ubuntu-24.04` it resolves androidx — Material 3 from the
-  stable channel by way of `compose-bom` — and compiles `:compose` and
-  `:patterns`. As of 28 August 2026 the theme compiles and THE PATTERNS DO NOT:
-  `:patterns:compileReleaseKotlin` fails against the real library while passing
-  against the declared surface, which is the exact discrepancy this gate was built
-  to find and the reason it was worth building. The specific errors are not yet
-  fixed, and the gate lives on the `compose-against-androidx` branch rather than
-  on `main` for that reason.
+  **A Gradle gate checks that code against the real library, and it has already
+  paid for itself.** On `ubuntu-24.04` it resolves androidx — Material 3 from the
+  stable channel by way of `compose-bom` — and compiles `:compose` and `:patterns`.
+
+  On 28 August 2026 the theme compiled and THE PATTERNS DID NOT. Four errors, all
+  one class: `stateDescription`, `role` and `contentDescription` were declared as
+  MEMBERS of `SemanticsPropertyReceiver` in the stub, and androidx declares every
+  one of them as an extension property at package level — so the real library needs
+  an import per property and the stub needed none. The note under `heading()` in
+  that same file had said exactly this, about exactly this receiver, and had been
+  applied to one declaration out of four.
+
+  Both halves are fixed. The three declarations are extensions now, so the LOCAL
+  kotlinc compile reproduces the failure that used to need a CI run — same files,
+  same line and column — and the five missing imports are in. That is the whole
+  value of the gate: not that it found four typos, but that it moved a class of
+  error off a remote runner and onto the machine the code is written on.
 
   The stub is what a machine without the Android SDK can run; the Gradle gate is
   what says whether the code actually builds. Where the two disagree, the Gradle
